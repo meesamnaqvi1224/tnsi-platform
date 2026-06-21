@@ -1,0 +1,22 @@
+{
+  "name": "@tnsi/config",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./typescript/base.json": "./typescript/base.json",
+    "./typescript/nextjs.json": "./typescript/nextjs.json",
+    "./eslint": "./eslint/base.mjs",
+    "./prettier": "./prettier/index.js"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.17.0",
+    "typescript-eslint": "^8.19.0",
+    "prettier-plugin-tailwindcss": "^0.6.9",
+    "globals": "^15.14.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9",
+    "prettier": "^3",
+    "typescript": "^5"
+  }
+}

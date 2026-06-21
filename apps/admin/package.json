@@ -1,0 +1,6 @@
+{
+  "name": "@tnsi/admin",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Reserved workspace member for the internal back-office app."
+}

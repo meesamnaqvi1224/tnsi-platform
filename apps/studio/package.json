@@ -1,0 +1,6 @@
+{
+  "name": "@tnsi/studio",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Reserved workspace member for the standalone Sanity Studio app."
+}
