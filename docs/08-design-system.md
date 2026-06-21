@@ -1,7 +1,12 @@
 # 08 — Design System
 
-> Status: Phase 3 complete (foundation). Visual/brand identity is still
-> pending `docs/02-brand-strategy.md`.
+> Status: Phase 3 foundation complete and committed. Brand identity is now
+> decided (see [02-brand-strategy.md](./02-brand-strategy.md)) but **not
+> yet reflected in code** — `packages/ui`'s tokens still use the neutral
+> placeholder palette and single font family described below. Updating
+> `tokens.css`/`theme.css` to the real spec is the next tracked piece of
+> work, deliberately done as a separate pass from this doc-ingestion
+> change.
 
 The design system lives in code, at [`packages/ui`](../packages/ui)
 (`@tnsi/ui`) — not in `design/`. `design/` is reserved for source design
@@ -23,11 +28,32 @@ Two layers, both under `packages/ui/src/styles/`:
   breakpoints so `rounded-*`, `shadow-*`, and `sm:`/`md:`/… utilities are
   generated from our scale.
 
-**Brand color is a placeholder.** `--brand-*` in `tokens.css` currently
-aliases the neutral (zero-chroma) ramp because `docs/02-brand-strategy.md`
-hasn't been written yet. When brand strategy is decided, only that block in
-`tokens.css` changes — no component or theme code references raw color
-values, so the actual brand hue can land without touching anything else.
+**Brand color is currently a placeholder, but the target is now known.**
+`--brand-*` in `tokens.css` aliases the neutral (zero-chroma) ramp; the
+real palette from [02-brand-strategy.md](./02-brand-strategy.md) is:
+
+- Primary: Warm Ivory, Soft White, Charcoal, Deep Slate.
+- Secondary: Warm Sand, Stone Grey, Muted Olive, Soft Taupe.
+- Accent (charts/highlights only, not UI chrome): Deep Forest Green, Muted
+  Bronze, Very Soft Blue.
+
+Typography is also decided but not yet implemented: an elegant serif
+display font (Canela / Noe Display / Cormorant Garamond / Libre
+Baskerville) paired with a modern sans body font (Inter / Manrope /
+Satoshi / General Sans) — meaning `--font-heading` should stop aliasing
+`--font-sans` once a serif is loaded via `next/font`.
+
+Because no component or theme code references raw color/font values
+directly (everything goes through the semantic `--color-*`/`--font-*`
+layer), this is purely a `tokens.css`/`theme.css` + font-loading change in
+`apps/web/src/app/layout.tsx` — no component API changes.
+
+The spacing scale this system already uses (`--space-xs` through
+`--space-4xl`, currently 8/16/24/32/48/64/96px) matches the brand spec's
+8/16/24/32/48/64/96/128 scale almost exactly; only a `--space-5xl: 8rem`
+(128px) step is missing. The radius scale does **not** match — the brand
+spec wants a simpler 4-step scale (8/12/16/24px) versus the current 7-step
+scale — that's a real change, not just an addition.
 
 ## Component inventory
 
@@ -63,8 +89,9 @@ Baseline: WCAG 2.1 AA. Concretely, in this system:
 
 ## Design-to-code workflow
 
-There are no design assets yet (`design/` is empty). Until
-`docs/02-brand-strategy.md` lands, this system is the working default:
-build screens against `@tnsi/ui` components and tokens now; when brand
-assets exist, they'll update `tokens.css`'s color ramps and any
-typography/motion tokens that need to change, not the component APIs.
+There are no design assets yet (`design/` is still empty — the brand
+strategy doc has prose/values but no Figma exports or asset files). Build
+screens against `@tnsi/ui` components and tokens now; the pending token
+update (above) only touches `tokens.css`/`theme.css` and font loading, not
+component APIs, so screens built before that update don't need rework
+afterward.

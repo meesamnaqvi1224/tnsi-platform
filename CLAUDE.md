@@ -40,3 +40,55 @@ build step.
 - Code style: Prettier (`.prettierrc`) and ESLint (`.eslintrc.json`) are the
   baseline. The ESLint config is intentionally generic (no framework plugins)
   until `apps/` has a chosen stack — extend it then, don't pre-guess it now.
+
+## Development rules
+
+Source: founding engineering handbook (ingested into `docs/01`–`docs/08`;
+this is the condensed, durable subset worth keeping front-and-center).
+
+**Always:** Server Components by default, Client Components only when
+interaction requires it; TypeScript everywhere; reusable/composable
+components over one-offs; semantic HTML; accessibility as a requirement
+(WCAG AA — see [08-design-system.md](./docs/08-design-system.md)), not an
+enhancement.
+
+**Never:** hardcode content that belongs in Sanity once `packages/cms` is
+wired up; duplicate logic across packages/apps; create unnecessary
+wrapper components; install a dependency without a documented need (see
+above); ignore TypeScript warnings; commit secrets — use environment
+variables, never hardcode keys.
+
+## Definition of done
+
+A feature is complete when it's: functional, responsive, accessible,
+SEO-ready (every page needs `seoTitle`/`seoDescription`/canonical/OG
+image/structured data — see
+[07-technical-architecture.md](./docs/07-technical-architecture.md)),
+CMS-integrated where required, type-safe, tested, documented, reviewed,
+and production-ready.
+
+## Git workflow
+
+Conventional commit prefixes: `feat:`, `fix:`, `docs:`, `refactor:`,
+`style:`, `test:`, `chore:` — scoped where useful, e.g.
+`feat(design-system): create reusable design system foundation`. Every
+pull request should be reviewed before merge once there's more than one
+contributor.
+
+## AI principles (binding once `packages/ai` is built)
+
+AI exists to support education, not replace human expertise or the
+founder. AI must never: diagnose, replace Caroline/professional support,
+or provide unsupported clinical advice — it only uses approved Institute
+content. See [07-technical-architecture.md](./docs/07-technical-architecture.md)
+for the full risk callout (moderation, escalation path, eval-before-ship);
+this needs product/legal review before `packages/ai` is built, which
+hasn't happened yet.
+
+## CRM rule
+
+Every meaningful user interaction syncs to Flowi automatically (assessment
+→ contact, newsletter → lead, webinar → pipeline, consultation →
+opportunity, programme purchase → client, membership → member). See
+[06-feature-specification.md](./docs/06-feature-specification.md) §CRM
+integration. Don't build a conversion-flow feature that skips this sync.
