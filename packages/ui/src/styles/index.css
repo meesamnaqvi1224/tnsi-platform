@@ -1,0 +1,11 @@
+/**
+ * Single CSS entry point for `@tnsi/ui`. Consuming apps import this once
+ * (after Tailwind's own `tailwindcss` import) and add an `@source` pointing
+ * at this package's `src/` so Tailwind's content scanner picks up the
+ * utility classes used inside these components.
+ */
+@import 'tw-animate-css';
+@import './tokens.css';
+@import './theme.css';
+
+@custom-variant dark (&:is(.dark *));

@@ -2,12 +2,16 @@
 
 ## Current phase
 
-This repository is in **Phase 0 — Engineering Foundation**. There is no
-application code, no chosen framework, and no installed dependencies. Do not
-scaffold an application, install packages, or write application code unless
-explicitly asked to in the current request — earlier instructions to hold off
-do not expire on their own, but also don't assume they still apply if the
-user later asks for a build step.
+See `PROJECT.md` for the authoritative phase table — this section is a
+pointer, not a duplicate, so it can't drift out of sync the way a copy would.
+As of Phase 3 (design system) completing: the framework decision is made
+(`ARCHITECTURE.md`), `apps/web` has Next.js/Tailwind/`@tnsi/ui` installed,
+and `packages/ui` has real components. Phase 4 (first application
+scaffold — actual pages/layouts) has not started. Do not build pages,
+layouts, or app-specific feature code unless explicitly asked to in the
+current request — earlier instructions to hold off don't expire on their
+own, but also don't assume they still apply if the user later asks for a
+build step.
 
 ## Repository conventions
 
