@@ -9,23 +9,21 @@ current phase, open decisions, and what's next.
 **Phase 4 — First application scaffold (next)**
 
 Engineering foundation, technical architecture (see `ARCHITECTURE.md`),
-product definition (`docs/01`–`docs/06`), and the design system foundation
-(`packages/ui`, see `docs/08-design-system.md`) are done. One known gap:
-`packages/ui`'s tokens still use a placeholder neutral palette/single font
-— the real brand spec (`docs/02-brand-strategy.md`) hasn't been applied to
-code yet (tracked as a follow-up, not blocking Phase 4). No product
-pages/layouts have been built — `apps/web` has Next.js, Tailwind, and
-`@tnsi/ui` wired up, but no screens.
+product definition (`docs/01`–`docs/06`), and the design system —
+including brand tokens (`packages/ui`, see `docs/08-design-system.md`) —
+are done. No product pages/layouts have been built — `apps/web` has
+Next.js, Tailwind, `@tnsi/ui`, and the brand typefaces wired up, but no
+screens.
 
 ## Phase history
 
-| Phase | Description                                                        | Status                                    |
-| ----- | ------------------------------------------------------------------ | ----------------------------------------- |
-| 0     | Engineering foundation (repo structure, conventions, doc skeleton) | Complete                                  |
-| 1     | Product definition (PRD, personas, business model, IA)             | Drafted (v1.0)                            |
-| 2     | Technical architecture decisions (stack, infra, data model)        | Complete                                  |
-| 3     | Design system                                                      | Foundation complete, brand tokens pending |
-| 4     | First application scaffold                                         | Not started                               |
+| Phase | Description                                                        | Status         |
+| ----- | ------------------------------------------------------------------ | -------------- |
+| 0     | Engineering foundation (repo structure, conventions, doc skeleton) | Complete       |
+| 1     | Product definition (PRD, personas, business model, IA)             | Drafted (v1.0) |
+| 2     | Technical architecture decisions (stack, infra, data model)        | Complete       |
+| 3     | Design system                                                      | Complete       |
+| 4     | First application scaffold                                         | Not started    |
 
 ## Decisions log
 
@@ -75,11 +73,38 @@ draft) were found in source files outside the repo and ingested:
   brand strategy hadn't happened yet) need a follow-up update. That's
   scoped as separate work, not done in this pass.
 
+### 2026-06-22 — Brand tokens applied to `packages/ui`
+
+- **Warm neutral ramp** replaces the zero-chroma placeholder (Soft White →
+  Charcoal); **`--deep-slate`/`--deep-slate-raised`** added as a distinct
+  cool hue for dark mode rather than just a darker warm step.
+- **Secondary palette** (`--warm-sand`/`--stone-grey`/`--muted-olive`/
+  `--soft-taupe`) and the **accent trio**
+  (`--accent-forest`/`--accent-bronze`/`--accent-blue`) added as raw
+  tokens. The accent trio is deliberately _not_ wired into any semantic
+  role — brand strategy scopes it to charts/highlights only, and nothing
+  renders a chart yet.
+- **`--brand-*` still aliases neutral** — primary actions stay ink/
+  Charcoal, not a saturated hue, per the brand doc's "Premium Through
+  Restraint" principle. This was a placeholder before; it's now a
+  confirmed decision.
+- **Radius scale simplified** from 7 steps to the brand spec's 4
+  (8/12/16/24px) — `rounded-xs` removed; updated the 3 call sites that
+  used it to `rounded-sm`.
+- **Spacing scale extended** with `--space-5xl` (128px), completing the
+  8/16/24/32/48/64/96/128 scale.
+- **Typography wired up** in `apps/web`: Inter (body) + Cormorant Garamond
+  (display, via `font-heading`) loaded through `next/font/google`. Canela/
+  Noe Display (the brand doc's first choices) aren't on Google Fonts —
+  revisit if a licensed version becomes available.
+- **Known gap, not addressed here:** `apps/web/globals.css`'s own
+  `--chart-*`/`--sidebar-*` tokens are still cold greyscale — they're
+  app-level, not part of `@tnsi/ui`, and nothing renders a chart or
+  sidebar yet.
+
 ## Open decisions
 
-- Update `packages/ui`'s `tokens.css`/`theme.css` (colors, fonts, radius
-  scale) to match `docs/02-brand-strategy.md`'s real brand spec, plus load
-  a serif display font in `apps/web` alongside the existing sans.
+None recorded yet beyond the log above.
 
 ## How to use this file
 

@@ -19,18 +19,15 @@
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 96rem;
 
-  /* Border radius scale */
+  /* Border radius scale — 8/12/16/24px per docs/02-brand-strategy.md */
   --radius-none: 0px;
-  --radius-xs: 0.25rem;
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.625rem;
-  --radius-xl: 0.875rem;
-  --radius-2xl: 1.125rem;
-  --radius-3xl: 1.375rem;
+  --radius-sm: 0.5rem; /* 8px */
+  --radius-md: 0.75rem; /* 12px */
+  --radius-lg: 1rem; /* 16px */
+  --radius-xl: 1.5rem; /* 24px */
   --radius-full: 9999px;
 
-  /* Shadows */
+  /* Shadows — brand strategy explicitly avoids heavy shadows; kept subtle */
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -40,23 +37,26 @@
 }
 
 :root {
-  --background: var(--neutral-50);
-  --foreground: var(--neutral-950);
+  /* Page background: Warm Ivory. Card/popover sit a touch brighter (Soft White). */
+  --background: var(--neutral-100);
+  --foreground: var(--neutral-900);
 
-  --card: oklch(1 0 0);
-  --card-foreground: var(--neutral-950);
-  --popover: oklch(1 0 0);
-  --popover-foreground: var(--neutral-950);
+  --card: var(--neutral-50);
+  --card-foreground: var(--neutral-900);
+  --popover: var(--neutral-50);
+  --popover-foreground: var(--neutral-900);
 
+  /* Primary action = ink (Charcoal), not a saturated hue — "Premium Through
+     Restraint" in docs/02-brand-strategy.md. */
   --primary: var(--brand-900);
   --primary-foreground: var(--neutral-50);
-  --secondary: var(--neutral-100);
-  --secondary-foreground: var(--brand-900);
+  --secondary: var(--warm-sand);
+  --secondary-foreground: var(--neutral-900);
 
   --muted: var(--neutral-100);
-  --muted-foreground: var(--neutral-500);
-  --accent: var(--neutral-100);
-  --accent-foreground: var(--brand-900);
+  --muted-foreground: var(--stone-grey);
+  --accent: var(--neutral-200);
+  --accent-foreground: var(--neutral-900);
 
   --success: var(--success-500);
   --success-foreground: oklch(0.985 0 0);
@@ -69,20 +69,22 @@
 
   --border: var(--neutral-200);
   --input: var(--neutral-200);
-  --ring: var(--neutral-400);
+  --ring: var(--stone-grey);
 }
 
 .dark {
-  --background: var(--neutral-950);
+  /* Dark-mode background is Deep Slate — a distinct cool hue, not just a
+     darker step of the warm neutral ramp. */
+  --background: var(--deep-slate);
   --foreground: var(--neutral-50);
 
-  --card: var(--neutral-900);
+  --card: var(--deep-slate-raised);
   --card-foreground: var(--neutral-50);
-  --popover: var(--neutral-900);
+  --popover: var(--deep-slate-raised);
   --popover-foreground: var(--neutral-50);
 
-  --primary: var(--brand-200);
-  --primary-foreground: var(--neutral-900);
+  --primary: var(--neutral-50);
+  --primary-foreground: var(--deep-slate);
   --secondary: var(--neutral-800);
   --secondary-foreground: var(--neutral-50);
 

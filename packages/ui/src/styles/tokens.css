@@ -4,26 +4,46 @@
  * and is what components/consumers should reference; nothing outside this file
  * should reference `--neutral-*` or `--space-*` etc. directly.
  *
- * Brand hue is intentionally NOT decided here: docs/02-brand-strategy.md is not
- * started yet, so `--brand-*` below reuses the neutral ramp (zero chroma) as a
- * safe placeholder. When brand strategy lands, only this block changes.
+ * Brand palette is decided — see docs/02-brand-strategy.md. The neutral ramp
+ * below is warm-toned (Warm Ivory → Charcoal), not a cold greyscale, and
+ * `--deep-slate` covers the brand's distinct dark-mode background hue.
+ * `--brand-*` deliberately keeps aliasing the neutral ramp rather than
+ * adopting a saturated hue: primary actions are ink/charcoal, not colorful —
+ * "Premium Through Restraint" in the brand strategy doc. The named accent
+ * trio (forest/bronze/blue) is scoped to charts/highlights only, per that
+ * doc, and is not used for UI chrome.
  */
 
 :root {
-  /* Neutral ramp — oklch, zero chroma, 50 (lightest) -> 950 (darkest) */
-  --neutral-50: oklch(0.985 0 0);
-  --neutral-100: oklch(0.97 0 0);
-  --neutral-200: oklch(0.922 0 0);
-  --neutral-300: oklch(0.87 0 0);
-  --neutral-400: oklch(0.708 0 0);
-  --neutral-500: oklch(0.556 0 0);
-  --neutral-600: oklch(0.439 0 0);
-  --neutral-700: oklch(0.371 0 0);
-  --neutral-800: oklch(0.269 0 0);
-  --neutral-900: oklch(0.205 0 0);
-  --neutral-950: oklch(0.145 0 0);
+  /* Neutral ramp — oklch, warm hue (~75°), 50 (lightest, "Soft White") -> 950 (darkest, "Charcoal") */
+  --neutral-50: oklch(0.985 0.004 75);
+  --neutral-100: oklch(0.965 0.006 75);
+  --neutral-200: oklch(0.92 0.008 72);
+  --neutral-300: oklch(0.85 0.01 70);
+  --neutral-400: oklch(0.7 0.012 68);
+  --neutral-500: oklch(0.56 0.013 65);
+  --neutral-600: oklch(0.45 0.013 60);
+  --neutral-700: oklch(0.35 0.012 55);
+  --neutral-800: oklch(0.26 0.01 50);
+  --neutral-900: oklch(0.19 0.008 50); /* Charcoal */
+  --neutral-950: oklch(0.13 0.006 50);
 
-  /* Brand ramp — placeholder, see file header */
+  /* Deep Slate — distinct cool dark hue for dark-mode surfaces, not on the warm ramp */
+  --deep-slate: oklch(0.17 0.012 250);
+  --deep-slate-raised: oklch(0.22 0.012 250);
+
+  /* Secondary palette */
+  --warm-sand: oklch(0.91 0.025 75);
+  --stone-grey: oklch(0.6 0.012 60);
+  --muted-olive: oklch(0.52 0.045 125);
+  --soft-taupe: oklch(0.8 0.018 55);
+
+  /* Accent trio — charts/highlights only, never UI chrome (see file header) */
+  --accent-forest: oklch(0.4 0.07 150);
+  --accent-bronze: oklch(0.56 0.08 55);
+  --accent-blue: oklch(0.78 0.035 235);
+
+  /* Brand ramp — aliases neutral by design, see file header */
   --brand-50: var(--neutral-50);
   --brand-100: var(--neutral-100);
   --brand-200: var(--neutral-200);
@@ -36,7 +56,7 @@
   --brand-900: var(--neutral-900);
   --brand-950: var(--neutral-950);
 
-  /* Semantic state hues — not brand identity, safe to fix now */
+  /* Semantic state hues — not brand identity, independent of the palette above */
   --success-500: oklch(0.6 0.16 145);
   --success-600: oklch(0.51 0.15 145);
   --warning-500: oklch(0.77 0.16 75);
@@ -57,6 +77,7 @@
   --space-2xl: 3rem; /* 48px */
   --space-3xl: 4rem; /* 64px */
   --space-4xl: 6rem; /* 96px */
+  --space-5xl: 8rem; /* 128px */
 
   /*
    * Border radius and shadows are NOT declared here: Tailwind v4 generates

@@ -60,7 +60,7 @@ function Toaster() {
             ) : null}
             <ToastPrimitive.Close
               aria-label="Dismiss"
-              className="absolute right-2 top-2 rounded-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="absolute right-2 top-2 rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <X className="size-4" />
             </ToastPrimitive.Close>

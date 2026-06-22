@@ -1,12 +1,9 @@
 # 08 — Design System
 
-> Status: Phase 3 foundation complete and committed. Brand identity is now
-> decided (see [02-brand-strategy.md](./02-brand-strategy.md)) but **not
-> yet reflected in code** — `packages/ui`'s tokens still use the neutral
-> placeholder palette and single font family described below. Updating
-> `tokens.css`/`theme.css` to the real spec is the next tracked piece of
-> work, deliberately done as a separate pass from this doc-ingestion
-> change.
+> Status: Phase 3 complete, including brand tokens. `packages/ui`'s
+> `tokens.css`/`theme.css` now implement the real palette and radius scale
+> from [02-brand-strategy.md](./02-brand-strategy.md), and `apps/web` loads
+> the chosen typefaces.
 
 The design system lives in code, at [`packages/ui`](../packages/ui)
 (`@tnsi/ui`) — not in `design/`. `design/` is reserved for source design
@@ -28,32 +25,40 @@ Two layers, both under `packages/ui/src/styles/`:
   breakpoints so `rounded-*`, `shadow-*`, and `sm:`/`md:`/… utilities are
   generated from our scale.
 
-**Brand color is currently a placeholder, but the target is now known.**
-`--brand-*` in `tokens.css` aliases the neutral (zero-chroma) ramp; the
-real palette from [02-brand-strategy.md](./02-brand-strategy.md) is:
+**Brand color is implemented.** `tokens.css`'s neutral ramp is now
+warm-hued (oklch, ~75° hue) rather than zero-chroma grey — its endpoints
+are Soft White (`--neutral-50`) and Charcoal (`--neutral-900`). A separate
+`--deep-slate`/`--deep-slate-raised` pair covers the brand's distinct cool
+dark-mode hue, rather than just a darker step of the warm ramp. Named
+secondary tokens (`--warm-sand`, `--stone-grey`, `--muted-olive`,
+`--soft-taupe`) and the accent trio (`--accent-forest`, `--accent-bronze`,
+`--accent-blue`) exist as raw tokens; the accent trio is intentionally
+**not** wired into any semantic role yet — per the brand doc it's for
+charts/highlights only, and no component renders a chart today.
+`--brand-*` still deliberately aliases the neutral ramp: primary actions
+are ink/Charcoal, not a saturated hue — "Premium Through Restraint" in
+[02-brand-strategy.md](./02-brand-strategy.md).
 
-- Primary: Warm Ivory, Soft White, Charcoal, Deep Slate.
-- Secondary: Warm Sand, Stone Grey, Muted Olive, Soft Taupe.
-- Accent (charts/highlights only, not UI chrome): Deep Forest Green, Muted
-  Bronze, Very Soft Blue.
+**Typography is implemented.** `apps/web/src/app/layout.tsx` loads Inter
+(body, `--font-sans-body`) and Cormorant Garamond (display,
+`--font-display`) via `next/font/google`; `globals.css` points
+`--font-sans`/`--font-heading` at them. Canela and Noe Display (the brand
+doc's first-choice serifs) aren't available via `next/font/google` — being
+commercial typefaces — so Cormorant Garamond is the standing choice until
+a licensed alternative is set up; revisit if/when that happens.
 
-Typography is also decided but not yet implemented: an elegant serif
-display font (Canela / Noe Display / Cormorant Garamond / Libre
-Baskerville) paired with a modern sans body font (Inter / Manrope /
-Satoshi / General Sans) — meaning `--font-heading` should stop aliasing
-`--font-sans` once a serif is loaded via `next/font`.
+**Spacing and radius are implemented.** The spacing scale now goes up to
+`--space-5xl: 8rem` (128px), matching the brand spec's full 8/16/24/32/48/
+64/96/128 scale. The radius scale was simplified from 7 steps to the brand
+spec's 4 (`--radius-sm`=8px, `-md`=12px, `-lg`=16px, `-xl`=24px, plus
+`-none`/`-full`) — `rounded-xs` no longer exists; the few call sites using
+it (`Checkbox`, `Link`, `Toast`'s close button) now use `rounded-sm`.
 
-Because no component or theme code references raw color/font values
-directly (everything goes through the semantic `--color-*`/`--font-*`
-layer), this is purely a `tokens.css`/`theme.css` + font-loading change in
-`apps/web/src/app/layout.tsx` — no component API changes.
-
-The spacing scale this system already uses (`--space-xs` through
-`--space-4xl`, currently 8/16/24/32/48/64/96px) matches the brand spec's
-8/16/24/32/48/64/96/128 scale almost exactly; only a `--space-5xl: 8rem`
-(128px) step is missing. The radius scale does **not** match — the brand
-spec wants a simpler 4-step scale (8/12/16/24px) versus the current 7-step
-scale — that's a real change, not just an addition.
+**Known gap:** `apps/web/src/app/globals.css` still has its own
+`--chart-1..5`/`--sidebar-*` tokens in cold greyscale, unrelated to the new
+warm palette — those are app-level (not `@tnsi/ui`) and weren't in scope
+for this pass since no component renders a chart or sidebar yet. Update
+them to the accent trio above if/when a chart component is built.
 
 ## Component inventory
 
