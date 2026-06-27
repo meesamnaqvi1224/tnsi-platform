@@ -68,6 +68,136 @@ them to the accent trio above if/when a chart component is built.
 | Forms      | Input, Textarea, Select, Checkbox, Radio, Switch, Label, Form/FormField, ValidationMessage             |
 | Feedback   | Alert, Toast, Spinner, Skeleton, Progress, EmptyState                                                  |
 | Overlay    | Modal, Drawer, Dropdown, Popover, Tooltip                                                              |
+| Editorial  | ChapterMarker, CapacityJourney, TypographicMoment, PageQuote, InstitutionalEvidence, EditorialFigure   |
+
+## Editorial component system
+
+Six components define the TNSI editorial design language — the visual grammar
+that makes every page feel like a chapter of one publication rather than a
+collection of independent screens. All live in `packages/ui/src/editorial/`
+and are exported from `@tnsi/ui`. Future pages must use these primitives
+rather than inventing equivalent visual patterns ad hoc.
+
+### Design principles the editorial layer encodes
+
+**Typography is the primary design element.** No icons, no decorative
+graphics, no animation. All hierarchy, rhythm, and meaning are carried by
+typeface, weight, size, and spacing alone.
+
+**One major idea per screen.** The editorial components are calibrated for
+generous whitespace. Do not attempt to increase information density by
+reducing their default spacing — that collapses the rhythm they depend on.
+
+**Restraint is the identity.** Every addition must reinforce calm, authority,
+and clarity. If a visual element cannot justify its presence through those
+three criteria, it does not belong on a TNSI page.
+
+**The serif (Cormorant Garamond) is emotional; the sans (Inter) is functional.**
+`ChapterMarker`, `TypographicMoment`, and `PageQuote` use `font-heading` for
+this reason. Labels, captions, and credentials use `font-sans`.
+
+---
+
+### `ChapterMarker`
+
+Replaces conventional `Eyebrow + Heading` pairs for major section transitions.
+
+A mono-spaced chapter label anchors left; a hairline `border-t` rule extends
+to the container edge; the chapter title sits below. The rule and the label
+together signal a boundary — the reader knows they have arrived somewhere new
+without being told explicitly.
+
+**Props:** `index` (string), `title` (string), `as` (heading level, default
+`h2`), `size` (heading size, default `xl`).
+
+**Use for:** major chapter-level transitions only — the Method's four stages,
+the About page's structural sections, the Faculty page's credentialling blocks.
+
+**Do not use for:** sub-sections within a chapter (use `Heading` directly),
+card titles, or any heading that does not represent a full narrative chapter.
+
+---
+
+### `CapacityJourney`
+
+The Nervous System Institute's signature orientation element. Five stages
+(`Survival → Understand → Regulate → Rewire → Lead`) over a continuous 1px
+hairline, with tick marks at each stage.
+
+Two modes:
+
+- **Passive** (no `current` prop): all stages at equal visual weight. The full
+  arc shown as a map. Use when first introducing the concept.
+- **Active** (`current` set): one stage emphasised, others recede. Use when a
+  piece of content, program, or user context is associated with a specific stage.
+
+**Do not use** more than twice per page without a clear reason — the element
+derives its authority from being used deliberately, not frequently.
+
+---
+
+### `TypographicMoment`
+
+A single sentence given `min-h-[85vh]` of space, vertically centred. The
+drama comes from the ratio of text to silence, not from the type size alone.
+
+Two variants: `'light'` (warm ivory background, left-aligned — the sentence
+addresses the reader personally) and `'dark'` (Deep Slate background, supports
+either alignment — contemplative, more universal in register).
+
+**Caller rules:**
+
+- One complete thought only. If two sentences feel necessary, the thought is
+  not ready to be a `TypographicMoment`.
+- No pull-quote marks — scale is the emphasis.
+- Use sparingly: one per major page section. Back-to-back instances eliminate
+  the pause this component depends on.
+- Vary `variant` when using more than once per page.
+
+---
+
+### `PageQuote`
+
+The colophon of a section. Small italic Cormorant Garamond, narrow centred
+column, single hairline rule above. Always positioned after the intellectual
+content of a section — never at the top.
+
+Rendered as a semantic `<blockquote>` with `<footer>/<cite>` for attribution.
+
+**Do not use** for external testimonials or social proof — build a separate
+testimonial component for that purpose. `PageQuote` is for the Institute's
+own philosophy and Caroline's voice, not for external validation.
+
+---
+
+### `InstitutionalEvidence`
+
+A quiet evidence panel presenting institutional credibility through typography,
+spacing, and two hairline rules. No icons. No counters. No animation.
+
+Accepts an array of `{ label, statement }` items. Labels are rendered in small
+muted caps above the statement. Statements must be qualitative — write
+"Fifteen years in private practice" not "500+ clients served". The former reads
+as a considered credential; the latter reads as a marketing metric.
+
+3–5 items is the intended range. The component handles its own internal
+grid layout; the caller provides `Container` and `Section` context.
+
+---
+
+### `EditorialFigure`
+
+Publication-style figure wrapper for diagrams, illustrations, and scientific
+visuals. Figure number and caption flow as a single paragraph below a hairline
+rule, following academic journal conventions.
+
+**Props:** `number` (string or number), `caption` (string), `source`
+(optional citation), `children` (figure content — image, SVG, diagram
+component). When `children` is omitted, a labelled placeholder is shown.
+
+Caption content rules: write in complete sentences, active voice, explaining
+what the figure shows and why it matters — not a title, a description. Use
+`source` for any figure derived from external research.
 
 Interactive/overlay components wrap [`@base-ui/react`](https://base-ui.com)
 primitives (matching the `base-nova` shadcn style already configured in

@@ -36,38 +36,40 @@ export const DrawerContent = React.forwardRef<HTMLDivElement, DrawerContentProps
   ) => (
     <DrawerPrimitive.Portal>
       <DrawerPrimitive.Backdrop className="fixed inset-0 z-(--z-modal-backdrop) bg-black/50 transition-opacity data-[starting-style]:opacity-0 data-[ending-style]:opacity-0" />
-      <DrawerPrimitive.Popup
-        ref={ref}
-        className={cn(
-          'fixed z-(--z-drawer) flex flex-col border-border bg-card p-6 text-card-foreground shadow-xl transition-transform',
-          sideClasses[side],
-          className,
-        )}
-        {...props}
-      >
-        <DrawerPrimitive.Title className="text-lg font-semibold leading-none">
-          {title}
-        </DrawerPrimitive.Title>
-        {description ? (
-          <DrawerPrimitive.Description className="mt-2 text-sm text-muted-foreground">
-            {description}
-          </DrawerPrimitive.Description>
-        ) : null}
-        <div className="mt-4 flex-1 overflow-y-auto">{children}</div>
-        {showCloseButton ? (
-          <DrawerPrimitive.Close
-            render={
-              <IconButton
-                aria-label="Close"
-                icon={<X className="size-4" />}
-                variant="ghost"
-                size="sm"
-                className="absolute right-3 top-3"
-              />
-            }
-          />
-        ) : null}
-      </DrawerPrimitive.Popup>
+      <DrawerPrimitive.Viewport>
+        <DrawerPrimitive.Popup
+          ref={ref}
+          className={cn(
+            'fixed z-(--z-drawer) flex flex-col border-border bg-card p-6 text-card-foreground shadow-xl transition-transform',
+            sideClasses[side],
+            className,
+          )}
+          {...props}
+        >
+          <DrawerPrimitive.Title className="text-lg font-semibold leading-none">
+            {title}
+          </DrawerPrimitive.Title>
+          {description ? (
+            <DrawerPrimitive.Description className="mt-2 text-sm text-muted-foreground">
+              {description}
+            </DrawerPrimitive.Description>
+          ) : null}
+          <div className="mt-4 flex-1 overflow-y-auto">{children}</div>
+          {showCloseButton ? (
+            <DrawerPrimitive.Close
+              render={
+                <IconButton
+                  aria-label="Close"
+                  icon={<X className="size-4" />}
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-3 top-3"
+                />
+              }
+            />
+          ) : null}
+        </DrawerPrimitive.Popup>
+      </DrawerPrimitive.Viewport>
     </DrawerPrimitive.Portal>
   ),
 );

@@ -21,6 +21,7 @@ export { Stack, type StackProps } from './primitives/stack';
 export { Grid, type GridProps } from './primitives/grid';
 export { Section, type SectionProps } from './primitives/section';
 export { Divider, type DividerProps } from './primitives/divider';
+export { Eyebrow, type EyebrowProps } from './primitives/eyebrow';
 export { Heading, type HeadingProps } from './primitives/heading';
 export { Text, type TextProps } from './primitives/text';
 export { Link, type LinkProps } from './primitives/link';
@@ -95,3 +96,20 @@ export {
   TooltipContent,
   type TooltipContentProps,
 } from './overlay/tooltip';
+
+// editorial
+export { ChapterMarker, type ChapterMarkerProps } from './editorial/chapter-marker';
+export {
+  CapacityJourney,
+  CAPACITY_STAGES,
+  type CapacityJourneyProps,
+  type CapacityStage,
+} from './editorial/capacity-journey';
+export { TypographicMoment, type TypographicMomentProps } from './editorial/typographic-moment';
+export { PageQuote, type PageQuoteProps } from './editorial/page-quote';
+export {
+  InstitutionalEvidence,
+  type InstitutionalEvidenceProps,
+  type EvidenceItem,
+} from './editorial/institutional-evidence';
+export { EditorialFigure, type EditorialFigureProps } from './editorial/editorial-figure';
