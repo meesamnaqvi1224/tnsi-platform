@@ -1,0 +1,42 @@
+import NextLink from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { Text } from '@tnsi/ui';
+import type { ResourceCollectionItem } from '@/content/resources';
+
+export interface ResourceCollectionProps {
+  collection: ResourceCollectionItem;
+  index: number;
+}
+
+export function ResourceCollection({ collection, index }: ResourceCollectionProps) {
+  return (
+    <article className="border-border grid grid-cols-1 items-end gap-(--space-xl) border-t py-(--space-3xl) lg:grid-cols-[auto_1fr_auto] lg:gap-(--space-4xl)">
+      <span className="text-muted-foreground font-mono text-sm tabular-nums">
+        {String(index + 1).padStart(2, '0')}
+      </span>
+
+      <div className="flex flex-col gap-(--space-md)">
+        <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl">
+          {collection.title}
+        </h3>
+        <Text tone="muted" className="max-w-2xl leading-relaxed">
+          {collection.description}
+        </Text>
+        <span className="text-muted-foreground font-mono text-xs tracking-widest uppercase">
+          {collection.count}
+        </span>
+      </div>
+
+      <NextLink
+        href={collection.href}
+        className="text-foreground group inline-flex shrink-0 items-center gap-(--space-sm) self-start text-sm font-medium tracking-wide lg:self-end"
+      >
+        Explore Collection
+        <ArrowRight
+          aria-hidden
+          className="size-4 transition-transform duration-200 group-hover:translate-x-1"
+        />
+      </NextLink>
+    </article>
+  );
+}
