@@ -1,0 +1,53 @@
+import Image from 'next/image';
+import NextLink from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { Text } from '@tnsi/ui';
+import type { FacultyExpertiseItem } from '@/content/faculty';
+
+export interface FacultyExpertiseProps {
+  item: FacultyExpertiseItem;
+}
+
+export function FacultyExpertise({ item }: FacultyExpertiseProps) {
+  const imageFirst = item.layout === 'image-left';
+
+  return (
+    <article className="border-border grid grid-cols-1 items-stretch border-t lg:grid-cols-2">
+      <div
+        className={`relative min-h-[40vh] overflow-hidden ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
+      >
+        <Image
+          src={item.imageSrc}
+          alt={item.imageAlt}
+          fill
+          unoptimized
+          className="object-cover"
+          sizes="(max-width: 1024px) 100vw, 50vw"
+        />
+      </div>
+
+      <div
+        className={`flex flex-col justify-center px-(--space-xl) py-(--space-3xl) sm:px-(--space-2xl) ${imageFirst ? 'lg:order-2 lg:pl-(--space-4xl)' : 'lg:order-1 lg:pr-(--space-4xl)'}`}
+      >
+        <div className="flex max-w-lg flex-col gap-(--space-lg)">
+          <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight">
+            {item.title}
+          </h3>
+          <Text tone="muted" className="leading-relaxed">
+            {item.summary}
+          </Text>
+          <NextLink
+            href={item.href}
+            className="text-foreground group inline-flex items-center gap-(--space-sm) text-sm font-medium tracking-wide transition-opacity duration-200 hover:opacity-70"
+          >
+            Learn More
+            <ArrowRight
+              aria-hidden
+              className="size-4 transition-transform duration-200 group-hover:translate-x-1"
+            />
+          </NextLink>
+        </div>
+      </div>
+    </article>
+  );
+}
