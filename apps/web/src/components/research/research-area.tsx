@@ -1,0 +1,50 @@
+import NextLink from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { Text } from '@tnsi/ui';
+import type { ResearchAreaItem } from '@/content/research';
+
+export interface ResearchAreaProps {
+  area: ResearchAreaItem;
+}
+
+export function ResearchArea({ area }: ResearchAreaProps) {
+  const imageFirst = area.layout === 'image-left';
+
+  return (
+    <article className="border-border grid grid-cols-1 items-center border-t lg:grid-cols-2">
+      <div
+        className={`bg-secondary relative min-h-[45vh] ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
+      >
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Text size="sm" tone="muted" className="max-w-[12rem] text-center">
+            Research area photography placeholder
+          </Text>
+        </div>
+        <span className="sr-only">{area.imageAlt}</span>
+      </div>
+
+      <div
+        className={`flex flex-col justify-center px-(--space-xl) py-(--space-3xl) sm:px-(--space-2xl) ${imageFirst ? 'lg:order-2 lg:pl-(--space-4xl)' : 'lg:order-1 lg:pr-(--space-4xl)'}`}
+      >
+        <div className="flex max-w-lg flex-col gap-(--space-lg)">
+          <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight">
+            {area.title}
+          </h3>
+          <Text tone="muted" className="leading-relaxed">
+            {area.summary}
+          </Text>
+          <NextLink
+            href={area.href}
+            className="text-foreground group inline-flex items-center gap-(--space-sm) text-sm font-medium tracking-wide"
+          >
+            Learn More
+            <ArrowRight
+              aria-hidden
+              className="size-4 transition-transform duration-200 group-hover:translate-x-1"
+            />
+          </NextLink>
+        </div>
+      </div>
+    </article>
+  );
+}
