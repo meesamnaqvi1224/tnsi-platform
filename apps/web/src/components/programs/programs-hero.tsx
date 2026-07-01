@@ -1,63 +1,54 @@
 import NextLink from 'next/link';
 import { buttonVariants, Eyebrow, Stack, Text } from '@tnsi/ui';
+import { programsOverviewContent } from '@/content/programs';
+
+const { hero } = programsOverviewContent;
 
 export function ProgramsHero() {
   return (
     <section
       aria-labelledby="programs-hero-heading"
-      className="grid min-h-screen grid-cols-1 lg:grid-cols-[45fr_55fr]"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden"
     >
-      {/* Left — Deep Slate editorial panel, text anchored to bottom */}
-      <div className="dark bg-background text-foreground flex flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-4xl) sm:px-(--space-3xl) lg:px-(--space-3xl)">
-        <Stack gap="xl" className="max-w-lg">
-          <div>
-            <div className="border-border mb-(--space-md) w-10 border-t-2" />
-            <Eyebrow className="text-muted-foreground">Programs</Eyebrow>
-          </div>
+      {/* Full-bleed background image */}
+      {/* TODO: swap for approved full-bleed editorial asset once added to apps/web/public */}
+      <div className="bg-secondary absolute inset-0" aria-hidden>
+        <div className="flex h-full items-center justify-center">
+          <Text size="sm" tone="muted">
+            Editorial hero photography placeholder
+          </Text>
+        </div>
+      </div>
+
+      {/* Light scrim for legibility — no dark panel */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-[color-mix(in_oklch,var(--background)_72%,transparent)]"
+      />
+
+      {/* Centred editorial content */}
+      <div className="relative z-10 px-(--space-xl) py-(--space-4xl) text-center sm:px-(--space-2xl)">
+        <Stack gap="xl" className="mx-auto max-w-2xl items-center">
+          <Eyebrow className="text-muted-foreground">{hero.eyebrow}</Eyebrow>
 
           <h1
             id="programs-hero-heading"
-            className="font-heading text-foreground text-5xl leading-[1.03] font-semibold tracking-tight lg:text-[4rem] xl:text-[5rem]"
+            className="font-heading text-foreground text-5xl leading-[1.03] font-semibold tracking-tight lg:text-[4.5rem] xl:text-[5.5rem]"
           >
-            Every transformation
-            <br />
-            begins with the right
-            <br />
-            pathway.
+            {hero.headline}
           </h1>
 
-          <Stack gap="lg">
-            <Text size="lg" tone="muted" className="max-w-[22rem]">
-              Whether you&apos;re seeking personal healing, professional development or practitioner
-              training, our programs are designed to help you build lasting nervous system capacity
-              through evidence-informed education.
-            </Text>
-            <Stack direction="row" gap="sm" wrap="wrap">
-              <NextLink
-                href="/programs/life-beyond-trauma"
-                className={buttonVariants({ variant: 'primary', size: 'lg' })}
-              >
-                Explore Life Beyond Trauma
-              </NextLink>
-              <NextLink
-                href="/book-a-call"
-                className={buttonVariants({ variant: 'outline', size: 'lg' })}
-              >
-                Book a Discovery Call
-              </NextLink>
-            </Stack>
-          </Stack>
-        </Stack>
-      </div>
-
-      {/* Right — image, full height, bleeds to viewport edge */}
-      {/* TODO: swap for approved editorial portrait once added to apps/web/public */}
-      <div className="bg-secondary relative hidden lg:block">
-        <div className="absolute inset-0 flex items-end justify-start p-(--space-lg)">
-          <Text size="sm" tone="muted">
-            Editorial portrait placeholder
+          <Text size="lg" tone="muted" className="max-w-md">
+            {hero.supportingCopy}
           </Text>
-        </div>
+
+          <NextLink
+            href={hero.primaryCta.href}
+            className={buttonVariants({ variant: 'primary', size: 'lg' })}
+          >
+            {hero.primaryCta.label}
+          </NextLink>
+        </Stack>
       </div>
     </section>
   );

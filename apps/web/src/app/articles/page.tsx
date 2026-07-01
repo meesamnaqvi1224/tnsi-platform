@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { Container, PageQuote, Section } from '@tnsi/ui';
+import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { ArticlesCategories } from '@/components/articles/articles-categories';
@@ -14,18 +14,26 @@ import { articlesContent } from '@/content/articles';
 
 const { seo, footerQuote } = articlesContent;
 
-export const metadata: Metadata = {
-  title: seo.title,
+import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
+
+export const metadata = createPageMetadata({
+  title: 'Articles',
   description: seo.description,
-  openGraph: {
-    title: seo.title,
-    description: seo.description,
-  },
-};
+  path: '/articles',
+});
 
 export default function ArticlesPage() {
+  const jsonLd = [
+    createWebPageJsonLd({ title: 'Articles', description: seo.description, path: '/articles' }),
+    createBreadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Articles', path: '/articles' },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <SiteHeader />
       <main>
         <ArticlesHero />

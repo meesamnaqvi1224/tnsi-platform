@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { Container, PageQuote, Section } from '@tnsi/ui';
+import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { EaAreas } from '@/components/programs/executive-advisory/ea-areas';
@@ -15,18 +15,31 @@ import { executiveAdvisoryContent } from '@/content/executive-advisory';
 
 const { seo, footerQuote } = executiveAdvisoryContent;
 
-export const metadata: Metadata = {
-  title: seo.title,
+import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
+
+export const metadata = createPageMetadata({
+  title: 'Executive Advisory',
   description: seo.description,
-  openGraph: {
-    title: seo.title,
-    description: seo.description,
-  },
-};
+  path: '/programs/executive-advisory',
+});
 
 export default function ExecutiveAdvisoryPage() {
+  const jsonLd = [
+    createWebPageJsonLd({
+      title: 'Executive Advisory',
+      description: seo.description,
+      path: '/programs/executive-advisory',
+    }),
+    createBreadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Programs', path: '/programs' },
+      { name: 'Executive Advisory', path: '/programs/executive-advisory' },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <SiteHeader />
       <main>
         <EaHero />

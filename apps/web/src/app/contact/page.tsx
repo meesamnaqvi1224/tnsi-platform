@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { Container, PageQuote, Section } from '@tnsi/ui';
+import { JsonLd } from '@/components/seo/json-ld';
 import { CollaborationCTA } from '@/components/contact/collaboration-cta';
 import { ContactClosing } from '@/components/contact/contact-closing';
 import { ContactForm } from '@/components/contact/contact-form';
@@ -13,18 +13,26 @@ import { contactContent } from '@/content/contact';
 
 const { seo, footerQuote } = contactContent;
 
-export const metadata: Metadata = {
-  title: seo.title,
+import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
+
+export const metadata = createPageMetadata({
+  title: 'Contact',
   description: seo.description,
-  openGraph: {
-    title: seo.title,
-    description: seo.description,
-  },
-};
+  path: '/contact',
+});
 
 export default function ContactPage() {
+  const jsonLd = [
+    createWebPageJsonLd({ title: 'Contact', description: seo.description, path: '/contact' }),
+    createBreadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Contact', path: '/contact' },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <SiteHeader />
       <main>
         <ContactHero />

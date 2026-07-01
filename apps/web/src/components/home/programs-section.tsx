@@ -8,7 +8,7 @@ const programs = [
     title: 'Life Beyond Trauma',
     description:
       'A foundational program for ambitious women ready to rebuild their relationship with their nervous system and reclaim sustainable capacity.',
-    href: '/programs/life-beyond-trauma',
+    href: '/method',
   },
   {
     title: 'Practitioner Certification',

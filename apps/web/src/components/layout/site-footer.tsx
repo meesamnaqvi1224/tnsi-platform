@@ -2,6 +2,13 @@ import NextLink from 'next/link';
 import { Container, Divider, Grid, Stack, Text } from '@tnsi/ui';
 import { footerColumns } from '@/lib/nav-links';
 
+const legalLinks = [
+  { label: 'Privacy Policy', href: '/privacy' },
+  { label: 'Terms of Use', href: '/terms' },
+  { label: 'Accessibility', href: '/accessibility' },
+  { label: 'Cookies', href: '/cookies' },
+] as const;
+
 export function SiteFooter() {
   return (
     <footer className="bg-secondary">
@@ -44,21 +51,18 @@ export function SiteFooter() {
 
         <Stack direction="row" justify="between" wrap="wrap" gap="sm">
           <Text size="sm" tone="muted">
-            © 2025 The Nervous System Institute. All rights reserved.
+            © 2026 The Nervous System Institute. All rights reserved.
           </Text>
-          <Stack direction="row" gap="lg">
-            <NextLink
-              href="/privacy-policy"
-              className="text-muted-foreground duration-base ease-standard hover:text-foreground text-sm transition-colors"
-            >
-              Privacy Policy
-            </NextLink>
-            <NextLink
-              href="/terms-of-use"
-              className="text-muted-foreground duration-base ease-standard hover:text-foreground text-sm transition-colors"
-            >
-              Terms of Use
-            </NextLink>
+          <Stack direction="row" gap="lg" wrap="wrap">
+            {legalLinks.map((link) => (
+              <NextLink
+                key={link.href}
+                href={link.href}
+                className="text-muted-foreground duration-base ease-standard hover:text-foreground text-sm transition-colors"
+              >
+                {link.label}
+              </NextLink>
+            ))}
           </Stack>
         </Stack>
       </Container>

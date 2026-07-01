@@ -1,108 +1,78 @@
-import { Container, Section, Stack } from '@tnsi/ui';
+import NextLink from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { Container, Section, Stack, Text } from '@tnsi/ui';
+import { programsOverviewContent } from '@/content/programs';
 
-const programs = [
-  'Life Beyond Trauma',
-  'Practitioner Certification',
-  'Executive Advisory',
-] as const;
+const { comparison } = programsOverviewContent;
 
-const rows = [
-  {
-    label: 'Best For',
-    values: [
-      'Individuals seeking personal healing and sustainable wellbeing',
-      'Therapists, coaches and health professionals',
-      'Leaders, founders and organisations',
-    ],
-  },
-  {
-    label: 'Format',
-    values: [
-      'Live group programme with individual support',
-      'Structured certification curriculum',
-      'Private advisory, bespoke to each organisation',
-    ],
-  },
-  {
-    label: 'Duration',
-    values: ['Ongoing cohorts', 'One year', 'Ongoing engagement'],
-  },
-  {
-    label: 'Support',
-    values: [
-      'Community, coaching sessions, resource library',
-      'Supervision, peer learning, mentorship',
-      'Direct access to Caroline Reed',
-    ],
-  },
-  {
-    label: 'Outcome',
-    values: [
-      'Regulated nervous system, expanded capacity, sustainable success',
-      'Certifiable trauma-informed nervous system education',
-      'Healthier leadership culture and measurable organisational change',
-    ],
-  },
-] as const;
+const attributes = [
+  { key: 'audience' as const, label: 'Best for' },
+  { key: 'format' as const, label: 'Format' },
+  { key: 'duration' as const, label: 'Duration' },
+  { key: 'outcome' as const, label: 'Outcome' },
+];
+
+function ComparisonCard({
+  title,
+  audience,
+  format,
+  duration,
+  outcome,
+  href,
+}: (typeof comparison)[number]) {
+  const values = { audience, format, duration, outcome };
+
+  return (
+    <article className="border-border flex h-full flex-col border p-(--space-xl)">
+      <Stack gap="xl" className="flex-1">
+        <h3 className="font-heading text-foreground text-xl font-semibold tracking-tight lg:text-2xl">
+          {title}
+        </h3>
+
+        <Stack gap="md">
+          {attributes.map(({ key, label }) => (
+            <div key={key} className="border-border border-t pt-(--space-md)">
+              <p className="text-muted-foreground mb-(--space-2xs) text-xs tracking-widest uppercase">
+                {label}
+              </p>
+              <Text size="sm" tone="muted" className="leading-relaxed">
+                {values[key]}
+              </Text>
+            </div>
+          ))}
+        </Stack>
+      </Stack>
+
+      <NextLink
+        href={href}
+        className="text-foreground duration-base ease-standard hover:text-muted-foreground mt-(--space-xl) inline-flex items-center gap-(--space-xs) text-sm font-medium transition-colors"
+      >
+        Explore
+        <ArrowRight aria-hidden className="size-4" />
+      </NextLink>
+    </article>
+  );
+}
 
 export function ProgramsComparison() {
   return (
-    <Section spacing="xl" className="border-border border-t" aria-labelledby="comparison-heading">
+    <Section
+      spacing="xl"
+      className="border-border bg-secondary border-t"
+      aria-labelledby="comparison-heading"
+    >
       <Container size="xl">
-        <Stack gap="sm" className="mb-(--space-3xl) max-w-2xl">
-          <p className="text-muted-foreground text-xs tracking-widest uppercase">
-            Compare the pathways
-          </p>
-          <h2
-            id="comparison-heading"
-            className="font-heading text-foreground text-4xl font-semibold tracking-tight"
-          >
-            Find the right fit.
-          </h2>
-        </Stack>
+        <p
+          id="comparison-heading"
+          className="text-muted-foreground mb-(--space-3xl) text-xs tracking-widest uppercase"
+        >
+          Compare pathways
+        </p>
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-left">
-            <thead>
-              <tr className="border-border border-b">
-                {/* Empty header for the row-label column */}
-                <th
-                  scope="col"
-                  className="w-[160px] pr-(--space-xl) pb-(--space-lg)"
-                  aria-label="Category"
-                />
-                {programs.map((program) => (
-                  <th
-                    key={program}
-                    scope="col"
-                    className="font-heading text-foreground pr-(--space-xl) pb-(--space-lg) text-base font-semibold tracking-tight last:pr-0"
-                  >
-                    {program}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.label} className="border-border border-b last:border-0">
-                  <th
-                    scope="row"
-                    className="text-muted-foreground py-(--space-lg) pr-(--space-xl) align-top text-xs font-medium tracking-widest uppercase"
-                  >
-                    {row.label}
-                  </th>
-                  {row.values.map((value, i) => (
-                    <td
-                      key={i}
-                      className="text-muted-foreground py-(--space-lg) pr-(--space-xl) align-top text-sm leading-relaxed last:pr-0"
-                    >
-                      {value}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="grid grid-cols-1 gap-(--space-lg) md:grid-cols-3">
+          {comparison.map((program) => (
+            <ComparisonCard key={program.title} {...program} />
+          ))}
         </div>
       </Container>
     </Section>

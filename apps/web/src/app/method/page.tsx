@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { Container, PageQuote, Section, TypographicMoment } from '@tnsi/ui';
+import { JsonLd } from '@/components/seo/json-ld';
 import { CtaBand } from '@/components/home/cta-band';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
@@ -8,20 +8,30 @@ import { MethodFoundation } from '@/components/method/method-foundation';
 import { MethodHero } from '@/components/method/method-hero';
 import { MethodJourney } from '@/components/method/method-journey';
 
-export const metadata: Metadata = {
-  title: 'The Method — The Nervous System Institute',
-  description:
-    'Life Beyond Trauma: an evidence-informed methodology built on fifteen years of clinical research into the nervous system, polyvagal theory, and sustainable high performance.',
-  openGraph: {
-    title: 'The Method — The Nervous System Institute',
-    description:
-      'Not a technique for managing symptoms. A different physiological foundation — built at the level where patterns actually live.',
-  },
-};
+import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
+
+const PAGE_TITLE = 'The Method';
+const PAGE_DESCRIPTION =
+  'Life Beyond Trauma: an evidence-informed methodology built on fifteen years of clinical research into the nervous system, polyvagal theory, and sustainable high performance.';
+
+export const metadata = createPageMetadata({
+  title: PAGE_TITLE,
+  description: PAGE_DESCRIPTION,
+  path: '/method',
+});
 
 export default function MethodPage() {
+  const jsonLd = [
+    createWebPageJsonLd({ title: PAGE_TITLE, description: PAGE_DESCRIPTION, path: '/method' }),
+    createBreadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: PAGE_TITLE, path: '/method' },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <SiteHeader />
       <main>
         <MethodHero />

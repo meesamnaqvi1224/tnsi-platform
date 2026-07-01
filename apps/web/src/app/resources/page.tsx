@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { Container, PageQuote, Section } from '@tnsi/ui';
+import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { ResourcesCategories } from '@/components/resources/resources-categories';
@@ -14,18 +14,26 @@ import { resourcesContent } from '@/content/resources';
 
 const { seo, footerQuote } = resourcesContent;
 
-export const metadata: Metadata = {
-  title: seo.title,
+import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
+
+export const metadata = createPageMetadata({
+  title: 'Resources',
   description: seo.description,
-  openGraph: {
-    title: seo.title,
-    description: seo.description,
-  },
-};
+  path: '/resources',
+});
 
 export default function ResourcesPage() {
+  const jsonLd = [
+    createWebPageJsonLd({ title: 'Resources', description: seo.description, path: '/resources' }),
+    createBreadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Resources', path: '/resources' },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <SiteHeader />
       <main>
         <ResourcesHero />

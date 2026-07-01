@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Container, PageQuote, Section } from '@tnsi/ui';
+import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { ArticleBody } from '@/components/articles/template/article-body';
@@ -12,6 +12,7 @@ import { ReadingProgress } from '@/components/articles/template/reading-progress
 import { RelatedArticles } from '@/components/articles/template/related-articles';
 import { TableOfContents } from '@/components/articles/template/table-of-contents';
 import { getAllArticleSlugs, getArticleBySlug } from '@/lib/articles';
+import { createBreadcrumbJsonLd, createPageMetadata } from '@/lib/seo';
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -21,22 +22,25 @@ export async function generateStaticParams() {
   return getAllArticleSlugs().map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: ArticlePageProps) {
   const { slug } = await params;
   const article = getArticleBySlug(slug);
 
   if (!article) {
-    return { title: 'Article Not Found' };
+    return createPageMetadata({
+      title: 'Article Not Found',
+      description: 'The requested article could not be found.',
+      path: `/articles/${slug}`,
+      noIndex: true,
+    });
   }
 
-  return {
-    title: article.seo.title,
+  return createPageMetadata({
+    title: article.hero.headline,
     description: article.seo.description,
-    openGraph: {
-      title: article.seo.title,
-      description: article.seo.description,
-    },
-  };
+    path: `/articles/${slug}`,
+    type: 'article',
+  });
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
@@ -47,8 +51,31 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     notFound();
   }
 
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: article.hero.headline,
+      description: article.seo.description,
+      author: {
+        '@type': 'Person',
+        name: article.author.name,
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'The Nervous System Institute',
+      },
+    },
+    createBreadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Articles', path: '/articles' },
+      { name: article.hero.headline, path: `/articles/${slug}` },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <ReadingProgress />
       <SiteHeader />
       <main>

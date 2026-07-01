@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { Container, PageQuote, Section } from '@tnsi/ui';
+import { JsonLd } from '@/components/seo/json-ld';
 import { AlternativeContact } from '@/components/discovery-call/alternative-contact';
 import { BookingSection } from '@/components/discovery-call/booking-section';
 import { DiscoveryClosing } from '@/components/discovery-call/discovery-closing';
@@ -14,18 +14,30 @@ import { discoveryCallContent } from '@/content/discovery-call';
 
 const { seo, footerQuote } = discoveryCallContent;
 
-export const metadata: Metadata = {
-  title: seo.title,
+import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
+
+export const metadata = createPageMetadata({
+  title: 'Book a Discovery Call',
   description: seo.description,
-  openGraph: {
-    title: seo.title,
-    description: seo.description,
-  },
-};
+  path: '/book-a-call',
+});
 
 export default function BookACallPage() {
+  const jsonLd = [
+    createWebPageJsonLd({
+      title: 'Book a Discovery Call',
+      description: seo.description,
+      path: '/book-a-call',
+    }),
+    createBreadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Book a Discovery Call', path: '/book-a-call' },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <SiteHeader />
       <main className="bg-background">
         <DiscoveryHero />

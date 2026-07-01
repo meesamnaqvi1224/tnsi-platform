@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { Container, PageQuote, Section } from '@tnsi/ui';
+import { JsonLd } from '@/components/seo/json-ld';
 import { FacultyClosing } from '@/components/faculty/faculty-closing';
 import { FacultyExpertiseSection } from '@/components/faculty/faculty-expertise-section';
 import { FacultyHero } from '@/components/faculty/faculty-hero';
@@ -13,18 +13,26 @@ import { facultyContent } from '@/content/faculty';
 
 const { seo, footerQuote } = facultyContent;
 
-export const metadata: Metadata = {
-  title: seo.title,
+import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
+
+export const metadata = createPageMetadata({
+  title: 'Faculty',
   description: seo.description,
-  openGraph: {
-    title: seo.title,
-    description: seo.description,
-  },
-};
+  path: '/faculty',
+});
 
 export default function FacultyPage() {
+  const jsonLd = [
+    createWebPageJsonLd({ title: 'Faculty', description: seo.description, path: '/faculty' }),
+    createBreadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Faculty', path: '/faculty' },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <SiteHeader />
       <main>
         <FacultyHero />

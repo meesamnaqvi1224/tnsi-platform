@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { Container, PageQuote, Section } from '@tnsi/ui';
+import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { PcAudience } from '@/components/programs/practitioner-certification/pc-audience';
@@ -15,18 +15,31 @@ import { practitionerCertificationContent } from '@/content/practitioner-certifi
 
 const { seo, footerQuote } = practitionerCertificationContent;
 
-export const metadata: Metadata = {
-  title: seo.title,
+import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
+
+export const metadata = createPageMetadata({
+  title: 'Practitioner Certification',
   description: seo.description,
-  openGraph: {
-    title: seo.title,
-    description: seo.description,
-  },
-};
+  path: '/programs/practitioner-certification',
+});
 
 export default function PractitionerCertificationPage() {
+  const jsonLd = [
+    createWebPageJsonLd({
+      title: 'Practitioner Certification',
+      description: seo.description,
+      path: '/programs/practitioner-certification',
+    }),
+    createBreadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Programs', path: '/programs' },
+      { name: 'Practitioner Certification', path: '/programs/practitioner-certification' },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <SiteHeader />
       <main>
         <PcHero />
