@@ -5,7 +5,7 @@ export function CalendlyPlaceholder() {
   return (
     <div
       aria-label="Booking calendar placeholder"
-      className="border-border/60 bg-background/80 flex min-h-[28rem] flex-col items-center justify-center gap-(--space-xl) rounded-2xl border p-(--space-3xl) lg:min-h-[32rem]"
+      className="border-border/60 bg-background/80 flex min-h-[28rem] flex-col items-center justify-center gap-(--space-xl) rounded-lg border p-(--space-3xl) lg:min-h-[32rem]"
     >
       <div className="border-border/50 bg-secondary/40 flex size-16 items-center justify-center rounded-full border">
         <CalendarDays aria-hidden className="text-muted-foreground size-7" strokeWidth={1.25} />
@@ -21,7 +21,7 @@ export function CalendlyPlaceholder() {
         </Text>
       </Stack>
 
-      <div className="border-border/40 flex w-full max-w-sm flex-col gap-(--space-sm) rounded-xl border p-(--space-lg)">
+      <div className="border-border/40 flex w-full max-w-sm flex-col gap-(--space-sm) rounded-lg border p-(--space-lg)">
         {['Select a date', 'Choose a time', 'Confirm your details'].map((step, index) => (
           <div
             key={step}

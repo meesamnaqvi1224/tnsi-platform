@@ -31,7 +31,7 @@ export function EaHero() {
 
           <h1
             id="ea-hero-heading"
-            className="font-heading text-foreground text-5xl leading-[1.02] font-semibold tracking-tight lg:text-[4.5rem] xl:text-[5rem]"
+            className="font-heading text-foreground text-5xl leading-[1.02] font-semibold tracking-tight lg:text-[4.5rem] xl:text-[5.5rem]"
           >
             {hero.headline}
           </h1>
@@ -40,7 +40,7 @@ export function EaHero() {
             <p className="text-foreground max-w-2xl text-xl leading-snug font-medium lg:text-2xl">
               {hero.supportingHeadline}
             </p>
-            <Text tone="muted" className="max-w-prose text-base leading-relaxed">
+            <Text tone="muted" className="max-w-prose leading-relaxed">
               {hero.supportingCopy}
             </Text>
           </Stack>

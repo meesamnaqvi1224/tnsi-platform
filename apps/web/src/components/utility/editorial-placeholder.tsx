@@ -25,7 +25,9 @@ export function EditorialPlaceholder({
   priority = false,
 }: EditorialPlaceholderProps) {
   return (
-    <figure className={cn('relative w-full overflow-hidden', aspectClasses[aspect], className)}>
+    <figure
+      className={cn('relative w-full overflow-hidden rounded-sm', aspectClasses[aspect], className)}
+    >
       <Image
         src={src}
         alt={alt}

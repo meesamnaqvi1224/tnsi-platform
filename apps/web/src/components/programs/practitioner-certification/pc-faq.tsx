@@ -14,13 +14,13 @@ export function PcFaq() {
           <div className="max-w-3xl">
             {faq.items.map(({ question, answer }) => (
               <details key={question} className="group border-border border-t">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-(--space-lg) py-(--space-lg) [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-(--space-lg) py-(--space-xl) [&::-webkit-details-marker]:hidden">
                   <span className="font-heading text-foreground text-base font-semibold tracking-tight">
                     {question}
                   </span>
                   <ChevronDown
                     aria-hidden
-                    className="text-muted-foreground size-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
+                    className="text-muted-foreground size-4 shrink-0 transition-transform duration-300 group-open:rotate-180"
                   />
                 </summary>
                 <div className="pb-(--space-xl)">

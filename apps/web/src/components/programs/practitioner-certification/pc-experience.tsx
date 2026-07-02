@@ -16,7 +16,7 @@ export function PcExperience() {
                 key={feature.title}
                 className="border-border flex flex-col gap-(--space-lg) border-t pt-(--space-xl)"
               >
-                <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight">
+                <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight lg:text-3xl">
                   {feature.title}
                 </h3>
                 <Text tone="muted" size="sm" className="max-w-prose leading-relaxed">

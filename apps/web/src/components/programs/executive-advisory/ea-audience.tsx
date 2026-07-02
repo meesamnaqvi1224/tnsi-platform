@@ -25,7 +25,7 @@ export function EaAudience() {
                 role="listitem"
                 className="flex flex-col gap-(--space-lg) py-(--space-md)"
               >
-                <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight">
+                <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight lg:text-3xl">
                   {card.title}
                 </h3>
                 <Text tone="muted" size="sm" className="leading-relaxed">

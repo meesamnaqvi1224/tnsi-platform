@@ -25,7 +25,7 @@ export function ReferenceList({ references }: ReferenceListProps) {
             </p>
           </div>
 
-          <span className="text-muted-foreground self-start font-mono text-[0.625rem] tracking-widest uppercase sm:text-right">
+          <span className="text-muted-foreground self-start font-mono text-[0.625rem] tracking-[0.15em] uppercase sm:text-right">
             {ref.category}
           </span>
         </li>

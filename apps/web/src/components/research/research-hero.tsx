@@ -8,11 +8,11 @@ export function ResearchHero() {
   return (
     <section
       aria-labelledby="research-hero-heading"
-      className="border-border relative flex min-h-[80vh] items-end overflow-hidden border-b"
+      className="border-border relative flex min-h-[85vh] items-end overflow-hidden border-b"
     >
       <div className="bg-secondary absolute inset-0" aria-hidden>
         <div className="flex h-full items-center justify-center">
-          <Text size="sm" tone="muted" className="max-w-[18rem] text-center">
+          <Text size="sm" tone="muted" className="max-w-[16rem] text-center">
             Research photography — papers, journals, notebook, natural daylight
           </Text>
         </div>
@@ -39,7 +39,7 @@ export function ResearchHero() {
 
           <h1
             id="research-hero-heading"
-            className="font-heading text-foreground text-6xl leading-[0.98] font-semibold tracking-tight lg:text-[5rem] xl:text-[6rem]"
+            className="font-heading text-foreground text-6xl leading-[0.98] font-semibold tracking-tight lg:text-[5.5rem] xl:text-[6.5rem]"
           >
             {hero.headline}
           </h1>
@@ -48,7 +48,7 @@ export function ResearchHero() {
             <p className="text-foreground max-w-2xl text-xl leading-snug font-medium lg:text-2xl">
               {hero.supportingHeadline}
             </p>
-            <Text tone="muted" className="max-w-prose text-base leading-relaxed">
+            <Text tone="muted" className="max-w-prose leading-relaxed">
               {hero.supportingCopy}
             </Text>
           </Stack>

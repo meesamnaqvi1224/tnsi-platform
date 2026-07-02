@@ -29,12 +29,12 @@ export function ProgramsFaq() {
     <Section spacing="xl" className="border-border border-t" aria-labelledby="faq-heading">
       <Container size="xl">
         <Stack gap="sm" className="mb-(--space-3xl) max-w-2xl">
-          <p className="text-muted-foreground text-xs tracking-widest uppercase">
+          <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
             Frequently asked questions
           </p>
           <h2
             id="faq-heading"
-            className="font-heading text-foreground text-4xl font-semibold tracking-tight"
+            className="font-heading text-foreground text-4xl leading-[1.1] font-semibold tracking-tight lg:text-5xl"
           >
             Common questions.
           </h2>
@@ -43,13 +43,13 @@ export function ProgramsFaq() {
         <div className="max-w-3xl">
           {faqs.map(({ question, answer }) => (
             <details key={question} className="group border-border border-t">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-(--space-lg) py-(--space-lg) [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-(--space-lg) py-(--space-xl) [&::-webkit-details-marker]:hidden">
                 <span className="font-heading text-foreground text-base font-semibold tracking-tight">
                   {question}
                 </span>
                 <ChevronDown
                   aria-hidden
-                  className="text-muted-foreground size-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
+                  className="text-muted-foreground size-4 shrink-0 transition-transform duration-300 group-open:rotate-180"
                 />
               </summary>
               <div className="pb-(--space-xl)">

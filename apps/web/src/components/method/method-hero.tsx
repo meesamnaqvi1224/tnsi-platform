@@ -17,7 +17,7 @@ export function MethodHero() {
 
           <h1
             id="method-hero-heading"
-            className="font-heading text-foreground text-5xl leading-[1.03] font-semibold tracking-tight lg:text-[4.5rem] xl:text-[5.5rem]"
+            className="font-heading text-foreground text-5xl leading-[1.02] font-semibold tracking-tight lg:text-[4.5rem] xl:text-[5.5rem]"
           >
             Life Beyond
             <br />

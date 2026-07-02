@@ -64,7 +64,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
               publishedAt={article.publishedAt}
               readingTime={article.readingTime}
             />
-            <h3 className="font-heading text-foreground text-4xl leading-[1.08] font-semibold tracking-tight">
+            <h3 className="font-heading text-foreground text-4xl leading-[1.08] font-semibold tracking-tight lg:text-5xl">
               {article.title}
             </h3>
             <Text tone="muted" className="leading-relaxed">
@@ -87,7 +87,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
             publishedAt={article.publishedAt}
             readingTime={article.readingTime}
           />
-          <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight">
+          <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight lg:text-3xl">
             {article.title}
           </h3>
           <Text tone="muted" size="sm" className="leading-relaxed">

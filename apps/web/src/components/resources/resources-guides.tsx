@@ -27,7 +27,7 @@ export function ResourcesGuides() {
                   <span className="text-muted-foreground font-mono text-xs tabular-nums">
                     {String(index + 1).padStart(2, '0')}
                   </span>
-                  <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight">
+                  <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight lg:text-3xl">
                     {guide.title}
                   </h3>
                 </div>

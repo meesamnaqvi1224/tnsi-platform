@@ -8,7 +8,7 @@ export function ResourcesHero() {
   return (
     <section
       aria-labelledby="resources-hero-heading"
-      className="relative flex min-h-[88vh] items-end overflow-hidden"
+      className="border-border relative flex min-h-[85vh] items-end overflow-hidden border-b"
     >
       <div className="bg-secondary absolute inset-0" aria-hidden>
         <div className="flex h-full items-center justify-center">

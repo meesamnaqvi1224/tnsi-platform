@@ -18,7 +18,7 @@ export function ResearchPillar({ pillar, index }: ResearchPillarProps) {
       <Text tone="muted" className="max-w-prose leading-relaxed">
         {pillar.description}
       </Text>
-      <span className="text-muted-foreground font-mono text-[0.625rem] tracking-widest uppercase">
+      <span className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">
         {pillar.statistic}
       </span>
     </article>

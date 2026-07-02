@@ -10,7 +10,7 @@ export function MeetCarolineSection() {
     <Section spacing="xl" className="border-border border-t" aria-label={caroline.heading}>
       <Container size="xl">
         <div className="grid grid-cols-1 items-center gap-(--space-3xl) lg:grid-cols-[0.9fr_1.1fr] lg:gap-(--space-5xl)">
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl lg:mx-0 lg:max-w-none">
+          <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-lg lg:mx-0 lg:max-w-none">
             <Image
               src={caroline.imageSrc}
               alt={caroline.imageAlt}
@@ -28,7 +28,7 @@ export function MeetCarolineSection() {
             <ChapterMarker index={caroline.chapter} as="h2" title={caroline.heading} />
 
             <Stack gap="md">
-              <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight">
+              <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl">
                 {caroline.name}
               </h3>
               <ul className="flex flex-wrap gap-(--space-sm)">
@@ -45,7 +45,7 @@ export function MeetCarolineSection() {
 
             <Stack gap="lg">
               {caroline.biography.map((paragraph) => (
-                <Text key={paragraph} tone="muted" className="text-base leading-[1.8]">
+                <Text key={paragraph} tone="muted" className="text-base leading-relaxed">
                   {paragraph}
                 </Text>
               ))}

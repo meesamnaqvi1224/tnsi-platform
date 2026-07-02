@@ -41,7 +41,7 @@ function FeaturedSection({
       }
     >
       <Stack gap="sm">
-        <p className="text-muted-foreground text-xs tracking-widest uppercase">{eyebrow}</p>
+        <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">{eyebrow}</p>
         <h2 className="font-heading text-foreground text-4xl leading-[1.08] font-semibold tracking-tight lg:text-5xl">
           {title}
         </h2>
@@ -55,7 +55,7 @@ function FeaturedSection({
         <dl className="grid grid-cols-1 gap-(--space-md) sm:grid-cols-3">
           {details.map(({ label, value }) => (
             <div key={label} className="border-border border-t pt-(--space-md)">
-              <dt className="text-muted-foreground mb-(--space-2xs) font-mono text-[0.625rem] tracking-widest uppercase">
+              <dt className="text-muted-foreground mb-(--space-2xs) font-mono text-[0.625rem] tracking-[0.15em] uppercase">
                 {label}
               </dt>
               <dd className="text-foreground text-sm leading-snug font-medium">{value}</dd>
@@ -69,7 +69,7 @@ function FeaturedSection({
               key={label}
               className="border-border flex items-baseline justify-between gap-(--space-md) border-t py-(--space-sm)"
             >
-              <span className="text-muted-foreground shrink-0 text-xs tracking-widest uppercase">
+              <span className="text-muted-foreground shrink-0 text-xs tracking-[0.15em] uppercase">
                 {label}
               </span>
               <span className="text-foreground text-right text-sm font-medium">{value}</span>
@@ -107,8 +107,8 @@ function FeaturedSection({
 
 export function ProgramsFeatured() {
   return (
-    <Section spacing="xl" className="border-border border-t" aria-label="Featured programs">
-      <Container size="xl">
+    <Section spacing="none" className="border-border border-t" aria-label="Featured programs">
+      <Container size="xl" className="py-(--space-4xl)">
         <Stack gap="4xl">
           {featured.map((program, index) => (
             <div

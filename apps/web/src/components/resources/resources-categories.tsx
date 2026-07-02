@@ -34,7 +34,7 @@ export function ResourcesCategories() {
                   <h3 className="font-heading text-foreground text-4xl font-semibold tracking-tight lg:text-5xl">
                     {category.title}
                   </h3>
-                  <span className="text-muted-foreground font-mono text-xs tracking-widest uppercase">
+                  <span className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
                     {category.count}
                   </span>
                 </div>

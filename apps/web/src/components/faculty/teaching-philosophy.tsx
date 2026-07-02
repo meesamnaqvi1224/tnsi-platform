@@ -14,13 +14,13 @@ export function TeachingPhilosophy() {
         <Stack gap="3xl">
           <ChapterMarker index={teachingPhilosophy.chapter} as="h2" title="Teaching Philosophy" />
 
-          <h3 className="font-heading text-foreground max-w-4xl text-4xl leading-[1.12] font-semibold tracking-tight lg:text-5xl xl:text-[3.25rem]">
+          <h3 className="font-heading text-foreground max-w-4xl text-4xl leading-[1.1] font-semibold tracking-tight lg:text-5xl">
             {teachingPhilosophy.headline}
           </h3>
 
           <Stack gap="lg" className="max-w-3xl">
             {teachingPhilosophy.paragraphs.map((paragraph) => (
-              <Text key={paragraph} tone="muted" className="text-base leading-[1.85] lg:text-lg">
+              <Text key={paragraph} tone="muted" className="text-base leading-relaxed lg:text-lg">
                 {paragraph}
               </Text>
             ))}

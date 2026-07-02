@@ -10,17 +10,17 @@ export function PcCta() {
       <Container size="xl">
         <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-[1fr_2fr]">
           <div className="flex flex-col gap-(--space-sm) lg:pt-(--space-lg)">
-            <span className="text-muted-foreground font-mono text-xs tracking-widest uppercase">
+            <span className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
               Chapter {cta.chapter}
             </span>
-            <div className="border-border w-10 border-t" aria-hidden />
+            <div className="border-border w-12 border-t" aria-hidden />
           </div>
 
           <Stack gap="xl">
             <Stack gap="md">
               <h2
                 id="pc-cta-heading"
-                className="font-heading text-foreground text-4xl leading-[1.1] font-semibold tracking-tight"
+                className="font-heading text-foreground text-4xl leading-[1.1] font-semibold tracking-tight lg:text-5xl"
               >
                 {cta.headline}
               </h2>

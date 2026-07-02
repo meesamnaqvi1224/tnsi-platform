@@ -51,7 +51,7 @@ export function FacultyProfile() {
 
             <Stack gap="lg">
               {founder.biography.map((paragraph) => (
-                <Text key={paragraph} tone="muted" className="text-base leading-[1.8]">
+                <Text key={paragraph} tone="muted" className="text-base leading-relaxed">
                   {paragraph}
                 </Text>
               ))}

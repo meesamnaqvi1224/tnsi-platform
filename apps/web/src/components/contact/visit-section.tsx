@@ -10,7 +10,7 @@ export function VisitSection() {
         <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-2 lg:gap-(--space-5xl)">
           <Stack gap="2xl">
             <ChapterMarker index={visit.chapter} as="h2" title={visit.heading} />
-            <Text tone="muted" className="max-w-prose text-base leading-[1.8]">
+            <Text tone="muted" className="max-w-prose text-base leading-relaxed">
               {visit.description}
             </Text>
 

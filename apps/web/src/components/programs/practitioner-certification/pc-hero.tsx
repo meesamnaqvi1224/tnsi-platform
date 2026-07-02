@@ -14,25 +14,25 @@ export function PcHero() {
         <Stack gap="xl" className="max-w-xl">
           <div className="flex flex-col gap-(--space-sm)">
             <div className="flex items-center gap-(--space-md)">
-              <span className="text-muted-foreground shrink-0 font-mono text-xs tracking-widest uppercase">
+              <span className="text-muted-foreground shrink-0 font-mono text-xs tracking-[0.2em] uppercase">
                 Chapter {hero.chapter}
               </span>
               <div className="border-border flex-1 border-t" aria-hidden />
             </div>
-            <p className="text-muted-foreground text-xs tracking-widest uppercase">
+            <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
               {hero.eyebrow}
             </p>
           </div>
 
           <h1
             id="pc-hero-heading"
-            className="font-heading text-foreground text-5xl leading-[1.05] font-semibold tracking-tight lg:text-[3.75rem] xl:text-[4.25rem]"
+            className="font-heading text-foreground text-5xl leading-[1.02] font-semibold tracking-tight lg:text-[4.5rem] xl:text-[5.5rem]"
           >
             {hero.headline}
           </h1>
 
           <Stack gap="lg">
-            <p className="text-foreground text-lg leading-relaxed font-medium">
+            <p className="text-foreground max-w-2xl text-xl leading-snug font-medium lg:text-2xl">
               {hero.supportingHeadline}
             </p>
             <Text tone="muted" className="max-w-prose leading-relaxed">
@@ -43,7 +43,7 @@ export function PcHero() {
           <dl className="border-border grid grid-cols-3 gap-(--space-md) border-y py-(--space-lg)">
             {hero.metadata.map(({ label, value }) => (
               <div key={label} className="flex flex-col gap-(--space-2xs)">
-                <dt className="text-muted-foreground font-mono text-[0.625rem] tracking-widest uppercase">
+                <dt className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">
                   {label}
                 </dt>
                 <dd className="text-foreground text-sm font-medium">{value}</dd>

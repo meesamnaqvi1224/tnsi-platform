@@ -39,7 +39,7 @@ function DestinationCard({
           </Text>
         </Stack>
 
-        <NextLink href={href} className={buttonVariants({ variant: 'outline', size: 'md' })}>
+        <NextLink href={href} className={buttonVariants({ variant: 'outline', size: 'lg' })}>
           {cta}
           <ArrowRight aria-hidden className="size-4" />
         </NextLink>
@@ -59,7 +59,7 @@ export function ProgramsCards() {
       <Container size="xl">
         <p
           id="programs-cards-heading"
-          className="text-muted-foreground mb-(--space-3xl) text-xs tracking-widest uppercase"
+          className="text-muted-foreground mb-(--space-3xl) text-xs tracking-[0.15em] uppercase"
         >
           Three pathways
         </p>

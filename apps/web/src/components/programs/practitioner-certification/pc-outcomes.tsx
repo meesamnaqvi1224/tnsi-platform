@@ -14,7 +14,7 @@ function OutcomeColumn({
 }) {
   return (
     <div className="border-border flex flex-col gap-(--space-xl) border-t pt-(--space-xl)">
-      <p className="text-muted-foreground font-mono text-xs tracking-widest uppercase">{label}</p>
+      <p className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">{label}</p>
       <ul className="flex flex-col gap-(--space-lg)" role="list">
         {items.map((item) => (
           <li

@@ -22,7 +22,7 @@ export function ResourceCollection({ collection, index }: ResourceCollectionProp
         <Text tone="muted" className="max-w-2xl leading-relaxed">
           {collection.description}
         </Text>
-        <span className="text-muted-foreground font-mono text-xs tracking-widest uppercase">
+        <span className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
           {collection.count}
         </span>
       </div>

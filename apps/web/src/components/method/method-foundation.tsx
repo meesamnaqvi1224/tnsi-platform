@@ -36,7 +36,7 @@ export function MethodFoundation() {
       aria-labelledby="method-foundation-heading"
     >
       <Container size="xl">
-        <p className="text-muted-foreground mb-(--space-3xl) text-xs tracking-widest uppercase">
+        <p className="text-muted-foreground mb-(--space-3xl) text-xs tracking-[0.15em] uppercase">
           Three perspectives
         </p>
 

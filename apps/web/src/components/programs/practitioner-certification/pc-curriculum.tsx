@@ -40,7 +40,7 @@ export function PcCurriculum() {
                   </div>
 
                   <div className="flex flex-col justify-center gap-(--space-xs)">
-                    <span className="text-muted-foreground font-mono text-[0.625rem] tracking-widest uppercase">
+                    <span className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">
                       Module {module.number}
                     </span>
                     <p className="font-heading text-foreground text-xl font-semibold tracking-tight sm:text-2xl">

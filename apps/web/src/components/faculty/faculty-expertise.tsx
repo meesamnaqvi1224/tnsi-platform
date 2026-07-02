@@ -30,7 +30,7 @@ export function FacultyExpertise({ item }: FacultyExpertiseProps) {
         className={`flex flex-col justify-center px-(--space-xl) py-(--space-3xl) sm:px-(--space-2xl) ${imageFirst ? 'lg:order-2 lg:pl-(--space-4xl)' : 'lg:order-1 lg:pr-(--space-4xl)'}`}
       >
         <div className="flex max-w-lg flex-col gap-(--space-lg)">
-          <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight">
+          <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl">
             {item.title}
           </h3>
           <Text tone="muted" className="leading-relaxed">

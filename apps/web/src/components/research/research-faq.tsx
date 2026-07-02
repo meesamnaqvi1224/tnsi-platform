@@ -24,7 +24,7 @@ export function ResearchFaq() {
                   </span>
                   <ChevronDown
                     aria-hidden
-                    className="text-muted-foreground size-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
+                    className="text-muted-foreground size-4 shrink-0 transition-transform duration-300 group-open:rotate-180"
                   />
                 </summary>
                 <div className="pb-(--space-xl)">

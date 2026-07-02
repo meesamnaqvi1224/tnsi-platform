@@ -11,7 +11,7 @@ export function RelatedArticles({ articles }: RelatedArticlesProps) {
   return (
     <section aria-label="Related articles" className="border-border border-t">
       <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">
-        <h2 className="font-heading text-foreground mb-(--space-3xl) text-3xl font-semibold tracking-tight">
+        <h2 className="font-heading text-foreground mb-(--space-3xl) text-3xl font-semibold tracking-tight lg:text-4xl">
           Related Articles
         </h2>
 

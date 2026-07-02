@@ -28,7 +28,7 @@ export default function NotFound() {
                 >
                   {notFoundContent.headline}
                 </h1>
-                <Text tone="muted" className="max-w-prose text-base leading-[1.8]">
+                <Text tone="muted" className="max-w-prose text-base leading-relaxed">
                   {notFoundContent.supportingCopy}
                 </Text>
                 <Stack direction="row" gap="sm" wrap="wrap">

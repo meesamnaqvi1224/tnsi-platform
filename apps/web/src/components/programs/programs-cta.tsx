@@ -14,11 +14,11 @@ export function ProgramsCta() {
             <Stack gap="md">
               <h2
                 id="programs-cta-heading"
-                className="font-heading text-foreground text-4xl leading-[1.1] font-semibold tracking-tight"
+                className="font-heading text-foreground text-4xl leading-[1.1] font-semibold tracking-tight lg:text-5xl"
               >
                 Not sure where to begin?
               </h2>
-              <Text tone="muted" className="max-w-prose">
+              <Text tone="muted" className="max-w-prose leading-relaxed">
                 Book a complimentary discovery call and together we will identify the most
                 appropriate starting point for your journey. No obligation, no pressure — a
                 conversation to help you find the right pathway.

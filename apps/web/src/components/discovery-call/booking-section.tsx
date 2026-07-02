@@ -19,7 +19,7 @@ export function BookingSection() {
 
             <Stack gap="lg">
               {booking.paragraphs.map((paragraph) => (
-                <Text key={paragraph} tone="muted" className="text-base leading-[1.8]">
+                <Text key={paragraph} tone="muted" className="text-base leading-relaxed">
                   {paragraph}
                 </Text>
               ))}

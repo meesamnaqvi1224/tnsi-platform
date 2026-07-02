@@ -36,7 +36,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
             </span>
           </div>
 
-          <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight">
+          <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl">
             {resource.title}
           </h3>
 

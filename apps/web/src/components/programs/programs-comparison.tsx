@@ -32,7 +32,7 @@ function ComparisonCard({
         <Stack gap="md">
           {attributes.map(({ key, label }) => (
             <div key={key} className="border-border border-t pt-(--space-md)">
-              <p className="text-muted-foreground mb-(--space-2xs) text-xs tracking-widest uppercase">
+              <p className="text-muted-foreground mb-(--space-2xs) text-xs tracking-[0.15em] uppercase">
                 {label}
               </p>
               <Text size="sm" tone="muted" className="leading-relaxed">
@@ -64,7 +64,7 @@ export function ProgramsComparison() {
       <Container size="xl">
         <p
           id="comparison-heading"
-          className="text-muted-foreground mb-(--space-3xl) text-xs tracking-widest uppercase"
+          className="text-muted-foreground mb-(--space-3xl) text-xs tracking-[0.15em] uppercase"
         >
           Compare pathways
         </p>

@@ -23,7 +23,7 @@ export function EaCta() {
           <Stack gap="lg" className="items-center">
             <h2
               id="ea-cta-heading"
-              className="font-heading text-4xl leading-[1.08] font-semibold tracking-tight lg:text-5xl"
+              className="font-heading text-foreground text-4xl leading-[1.1] font-semibold tracking-tight lg:text-5xl"
             >
               {cta.headline}
             </h2>

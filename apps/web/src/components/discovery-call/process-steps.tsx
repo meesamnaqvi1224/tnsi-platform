@@ -5,7 +5,7 @@ const { process } = discoveryCallContent;
 
 function ProcessStepCard({ number, title, description }: ProcessStep) {
   return (
-    <article className="border-border/70 bg-background/60 hover:bg-background flex flex-col gap-(--space-lg) rounded-2xl border p-(--space-2xl) transition-colors duration-300">
+    <article className="border-border/70 bg-background/60 hover:bg-background flex flex-col gap-(--space-lg) rounded-lg border p-(--space-2xl) transition-colors duration-300">
       <span className="font-heading text-muted-foreground/60 text-4xl leading-none font-light tracking-tight">
         {number}
       </span>

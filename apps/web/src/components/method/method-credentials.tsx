@@ -33,7 +33,7 @@ export function MethodCredentials() {
       <Container size="xl">
         <Stack gap="2xl">
           <Stack gap="lg" className="max-w-2xl">
-            <p className="text-muted-foreground text-xs tracking-widest uppercase">
+            <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
               The evidence base
             </p>
             <p className="font-heading text-foreground text-3xl leading-[1.2] font-semibold tracking-tight lg:text-4xl">

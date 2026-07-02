@@ -102,7 +102,7 @@ export function SearchInterface() {
 
       {hasQuery && !hasResults ? (
         <Stack gap="md" className="border-border border-t pt-(--space-2xl)">
-          <h2 className="font-heading text-foreground text-2xl font-semibold tracking-tight">
+          <h2 className="font-heading text-foreground text-2xl font-semibold tracking-tight lg:text-3xl">
             {emptyState.heading}
           </h2>
           <Text tone="muted" className="leading-relaxed">

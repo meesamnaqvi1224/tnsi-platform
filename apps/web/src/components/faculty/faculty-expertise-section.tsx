@@ -7,7 +7,7 @@ const { expertise } = facultyContent;
 export function FacultyExpertiseSection() {
   return (
     <Section spacing="none" className="border-border border-t" aria-label={expertise.heading}>
-      <Container size="xl" className="py-(--space-3xl) lg:py-(--space-4xl)">
+      <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">
         <ChapterMarker index={expertise.chapter} as="h2" title={expertise.heading} />
       </Container>
 

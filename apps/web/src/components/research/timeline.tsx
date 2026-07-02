@@ -29,7 +29,7 @@ export function Timeline({ events, intro }: TimelineProps) {
         {events.map((event, index) => (
           <li key={event.era} className="flex flex-col">
             <div className="border-border flex flex-col gap-(--space-md) border-t pt-(--space-xl)">
-              <span className="text-muted-foreground font-mono text-xs tracking-widest uppercase">
+              <span className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
                 {event.era}
               </span>
               <p className="font-heading text-foreground text-lg leading-snug font-semibold tracking-tight">
@@ -55,7 +55,7 @@ export function Timeline({ events, intro }: TimelineProps) {
           return (
             <li key={event.era} className="flex flex-col items-start">
               <div className="border-border w-full border-t py-(--space-xl)">
-                <span className="text-muted-foreground font-mono text-xs tracking-widest uppercase">
+                <span className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
                   {event.era}
                 </span>
                 <p className="font-heading text-foreground mt-(--space-sm) text-xl font-semibold tracking-tight">

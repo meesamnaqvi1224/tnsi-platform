@@ -67,7 +67,7 @@ export function EligibilitySection() {
 
         <div
           role="note"
-          className="border-border/70 bg-background/50 mt-(--space-3xl) flex gap-(--space-md) rounded-xl border p-(--space-xl) lg:mt-(--space-4xl)"
+          className="border-border/70 bg-background/50 mt-(--space-3xl) flex gap-(--space-md) rounded-lg border p-(--space-xl) lg:mt-(--space-4xl)"
         >
           <AlertCircle
             aria-hidden

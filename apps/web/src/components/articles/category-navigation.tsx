@@ -18,7 +18,7 @@ export function CategoryNavigation({ categories }: CategoryNavigationProps) {
               <span className="font-heading text-foreground text-lg font-semibold tracking-tight">
                 {category.label}
               </span>
-              <span className="text-muted-foreground font-mono text-[0.625rem] tracking-widest uppercase">
+              <span className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">
                 {category.count} articles
               </span>
             </NextLink>

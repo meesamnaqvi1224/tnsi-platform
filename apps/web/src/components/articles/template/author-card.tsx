@@ -21,7 +21,7 @@ export function AuthorCard({ author }: AuthorCardProps) {
 
         <div className="flex flex-col gap-(--space-md)">
           <div>
-            <h2 className="font-heading text-foreground text-2xl font-semibold tracking-tight">
+            <h2 className="font-heading text-foreground text-2xl font-semibold tracking-tight lg:text-3xl">
               {author.name}
             </h2>
             <p className="text-muted-foreground mt-(--space-xs) text-sm">{author.role}</p>
@@ -31,7 +31,7 @@ export function AuthorCard({ author }: AuthorCardProps) {
           </Text>
           <NextLink
             href={author.href}
-            className={buttonVariants({ variant: 'outline', size: 'md' })}
+            className={buttonVariants({ variant: 'outline', size: 'lg' })}
           >
             About Caroline
           </NextLink>
