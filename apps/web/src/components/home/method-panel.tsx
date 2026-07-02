@@ -1,8 +1,6 @@
 import type * as React from 'react';
 import NextLink from 'next/link';
 import { Eyebrow, Heading, Link, Stack, Text } from '@tnsi/ui';
-import { EditorialImage } from '@/components/utility/editorial-image';
-import { homeImages } from '@/content/images';
 
 export function MethodPanel() {
   return (
@@ -10,6 +8,8 @@ export function MethodPanel() {
       aria-labelledby="method-heading"
       className="grid min-w-0 grid-cols-1 overflow-hidden lg:grid-cols-2"
     >
+      {/* `dark` flips the semantic tokens locally to Deep Slate background / cream foreground,
+          per docs/02-brand-strategy.md — not a hardcoded navy. */}
       <div className="dark bg-background text-foreground flex items-center px-(--space-lg) py-(--space-3xl) sm:px-(--space-2xl) lg:px-(--space-3xl)">
         <Stack gap="md" className="max-w-md">
           <Eyebrow className="text-muted-foreground">The Method</Eyebrow>
@@ -36,13 +36,17 @@ export function MethodPanel() {
         </Stack>
       </div>
 
-      <EditorialImage
-        src={homeImages.methodPanel}
-        alt="Caroline Reed in a warm editorial portrait within a modern office setting."
-        aspect="landscape"
-        className="border-border border lg:aspect-auto lg:min-h-full lg:rounded-none"
-        sizes="(max-width: 1024px) 100vw, 50vw"
-      />
+      {/* TODO: swap for the approved teacup/notebook still-life asset once added to apps/web/public */}
+      <figure className="border-border bg-secondary relative aspect-[4/3] w-full border lg:aspect-auto">
+        <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
+          <Text size="sm" tone="muted">
+            Still-life placeholder
+          </Text>
+        </div>
+        <span className="sr-only">
+          Still-life editorial photograph — teacup and notebook in warm natural light.
+        </span>
+      </figure>
     </section>
   );
 }

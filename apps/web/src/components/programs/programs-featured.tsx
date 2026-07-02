@@ -1,20 +1,17 @@
 import NextLink from 'next/link';
 import { buttonVariants, Container, Section, Stack, Text } from '@tnsi/ui';
-import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { programsOverviewContent } from '@/content/programs';
 
 const { featured } = programsOverviewContent;
 
-function FeaturedImage({ src, alt }: { src: string; alt: string }) {
+function FeaturedImage({ label }: { label: string }) {
   return (
-    <div className="relative min-h-[28rem] w-full overflow-hidden lg:min-h-[36rem]">
-      <ResponsiveImage
-        src={src}
-        alt={alt}
-        fill
-        className="object-cover"
-        sizes="(max-width: 1024px) 100vw, 50vw"
-      />
+    <div className="bg-secondary relative min-h-[28rem] w-full overflow-hidden lg:min-h-[36rem]">
+      <div className="absolute inset-0 flex items-center justify-center">
+        <Text size="sm" tone="muted" className="max-w-[14rem] text-center">
+          {label}
+        </Text>
+      </div>
     </div>
   );
 }
@@ -26,8 +23,7 @@ function FeaturedSection({
   details,
   href,
   cta,
-  imageSrc,
-  imageAlt,
+  imageLabel,
   layout,
   index,
 }: (typeof featured)[number] & { index: number }) {
@@ -92,7 +88,7 @@ function FeaturedSection({
     </Stack>
   );
 
-  const imageBlock = <FeaturedImage src={imageSrc} alt={imageAlt} />;
+  const imageBlock = <FeaturedImage label={imageLabel} />;
 
   return (
     <div className="grid grid-cols-1 items-center gap-(--space-2xl) lg:grid-cols-2 lg:gap-(--space-3xl)">

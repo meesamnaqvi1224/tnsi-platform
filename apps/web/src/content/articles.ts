@@ -20,7 +20,6 @@ export interface ArticleItem {
   publishedAt: string;
   readingTime: string;
   imageAlt: string;
-  imageSrc?: string;
   href: string;
   variant: ArticleVariant;
 }
@@ -41,8 +40,7 @@ export const articlesContent = {
     supportingHeadline:
       'Thoughtful perspectives on neuroscience, trauma recovery, leadership and nervous system education.',
     supportingCopy: 'Explore our latest writing, research summaries and practical insights.',
-    imageSrc: '/images/articles/hero-landscape.webp',
-    imageAlt: 'Caroline Reed in an editorial portrait for the Institute publication.',
+    imageAlt: 'Editorial photography — notebook, books and writing desk in natural light.',
     primaryCta: { label: 'Latest Articles', href: '#latest' },
     secondaryCta: { label: 'Browse Topics', href: '#topics' },
   },
@@ -55,8 +53,7 @@ export const articlesContent = {
     title: 'The Nervous System as a Framework for Understanding Human Behaviour',
     summary:
       'A long-form introduction to how autonomic state shapes perception, relationships and the capacity for change — written for curious readers and serious practitioners alike.',
-    imageSrc: '/images/articles/featured-article.webp',
-    imageAlt: 'Caroline Reed in an editorial portrait for the featured article.',
+    imageAlt: 'Open journal with handwritten notes beside stacked research volumes.',
     href: '/articles/nervous-system-framework',
   },
 
@@ -101,7 +98,6 @@ export const articlesContent = {
         category: 'Neuroscience',
         publishedAt: 'June 2026',
         readingTime: '8 min read',
-        imageSrc: '/images/articles/latest-polyvagal.webp',
         imageAlt: 'Annotated research papers on a wooden desk.',
         href: '/articles/polyvagal-theory-in-practice',
         variant: 'large',
@@ -114,7 +110,6 @@ export const articlesContent = {
         category: 'Trauma Recovery',
         publishedAt: 'June 2026',
         readingTime: '6 min read',
-        imageSrc: '/images/articles/latest-window-tolerance.webp',
         imageAlt: 'Quiet reading corner with soft daylight.',
         href: '/articles/window-of-tolerance',
         variant: 'medium',
@@ -128,7 +123,6 @@ export const articlesContent = {
         category: 'Leadership',
         publishedAt: 'May 2026',
         readingTime: '10 min read',
-        imageSrc: '/images/articles/latest-leadership.webp',
         imageAlt: 'Executive journal and fountain pen.',
         href: '/articles/nervous-system-of-leadership',
         variant: 'medium',
@@ -178,7 +172,6 @@ export const articlesContent = {
         category: 'Research',
         publishedAt: 'April 2026',
         readingTime: '11 min read',
-        imageSrc: '/images/articles/latest-neuroception.webp',
         imageAlt: 'Research journal open on a linen-covered table.',
         href: '/articles/neuroception-and-safety',
         variant: 'large',
@@ -192,7 +185,6 @@ export const articlesContent = {
         category: 'Interviews',
         publishedAt: 'March 2026',
         readingTime: '15 min read',
-        imageSrc: '/images/articles/latest-interview.webp',
         imageAlt: 'Editorial portrait setting with natural light.',
         href: '/articles/interview-caroline-reed',
         variant: 'medium',
@@ -206,7 +198,6 @@ export const articlesContent = {
         category: 'Practitioner Education',
         publishedAt: 'March 2026',
         readingTime: '8 min read',
-        imageSrc: '/images/articles/latest-somatic-markers.webp',
         imageAlt: 'Handwritten therapy notes and anatomy reference.',
         href: '/articles/somatic-markers-in-therapy',
         variant: 'medium',
@@ -280,8 +271,7 @@ export const articlesContent = {
         title: 'Building Capacity Beyond Resilience',
         summary:
           'Why resilience is an insufficient frame — and what nervous system capacity offers instead.',
-        imageSrc: '/images/articles/editors-pick-01.webp',
-        imageAlt: 'Caroline Reed in a thoughtful editorial portrait.',
+        imageAlt: 'Printed journal on a marble surface.',
         href: '/articles/building-capacity-beyond-resilience',
         layout: 'image-left' as const,
       },
@@ -290,8 +280,7 @@ export const articlesContent = {
         title: 'What Trauma-Informed Really Means',
         summary:
           'Moving beyond buzzwords toward physiology, safety and evidence-informed practice.',
-        imageSrc: '/images/articles/editors-pick-02.webp',
-        imageAlt: 'Caroline Reed in a composed black-and-white portrait.',
+        imageAlt: 'Research papers with marginalia.',
         href: '/articles/what-trauma-informed-means',
         layout: 'image-right' as const,
       },
@@ -300,8 +289,7 @@ export const articlesContent = {
         title: 'Leadership Culture Starts in the Nervous System',
         summary:
           'How a leader\u2019s physiological state becomes the unwritten policy of an organisation.',
-        imageSrc: '/images/articles/editors-pick-03.webp',
-        imageAlt: 'Caroline Reed in a warm, approachable portrait.',
+        imageAlt: 'Executive office with natural materials.',
         href: '/articles/leadership-culture-nervous-system',
         layout: 'image-left' as const,
       },

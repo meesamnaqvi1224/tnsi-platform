@@ -35,7 +35,7 @@ export function EaFounder() {
       <EditorialImage
         src={founder.imageSrc}
         alt={founder.imageAlt}
-        aspect="landscape"
+        aspect="portrait"
         className="lg:order-2 lg:aspect-auto lg:min-h-full lg:rounded-none"
         sizes="(max-width: 1024px) 100vw, 50vw"
       />

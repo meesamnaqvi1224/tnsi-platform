@@ -1,7 +1,6 @@
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Text } from '@tnsi/ui';
-import { ResponsiveImage } from '@/components/utility/responsive-image';
 import type { EditorsPickItem } from '@/content/articles';
 
 export interface EditorsPickProps {
@@ -14,15 +13,14 @@ export function EditorsPick({ pick }: EditorsPickProps) {
   return (
     <article className="border-border grid grid-cols-1 items-center border-t lg:grid-cols-2">
       <div
-        className={`relative min-h-[45vh] overflow-hidden ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
+        className={`bg-secondary relative min-h-[45vh] ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
       >
-        <ResponsiveImage
-          src={pick.imageSrc}
-          alt={pick.imageAlt}
-          fill
-          className="object-cover"
-          sizes="(max-width: 1024px) 100vw, 50vw"
-        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Text size="sm" tone="muted" className="max-w-[12rem] text-center">
+            Editor&apos;s pick photography placeholder
+          </Text>
+        </div>
+        <span className="sr-only">{pick.imageAlt}</span>
       </div>
 
       <div

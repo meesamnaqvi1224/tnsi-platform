@@ -34,9 +34,9 @@ export default function NotFound() {
               <EditorialImage
                 src={notFoundContent.imageSrc}
                 alt={notFoundContent.imageAlt}
+                label={notFoundContent.imageLabel}
                 aspect="landscape"
                 className="rounded-sm"
-                sizes="(max-width: 1024px) 100vw, 50vw"
               />
 
               <Stack gap="2xl">

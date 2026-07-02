@@ -24,8 +24,7 @@ export const executiveAdvisoryContent = {
       'Helping leaders build organisations that perform sustainably through nervous system-informed leadership.',
     supportingCopy:
       'Modern organisations don\u2019t just need better strategies. They need leaders capable of making clear decisions, leading through uncertainty and creating environments where people can perform without chronic stress.',
-    imageSrc: '/images/programs/executive/hero-meeting.webp',
-    imageAlt: 'Caroline Reed in an executive portrait within a modern office setting.',
+    imageAlt: 'Executive meeting photography — private strategy session, natural light.',
     imageCaption:
       'Private advisory engagements for leaders navigating complexity, capacity and culture.',
     metadata: [

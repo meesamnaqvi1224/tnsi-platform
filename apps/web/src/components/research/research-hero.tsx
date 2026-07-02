@@ -1,6 +1,5 @@
 import NextLink from 'next/link';
 import { buttonVariants, Container, Stack, Text } from '@tnsi/ui';
-import { SectionImage } from '@/components/utility/section-image';
 import { researchContent } from '@/content/research';
 
 const { hero } = researchContent;
@@ -11,7 +10,13 @@ export function ResearchHero() {
       aria-labelledby="research-hero-heading"
       className="border-border relative flex min-h-[85vh] items-end overflow-hidden border-b"
     >
-      <SectionImage src={hero.imageSrc} alt={hero.imageAlt} priority sizes="100vw" />
+      <div className="bg-secondary absolute inset-0" aria-hidden>
+        <div className="flex h-full items-center justify-center">
+          <Text size="sm" tone="muted" className="max-w-[16rem] text-center">
+            Research photography — papers, journals, notebook, natural daylight
+          </Text>
+        </div>
+      </div>
 
       <div
         aria-hidden
@@ -64,6 +69,8 @@ export function ResearchHero() {
           </Stack>
         </Stack>
       </Container>
+
+      <span className="sr-only">{hero.imageAlt}</span>
     </section>
   );
 }

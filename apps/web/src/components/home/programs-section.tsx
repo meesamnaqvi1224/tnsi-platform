@@ -2,8 +2,6 @@ import type * as React from 'react';
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Container, Eyebrow, Grid, Heading, Link, Section, Stack, Text } from '@tnsi/ui';
-import { ResponsiveImage } from '@/components/utility/responsive-image';
-import { homeImages } from '@/content/images';
 
 const programs = [
   {
@@ -11,39 +9,33 @@ const programs = [
     description:
       'A foundational program for ambitious women ready to rebuild their relationship with their nervous system and reclaim sustainable capacity.',
     href: '/method',
-    imageSrc: homeImages.programLifeBeyondTrauma,
-    imageAlt: 'Caroline Reed in a warm editorial portrait for the Life Beyond Trauma programme.',
   },
   {
     title: 'Practitioner Certification',
     description:
       'Advanced certification for therapists, coaches and healthcare professionals integrating nervous system science into their practice.',
     href: '/programs/practitioner-certification',
-    imageSrc: homeImages.programPractitioner,
-    imageAlt: 'Caroline Reed in a professional portrait for Practitioner Certification.',
   },
   {
     title: 'Executive Advisory',
     description:
       'Private advisory for senior leaders and executives navigating high-performance environments without physiological cost.',
     href: '/programs/executive-advisory',
-    imageSrc: homeImages.programExecutive,
-    imageAlt: 'Caroline Reed in an executive portrait for Executive Advisory.',
   },
 ] as const;
 
-function ProgramCard({ title, description, href, imageSrc, imageAlt }: (typeof programs)[number]) {
+function ProgramCard({ title, description, href }: (typeof programs)[number]) {
   return (
     <article className="group">
       <NextLink href={href} className="interaction-focus block rounded-lg">
-        <figure className="border-border relative aspect-[4/3] w-full overflow-hidden rounded-lg border">
-          <ResponsiveImage
-            src={imageSrc}
-            alt={imageAlt}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 33vw"
-          />
+        {/* TODO: swap for the approved program-specific lifestyle image once added to apps/web/public */}
+        <figure className="border-border bg-secondary relative aspect-[4/3] w-full overflow-hidden rounded-lg border">
+          <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
+            <Text size="sm" tone="muted">
+              Image placeholder
+            </Text>
+          </div>
+          <span className="sr-only">{title} program photography placeholder.</span>
         </figure>
       </NextLink>
       <Stack gap="xs" className="mt-(--space-md)">

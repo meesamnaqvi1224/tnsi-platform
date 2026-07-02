@@ -20,9 +20,8 @@ export const contactContent = {
     headline: 'Contact',
     supportingHeadline:
       'Whether you have a question, are exploring a programme or would like to collaborate, we\u2019d love to hear from you.',
-    imageSrc: '/images/contact/hero-landscape.webp',
-    imageAlt:
-      'Editorial photograph — warm office interior, books and natural light. No corporate setting.',
+    imageSrc: '/images/shared/caroline-portrait-warm.webp',
+    imageAlt: 'Portrait of Caroline Reed — warm natural light, editorial treatment.',
     primaryCta: { label: 'Book Discovery Call', href: '/book-a-call' },
     secondaryCta: { label: 'Email Us', href: 'mailto:hello@tnsi.org' },
   },

@@ -1,7 +1,6 @@
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Text } from '@tnsi/ui';
-import { ResponsiveImage } from '@/components/utility/responsive-image';
 
 export interface FeaturedArticleProps {
   category: string;
@@ -9,7 +8,6 @@ export interface FeaturedArticleProps {
   readingTime: string;
   title: string;
   summary: string;
-  imageSrc: string;
   imageAlt: string;
   href: string;
 }
@@ -20,20 +18,18 @@ export function FeaturedArticle({
   readingTime,
   title,
   summary,
-  imageSrc,
   imageAlt,
   href,
 }: FeaturedArticleProps) {
   return (
     <article className="border-border grid grid-cols-1 border-t lg:grid-cols-[3fr_2fr]">
-      <div className="relative min-h-[55vh] overflow-hidden lg:min-h-[75vh]">
-        <ResponsiveImage
-          src={imageSrc}
-          alt={imageAlt}
-          fill
-          className="object-cover"
-          sizes="(max-width: 1024px) 100vw, 60vw"
-        />
+      <div className="bg-secondary relative min-h-[55vh] lg:min-h-[75vh]">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Text size="sm" tone="muted" className="max-w-[14rem] text-center">
+            Featured article photography placeholder
+          </Text>
+        </div>
+        <span className="sr-only">{imageAlt}</span>
       </div>
 
       <div className="flex flex-col justify-center px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:px-(--space-3xl)">

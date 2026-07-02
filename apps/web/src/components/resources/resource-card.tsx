@@ -1,7 +1,6 @@
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Text } from '@tnsi/ui';
-import { ResponsiveImage } from '@/components/utility/responsive-image';
 import type { ResourceItem } from '@/content/resources';
 
 export interface ResourceCardProps {
@@ -14,15 +13,14 @@ export function ResourceCard({ resource }: ResourceCardProps) {
   return (
     <article className="border-border grid min-w-0 grid-cols-1 items-center overflow-hidden border-t lg:grid-cols-2">
       <div
-        className={`relative min-h-[40vh] overflow-hidden ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
+        className={`bg-secondary relative min-h-[40vh] ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
       >
-        <ResponsiveImage
-          src={resource.imageSrc}
-          alt={resource.imageAlt}
-          fill
-          className="object-cover"
-          sizes="(max-width: 1024px) 100vw, 50vw"
-        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Text size="sm" tone="muted" className="max-w-[12rem] text-center">
+            Resource photography placeholder
+          </Text>
+        </div>
+        <span className="sr-only">{resource.imageAlt}</span>
       </div>
 
       <div

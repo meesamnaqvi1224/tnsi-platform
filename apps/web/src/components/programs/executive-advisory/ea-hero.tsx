@@ -1,6 +1,5 @@
 import NextLink from 'next/link';
 import { buttonVariants, Container, Stack, Text } from '@tnsi/ui';
-import { SectionImage } from '@/components/utility/section-image';
 import { executiveAdvisoryContent } from '@/content/executive-advisory';
 
 const { hero } = executiveAdvisoryContent;
@@ -8,10 +7,17 @@ const { hero } = executiveAdvisoryContent;
 export function EaHero() {
   return (
     <section aria-labelledby="ea-hero-heading" className="border-border border-b">
-      <div className="relative min-h-[72vh] w-full overflow-hidden">
-        <SectionImage src={hero.imageSrc} alt={hero.imageAlt} priority sizes="100vw" />
+      {/* Full-width editorial photography */}
+      <div className="bg-foreground relative min-h-[72vh] w-full">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Text size="sm" className="text-background/50 max-w-[16rem] text-center">
+            Executive meeting photography placeholder — private strategy session, natural light
+          </Text>
+        </div>
+        <span className="sr-only">{hero.imageAlt}</span>
       </div>
 
+      {/* Editorial content block — stacked below image, not side-by-side */}
       <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">
         <Stack gap="2xl" className="max-w-4xl">
           <div className="flex flex-col gap-(--space-sm)">
@@ -56,6 +62,7 @@ export function EaHero() {
         </Stack>
       </Container>
 
+      {/* Premium metadata strip — inverted for executive distinction */}
       <div className="bg-foreground text-background border-border border-t">
         <Container size="xl" className="px-(--space-xl) py-(--space-xl) sm:px-(--space-2xl)">
           <dl className="grid grid-cols-1 gap-(--space-xl) sm:grid-cols-3">

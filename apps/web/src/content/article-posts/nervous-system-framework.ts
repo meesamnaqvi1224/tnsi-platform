@@ -15,8 +15,8 @@ export const nervousSystemFrameworkPost: ArticlePost = {
     headline: 'The Nervous System as a Framework for Understanding Human Behaviour',
     subtitle:
       'Why the body\u2019s autonomic state may be the most overlooked variable in psychology, leadership and everyday life.',
-    imageSrc: '/images/articles/post-hero.webp',
-    imageAlt: 'Caroline Reed in an editorial portrait for the Institute publication.',
+    imageAlt:
+      'Editorial photograph — open research journal beside stacked volumes in natural light.',
     author: {
       name: 'Caroline Reed',
       role: 'Founder, The Nervous System Institute',
@@ -81,8 +81,7 @@ export const nervousSystemFrameworkPost: ArticlePost = {
     },
     {
       type: 'figure',
-      imageSrc: '/images/articles/figure-inline.webp',
-      imageAlt: 'Caroline Reed in an editorial portrait within a professional office setting.',
+      imageAlt: 'Handwritten clinical notes beside anatomy reference texts.',
       caption:
         'Figure 1. Clinical observation remains essential — nervous system frameworks sharpen, rather than replace, attentive practice.',
       variant: 'inline',
@@ -117,8 +116,7 @@ export const nervousSystemFrameworkPost: ArticlePost = {
     },
     {
       type: 'figure',
-      imageSrc: '/images/articles/figure-full.webp',
-      imageAlt: 'Caroline Reed at her desk in a professional office setting.',
+      imageAlt: 'Wide editorial photograph of a quiet research library with natural light.',
       caption:
         'Figure 2. The Institute\u2019s educational work sits at the intersection of rigorous research and practical application.',
       variant: 'full',
@@ -159,8 +157,7 @@ export const nervousSystemFrameworkPost: ArticlePost = {
     role: 'Founder of The Nervous System Institute',
     biography:
       'Caroline Reed brings more than twenty years of clinical experience in trauma recovery and nervous system education. Her writing and teaching integrate neuroscience, psychology and practical implementation into frameworks used by practitioners and leaders internationally.',
-    imageSrc: '/images/articles/author-portrait.webp',
-    imageAlt: 'Black and white portrait of Caroline Reed, founder of The Nervous System Institute.',
+    imageAlt: 'Portrait of Caroline Reed.',
     href: '/about',
   },
   related: [
@@ -170,24 +167,21 @@ export const nervousSystemFrameworkPost: ArticlePost = {
       title: 'Polyvagal Theory in Everyday Practice',
       summary:
         'Translating Stephen Porges\u2019 framework into language clinicians and educators can use with confidence.',
-      imageSrc: '/images/articles/related-01.webp',
-      imageAlt: 'Caroline Reed in a professional editorial portrait.',
+      imageAlt: 'Annotated research papers on a wooden desk.',
     },
     {
       slug: 'window-of-tolerance',
       category: 'Trauma Recovery',
       title: 'The Window of Tolerance Explained',
       summary: 'A clear guide to dysregulation, hyperarousal and the physiology of overwhelm.',
-      imageSrc: '/images/articles/related-02.webp',
-      imageAlt: 'Caroline Reed in a warm editorial portrait.',
+      imageAlt: 'Quiet reading corner with soft daylight.',
     },
     {
       slug: 'co-regulation',
       category: 'Neuroscience',
       title: 'Co-Regulation and Relational Safety',
       summary: 'Why connection is a physiological intervention, not merely a therapeutic ideal.',
-      imageSrc: '/images/articles/related-03.webp',
-      imageAlt: 'Caroline Reed in an approachable editorial portrait.',
+      imageAlt: 'Two chairs in a calm consultation room.',
     },
   ],
   footerQuote: {

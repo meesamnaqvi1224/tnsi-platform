@@ -27,7 +27,6 @@ function mergeListingMeta(slug: string, post: ArticlePost): ArticlePost {
     publishedAt: articlesContent.featured.publishedAt,
     readingTime: articlesContent.featured.readingTime,
     imageAlt: articlesContent.featured.imageAlt,
-    imageSrc: articlesContent.featured.imageSrc,
     href: articlesContent.featured.href,
     id: featuredSlug,
     variant: 'large' as const,
@@ -48,7 +47,6 @@ function mergeListingMeta(slug: string, post: ArticlePost): ArticlePost {
       headline: source.title,
       subtitle: source.summary,
       imageAlt: source.imageAlt,
-      imageSrc: 'imageSrc' in source ? source.imageSrc : post.hero.imageSrc,
     },
   };
 }
