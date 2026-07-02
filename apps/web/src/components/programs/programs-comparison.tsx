@@ -45,7 +45,7 @@ function ComparisonCard({
 
       <NextLink
         href={href}
-        className="text-foreground duration-base ease-standard hover:text-muted-foreground mt-(--space-xl) inline-flex items-center gap-(--space-xs) text-sm font-medium transition-colors"
+        className="interaction-text-link text-foreground hover:text-muted-foreground mt-(--space-xl) inline-flex items-center gap-(--space-xs) text-sm font-medium"
       >
         Explore
         <ArrowRight aria-hidden className="size-4" />

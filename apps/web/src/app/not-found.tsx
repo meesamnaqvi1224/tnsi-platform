@@ -46,7 +46,7 @@ export default function NotFound() {
                   </NextLink>
                   <NextLink
                     href={notFoundContent.tertiaryCta.href}
-                    className="text-muted-foreground hover:text-foreground duration-base text-sm underline-offset-4 transition-colors hover:underline"
+                    className="interaction-text-link-underline"
                   >
                     {notFoundContent.tertiaryCta.label}
                   </NextLink>

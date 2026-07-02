@@ -29,13 +29,10 @@ export function ResourceCollection({ collection, index }: ResourceCollectionProp
 
       <NextLink
         href={collection.href}
-        className="text-foreground group inline-flex shrink-0 items-center gap-(--space-sm) self-start text-sm font-medium tracking-wide lg:self-end"
+        className="interaction-text-link text-foreground group inline-flex shrink-0 items-center gap-(--space-sm) self-start text-sm font-medium tracking-wide lg:self-end"
       >
         Explore Collection
-        <ArrowRight
-          aria-hidden
-          className="size-4 transition-transform duration-200 group-hover:translate-x-1"
-        />
+        <ArrowRight aria-hidden className="interaction-arrow size-4" />
       </NextLink>
     </article>
   );

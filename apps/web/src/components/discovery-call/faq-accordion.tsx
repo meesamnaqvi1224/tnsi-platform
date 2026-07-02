@@ -22,18 +22,12 @@ export function FAQAccordion() {
 
           <div>
             {faq.items.map(({ question, answer }) => (
-              <details
-                key={question}
-                className="group border-border border-t transition-opacity duration-200 first:border-t"
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-(--space-lg) py-(--space-xl) [&::-webkit-details-marker]:hidden">
+              <details key={question} className="group border-border border-t first:border-t">
+                <summary className="interaction-accordion-summary">
                   <span className="font-heading text-foreground text-base font-semibold tracking-tight">
                     {question}
                   </span>
-                  <ChevronDown
-                    aria-hidden
-                    className="text-muted-foreground size-4 shrink-0 transition-transform duration-300 group-open:rotate-180"
-                  />
+                  <ChevronDown aria-hidden className="interaction-accordion-icon" />
                 </summary>
                 <div className="pb-(--space-xl)">
                   <p className="text-muted-foreground text-sm leading-relaxed">{answer}</p>

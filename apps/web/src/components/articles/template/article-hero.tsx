@@ -14,7 +14,7 @@ export function ArticleHero({ hero }: ArticleHeroProps) {
       <Container size="xl" className="px-(--space-xl) pt-(--space-xl) sm:px-(--space-2xl)">
         <NextLink
           href="/articles"
-          className="text-muted-foreground hover:text-foreground mb-(--space-xl) inline-flex items-center gap-(--space-sm) text-sm font-medium transition-colors"
+          className="interaction-text-link mb-(--space-xl) inline-flex items-center gap-(--space-sm) text-sm font-medium"
         >
           <ArrowLeft aria-hidden className="size-4" />
           Back to Articles

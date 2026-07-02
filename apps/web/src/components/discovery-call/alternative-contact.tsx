@@ -18,7 +18,7 @@ function ContactCard({
   const valueContent = href ? (
     <NextLink
       href={href}
-      className="text-foreground hover:text-muted-foreground text-lg font-medium transition-colors duration-200"
+      className="interaction-text-link text-foreground hover:text-muted-foreground text-lg font-medium"
     >
       {value}
     </NextLink>
@@ -27,7 +27,7 @@ function ContactCard({
   );
 
   return (
-    <article className="border-border/70 bg-background/50 hover:bg-background flex flex-1 flex-col gap-(--space-lg) rounded-lg border p-(--space-2xl) transition-colors duration-300">
+    <article className="interaction-card-surface interaction-focus bg-background/50 hover:bg-background flex flex-1 flex-col gap-(--space-lg) rounded-lg border p-(--space-2xl)">
       <Stack gap="sm">
         <h3 className="font-heading text-foreground text-lg font-semibold tracking-tight">
           {title}

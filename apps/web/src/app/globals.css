@@ -79,6 +79,54 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
+  }
+}
+
+@layer utilities {
+  /* Calm, token-driven interaction primitives */
+  .interaction-colors {
+    @apply duration-base ease-standard transition-colors;
+  }
+
+  .interaction-transform {
+    @apply duration-base ease-standard transition-transform;
+  }
+
+  .interaction-opacity {
+    @apply duration-base ease-standard transition-opacity;
+  }
+
+  .interaction-width {
+    @apply duration-base ease-standard transition-[width];
+  }
+
+  .interaction-focus {
+    @apply focus-visible:ring-ring rounded-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
+  }
+
+  .interaction-arrow {
+    @apply duration-base ease-standard size-4 transition-transform group-hover:translate-x-1;
+  }
+
+  .interaction-accordion-icon {
+    @apply text-muted-foreground duration-slow ease-standard size-4 shrink-0 transition-transform group-open:rotate-180;
+  }
+
+  .interaction-accordion-summary {
+    @apply focus-visible:ring-ring flex cursor-pointer list-none items-center justify-between gap-(--space-lg) rounded-sm py-(--space-xl) focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none [&::-webkit-details-marker]:hidden;
+  }
+
+  .interaction-card-surface {
+    @apply duration-base ease-standard border-border/70 hover:bg-secondary/20 transition-colors;
+  }
+
+  .interaction-text-link {
+    @apply duration-base ease-standard text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
+  }
+
+  .interaction-text-link-underline {
+    @apply duration-base ease-standard text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded-sm text-sm underline-offset-4 transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
   }
 }

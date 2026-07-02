@@ -59,10 +59,7 @@ export function ContactHero() {
             >
               {hero.primaryCta.label}
             </NextLink>
-            <NextLink
-              href={hero.secondaryCta.href}
-              className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 transition-colors duration-200 hover:underline"
-            >
+            <NextLink href={hero.secondaryCta.href} className="interaction-text-link-underline">
               {hero.secondaryCta.label}
             </NextLink>
           </Stack>

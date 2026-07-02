@@ -27,10 +27,10 @@ const programs = [
 function ProgramCard({ title, description, href }: (typeof programs)[number]) {
   return (
     <article className="group">
-      <NextLink href={href} className="block">
+      <NextLink href={href} className="interaction-focus block rounded-lg">
         {/* TODO: swap for the approved program-specific lifestyle image once added to apps/web/public */}
         <div className="border-border bg-secondary relative aspect-[4/3] w-full overflow-hidden rounded-lg border">
-          <div className="duration-slow ease-standard absolute inset-0 flex items-center justify-center transition-transform group-hover:scale-105">
+          <div className="absolute inset-0 flex items-center justify-center">
             <Text size="sm" tone="muted">
               Image placeholder
             </Text>
@@ -52,10 +52,7 @@ function ProgramCard({ title, description, href }: (typeof programs)[number]) {
           className="inline-flex items-center gap-1"
         >
           Learn More
-          <ArrowRight
-            aria-hidden
-            className="duration-base ease-standard size-4 transition-transform group-hover:translate-x-1"
-          />
+          <ArrowRight aria-hidden className="interaction-arrow" />
         </Link>
       </Stack>
     </article>

@@ -15,7 +15,7 @@ export function ContactMethods() {
             {methods.items.map((item) => (
               <article
                 key={item.id}
-                className="border-border/70 hover:bg-secondary/20 flex flex-col gap-(--space-lg) border p-(--space-2xl) transition-colors duration-300"
+                className="interaction-card-surface interaction-focus flex flex-col gap-(--space-lg) border p-(--space-2xl)"
               >
                 <Stack gap="sm">
                   <h3 className="font-heading text-foreground text-lg font-semibold tracking-tight">
@@ -23,7 +23,7 @@ export function ContactMethods() {
                   </h3>
                   <NextLink
                     href={item.href}
-                    className="text-foreground hover:text-muted-foreground text-base font-medium transition-colors duration-200"
+                    className="interaction-text-link text-foreground hover:text-muted-foreground text-base font-medium"
                   >
                     {item.email}
                   </NextLink>

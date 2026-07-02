@@ -35,7 +35,7 @@ export function SiteFooter() {
                     <li key={link.href}>
                       <NextLink
                         href={link.href}
-                        className="text-muted-foreground duration-base ease-standard hover:text-foreground text-sm transition-colors"
+                        className="interaction-colors interaction-focus text-muted-foreground hover:text-foreground text-sm"
                       >
                         {link.label}
                       </NextLink>
@@ -58,7 +58,7 @@ export function SiteFooter() {
               <NextLink
                 key={link.href}
                 href={link.href}
-                className="text-muted-foreground duration-base ease-standard hover:text-foreground text-sm transition-colors"
+                className="interaction-colors interaction-focus text-muted-foreground hover:text-foreground text-sm"
               >
                 {link.label}
               </NextLink>

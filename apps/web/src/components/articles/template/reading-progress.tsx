@@ -39,10 +39,7 @@ export function ReadingProgress() {
       className="bg-border fixed top-0 right-0 left-0 z-50 h-0.5"
       role="presentation"
     >
-      <div
-        className="bg-foreground h-full transition-[width] duration-150 ease-out"
-        style={{ width: `${progress}%` }}
-      />
+      <div className="bg-foreground interaction-width h-full" style={{ width: `${progress}%` }} />
     </div>
   );
 }

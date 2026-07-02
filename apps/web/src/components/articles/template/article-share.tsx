@@ -6,7 +6,7 @@ export function ArticleShare() {
   return (
     <button
       type="button"
-      className="text-muted-foreground hover:text-foreground inline-flex items-center gap-(--space-sm) text-sm transition-colors"
+      className="interaction-text-link inline-flex items-center gap-(--space-sm) text-sm"
       onClick={() => {
         void navigator.clipboard.writeText(window.location.href);
       }}

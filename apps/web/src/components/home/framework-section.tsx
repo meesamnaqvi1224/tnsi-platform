@@ -45,11 +45,7 @@ export function FrameworkSection() {
 
         <Grid cols="4" gap="xl" className="mt-(--space-2xl)">
           {steps.map((step) => (
-            <Stack
-              key={step.number}
-              gap="sm"
-              className="group duration-base ease-standard transition-transform hover:-translate-y-1"
-            >
+            <Stack key={step.number} gap="sm" className="group">
               <step.icon aria-hidden className="text-muted-foreground size-5" />
               <Text size="sm" tone="muted">
                 {step.number}

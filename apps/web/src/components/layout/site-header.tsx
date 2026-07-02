@@ -29,7 +29,7 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        'duration-base ease-standard sticky top-0 z-(--z-sticky) w-full border-b transition-colors',
+        'interaction-colors sticky top-0 z-(--z-sticky) w-full border-b',
         isScrolled
           ? 'border-border bg-background/95 backdrop-blur-sm'
           : 'bg-background border-transparent',
@@ -38,7 +38,7 @@ export function SiteHeader() {
       <Container size="xl" className="flex h-20 items-center justify-between">
         <NextLink
           href="/"
-          className="font-heading text-sm leading-tight font-semibold tracking-[0.1em] uppercase"
+          className="interaction-focus font-heading text-sm leading-tight font-semibold tracking-[0.1em] uppercase"
         >
           The
           <br />
@@ -50,7 +50,7 @@ export function SiteHeader() {
             <NextLink
               key={link.href}
               href={link.href}
-              className="text-foreground duration-base ease-standard hover:text-muted-foreground text-sm transition-colors"
+              className="interaction-colors interaction-focus text-foreground hover:text-muted-foreground text-sm"
             >
               {link.label}
             </NextLink>
@@ -84,7 +84,10 @@ export function SiteHeader() {
                       key={link.href}
                       nativeButton={false}
                       render={
-                        <NextLink href={link.href} className="text-foreground text-base">
+                        <NextLink
+                          href={link.href}
+                          className="interaction-text-link text-foreground text-base"
+                        >
                           {link.label}
                         </NextLink>
                       }

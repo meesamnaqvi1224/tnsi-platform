@@ -45,13 +45,10 @@ export function ResourcesCategories() {
                   </Text>
                   <NextLink
                     href={category.href}
-                    className="text-foreground group inline-flex items-center gap-(--space-sm) text-sm font-medium tracking-wide"
+                    className="interaction-text-link text-foreground group inline-flex items-center gap-(--space-sm) text-sm font-medium tracking-wide"
                   >
                     Explore
-                    <ArrowRight
-                      aria-hidden
-                      className="size-4 transition-transform duration-200 group-hover:translate-x-1"
-                    />
+                    <ArrowRight aria-hidden className="interaction-arrow size-4" />
                   </NextLink>
                 </Stack>
               </article>

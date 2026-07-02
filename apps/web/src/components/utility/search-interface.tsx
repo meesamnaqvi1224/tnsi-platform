@@ -71,7 +71,7 @@ export function SearchInterface() {
                   key={suggestion}
                   type="button"
                   onClick={() => setQuery(suggestion)}
-                  className="border-border/70 text-muted-foreground hover:text-foreground hover:border-border duration-base rounded-full border px-(--space-md) py-(--space-xs) text-sm transition-colors"
+                  className="interaction-colors interaction-focus border-border/70 text-muted-foreground hover:text-foreground hover:border-border rounded-full border px-(--space-md) py-(--space-xs) text-sm"
                 >
                   {suggestion}
                 </button>
@@ -89,7 +89,7 @@ export function SearchInterface() {
                   <button
                     type="button"
                     onClick={() => setQuery(term)}
-                    className="text-muted-foreground hover:text-foreground duration-base text-sm transition-colors"
+                    className="interaction-text-link text-sm"
                   >
                     {term}
                   </button>
@@ -127,9 +127,9 @@ export function SearchInterface() {
                     <li key={item.id}>
                       <NextLink
                         href={item.href}
-                        className="group border-border/70 hover:border-border duration-base block border-b pb-(--space-lg) transition-colors"
+                        className="interaction-colors interaction-focus group border-border/70 hover:border-border block border-b pb-(--space-lg)"
                       >
-                        <p className="font-heading text-foreground group-hover:text-muted-foreground duration-base text-lg font-medium tracking-tight transition-colors">
+                        <p className="interaction-colors font-heading text-foreground group-hover:text-muted-foreground text-lg font-medium tracking-tight">
                           {item.title}
                         </p>
                         <Text tone="muted" className="mt-(--space-xs) text-sm leading-relaxed">

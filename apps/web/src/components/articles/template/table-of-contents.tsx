@@ -27,10 +27,7 @@ export function TableOfContents({ blocks }: TableOfContentsProps) {
         <ol className="flex flex-col gap-(--space-sm)">
           {headings.map((heading) => (
             <li key={heading.id}>
-              <a
-                href={`#${heading.id}`}
-                className="text-muted-foreground hover:text-foreground text-sm leading-snug transition-colors"
-              >
+              <a href={`#${heading.id}`} className="interaction-text-link text-sm leading-snug">
                 {heading.text}
               </a>
             </li>

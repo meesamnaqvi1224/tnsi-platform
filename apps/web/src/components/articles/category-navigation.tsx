@@ -13,7 +13,7 @@ export function CategoryNavigation({ categories }: CategoryNavigationProps) {
           <li key={category.id}>
             <NextLink
               href={category.href}
-              className="group flex flex-col gap-(--space-xs) transition-opacity hover:opacity-70"
+              className="interaction-opacity interaction-focus group flex flex-col gap-(--space-xs) rounded-sm hover:opacity-80"
             >
               <span className="font-heading text-foreground text-lg font-semibold tracking-tight">
                 {category.label}

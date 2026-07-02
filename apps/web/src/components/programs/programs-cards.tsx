@@ -14,10 +14,10 @@ function DestinationCard({
 }: (typeof navigation)[number]) {
   return (
     <article className="group flex flex-col">
-      <NextLink href={href} className="block overflow-hidden">
+      <NextLink href={href} className="interaction-focus block overflow-hidden rounded-sm">
         {/* TODO: swap for approved program-specific photography once added to apps/web/public */}
         <div className="bg-secondary relative aspect-[3/4] w-full overflow-hidden sm:aspect-[4/5]">
-          <div className="duration-slow ease-standard absolute inset-0 flex items-center justify-center transition-transform group-hover:scale-[1.02]">
+          <div className="absolute inset-0 flex items-center justify-center">
             <Text size="sm" tone="muted" className="max-w-[12rem] text-center">
               {imageLabel}
             </Text>

@@ -23,7 +23,7 @@ export function Pagination({ currentPage, totalPages, baseHref, className }: Pag
             href={pageHref(baseHref, Math.max(1, currentPage - 1))}
             aria-disabled={currentPage === 1}
             className={cn(
-              'text-muted-foreground hover:text-foreground border-border inline-flex h-10 items-center border px-(--space-md) text-sm font-medium transition-colors',
+              'text-muted-foreground hover:text-foreground border-border interaction-colors interaction-focus inline-flex h-10 items-center border px-(--space-md) text-sm font-medium',
               currentPage === 1 && 'pointer-events-none opacity-40',
             )}
           >
@@ -37,7 +37,7 @@ export function Pagination({ currentPage, totalPages, baseHref, className }: Pag
               href={pageHref(baseHref, page)}
               aria-current={page === currentPage ? 'page' : undefined}
               className={cn(
-                'border-border inline-flex size-10 items-center justify-center border text-sm font-medium transition-colors',
+                'border-border interaction-colors interaction-focus inline-flex size-10 items-center justify-center border text-sm font-medium',
                 page === currentPage
                   ? 'bg-foreground text-background'
                   : 'text-muted-foreground hover:text-foreground',
@@ -53,7 +53,7 @@ export function Pagination({ currentPage, totalPages, baseHref, className }: Pag
             href={pageHref(baseHref, Math.min(totalPages, currentPage + 1))}
             aria-disabled={currentPage === totalPages}
             className={cn(
-              'text-muted-foreground hover:text-foreground border-border inline-flex h-10 items-center border px-(--space-md) text-sm font-medium transition-colors',
+              'text-muted-foreground hover:text-foreground border-border interaction-colors interaction-focus inline-flex h-10 items-center border px-(--space-md) text-sm font-medium',
               currentPage === totalPages && 'pointer-events-none opacity-40',
             )}
           >

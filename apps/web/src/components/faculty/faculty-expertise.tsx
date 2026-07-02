@@ -38,13 +38,10 @@ export function FacultyExpertise({ item }: FacultyExpertiseProps) {
           </Text>
           <NextLink
             href={item.href}
-            className="text-foreground group inline-flex items-center gap-(--space-sm) text-sm font-medium tracking-wide transition-opacity duration-200 hover:opacity-70"
+            className="interaction-opacity interaction-focus text-foreground group inline-flex items-center gap-(--space-sm) text-sm font-medium tracking-wide hover:opacity-80"
           >
             Learn More
-            <ArrowRight
-              aria-hidden
-              className="size-4 transition-transform duration-200 group-hover:translate-x-1"
-            />
+            <ArrowRight aria-hidden className="interaction-arrow size-4" />
           </NextLink>
         </div>
       </div>
