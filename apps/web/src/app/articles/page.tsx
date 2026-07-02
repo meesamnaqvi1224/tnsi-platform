@@ -35,7 +35,7 @@ export default function ArticlesPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <ArticlesHero />
         <ArticlesFeatured />
         <ArticlesCategories />

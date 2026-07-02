@@ -14,6 +14,8 @@ export interface ChapterMarkerProps {
   as?: HeadingProps['as'];
   /** Visual heading size. Defaults to `xl`. */
   size?: HeadingProps['size'];
+  /** Optional id for the chapter title heading — use with `aria-labelledby` on parent sections. */
+  headingId?: string;
   className?: string;
 }
 
@@ -39,6 +41,7 @@ export function ChapterMarker({
   title,
   as = 'h2',
   size = 'xl',
+  headingId,
   className,
 }: ChapterMarkerProps) {
   return (
@@ -51,7 +54,7 @@ export function ChapterMarker({
         <div className="flex-1 border-t border-border" aria-hidden />
       </div>
 
-      <Heading as={as} size={size}>
+      <Heading as={as} id={headingId} size={size}>
         {title}
       </Heading>
     </div>

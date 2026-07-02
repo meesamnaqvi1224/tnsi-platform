@@ -30,7 +30,7 @@ const stages = [
 
 export function MethodJourney() {
   return (
-    <Section spacing="xl" className="border-border border-t" aria-label="The Capacity Journey">
+    <Section spacing="xl" className="border-border border-t">
       <Container size="xl">
         <Stack gap="2xl">
           <ChapterMarker index="I" as="h2" size="xl" title="The Capacity Journey" />

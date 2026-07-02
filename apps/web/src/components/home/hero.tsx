@@ -32,18 +32,22 @@ export function Hero() {
           </Stack>
 
           {/* TODO: swap for the approved Caroline Reed portrait asset (red top, leather chair, hero style) once added to apps/web/public */}
-          <div className="border-border bg-secondary relative aspect-[4/5] w-full overflow-hidden rounded-lg border lg:col-span-2">
-            <div className="absolute inset-0 flex items-center justify-center">
+          <figure className="border-border bg-secondary relative aspect-[4/5] w-full overflow-hidden rounded-lg border lg:col-span-2">
+            <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
               <Text size="sm" tone="muted">
                 Portrait placeholder
               </Text>
             </div>
-            <div className="absolute bottom-0 left-0 p-(--space-md)">
+            <figcaption className="absolute bottom-0 left-0 p-(--space-md)">
               <Text size="sm" className="text-foreground">
                 Caroline Reed — Founder &amp; Director
               </Text>
-            </div>
-          </div>
+            </figcaption>
+            <span className="sr-only">
+              Editorial portrait of Caroline Reed, Founder and Director of The Nervous System
+              Institute.
+            </span>
+          </figure>
         </div>
       </Container>
     </Section>

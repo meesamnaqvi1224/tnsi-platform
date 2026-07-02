@@ -35,7 +35,7 @@ export default function ResourcesPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <ResourcesHero />
         <ResourcesFeatured />
         <ResourcesCategories />

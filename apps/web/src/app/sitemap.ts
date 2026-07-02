@@ -15,7 +15,6 @@ const STATIC_ROUTES = [
   '/faculty',
   '/book-a-call',
   '/contact',
-  '/search',
   '/privacy',
   '/terms',
   '/accessibility',

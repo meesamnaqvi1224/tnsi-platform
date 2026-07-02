@@ -33,7 +33,7 @@ export default function ProgramsPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <ProgramsHero />
         <ProgramsCards />
         <ProgramsFeatured />

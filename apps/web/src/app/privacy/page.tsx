@@ -28,7 +28,7 @@ export default function PrivacyPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <LegalDocument
           title={privacyContent.title}
           lastUpdated={privacyContent.lastUpdated}

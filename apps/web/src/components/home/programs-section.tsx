@@ -29,13 +29,14 @@ function ProgramCard({ title, description, href }: (typeof programs)[number]) {
     <article className="group">
       <NextLink href={href} className="interaction-focus block rounded-lg">
         {/* TODO: swap for the approved program-specific lifestyle image once added to apps/web/public */}
-        <div className="border-border bg-secondary relative aspect-[4/3] w-full overflow-hidden rounded-lg border">
-          <div className="absolute inset-0 flex items-center justify-center">
+        <figure className="border-border bg-secondary relative aspect-[4/3] w-full overflow-hidden rounded-lg border">
+          <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
             <Text size="sm" tone="muted">
               Image placeholder
             </Text>
           </div>
-        </div>
+          <span className="sr-only">{title} program photography placeholder.</span>
+        </figure>
       </NextLink>
       <Stack gap="xs" className="mt-(--space-md)">
         <Text weight="semibold">{title}</Text>

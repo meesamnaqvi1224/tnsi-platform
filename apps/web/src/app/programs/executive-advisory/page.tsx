@@ -41,7 +41,7 @@ export default function ExecutiveAdvisoryPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <EaHero />
         <EaChallenge />
         <EaAudience />

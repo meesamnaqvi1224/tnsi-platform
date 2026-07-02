@@ -19,6 +19,9 @@ export function ProgramsHero() {
           </Text>
         </div>
       </div>
+      <span className="sr-only">
+        Full-bleed editorial photography for the programs overview page.
+      </span>
 
       {/* Light scrim for legibility — no dark panel */}
       <div

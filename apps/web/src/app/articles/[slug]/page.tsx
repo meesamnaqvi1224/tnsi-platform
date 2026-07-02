@@ -12,7 +12,7 @@ import { ReadingProgress } from '@/components/articles/template/reading-progress
 import { RelatedArticles } from '@/components/articles/template/related-articles';
 import { TableOfContents } from '@/components/articles/template/table-of-contents';
 import { getAllArticleSlugs, getArticleBySlug } from '@/lib/articles';
-import { createBreadcrumbJsonLd, createPageMetadata } from '@/lib/seo';
+import { createArticleJsonLd, createBreadcrumbJsonLd, createPageMetadata } from '@/lib/seo';
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -52,20 +52,13 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   const jsonLd = [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'Article',
+    createArticleJsonLd({
       headline: article.hero.headline,
       description: article.seo.description,
-      author: {
-        '@type': 'Person',
-        name: article.author.name,
-      },
-      publisher: {
-        '@type': 'Organization',
-        name: 'The Nervous System Institute',
-      },
-    },
+      path: `/articles/${slug}`,
+      authorName: article.author.name,
+      datePublished: article.hero.publishedAt,
+    }),
     createBreadcrumbJsonLd([
       { name: 'Home', path: '/' },
       { name: 'Articles', path: '/articles' },
@@ -78,7 +71,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <JsonLd data={jsonLd} />
       <ReadingProgress />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <ArticleHero hero={article.hero} />
 
         <Section spacing="xl" className="border-border border-b">

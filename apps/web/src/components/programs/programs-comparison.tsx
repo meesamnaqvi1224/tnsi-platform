@@ -62,12 +62,12 @@ export function ProgramsComparison() {
       aria-labelledby="comparison-heading"
     >
       <Container size="xl">
-        <p
+        <h2
           id="comparison-heading"
-          className="text-muted-foreground mb-(--space-3xl) text-xs tracking-[0.15em] uppercase"
+          className="text-muted-foreground mb-(--space-3xl) text-xs font-normal tracking-[0.15em] uppercase"
         >
           Compare pathways
-        </p>
+        </h2>
 
         <div className="grid grid-cols-1 gap-(--space-lg) md:grid-cols-3">
           {comparison.map((program) => (

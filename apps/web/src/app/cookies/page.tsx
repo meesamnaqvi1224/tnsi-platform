@@ -28,7 +28,7 @@ export default function CookiesPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <LegalDocument
           title={cookiesContent.title}
           lastUpdated={cookiesContent.lastUpdated}

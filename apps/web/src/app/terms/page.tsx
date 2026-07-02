@@ -28,7 +28,7 @@ export default function TermsPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <LegalDocument
           title={termsContent.title}
           lastUpdated={termsContent.lastUpdated}

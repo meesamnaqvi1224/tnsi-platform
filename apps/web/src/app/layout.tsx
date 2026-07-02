@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { Cormorant_Garamond, Geist_Mono, Inter } from 'next/font/google';
+import { SkipLink } from '@/components/layout/skip-link';
 import { JsonLd } from '@/components/seo/json-ld';
-import { createOrganizationJsonLd, createPageMetadata } from '@/lib/seo';
+import { createOrganizationJsonLd, createPageMetadata, createWebSiteJsonLd } from '@/lib/seo';
 import './globals.css';
 
 const sansBody = Inter({
@@ -37,7 +38,8 @@ export default function RootLayout({
       <body
         className={`${sansBody.variable} ${displaySerif.variable} ${geistMono.variable} antialiased`}
       >
-        <JsonLd data={createOrganizationJsonLd()} />
+        <SkipLink />
+        <JsonLd data={[createOrganizationJsonLd(), createWebSiteJsonLd()]} />
         {children}
       </body>
     </html>

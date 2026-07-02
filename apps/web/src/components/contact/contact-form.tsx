@@ -17,12 +17,7 @@ const { form } = contactContent;
 
 export function ContactForm() {
   return (
-    <Section
-      id={form.id}
-      spacing="xl"
-      className="border-border bg-secondary/15 border-t"
-      aria-label={form.heading}
-    >
+    <Section id={form.id} spacing="xl" className="border-border bg-secondary/15 border-t">
       <Container size="xl">
         <div className="grid min-w-0 grid-cols-1 gap-(--space-3xl) lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-(--space-5xl)">
           <ChapterMarker

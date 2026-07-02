@@ -39,7 +39,7 @@ export default function BookACallPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main className="bg-background">
+      <main id="main-content" className="bg-background">
         <DiscoveryHero />
         <ProcessSteps />
         <EligibilitySection />

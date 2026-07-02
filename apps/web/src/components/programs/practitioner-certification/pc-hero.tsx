@@ -68,12 +68,13 @@ export function PcHero() {
         </Stack>
       </div>
 
-      <div className="bg-secondary relative min-h-[50vh] lg:min-h-0">
-        <div className="absolute inset-0 flex items-center justify-center">
+      <figure className="bg-secondary relative min-h-[50vh] lg:min-h-0">
+        <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
           <Text size="sm" tone="muted" className="max-w-[14rem] text-center">
             Workshop photography placeholder — Caroline teaching practitioners
           </Text>
         </div>
+        <span className="sr-only">{hero.imageCaption}</span>
         <Container size="xl" className="absolute right-0 bottom-0 left-0 p-(--space-lg)">
           <figcaption className="border-border border-t pt-(--space-sm)">
             <p className="text-muted-foreground text-xs leading-relaxed">
@@ -81,7 +82,7 @@ export function PcHero() {
             </p>
           </figcaption>
         </Container>
-      </div>
+      </figure>
     </section>
   );
 }

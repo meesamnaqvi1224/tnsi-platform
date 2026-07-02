@@ -54,6 +54,7 @@ export function SearchInterface() {
           onChange={(event) => setQuery(event.target.value)}
           placeholder={hero.placeholder}
           aria-label="Search the Institute"
+          aria-describedby="search-instructions"
           className="border-border/80 bg-background h-14 rounded-sm pr-4 pl-12 text-base"
           autoComplete="off"
         />

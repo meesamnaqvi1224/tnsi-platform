@@ -36,7 +36,7 @@ export default function ResearchPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <ResearchHero />
         <ResearchPhilosophy />
         <ResearchPillarsSection />

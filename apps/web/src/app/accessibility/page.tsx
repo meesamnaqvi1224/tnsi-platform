@@ -28,7 +28,7 @@ export default function AccessibilityPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <LegalDocument
           title={accessibilityContent.title}
           lastUpdated={accessibilityContent.lastUpdated}

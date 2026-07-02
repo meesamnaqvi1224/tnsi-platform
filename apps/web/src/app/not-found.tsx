@@ -1,15 +1,33 @@
+import type { Metadata } from 'next';
 import NextLink from 'next/link';
 import { buttonVariants, Container, Section, Stack, Text } from '@tnsi/ui';
 import { EditorialPlaceholder } from '@/components/utility/editorial-placeholder';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
+import { JsonLd } from '@/components/seo/json-ld';
 import { notFoundContent } from '@/content/not-found';
+import { createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
+
+const NOT_FOUND_TITLE = 'Page Not Found';
+
+export const metadata: Metadata = createPageMetadata({
+  title: NOT_FOUND_TITLE,
+  description: notFoundContent.supportingCopy,
+  path: '/404',
+  noIndex: true,
+});
 
 export default function NotFound() {
+  const jsonLd = createWebPageJsonLd({
+    title: NOT_FOUND_TITLE,
+    description: notFoundContent.supportingCopy,
+    path: '/404',
+  });
   return (
     <>
+      <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <Section spacing="xl" aria-labelledby="not-found-heading">
           <Container size="xl">
             <div className="grid grid-cols-1 items-center gap-(--space-3xl) lg:grid-cols-2 lg:gap-(--space-5xl)">

@@ -33,7 +33,7 @@ export default function MethodPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <MethodHero />
 
         {/* One sentence. One viewport. The thesis of everything that follows. */}

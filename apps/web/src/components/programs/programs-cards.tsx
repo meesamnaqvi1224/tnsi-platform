@@ -57,12 +57,12 @@ export function ProgramsCards() {
       aria-labelledby="programs-cards-heading"
     >
       <Container size="xl">
-        <p
+        <h2
           id="programs-cards-heading"
-          className="text-muted-foreground mb-(--space-3xl) text-xs tracking-[0.15em] uppercase"
+          className="text-muted-foreground mb-(--space-3xl) text-xs font-normal tracking-[0.15em] uppercase"
         >
           Three pathways
-        </p>
+        </h2>
 
         <div className="grid grid-cols-1 gap-(--space-3xl) md:grid-cols-3 md:gap-(--space-xl)">
           {navigation.map((program) => (

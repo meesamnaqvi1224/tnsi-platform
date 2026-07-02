@@ -7,20 +7,26 @@ const { founder } = practitionerCertificationContent;
 export function PcFounder() {
   return (
     <section
-      aria-label={founder.heading}
+      aria-labelledby="pc-founder-heading"
       className="border-border grid grid-cols-1 border-t lg:grid-cols-2"
     >
-      <div className="border-border bg-secondary relative aspect-[4/5] w-full border-b lg:aspect-auto lg:border-r lg:border-b-0">
-        <div className="absolute inset-0 flex items-center justify-center">
+      <figure className="border-border bg-secondary relative aspect-[4/5] w-full border-b lg:aspect-auto lg:border-r lg:border-b-0">
+        <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
           <Text size="sm" tone="muted">
             Professional portrait placeholder
           </Text>
         </div>
-      </div>
+        <span className="sr-only">Professional portrait of Caroline Reed, program founder.</span>
+      </figure>
 
       <div className="flex items-center px-(--space-lg) py-(--space-3xl) sm:px-(--space-2xl) lg:px-(--space-3xl)">
         <Stack gap="xl" className="max-w-lg">
-          <ChapterMarker index={founder.chapter} as="h2" title={founder.heading} />
+          <ChapterMarker
+            index={founder.chapter}
+            as="h2"
+            headingId="pc-founder-heading"
+            title={founder.heading}
+          />
 
           <Stack gap="md">
             {founder.paragraphs.map((paragraph) => (

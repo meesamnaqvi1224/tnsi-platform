@@ -34,7 +34,7 @@ export default function ContactPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <ContactHero />
         <ContactMethods />
         <ContactForm />

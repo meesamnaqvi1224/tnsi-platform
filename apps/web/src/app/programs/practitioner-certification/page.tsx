@@ -41,7 +41,7 @@ export default function PractitionerCertificationPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <PcHero />
         <PcAudience />
         <PcPurpose />

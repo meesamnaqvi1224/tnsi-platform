@@ -37,13 +37,16 @@ export function MethodPanel() {
       </div>
 
       {/* TODO: swap for the approved teacup/notebook still-life asset once added to apps/web/public */}
-      <div className="border-border bg-secondary relative aspect-[4/3] w-full border lg:aspect-auto">
-        <div className="absolute inset-0 flex items-center justify-center">
+      <figure className="border-border bg-secondary relative aspect-[4/3] w-full border lg:aspect-auto">
+        <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
           <Text size="sm" tone="muted">
             Still-life placeholder
           </Text>
         </div>
-      </div>
+        <span className="sr-only">
+          Still-life editorial photograph — teacup and notebook in warm natural light.
+        </span>
+      </figure>
     </section>
   );
 }

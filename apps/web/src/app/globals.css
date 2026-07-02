@@ -133,4 +133,8 @@
   .interaction-text-link-underline {
     @apply duration-base ease-standard text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded-sm text-sm underline-offset-4 transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
   }
+
+  .skip-link {
+    @apply focus-visible:ring-ring bg-background text-foreground sr-only rounded-sm px-4 py-2 text-sm font-medium focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[calc(var(--z-sticky)+1)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
+  }
 }

@@ -5,11 +5,7 @@ const { teachingPhilosophy } = facultyContent;
 
 export function TeachingPhilosophy() {
   return (
-    <Section
-      spacing="xl"
-      className="border-border bg-secondary/25 border-t"
-      aria-label={teachingPhilosophy.headline}
-    >
+    <Section spacing="xl" className="border-border bg-secondary/25 border-t">
       <Container size="xl">
         <Stack gap="3xl">
           <ChapterMarker index={teachingPhilosophy.chapter} as="h2" title="Teaching Philosophy" />
