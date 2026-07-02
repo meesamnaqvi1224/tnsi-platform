@@ -37,7 +37,7 @@ export function FacultyProfile() {
 
           <Stack gap="2xl">
             <Stack gap="md">
-              <h3 className="font-heading text-foreground text-4xl font-semibold tracking-tight lg:text-5xl">
+              <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
                 {founder.name}
               </h3>
               <ul className="border-border flex flex-col gap-(--space-xs) border-t pt-(--space-lg)">

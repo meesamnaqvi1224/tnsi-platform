@@ -8,7 +8,7 @@ export function Hero() {
         <div className="grid grid-cols-1 items-center gap-(--space-2xl) lg:grid-cols-5 lg:gap-(--space-3xl)">
           <Stack gap="lg" className="lg:col-span-3">
             <Eyebrow>Nervous System Education</Eyebrow>
-            <Heading as="h1" id="hero-heading" size="2xl">
+            <Heading as="h1" id="hero-heading" size="2xl" className="text-4xl sm:text-5xl">
               Success shouldn&apos;t cost your nervous system.
             </Heading>
             <Text size="lg" tone="muted" className="max-w-prose">

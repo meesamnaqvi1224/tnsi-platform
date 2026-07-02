@@ -39,13 +39,13 @@ export function ArticlesHero() {
 
           <h1
             id="articles-hero-heading"
-            className="font-heading text-foreground text-6xl leading-[0.98] font-semibold tracking-tight lg:text-[5.5rem] xl:text-[6.5rem]"
+            className="font-heading text-foreground text-4xl leading-[0.98] font-semibold tracking-tight sm:text-5xl md:text-6xl lg:text-[5.5rem] xl:text-[6.5rem]"
           >
             {hero.headline}
           </h1>
 
           <Stack gap="lg">
-            <p className="text-foreground max-w-2xl text-xl leading-snug font-medium lg:text-2xl">
+            <p className="text-foreground max-w-2xl text-lg leading-snug font-medium sm:text-xl lg:text-2xl">
               {hero.supportingHeadline}
             </p>
             <Text tone="muted" className="max-w-prose leading-relaxed">

@@ -5,7 +5,7 @@ export function CalendlyPlaceholder() {
   return (
     <div
       aria-label="Booking calendar placeholder"
-      className="border-border/60 bg-background/80 flex min-h-[28rem] flex-col items-center justify-center gap-(--space-xl) rounded-lg border p-(--space-3xl) lg:min-h-[32rem]"
+      className="border-border/60 bg-background/80 flex min-h-[28rem] w-full min-w-0 flex-col items-center justify-center gap-(--space-xl) rounded-lg border p-(--space-xl) sm:p-(--space-3xl) lg:min-h-[32rem]"
     >
       <div className="border-border/50 bg-secondary/40 flex size-16 items-center justify-center rounded-full border">
         <CalendarDays aria-hidden className="text-muted-foreground size-7" strokeWidth={1.25} />

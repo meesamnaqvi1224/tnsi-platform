@@ -17,13 +17,13 @@ export function Pagination({ currentPage, totalPages, baseHref, className }: Pag
 
   return (
     <nav aria-label="Article pagination" className={cn('flex justify-center', className)}>
-      <ul className="flex items-center gap-(--space-sm)">
+      <ul className="flex max-w-full flex-wrap items-center justify-center gap-(--space-sm)">
         <li>
           <NextLink
             href={pageHref(baseHref, Math.max(1, currentPage - 1))}
             aria-disabled={currentPage === 1}
             className={cn(
-              'text-muted-foreground hover:text-foreground border-border interaction-colors interaction-focus inline-flex h-10 items-center border px-(--space-md) text-sm font-medium',
+              'text-muted-foreground hover:text-foreground border-border interaction-colors interaction-focus inline-flex h-10 items-center border px-(--space-sm) text-sm font-medium max-sm:h-9 max-sm:px-2 max-sm:text-xs sm:px-(--space-md)',
               currentPage === 1 && 'pointer-events-none opacity-40',
             )}
           >
@@ -53,7 +53,7 @@ export function Pagination({ currentPage, totalPages, baseHref, className }: Pag
             href={pageHref(baseHref, Math.min(totalPages, currentPage + 1))}
             aria-disabled={currentPage === totalPages}
             className={cn(
-              'text-muted-foreground hover:text-foreground border-border interaction-colors interaction-focus inline-flex h-10 items-center border px-(--space-md) text-sm font-medium',
+              'text-muted-foreground hover:text-foreground border-border interaction-colors interaction-focus inline-flex h-10 items-center border px-(--space-sm) text-sm font-medium max-sm:h-9 max-sm:px-2 max-sm:text-xs sm:px-(--space-md)',
               currentPage === totalPages && 'pointer-events-none opacity-40',
             )}
           >

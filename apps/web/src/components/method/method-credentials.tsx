@@ -36,7 +36,7 @@ export function MethodCredentials() {
             <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
               The evidence base
             </p>
-            <p className="font-heading text-foreground text-3xl leading-[1.2] font-semibold tracking-tight lg:text-4xl">
+            <p className="font-heading text-foreground text-2xl leading-[1.2] font-semibold tracking-tight sm:text-3xl lg:text-4xl">
               Fifteen years of clinical observation.
               <br />
               One coherent framework.

@@ -8,7 +8,7 @@ const { hero } = facultyContent;
 export function FacultyHero() {
   return (
     <section aria-labelledby="faculty-hero-heading" className="border-border border-b">
-      <div className="grid grid-cols-1 lg:grid-cols-[0.45fr_0.55fr]">
+      <div className="grid min-w-0 grid-cols-1 overflow-hidden lg:grid-cols-[0.45fr_0.55fr]">
         <div className="relative min-h-[50vh] overflow-hidden lg:min-h-[78vh]">
           <Image
             src={hero.imageSrc}
@@ -40,13 +40,13 @@ export function FacultyHero() {
 
             <h1
               id="faculty-hero-heading"
-              className="font-heading text-foreground text-5xl leading-[1.02] font-semibold tracking-tight lg:text-[4.5rem] xl:text-[5.5rem]"
+              className="font-heading text-foreground text-4xl leading-[1.02] font-semibold tracking-tight sm:text-5xl lg:text-[4.5rem] xl:text-[5.5rem]"
             >
               {hero.headline}
             </h1>
 
             <Stack gap="lg">
-              <p className="text-foreground max-w-2xl text-xl leading-snug font-medium lg:text-2xl">
+              <p className="text-foreground max-w-2xl text-lg leading-snug font-medium sm:text-xl lg:text-2xl">
                 {hero.supportingHeadline}
               </p>
               <Text tone="muted" className="max-w-prose leading-relaxed">

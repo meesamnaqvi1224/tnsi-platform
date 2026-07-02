@@ -12,7 +12,7 @@ export function ResearchPillar({ pillar, index }: ResearchPillarProps) {
       <span className="text-muted-foreground font-mono text-sm tabular-nums">
         {String(index + 1).padStart(2, '0')}
       </span>
-      <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl">
+      <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
         {pillar.title}
       </h3>
       <Text tone="muted" className="max-w-prose leading-relaxed">

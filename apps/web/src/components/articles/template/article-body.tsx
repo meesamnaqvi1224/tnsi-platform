@@ -22,7 +22,7 @@ function renderBlock(block: ArticleBodyBlock, index: number) {
           <h2
             key={index}
             id={block.id}
-            className="font-heading text-foreground mt-(--space-3xl) mb-(--space-lg) scroll-mt-(--space-3xl) text-3xl font-semibold tracking-tight"
+            className="font-heading text-foreground mt-(--space-3xl) mb-(--space-lg) scroll-mt-(--space-3xl) text-2xl font-semibold tracking-tight sm:text-3xl"
           >
             {block.text}
           </h2>

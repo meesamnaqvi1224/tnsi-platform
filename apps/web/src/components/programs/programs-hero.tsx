@@ -33,7 +33,7 @@ export function ProgramsHero() {
 
           <h1
             id="programs-hero-heading"
-            className="font-heading text-foreground text-5xl leading-[1.02] font-semibold tracking-tight lg:text-[4.5rem] xl:text-[5.5rem]"
+            className="font-heading text-foreground text-4xl leading-[1.02] font-semibold tracking-tight sm:text-5xl lg:text-[4.5rem] xl:text-[5.5rem]"
           >
             {hero.headline}
           </h1>

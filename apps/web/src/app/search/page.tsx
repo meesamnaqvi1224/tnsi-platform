@@ -33,7 +33,7 @@ export default function SearchPage() {
               <header className="mx-auto max-w-3xl text-center">
                 <h1
                   id="search-heading"
-                  className="font-heading text-foreground text-4xl font-semibold tracking-tight lg:text-5xl"
+                  className="font-heading text-foreground text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl"
                 >
                   {hero.heading}
                 </h1>

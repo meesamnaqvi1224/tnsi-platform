@@ -22,7 +22,7 @@ export function CollaborationCTA() {
 
           <h2
             id="collaboration-heading"
-            className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl"
+            className="font-heading text-foreground text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl"
           >
             {collaboration.heading}
           </h2>

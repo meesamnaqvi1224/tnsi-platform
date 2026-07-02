@@ -8,7 +8,7 @@ export interface ResearchInitiativeProps {
 export function ResearchInitiative({ initiative }: ResearchInitiativeProps) {
   return (
     <article className="border-border flex flex-col gap-(--space-lg) border-t py-(--space-3xl)">
-      <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl">
+      <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
         {initiative.title}
       </h3>
       <Text tone="muted" className="max-w-prose leading-relaxed">

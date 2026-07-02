@@ -41,11 +41,13 @@ export function ArticleHero({ hero }: ArticleHeroProps) {
             </span>
           </div>
 
-          <h1 className="font-heading text-foreground text-4xl leading-[1.08] font-semibold tracking-tight lg:text-5xl">
+          <h1 className="font-heading text-foreground text-3xl leading-[1.08] font-semibold tracking-tight sm:text-4xl lg:text-5xl">
             {hero.headline}
           </h1>
 
-          <p className="text-foreground text-xl leading-relaxed font-medium">{hero.subtitle}</p>
+          <p className="text-foreground text-lg leading-relaxed font-medium sm:text-xl">
+            {hero.subtitle}
+          </p>
 
           <div className="border-border flex flex-wrap items-center justify-between gap-(--space-lg) border-t pt-(--space-lg)">
             <div className="flex flex-col gap-(--space-2xs)">

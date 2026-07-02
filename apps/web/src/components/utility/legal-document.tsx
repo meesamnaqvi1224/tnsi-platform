@@ -22,7 +22,7 @@ export function LegalDocument({ title, lastUpdated, introduction, sections }: Le
             <header className="border-border flex flex-col gap-(--space-md) border-b pb-(--space-2xl)">
               <h1
                 id="legal-document-heading"
-                className="font-heading text-foreground text-4xl font-semibold tracking-tight lg:text-5xl"
+                className="font-heading text-foreground text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl"
               >
                 {title}
               </h1>

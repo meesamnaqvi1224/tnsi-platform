@@ -28,10 +28,10 @@ export function ResourcesCategories() {
             {categories.items.map((category, index) => (
               <article
                 key={category.id}
-                className={`border-border grid grid-cols-1 gap-(--space-xl) border-t px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:grid-cols-[1fr_2fr] lg:items-end lg:gap-(--space-5xl) ${categoryTones[index % categoryTones.length]}`}
+                className={`border-border grid min-w-0 grid-cols-1 gap-(--space-xl) border-t px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:items-end lg:gap-(--space-5xl) ${categoryTones[index % categoryTones.length]}`}
               >
-                <div className="flex flex-col gap-(--space-md)">
-                  <h3 className="font-heading text-foreground text-4xl font-semibold tracking-tight lg:text-5xl">
+                <div className="flex min-w-0 flex-col gap-(--space-md)">
+                  <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
                     {category.title}
                   </h3>
                   <span className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">

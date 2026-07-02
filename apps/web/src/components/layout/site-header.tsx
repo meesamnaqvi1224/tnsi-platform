@@ -35,10 +35,13 @@ export function SiteHeader() {
           : 'bg-background border-transparent',
       )}
     >
-      <Container size="xl" className="flex h-20 items-center justify-between">
+      <Container
+        size="xl"
+        className="flex h-16 min-w-0 items-center justify-between gap-2 sm:h-20 sm:gap-4"
+      >
         <NextLink
           href="/"
-          className="interaction-focus font-heading text-sm leading-tight font-semibold tracking-[0.1em] uppercase"
+          className="interaction-focus font-heading min-w-0 shrink text-xs leading-tight font-semibold tracking-[0.1em] uppercase sm:text-sm"
         >
           The
           <br />
@@ -57,10 +60,13 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <Stack direction="row" align="center" gap="sm">
+        <Stack direction="row" align="center" gap="sm" className="shrink-0">
           <NextLink
             href="/book-a-call"
-            className={buttonVariants({ variant: 'primary', size: 'md' })}
+            className={cn(
+              buttonVariants({ variant: 'primary', size: 'md' }),
+              'max-sm:h-9 max-sm:px-3 max-sm:text-xs',
+            )}
           >
             Book a Call
           </NextLink>

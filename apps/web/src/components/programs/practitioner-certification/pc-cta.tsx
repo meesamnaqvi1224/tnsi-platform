@@ -20,7 +20,7 @@ export function PcCta() {
             <Stack gap="md">
               <h2
                 id="pc-cta-heading"
-                className="font-heading text-foreground text-4xl leading-[1.1] font-semibold tracking-tight lg:text-5xl"
+                className="font-heading text-foreground text-3xl leading-[1.1] font-semibold tracking-tight sm:text-4xl lg:text-5xl"
               >
                 {cta.headline}
               </h2>

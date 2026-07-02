@@ -10,7 +10,7 @@ export function TrustBar() {
   return (
     <Section spacing="md" aria-label="Why The Nervous System Institute">
       <Container size="xl">
-        <div className="divide-border grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <div className="divide-border grid grid-cols-1 divide-y md:grid-cols-3 md:divide-x md:divide-y-0">
           {pillars.map((pillar) => (
             <Stack
               key={pillar.title}

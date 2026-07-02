@@ -11,7 +11,7 @@ export function ResearchArea({ area }: ResearchAreaProps) {
   const imageFirst = area.layout === 'image-left';
 
   return (
-    <article className="border-border grid grid-cols-1 items-center border-t lg:grid-cols-2">
+    <article className="border-border grid min-w-0 grid-cols-1 items-center overflow-hidden border-t lg:grid-cols-2">
       <div
         className={`bg-secondary relative min-h-[45vh] ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
       >
@@ -27,7 +27,7 @@ export function ResearchArea({ area }: ResearchAreaProps) {
         className={`flex flex-col justify-center px-(--space-xl) py-(--space-3xl) sm:px-(--space-2xl) ${imageFirst ? 'lg:order-2 lg:pl-(--space-4xl)' : 'lg:order-1 lg:pr-(--space-4xl)'}`}
       >
         <div className="flex max-w-lg flex-col gap-(--space-lg)">
-          <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl">
+          <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
             {area.title}
           </h3>
           <Text tone="muted" className="leading-relaxed">

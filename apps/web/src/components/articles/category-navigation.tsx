@@ -8,7 +8,7 @@ export interface CategoryNavigationProps {
 export function CategoryNavigation({ categories }: CategoryNavigationProps) {
   return (
     <nav aria-label="Article categories">
-      <ul className="flex flex-wrap gap-x-(--space-2xl) gap-y-(--space-lg)">
+      <ul className="flex flex-wrap gap-x-(--space-lg) gap-y-(--space-lg) sm:gap-x-(--space-2xl)">
         {categories.map((category) => (
           <li key={category.id}>
             <NextLink

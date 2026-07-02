@@ -19,7 +19,7 @@ export function EaJourney() {
               </span>
               <div className="border-background/20 border-t" aria-hidden />
             </div>
-            <h2 className="font-heading mt-(--space-sm) text-4xl leading-[1.1] font-semibold tracking-tight lg:text-5xl">
+            <h2 className="font-heading mt-(--space-sm) text-3xl leading-[1.1] font-semibold tracking-tight sm:text-4xl lg:text-5xl">
               {journey.heading}
             </h2>
             <Text className="text-background/70 mt-(--space-lg) leading-relaxed">

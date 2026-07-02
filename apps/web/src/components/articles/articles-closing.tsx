@@ -22,7 +22,7 @@ export function ArticlesClosing() {
 
           <h2
             id="articles-closing-heading"
-            className="font-heading text-foreground text-4xl leading-[1.1] font-semibold tracking-tight lg:text-5xl"
+            className="font-heading text-foreground text-3xl leading-[1.1] font-semibold tracking-tight sm:text-4xl lg:text-5xl"
           >
             {closing.headline}
           </h2>

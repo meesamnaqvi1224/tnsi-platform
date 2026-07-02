@@ -38,7 +38,7 @@ export function FrameworkSection() {
       <Container size="xl">
         <Stack gap="sm" className="max-w-2xl">
           <Eyebrow>The Framework</Eyebrow>
-          <Heading as="h2" id="framework-heading" size="xl">
+          <Heading as="h2" id="framework-heading" size="xl" className="text-3xl sm:text-4xl">
             We help you move from survival to capacity.
           </Heading>
         </Stack>

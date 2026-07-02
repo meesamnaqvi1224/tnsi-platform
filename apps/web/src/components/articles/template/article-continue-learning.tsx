@@ -8,7 +8,7 @@ export function ArticleContinueLearning() {
         <Stack gap="xl" className="mx-auto max-w-[760px] text-center">
           <h2
             id="continue-learning-heading"
-            className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl"
+            className="font-heading text-foreground text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl"
           >
             Continue your learning journey
           </h2>

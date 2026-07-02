@@ -5,7 +5,7 @@ export function MethodHero() {
   return (
     <section
       aria-labelledby="method-hero-heading"
-      className="grid min-h-screen grid-cols-1 lg:grid-cols-[45fr_55fr]"
+      className="grid min-h-screen grid-cols-1 overflow-hidden lg:grid-cols-[45fr_55fr]"
     >
       {/* Left — Deep Slate editorial panel, text anchored to bottom */}
       <div className="dark bg-background text-foreground flex flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-4xl) sm:px-(--space-3xl) lg:px-(--space-3xl)">
@@ -17,7 +17,7 @@ export function MethodHero() {
 
           <h1
             id="method-hero-heading"
-            className="font-heading text-foreground text-5xl leading-[1.02] font-semibold tracking-tight lg:text-[4.5rem] xl:text-[5.5rem]"
+            className="font-heading text-foreground text-4xl leading-[1.02] font-semibold tracking-tight sm:text-5xl lg:text-[4.5rem] xl:text-[5.5rem]"
           >
             Life Beyond
             <br />

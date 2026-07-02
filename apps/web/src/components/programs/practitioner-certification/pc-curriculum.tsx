@@ -24,7 +24,7 @@ export function PcCurriculum() {
               return (
                 <li
                   key={module.number}
-                  className="border-border relative grid grid-cols-[auto_1fr] gap-(--space-lg) border-t py-(--space-xl) sm:grid-cols-[80px_1fr]"
+                  className="border-border relative grid grid-cols-[auto_minmax(0,1fr)] gap-(--space-lg) border-t py-(--space-xl) sm:grid-cols-[80px_minmax(0,1fr)]"
                 >
                   {!isLast && (
                     <div
@@ -39,7 +39,7 @@ export function PcCurriculum() {
                     </span>
                   </div>
 
-                  <div className="flex flex-col justify-center gap-(--space-xs)">
+                  <div className="flex min-w-0 flex-col justify-center gap-(--space-xs)">
                     <span className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">
                       Module {module.number}
                     </span>

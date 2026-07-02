@@ -28,7 +28,7 @@ export function MeetCarolineSection() {
             <ChapterMarker index={caroline.chapter} as="h2" title={caroline.heading} />
 
             <Stack gap="md">
-              <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl">
+              <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
                 {caroline.name}
               </h3>
               <ul className="flex flex-wrap gap-(--space-sm)">

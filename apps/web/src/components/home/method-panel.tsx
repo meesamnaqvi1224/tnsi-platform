@@ -4,13 +4,16 @@ import { Eyebrow, Heading, Link, Stack, Text } from '@tnsi/ui';
 
 export function MethodPanel() {
   return (
-    <section aria-labelledby="method-heading" className="grid grid-cols-1 lg:grid-cols-2">
+    <section
+      aria-labelledby="method-heading"
+      className="grid min-w-0 grid-cols-1 overflow-hidden lg:grid-cols-2"
+    >
       {/* `dark` flips the semantic tokens locally to Deep Slate background / cream foreground,
           per docs/02-brand-strategy.md — not a hardcoded navy. */}
       <div className="dark bg-background text-foreground flex items-center px-(--space-lg) py-(--space-3xl) sm:px-(--space-2xl) lg:px-(--space-3xl)">
         <Stack gap="md" className="max-w-md">
           <Eyebrow className="text-muted-foreground">The Method</Eyebrow>
-          <Heading as="h2" id="method-heading" size="xl">
+          <Heading as="h2" id="method-heading" size="xl" className="text-3xl sm:text-4xl">
             Life Beyond Trauma
           </Heading>
           <Text tone="muted">

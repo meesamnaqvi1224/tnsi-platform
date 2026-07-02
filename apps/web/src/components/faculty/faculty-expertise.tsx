@@ -12,7 +12,7 @@ export function FacultyExpertise({ item }: FacultyExpertiseProps) {
   const imageFirst = item.layout === 'image-left';
 
   return (
-    <article className="border-border grid grid-cols-1 items-stretch border-t lg:grid-cols-2">
+    <article className="border-border grid min-w-0 grid-cols-1 items-stretch overflow-hidden border-t lg:grid-cols-2">
       <div
         className={`relative min-h-[40vh] overflow-hidden ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
       >
@@ -30,7 +30,7 @@ export function FacultyExpertise({ item }: FacultyExpertiseProps) {
         className={`flex flex-col justify-center px-(--space-xl) py-(--space-3xl) sm:px-(--space-2xl) ${imageFirst ? 'lg:order-2 lg:pl-(--space-4xl)' : 'lg:order-1 lg:pr-(--space-4xl)'}`}
       >
         <div className="flex max-w-lg flex-col gap-(--space-lg)">
-          <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl">
+          <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
             {item.title}
           </h3>
           <Text tone="muted" className="leading-relaxed">

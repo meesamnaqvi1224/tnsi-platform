@@ -83,7 +83,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         <Section spacing="xl" className="border-border border-b">
           <Container size="xl" className="px-(--space-xl) sm:px-(--space-2xl)">
-            <div className="mx-auto grid max-w-6xl grid-cols-1 gap-(--space-4xl) xl:grid-cols-[200px_minmax(0,760px)]">
+            <div className="mx-auto grid w-full max-w-6xl min-w-0 grid-cols-1 gap-(--space-4xl) xl:grid-cols-[200px_minmax(0,760px)]">
               <TableOfContents blocks={article.body} />
 
               <article id="article-content" className="min-w-0">

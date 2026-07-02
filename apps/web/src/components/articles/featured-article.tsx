@@ -43,7 +43,7 @@ export function FeaturedArticle({
             </span>
           </div>
 
-          <h3 className="font-heading text-foreground text-4xl leading-[1.08] font-semibold tracking-tight lg:text-5xl">
+          <h3 className="font-heading text-foreground text-3xl leading-[1.08] font-semibold tracking-tight sm:text-4xl lg:text-5xl">
             {title}
           </h3>
 

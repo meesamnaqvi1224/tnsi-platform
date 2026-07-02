@@ -52,7 +52,7 @@ function ImagePlaceholder({ alt, className }: { alt: string; className?: string 
 export function ArticleCard({ article }: ArticleCardProps) {
   if (article.variant === 'large') {
     return (
-      <article className="border-border grid grid-cols-1 border-t lg:grid-cols-[1.2fr_1fr]">
+      <article className="border-border grid min-w-0 grid-cols-1 overflow-hidden border-t lg:grid-cols-[1.2fr_1fr]">
         <ImagePlaceholder alt={article.imageAlt} className="min-h-[50vh] lg:min-h-[60vh]" />
         <div className="flex flex-col justify-center px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:px-(--space-3xl)">
           <div className="flex max-w-lg flex-col gap-(--space-xl)">
@@ -61,7 +61,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
               publishedAt={article.publishedAt}
               readingTime={article.readingTime}
             />
-            <h3 className="font-heading text-foreground text-4xl leading-[1.08] font-semibold tracking-tight lg:text-5xl">
+            <h3 className="font-heading text-foreground text-3xl leading-[1.08] font-semibold tracking-tight sm:text-4xl lg:text-5xl">
               {article.title}
             </h3>
             <Text tone="muted" className="leading-relaxed">

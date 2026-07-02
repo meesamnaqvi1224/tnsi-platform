@@ -46,13 +46,13 @@ export function DiscoveryHero() {
 
           <h1
             id="discovery-hero-heading"
-            className="font-heading text-foreground text-5xl leading-[1.02] font-semibold tracking-tight lg:text-[4.5rem] xl:text-[5.5rem]"
+            className="font-heading text-foreground text-4xl leading-[1.02] font-semibold tracking-tight sm:text-5xl lg:text-[4.5rem] xl:text-[5.5rem]"
           >
             {hero.headline}
           </h1>
 
           <Stack gap="lg" className="items-center">
-            <p className="text-foreground text-xl leading-snug font-medium lg:text-2xl">
+            <p className="text-foreground text-lg leading-snug font-medium sm:text-xl lg:text-2xl">
               {hero.supportingHeadline}
             </p>
             <Text tone="muted" className="max-w-prose leading-relaxed">

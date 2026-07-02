@@ -42,7 +42,7 @@ function FeaturedSection({
     >
       <Stack gap="sm">
         <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">{eyebrow}</p>
-        <h2 className="font-heading text-foreground text-4xl leading-[1.08] font-semibold tracking-tight lg:text-5xl">
+        <h2 className="font-heading text-foreground text-3xl leading-[1.08] font-semibold tracking-tight sm:text-4xl lg:text-5xl">
           {title}
         </h2>
       </Stack>
@@ -67,12 +67,14 @@ function FeaturedSection({
           {details.map(({ label, value }) => (
             <div
               key={label}
-              className="border-border flex items-baseline justify-between gap-(--space-md) border-t py-(--space-sm)"
+              className="border-border flex min-w-0 items-baseline justify-between gap-(--space-md) border-t py-(--space-sm)"
             >
               <span className="text-muted-foreground shrink-0 text-xs tracking-[0.15em] uppercase">
                 {label}
               </span>
-              <span className="text-foreground text-right text-sm font-medium">{value}</span>
+              <span className="text-foreground min-w-0 text-right text-sm font-medium break-words">
+                {value}
+              </span>
             </div>
           ))}
         </Stack>

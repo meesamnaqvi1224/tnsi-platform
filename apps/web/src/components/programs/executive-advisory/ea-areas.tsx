@@ -21,7 +21,7 @@ export function EaAreas() {
                   className="border-border grid grid-cols-1 items-start gap-(--space-xl) border-t py-(--space-3xl) lg:grid-cols-2 lg:gap-(--space-4xl)"
                 >
                   <div className={isReversed ? 'lg:order-2 lg:pt-(--space-md)' : ''}>
-                    <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl">
+                    <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
                       {panel.title}
                     </h3>
                   </div>

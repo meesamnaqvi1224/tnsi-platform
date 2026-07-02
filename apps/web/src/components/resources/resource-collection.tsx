@@ -10,13 +10,13 @@ export interface ResourceCollectionProps {
 
 export function ResourceCollection({ collection, index }: ResourceCollectionProps) {
   return (
-    <article className="border-border grid grid-cols-1 items-end gap-(--space-xl) border-t py-(--space-3xl) lg:grid-cols-[auto_1fr_auto] lg:gap-(--space-4xl)">
+    <article className="border-border grid grid-cols-1 items-end gap-(--space-xl) border-t py-(--space-3xl) lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-(--space-4xl)">
       <span className="text-muted-foreground font-mono text-sm tabular-nums">
         {String(index + 1).padStart(2, '0')}
       </span>
 
-      <div className="flex flex-col gap-(--space-md)">
-        <h3 className="font-heading text-foreground text-3xl font-semibold tracking-tight lg:text-4xl">
+      <div className="flex min-w-0 flex-col gap-(--space-md)">
+        <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
           {collection.title}
         </h3>
         <Text tone="muted" className="max-w-2xl leading-relaxed">

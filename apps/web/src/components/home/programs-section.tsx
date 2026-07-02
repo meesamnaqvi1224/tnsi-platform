@@ -73,7 +73,7 @@ export function ProgramsSection() {
         >
           <Stack gap="sm" className="max-w-2xl">
             <Eyebrow>Programs</Eyebrow>
-            <Heading as="h2" id="programs-heading" size="xl">
+            <Heading as="h2" id="programs-heading" size="xl" className="text-3xl sm:text-4xl">
               Structured for transformation at every stage.
             </Heading>
           </Stack>

@@ -24,7 +24,7 @@ export function ContactForm() {
       aria-label={form.heading}
     >
       <Container size="xl">
-        <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-[1fr_1.2fr] lg:gap-(--space-5xl)">
+        <div className="grid min-w-0 grid-cols-1 gap-(--space-3xl) lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-(--space-5xl)">
           <ChapterMarker
             index={form.chapter}
             as="h2"
@@ -32,7 +32,7 @@ export function ContactForm() {
             className="lg:sticky lg:top-(--space-3xl) lg:self-start"
           />
 
-          <Form action={submitContactForm} className="max-w-xl">
+          <Form action={submitContactForm} className="w-full max-w-xl min-w-0">
             <FormField id="contact-name" label={form.fields.name.label} required>
               {(field) => (
                 <Input

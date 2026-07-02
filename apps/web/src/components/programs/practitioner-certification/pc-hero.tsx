@@ -26,13 +26,13 @@ export function PcHero() {
 
           <h1
             id="pc-hero-heading"
-            className="font-heading text-foreground text-5xl leading-[1.02] font-semibold tracking-tight lg:text-[4.5rem] xl:text-[5.5rem]"
+            className="font-heading text-foreground text-4xl leading-[1.02] font-semibold tracking-tight sm:text-5xl lg:text-[4.5rem] xl:text-[5.5rem]"
           >
             {hero.headline}
           </h1>
 
           <Stack gap="lg">
-            <p className="text-foreground max-w-2xl text-xl leading-snug font-medium lg:text-2xl">
+            <p className="text-foreground max-w-2xl text-lg leading-snug font-medium sm:text-xl lg:text-2xl">
               {hero.supportingHeadline}
             </p>
             <Text tone="muted" className="max-w-prose leading-relaxed">
@@ -40,7 +40,7 @@ export function PcHero() {
             </Text>
           </Stack>
 
-          <dl className="border-border grid grid-cols-3 gap-(--space-md) border-y py-(--space-lg)">
+          <dl className="border-border grid grid-cols-1 gap-(--space-md) border-y py-(--space-lg) sm:grid-cols-3">
             {hero.metadata.map(({ label, value }) => (
               <div key={label} className="flex flex-col gap-(--space-2xs)">
                 <dt className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">

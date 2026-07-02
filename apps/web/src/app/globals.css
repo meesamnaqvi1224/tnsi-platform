@@ -64,8 +64,12 @@
 
 @layer base {
   html {
-    @apply font-sans;
+    @apply overflow-x-clip font-sans;
     scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-w-0;
   }
 
   @media (prefers-reduced-motion: reduce) {

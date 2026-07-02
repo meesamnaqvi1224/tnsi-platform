@@ -22,7 +22,7 @@ export function Timeline({ events, intro }: TimelineProps) {
 
       {/* Horizontal timeline — desktop */}
       <ol
-        className="hidden gap-(--space-md) lg:grid"
+        className="hidden gap-(--space-md) xl:grid"
         style={{ gridTemplateColumns: `repeat(${events.length}, minmax(0, 1fr))` }}
         aria-label="Evidence timeline"
       >
@@ -49,7 +49,7 @@ export function Timeline({ events, intro }: TimelineProps) {
       </ol>
 
       {/* Vertical timeline — mobile/tablet */}
-      <ol className="flex flex-col lg:hidden" aria-label="Evidence timeline">
+      <ol className="flex flex-col xl:hidden" aria-label="Evidence timeline">
         {events.map((event, index) => {
           const isLast = index === events.length - 1;
           return (

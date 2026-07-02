@@ -14,7 +14,7 @@ export function TeachingPhilosophy() {
         <Stack gap="3xl">
           <ChapterMarker index={teachingPhilosophy.chapter} as="h2" title="Teaching Philosophy" />
 
-          <h3 className="font-heading text-foreground max-w-4xl text-4xl leading-[1.1] font-semibold tracking-tight lg:text-5xl">
+          <h3 className="font-heading text-foreground max-w-4xl text-3xl leading-[1.1] font-semibold tracking-tight sm:text-4xl lg:text-5xl">
             {teachingPhilosophy.headline}
           </h3>
 

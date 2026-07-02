@@ -6,7 +6,7 @@ export function AboutHero() {
       <Container size="xl" className="py-[var(--space-3xl)]">
         <Stack gap="md" className="max-w-3xl">
           <Eyebrow className="text-muted-foreground">Our Story</Eyebrow>
-          <Heading as="h1" id="about-hero-heading" size="2xl">
+          <Heading as="h1" id="about-hero-heading" size="2xl" className="text-4xl sm:text-5xl">
             Science-led. Humanity-centred.
           </Heading>
           <Text size="lg" tone="muted" className="max-w-prose">

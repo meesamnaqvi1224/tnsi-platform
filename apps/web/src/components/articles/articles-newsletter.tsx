@@ -1,4 +1,13 @@
-import { buttonVariants, ChapterMarker, Container, Input, Section, Stack, Text } from '@tnsi/ui';
+import {
+  buttonVariants,
+  ChapterMarker,
+  cn,
+  Container,
+  Input,
+  Section,
+  Stack,
+  Text,
+} from '@tnsi/ui';
 import { articlesContent } from '@/content/articles';
 
 const { newsletter } = articlesContent;
@@ -16,7 +25,7 @@ export function ArticlesNewsletter() {
             </Text>
 
             <form
-              className="flex w-full flex-col gap-(--space-md) sm:flex-row"
+              className="flex w-full min-w-0 flex-col gap-(--space-md) sm:flex-row sm:items-stretch"
               action="/api/newsletter"
               method="post"
             >
@@ -30,9 +39,15 @@ export function ArticlesNewsletter() {
                 required
                 autoComplete="email"
                 placeholder="your@email.com"
-                className="h-11 flex-1"
+                className="h-11 min-w-0 flex-1"
               />
-              <button type="submit" className={buttonVariants({ variant: 'primary', size: 'lg' })}>
+              <button
+                type="submit"
+                className={cn(
+                  buttonVariants({ variant: 'primary', size: 'lg' }),
+                  'w-full shrink-0 sm:w-auto',
+                )}
+              >
                 {newsletter.submitLabel}
               </button>
             </form>
