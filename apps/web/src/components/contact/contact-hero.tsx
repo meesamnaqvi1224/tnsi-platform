@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import NextLink from 'next/link';
 import { buttonVariants, Container, Stack } from '@tnsi/ui';
 import { contactContent } from '@/content/contact';
@@ -9,12 +9,11 @@ export function ContactHero() {
   return (
     <section aria-labelledby="contact-hero-heading" className="border-border border-b">
       <div className="relative min-h-[48vh] w-full overflow-hidden lg:min-h-[56vh]">
-        <Image
+        <ResponsiveImage
           src={hero.imageSrc}
           alt={hero.imageAlt}
           fill
           priority
-          unoptimized
           className="object-cover"
           sizes="100vw"
         />

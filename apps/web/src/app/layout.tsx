@@ -8,17 +8,26 @@ import './globals.css';
 const sansBody = Inter({
   variable: '--font-sans-body',
   subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+  adjustFontFallback: true,
 });
 
 const displaySerif = Cormorant_Garamond({
   variable: '--font-display',
   subsets: ['latin'],
   weight: ['500', '600', '700'],
+  display: 'swap',
+  preload: false,
+  adjustFontFallback: true,
 });
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+  display: 'swap',
+  preload: false,
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = createPageMetadata({

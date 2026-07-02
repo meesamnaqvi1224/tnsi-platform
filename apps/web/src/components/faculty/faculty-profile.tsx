@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
 import { facultyContent } from '@/content/faculty';
 
@@ -22,11 +22,10 @@ export function FacultyProfile() {
 
         <div className="grid grid-cols-1 items-start gap-(--space-3xl) lg:grid-cols-[2fr_3fr] lg:gap-(--space-5xl)">
           <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden lg:mx-0 lg:max-w-none">
-            <Image
+            <ResponsiveImage
               src={founder.imageSrc}
               alt={founder.imageAlt}
               fill
-              unoptimized
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 40vw"
             />

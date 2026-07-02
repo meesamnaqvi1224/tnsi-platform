@@ -1,7 +1,7 @@
 import NextLink from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Container, Stack, Text } from '@tnsi/ui';
-import { ArticleShare } from '@/components/articles/template/article-share';
+import { LazyArticleShare } from '@/components/articles/template/lazy-article-share';
 import type { ArticlePost } from '@/content/article-posts/types';
 
 export interface ArticleHeroProps {
@@ -55,7 +55,7 @@ export function ArticleHero({ hero }: ArticleHeroProps) {
               <span className="text-muted-foreground text-xs">{hero.author.role}</span>
             </div>
 
-            <ArticleShare />
+            <LazyArticleShare />
           </div>
         </Stack>
       </Container>

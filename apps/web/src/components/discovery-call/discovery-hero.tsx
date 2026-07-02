@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import NextLink from 'next/link';
 import { buttonVariants, Container, Stack, Text } from '@tnsi/ui';
 import { discoveryCallContent } from '@/content/discovery-call';
@@ -12,12 +12,11 @@ export function DiscoveryHero() {
       className="border-border border-b bg-[color-mix(in_oklch,var(--secondary)_18%,var(--background))]"
     >
       <div className="relative min-h-[52vh] w-full overflow-hidden lg:min-h-[60vh]">
-        <Image
+        <ResponsiveImage
           src={hero.imageSrc}
           alt={hero.imageAlt}
           fill
           priority
-          unoptimized
           className="object-cover"
           sizes="100vw"
         />

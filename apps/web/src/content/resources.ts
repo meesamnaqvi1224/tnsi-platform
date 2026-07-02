@@ -1,3 +1,5 @@
+import { NEWSLETTER_PRIVACY_NOTE } from '@/content/shared';
+
 /**
  * Resources hub page content.
  *
@@ -224,8 +226,7 @@ export const resourcesContent = {
     heading: 'Continue Learning',
     description:
       'Receive carefully curated articles, research summaries and educational insights from The Nervous System Institute.',
-    privacyNote:
-      'We respect your privacy. Unsubscribe at any time. We never share your information.',
+    privacyNote: NEWSLETTER_PRIVACY_NOTE,
     submitLabel: 'Subscribe',
   },
 

@@ -2,7 +2,7 @@ import { Container, Section, Stack, Text } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
-import { SearchInterface } from '@/components/utility/search-interface';
+import { LazySearchInterface } from '@/components/utility/lazy-search-interface';
 import { searchContent } from '@/content/search';
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
@@ -52,7 +52,7 @@ export default function SearchPage() {
                 </Text>
               </header>
 
-              <SearchInterface />
+              <LazySearchInterface />
             </Stack>
           </Container>
         </Section>

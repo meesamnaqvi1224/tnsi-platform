@@ -8,7 +8,7 @@ import { ArticleContinueLearning } from '@/components/articles/template/article-
 import { ArticleHero } from '@/components/articles/template/article-hero';
 import { ArticleTakeaways } from '@/components/articles/template/article-takeaways';
 import { AuthorCard } from '@/components/articles/template/author-card';
-import { ReadingProgress } from '@/components/articles/template/reading-progress';
+import { LazyReadingProgress } from '@/components/articles/template/lazy-reading-progress';
 import { RelatedArticles } from '@/components/articles/template/related-articles';
 import { TableOfContents } from '@/components/articles/template/table-of-contents';
 import { getAllArticleSlugs, getArticleBySlug } from '@/lib/articles';
@@ -69,7 +69,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <ReadingProgress />
+      <LazyReadingProgress />
       <SiteHeader />
       <main id="main-content">
         <ArticleHero hero={article.hero} />

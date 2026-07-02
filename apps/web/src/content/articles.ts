@@ -1,3 +1,5 @@
+import { NEWSLETTER_PRIVACY_NOTE } from '@/content/shared';
+
 /**
  * Articles listing page content.
  *
@@ -299,8 +301,7 @@ export const articlesContent = {
     heading: 'Stay informed.',
     description:
       'Receive new articles, research updates and educational insights directly from The Nervous System Institute.',
-    privacyNote:
-      'We respect your privacy. Unsubscribe at any time. We never share your information.',
+    privacyNote: NEWSLETTER_PRIVACY_NOTE,
     submitLabel: 'Subscribe',
   },
 

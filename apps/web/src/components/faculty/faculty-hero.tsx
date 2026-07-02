@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import NextLink from 'next/link';
 import { buttonVariants, Container, Stack, Text } from '@tnsi/ui';
 import { facultyContent } from '@/content/faculty';
@@ -10,12 +10,11 @@ export function FacultyHero() {
     <section aria-labelledby="faculty-hero-heading" className="border-border border-b">
       <div className="grid min-w-0 grid-cols-1 overflow-hidden lg:grid-cols-[0.45fr_0.55fr]">
         <div className="relative min-h-[50vh] overflow-hidden lg:min-h-[78vh]">
-          <Image
+          <ResponsiveImage
             src={hero.imageSrc}
             alt={hero.imageAlt}
             fill
             priority
-            unoptimized
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 45vw"
           />

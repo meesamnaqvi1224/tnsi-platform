@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import NextLink from 'next/link';
 import { buttonVariants, ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
 import { discoveryCallContent } from '@/content/discovery-call';
@@ -11,11 +11,10 @@ export function MeetCarolineSection() {
       <Container size="xl">
         <div className="grid grid-cols-1 items-center gap-(--space-3xl) lg:grid-cols-[0.9fr_1.1fr] lg:gap-(--space-5xl)">
           <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-lg lg:mx-0 lg:max-w-none">
-            <Image
+            <ResponsiveImage
               src={caroline.imageSrc}
               alt={caroline.imageAlt}
               fill
-              unoptimized
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 40vw"
             />

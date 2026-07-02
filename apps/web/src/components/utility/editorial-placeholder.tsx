@@ -1,5 +1,5 @@
-import Image from 'next/image';
 import { cn } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 
 interface EditorialPlaceholderProps {
   src: string;
@@ -28,11 +28,10 @@ export function EditorialPlaceholder({
     <figure
       className={cn('relative w-full overflow-hidden rounded-sm', aspectClasses[aspect], className)}
     >
-      <Image
+      <ResponsiveImage
         src={src}
         alt={alt}
         fill
-        unoptimized
         priority={priority}
         className="object-cover"
         sizes="(max-width: 768px) 100vw, 50vw"

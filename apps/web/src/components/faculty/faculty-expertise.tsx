@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Text } from '@tnsi/ui';
@@ -16,11 +16,10 @@ export function FacultyExpertise({ item }: FacultyExpertiseProps) {
       <div
         className={`relative min-h-[40vh] overflow-hidden ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
       >
-        <Image
+        <ResponsiveImage
           src={item.imageSrc}
           alt={item.imageAlt}
           fill
-          unoptimized
           className="object-cover"
           sizes="(max-width: 1024px) 100vw, 50vw"
         />
