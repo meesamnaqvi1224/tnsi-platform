@@ -6,7 +6,7 @@ export const SITE_NAME = 'The Nervous System Institute';
 export const DEFAULT_DESCRIPTION =
   'Evidence-informed education for ambitious women, leaders and practitioners who want sustainable success without sacrificing their wellbeing.';
 
-const DEFAULT_OG_IMAGE = '/placeholders/discovery-hero.svg';
+const DEFAULT_OG_IMAGE = '/images/shared/og-default.webp';
 
 export function getSiteUrl(): string {
   return env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '');

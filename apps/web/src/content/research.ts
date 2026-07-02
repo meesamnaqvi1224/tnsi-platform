@@ -22,8 +22,9 @@ export const researchContent = {
       'Exploring the science of the nervous system through evidence, clinical observation and practical application.',
     supportingCopy:
       'The Nervous System Institute brings together findings from neuroscience, psychology, attachment theory and somatic practice to create practical frameworks for sustainable human change.',
+    imageSrc: '/images/research/hero-landscape.webp',
     imageAlt:
-      'Editorial photograph — research papers, neuroscience journals and notebook in natural daylight.',
+      'Caroline Reed at her desk in a professional office setting for institutional research.',
     primaryCta: { label: 'Explore Publications', href: '#references' },
     secondaryCta: { label: 'Research Principles', href: '#philosophy' },
   },
@@ -88,6 +89,7 @@ export const researchContent = {
         summary:
           'How autonomic state shapes daily functioning, relational capacity and the physiological prerequisites for learning and change.',
         href: '/articles',
+        imageSrc: '/images/research/area-trauma-recovery.webp',
         imageAlt: 'Research journal open beside handwritten clinical notes.',
         layout: 'image-left' as const,
       },
@@ -97,6 +99,7 @@ export const researchContent = {
         summary:
           'The physiology of sustained excellence — examining capacity, recovery and the nervous system conditions that support performance without depletion.',
         href: '/articles',
+        imageSrc: '/images/research/area-nervous-system-science.webp',
         imageAlt: 'Executive notebook and reference texts on a wooden desk.',
         layout: 'image-right' as const,
       },
@@ -106,6 +109,7 @@ export const researchContent = {
         summary:
           'Evidence-informed pathways through trauma physiology toward regulation, integration and long-term wellbeing.',
         href: '/articles',
+        imageSrc: '/images/research/area-practitioner-education.webp',
         imageAlt: 'Quiet clinical consultation space with natural light.',
         layout: 'image-left' as const,
       },
@@ -115,6 +119,7 @@ export const researchContent = {
         summary:
           'How nervous system state influences executive judgment, team dynamics and the hidden physiology of organisational culture.',
         href: '/articles',
+        imageSrc: '/images/research/area-leadership-development.webp',
         imageAlt: 'Leadership research papers and annotated margins.',
         layout: 'image-right' as const,
       },
@@ -124,6 +129,7 @@ export const researchContent = {
         summary:
           'Neuroception, safety cues and the relational conditions required for psychological safety in clinical, educational and organisational settings.',
         href: '/articles',
+        imageSrc: '/images/research/area-somatic-healing.webp',
         imageAlt: 'Two chairs in a calm therapeutic environment.',
         layout: 'image-left' as const,
       },
@@ -133,6 +139,7 @@ export const researchContent = {
         summary:
           'The autonomic mechanisms underlying chronic stress, exhaustion and collapse — and the frameworks that address root physiology rather than symptoms alone.',
         href: '/articles',
+        imageSrc: '/images/research/area-clinical-practice.webp',
         imageAlt: 'Stacked volumes beside a window with soft daylight.',
         layout: 'image-right' as const,
       },

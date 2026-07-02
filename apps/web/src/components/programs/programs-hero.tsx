@@ -1,5 +1,6 @@
 import NextLink from 'next/link';
 import { buttonVariants, Eyebrow, Stack, Text } from '@tnsi/ui';
+import { SectionImage } from '@/components/utility/section-image';
 import { programsOverviewContent } from '@/content/programs';
 
 const { hero } = programsOverviewContent;
@@ -10,26 +11,13 @@ export function ProgramsHero() {
       aria-labelledby="programs-hero-heading"
       className="relative flex min-h-screen items-center justify-center overflow-hidden"
     >
-      {/* Full-bleed background image */}
-      {/* TODO: swap for approved full-bleed editorial asset once added to apps/web/public */}
-      <div className="bg-secondary absolute inset-0" aria-hidden>
-        <div className="flex h-full items-center justify-center">
-          <Text size="sm" tone="muted">
-            Editorial hero photography placeholder
-          </Text>
-        </div>
-      </div>
-      <span className="sr-only">
-        Full-bleed editorial photography for the programs overview page.
-      </span>
+      <SectionImage src={hero.imageSrc} alt={hero.imageAlt} priority sizes="100vw" />
 
-      {/* Light scrim for legibility — no dark panel */}
       <div
         aria-hidden
         className="absolute inset-0 bg-[color-mix(in_oklch,var(--background)_72%,transparent)]"
       />
 
-      {/* Centred editorial content */}
       <div className="relative z-10 px-(--space-xl) py-(--space-4xl) text-center sm:px-(--space-2xl)">
         <Stack gap="xl" className="mx-auto max-w-2xl items-center">
           <Eyebrow className="text-muted-foreground">{hero.eyebrow}</Eyebrow>

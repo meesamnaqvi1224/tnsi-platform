@@ -5,7 +5,9 @@ export const programsOverviewContent = {
     supportingCopy:
       'Three evidence-informed programs — each designed for a different stage of transformation.',
     primaryCta: { label: 'Explore Programs', href: '#pathways' },
-    imageAlt: 'Editorial photography — Institute programs overview',
+    imageSrc: '/images/programs/hero-landscape.webp',
+    imageAlt:
+      'Caroline Reed at her desk in a professional office setting, representing Institute programmes.',
   },
 
   navigation: [
@@ -16,7 +18,8 @@ export const programsOverviewContent = {
         'For ambitious women ready to move beyond survival and reclaim lasting wellbeing.',
       href: '/method',
       cta: 'Explore',
-      imageLabel: 'Life Beyond Trauma — lifestyle photography',
+      imageSrc: '/images/programs/life-beyond-trauma/navigation-card.webp',
+      imageAlt: 'Caroline Reed in a warm editorial portrait for Life Beyond Trauma.',
     },
     {
       id: 'practitioner-certification',
@@ -25,7 +28,8 @@ export const programsOverviewContent = {
         'For professionals integrating trauma-informed nervous system education into practice.',
       href: '/programs/practitioner-certification',
       cta: 'Explore',
-      imageLabel: 'Practitioner Certification — workshop photography',
+      imageSrc: '/images/programs/practitioner/hero-workshop.webp',
+      imageAlt: 'Caroline Reed in a professional portrait for Practitioner Certification.',
     },
     {
       id: 'executive-advisory',
@@ -33,7 +37,8 @@ export const programsOverviewContent = {
       description: 'For organisations building healthier leadership and workplace cultures.',
       href: '/programs/executive-advisory',
       cta: 'Explore',
-      imageLabel: 'Executive Advisory — leadership photography',
+      imageSrc: '/images/programs/executive/hero-meeting.webp',
+      imageAlt: 'Caroline Reed in an executive portrait for Executive Advisory.',
     },
   ] as const,
 
@@ -51,7 +56,8 @@ export const programsOverviewContent = {
       ],
       href: '/method',
       cta: 'Explore Program',
-      imageLabel: 'Life Beyond Trauma — programme photography',
+      imageSrc: '/images/programs/life-beyond-trauma/featured-program.webp',
+      imageAlt: 'Caroline Reed in a joyful editorial portrait for Life Beyond Trauma.',
       layout: 'image-left' as const,
     },
     {
@@ -67,7 +73,8 @@ export const programsOverviewContent = {
       ],
       href: '/programs/practitioner-certification',
       cta: 'Explore Program',
-      imageLabel: 'Practitioner Certification — classroom photography',
+      imageSrc: '/images/programs/practitioner/hero-workshop.webp',
+      imageAlt: 'Caroline Reed in a professional teaching portrait for Practitioner Certification.',
       layout: 'image-right' as const,
     },
     {
@@ -83,7 +90,8 @@ export const programsOverviewContent = {
       ],
       href: '/programs/executive-advisory',
       cta: 'Explore Advisory',
-      imageLabel: 'Executive Advisory — boardroom photography',
+      imageSrc: '/images/programs/executive/hero-meeting.webp',
+      imageAlt: 'Caroline Reed in an executive leadership portrait for Executive Advisory.',
       layout: 'image-left' as const,
     },
   ] as const,

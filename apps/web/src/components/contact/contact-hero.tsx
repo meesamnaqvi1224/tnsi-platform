@@ -21,9 +21,6 @@ export function ContactHero() {
           aria-hidden
           className="absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_oklch,var(--background)_92%,transparent)_0%,transparent_55%)]"
         />
-        <p className="text-muted-foreground absolute inset-x-0 bottom-8 text-center text-xs tracking-[0.12em] uppercase">
-          Photography placeholder — warm office, books, natural light
-        </p>
       </div>
 
       <Container

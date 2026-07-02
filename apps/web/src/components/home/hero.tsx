@@ -1,5 +1,7 @@
 import NextLink from 'next/link';
 import { buttonVariants, Container, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
+import { EditorialImage } from '@/components/utility/editorial-image';
+import { homeImages } from '@/content/images';
 
 export function Hero() {
   return (
@@ -31,23 +33,14 @@ export function Hero() {
             </Stack>
           </Stack>
 
-          {/* TODO: swap for the approved Caroline Reed portrait asset (red top, leather chair, hero style) once added to apps/web/public */}
-          <figure className="border-border bg-secondary relative aspect-[4/5] w-full overflow-hidden rounded-lg border lg:col-span-2">
-            <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
-              <Text size="sm" tone="muted">
-                Portrait placeholder
-              </Text>
-            </div>
-            <figcaption className="absolute bottom-0 left-0 p-(--space-md)">
-              <Text size="sm" className="text-foreground">
-                Caroline Reed — Founder &amp; Director
-              </Text>
-            </figcaption>
-            <span className="sr-only">
-              Editorial portrait of Caroline Reed, Founder and Director of The Nervous System
-              Institute.
-            </span>
-          </figure>
+          <EditorialImage
+            src={homeImages.heroPortrait}
+            alt="Caroline Reed, Founder and Director of The Nervous System Institute, in a professional portrait with warm natural light."
+            aspect="portrait"
+            className="rounded-lg lg:col-span-2"
+            priority
+            sizes="(max-width: 1024px) 100vw, 40vw"
+          />
         </div>
       </Container>
     </Section>

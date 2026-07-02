@@ -18,9 +18,6 @@ export function MeetCarolineSection() {
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 40vw"
             />
-            <p className="text-muted-foreground absolute inset-x-0 bottom-6 text-center text-xs tracking-[0.12em] uppercase">
-              Portrait placeholder
-            </p>
           </div>
 
           <Stack gap="2xl">

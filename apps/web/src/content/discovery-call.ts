@@ -22,7 +22,7 @@ export const discoveryCallContent = {
       'A calm conversation to explore where you are today, what you\u2019re experiencing and which path may be right for you.',
     supportingCopy:
       'This is not a therapy session. It is not a sales call. It is an opportunity to understand your goals, ask questions and determine whether The Nervous System Institute is the right fit for your next step.',
-    imageSrc: '/placeholders/discovery-hero.svg',
+    imageSrc: '/images/discovery/hero-landscape.webp',
     imageAlt:
       'Editorial photograph — warm natural light, comfortable conversation, tea and books. No corporate setting.',
     primaryCta: { label: 'Schedule Your Call', href: '#booking' },
@@ -96,7 +96,7 @@ export const discoveryCallContent = {
       'Caroline Reed is the founder of The Nervous System Institute and a trauma-informed educator with more than twenty years of clinical experience. Her work integrates neuroscience, attachment theory and somatic practice into practical frameworks for sustainable change.',
       'She has worked with high-achieving women, senior leaders and practitioners across Europe and North America — always with the same commitment: understand deeply, teach responsibly, and meet people where they are.',
     ],
-    imageSrc: '/placeholders/caroline-portrait.svg',
+    imageSrc: '/images/discovery/caroline-portrait.webp',
     imageAlt: 'Professional portrait of Caroline Reed — warm natural light, editorial treatment.',
     cta: { label: 'Learn More About Caroline', href: '/about' },
   },

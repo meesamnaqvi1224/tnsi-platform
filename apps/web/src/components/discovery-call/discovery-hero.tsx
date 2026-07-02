@@ -24,9 +24,6 @@ export function DiscoveryHero() {
           aria-hidden
           className="absolute inset-0 bg-[linear-gradient(to_bottom,color-mix(in_oklch,var(--background)_25%,transparent)_0%,color-mix(in_oklch,var(--background)_88%,transparent)_100%)]"
         />
-        <p className="text-muted-foreground absolute inset-x-0 bottom-8 text-center text-xs tracking-[0.12em] uppercase">
-          Photography placeholder — warm conversation, natural light
-        </p>
       </div>
 
       <Container

@@ -1,5 +1,6 @@
 import NextLink from 'next/link';
 import { buttonVariants, ChapterMarker, Stack, Text } from '@tnsi/ui';
+import { EditorialImage } from '@/components/utility/editorial-image';
 import { executiveAdvisoryContent } from '@/content/executive-advisory';
 
 const { founder } = executiveAdvisoryContent;
@@ -10,7 +11,6 @@ export function EaFounder() {
       aria-label={founder.heading}
       className="border-border grid grid-cols-1 border-t lg:grid-cols-2"
     >
-      {/* Content first on mobile; portrait on right for desktop — reversed from Practitioner page */}
       <div className="flex items-center px-(--space-lg) py-(--space-3xl) sm:px-(--space-2xl) lg:order-1 lg:px-(--space-3xl)">
         <Stack gap="xl" className="max-w-lg">
           <ChapterMarker index={founder.chapter} as="h2" title={founder.heading} />
@@ -32,14 +32,13 @@ export function EaFounder() {
         </Stack>
       </div>
 
-      <div className="bg-foreground relative aspect-[4/3] w-full lg:order-2 lg:aspect-auto">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Text size="sm" className="text-background/50">
-            Executive portrait placeholder
-          </Text>
-        </div>
-        <span className="sr-only">{founder.imageAlt}</span>
-      </div>
+      <EditorialImage
+        src={founder.imageSrc}
+        alt={founder.imageAlt}
+        aspect="landscape"
+        className="lg:order-2 lg:aspect-auto lg:min-h-full lg:rounded-none"
+        sizes="(max-width: 1024px) 100vw, 50vw"
+      />
     </section>
   );
 }

@@ -14,6 +14,7 @@ export function ResourcesFeatured() {
       <FeaturedResource
         title={featured.title}
         description={featured.description}
+        imageSrc={featured.imageSrc}
         imageAlt={featured.imageAlt}
         href={featured.href}
         cta={featured.cta}

@@ -1,4 +1,6 @@
 import { Container, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
+import { EditorialImage } from '@/components/utility/editorial-image';
+import { aboutImages } from '@/content/images';
 
 export function MissionSection() {
   return (
@@ -23,14 +25,13 @@ export function MissionSection() {
             </Text>
           </Stack>
 
-          {/* TODO: swap for approved editorial still-life asset once added to apps/web/public */}
-          <div className="border-border bg-secondary relative aspect-[4/3] w-full overflow-hidden rounded-lg border">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Text size="sm" tone="muted">
-                Editorial image placeholder
-              </Text>
-            </div>
-          </div>
+          <EditorialImage
+            src={aboutImages.missionEditorial}
+            alt="Caroline Reed in an editorial portrait within a calm, naturally lit professional setting."
+            aspect="landscape"
+            className="rounded-lg"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+          />
         </div>
       </Container>
     </Section>

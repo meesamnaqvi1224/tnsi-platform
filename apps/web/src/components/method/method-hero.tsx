@@ -1,5 +1,7 @@
 import NextLink from 'next/link';
 import { buttonVariants, Eyebrow, Stack, Text } from '@tnsi/ui';
+import { SectionImage } from '@/components/utility/section-image';
+import { methodImages } from '@/content/images';
 
 export function MethodHero() {
   return (
@@ -7,7 +9,6 @@ export function MethodHero() {
       aria-labelledby="method-hero-heading"
       className="grid min-h-screen grid-cols-1 overflow-hidden lg:grid-cols-[45fr_55fr]"
     >
-      {/* Left — Deep Slate editorial panel, text anchored to bottom */}
       <div className="dark bg-background text-foreground flex flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-4xl) sm:px-(--space-3xl) lg:px-(--space-3xl)">
         <Stack gap="xl" className="max-w-lg">
           <div>
@@ -41,14 +42,13 @@ export function MethodHero() {
         </Stack>
       </div>
 
-      {/* Right — image, full height, bleeds to viewport edge */}
-      {/* TODO: swap for approved full-bleed portrait once added to apps/web/public */}
       <div className="bg-secondary relative hidden lg:block">
-        <div className="absolute inset-0 flex items-end justify-start p-(--space-lg)">
-          <Text size="sm" tone="muted">
-            Full-bleed editorial image
-          </Text>
-        </div>
+        <SectionImage
+          src={methodImages.heroPortrait}
+          alt="Caroline Reed in a warm editorial portrait for the Life Beyond Trauma method."
+          priority
+          sizes="55vw"
+        />
       </div>
     </section>
   );

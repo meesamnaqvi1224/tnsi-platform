@@ -24,8 +24,8 @@ export const executiveAdvisoryContent = {
       'Helping leaders build organisations that perform sustainably through nervous system-informed leadership.',
     supportingCopy:
       'Modern organisations don\u2019t just need better strategies. They need leaders capable of making clear decisions, leading through uncertainty and creating environments where people can perform without chronic stress.',
-    imageAlt:
-      'Senior executives in a private strategy meeting — natural light, modern architecture, quiet luxury.',
+    imageSrc: '/images/programs/executive/hero-meeting.webp',
+    imageAlt: 'Caroline Reed in an executive portrait within a modern office setting.',
     imageCaption:
       'Private advisory engagements for leaders navigating complexity, capacity and culture.',
     metadata: [
@@ -195,6 +195,7 @@ export const executiveAdvisoryContent = {
   founder: {
     chapter: '07',
     heading: 'Why Caroline Reed',
+    imageSrc: '/images/programs/executive/founder-portrait.webp',
     imageAlt: 'Portrait of Caroline Reed — executive advisory and leadership education.',
     paragraphs: [
       'Caroline Reed brings more than twenty years of experience in trauma recovery, leadership education and nervous system science.',

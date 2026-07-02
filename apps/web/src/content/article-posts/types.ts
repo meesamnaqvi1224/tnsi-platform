@@ -10,7 +10,13 @@ export type ArticleBodyBlock =
   | { type: 'orderedList'; items: string[] }
   | { type: 'unorderedList'; items: string[] }
   | { type: 'note'; text: string }
-  | { type: 'figure'; imageAlt: string; caption: string; variant: 'inline' | 'full' }
+  | {
+      type: 'figure';
+      imageAlt: string;
+      imageSrc?: string;
+      caption: string;
+      variant: 'inline' | 'full';
+    }
   | { type: 'callout'; title?: string; text: string };
 
 export interface ArticleAuthor {
@@ -18,6 +24,7 @@ export interface ArticleAuthor {
   role: string;
   biography: string;
   imageAlt: string;
+  imageSrc?: string;
   href: string;
 }
 
@@ -27,6 +34,7 @@ export interface RelatedArticle {
   title: string;
   summary: string;
   imageAlt: string;
+  imageSrc?: string;
 }
 
 export interface ArticlePost {
@@ -42,6 +50,7 @@ export interface ArticlePost {
     headline: string;
     subtitle: string;
     imageAlt: string;
+    imageSrc?: string;
     author: {
       name: string;
       role: string;

@@ -20,7 +20,7 @@ export const contactContent = {
     headline: 'Contact',
     supportingHeadline:
       'Whether you have a question, are exploring a programme or would like to collaborate, we\u2019d love to hear from you.',
-    imageSrc: '/placeholders/contact-hero.svg',
+    imageSrc: '/images/contact/hero-landscape.webp',
     imageAlt:
       'Editorial photograph — warm office interior, books and natural light. No corporate setting.',
     primaryCta: { label: 'Book Discovery Call', href: '/book-a-call' },

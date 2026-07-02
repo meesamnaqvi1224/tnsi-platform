@@ -17,6 +17,7 @@ export function ArticlesFeatured() {
         readingTime={featured.readingTime}
         title={featured.title}
         summary={featured.summary}
+        imageSrc={featured.imageSrc}
         imageAlt={featured.imageAlt}
         href={featured.href}
       />

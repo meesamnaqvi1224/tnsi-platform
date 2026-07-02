@@ -1,7 +1,9 @@
 import NextLink from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { Container, Stack, Text } from '@tnsi/ui';
+import { Container, Stack } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { LazyArticleShare } from '@/components/articles/template/lazy-article-share';
+import { articleImages } from '@/content/images';
 import type { ArticlePost } from '@/content/article-posts/types';
 
 export interface ArticleHeroProps {
@@ -9,6 +11,8 @@ export interface ArticleHeroProps {
 }
 
 export function ArticleHero({ hero }: ArticleHeroProps) {
+  const imageSrc = hero.imageSrc ?? articleImages.hero;
+
   return (
     <header className="border-border border-b">
       <Container size="xl" className="px-(--space-xl) pt-(--space-xl) sm:px-(--space-2xl)">
@@ -21,13 +25,15 @@ export function ArticleHero({ hero }: ArticleHeroProps) {
         </NextLink>
       </Container>
 
-      <div className="bg-secondary relative aspect-video max-h-[70vh] w-full">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Text size="sm" tone="muted" className="max-w-[14rem] text-center">
-            Editorial hero photography placeholder
-          </Text>
-        </div>
-        <span className="sr-only">{hero.imageAlt}</span>
+      <div className="relative aspect-video max-h-[70vh] w-full overflow-hidden">
+        <ResponsiveImage
+          src={imageSrc}
+          alt={hero.imageAlt}
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
       </div>
 
       <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">

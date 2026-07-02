@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import NextLink from 'next/link';
 import { buttonVariants, Container, Section, Stack, Text } from '@tnsi/ui';
-import { EditorialPlaceholder } from '@/components/utility/editorial-placeholder';
+import { EditorialImage } from '@/components/utility/editorial-image';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -31,12 +31,12 @@ export default function NotFound() {
         <Section spacing="xl" aria-labelledby="not-found-heading">
           <Container size="xl">
             <div className="grid grid-cols-1 items-center gap-(--space-3xl) lg:grid-cols-2 lg:gap-(--space-5xl)">
-              <EditorialPlaceholder
+              <EditorialImage
                 src={notFoundContent.imageSrc}
                 alt={notFoundContent.imageAlt}
-                label={notFoundContent.imageLabel}
                 aspect="landscape"
                 className="rounded-sm"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
 
               <Stack gap="2xl">

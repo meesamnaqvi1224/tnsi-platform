@@ -22,7 +22,7 @@ export const facultyContent = {
       'Meet the educators, practitioners and researchers shaping The Nervous System Institute.',
     supportingCopy:
       'Our work combines decades of clinical practice, neuroscience, trauma recovery and education to create practical learning experiences that build lasting capacity.',
-    imageSrc: '/placeholders/faculty-hero.svg',
+    imageSrc: '/images/faculty/hero-portrait.webp',
     imageAlt:
       'Editorial portrait photography — professional educator in warm natural light, academic setting.',
     primaryCta: { label: 'Meet Caroline Reed', href: '#founder' },
@@ -41,7 +41,7 @@ export const facultyContent = {
       'EMDR Practitioner',
       'Founder of the Life Beyond Trauma Method',
     ],
-    imageSrc: '/placeholders/caroline-portrait.svg',
+    imageSrc: '/images/faculty/founder-portrait.webp',
     imageAlt: 'Professional portrait of Caroline Reed — editorial treatment, natural daylight.',
     biography: [
       'Caroline Reed founded The Nervous System Institute after more than twenty years in clinical practice, during which she observed the same pattern repeatedly: capable people exhausting themselves not through lack of effort, but through a nervous system trained to override its own signals.',
@@ -63,8 +63,9 @@ export const facultyContent = {
         summary:
           'Evidence-informed approaches to trauma physiology, dissociation and the pathways toward regulation — drawn from decades of clinical practice and contemporary trauma research.',
         href: '/method',
-        imageSrc: '/placeholders/discovery-hero.svg',
-        imageAlt: 'Clinical consultation space with natural light and reference texts.',
+        imageSrc: '/images/faculty/expertise-trauma-recovery.webp',
+        imageAlt:
+          'Caroline Reed in an editorial portrait for trauma recovery expertise, with natural light and reference texts.',
         layout: 'image-left' as const,
       },
       {
@@ -73,8 +74,9 @@ export const facultyContent = {
         summary:
           'The physiological foundations of regulation, threat detection and autonomic state — translated from peer-reviewed neuroscience into practical educational frameworks.',
         href: '/research',
-        imageSrc: '/placeholders/discovery-hero.svg',
-        imageAlt: 'Neuroscience journals and annotated research notes.',
+        imageSrc: '/images/faculty/expertise-nervous-system-science.webp',
+        imageAlt:
+          'Caroline Reed in an editorial portrait for nervous system science and annotated research notes.',
         layout: 'image-right' as const,
       },
       {
@@ -83,8 +85,9 @@ export const facultyContent = {
         summary:
           'Structured certification and supervision for professionals integrating nervous system science into clinical, coaching and healthcare practice.',
         href: '/programs/practitioner-certification',
-        imageSrc: '/placeholders/contact-hero.svg',
-        imageAlt: 'Teaching materials and clinical notebooks in a quiet study.',
+        imageSrc: '/images/faculty/expertise-practitioner-education.webp',
+        imageAlt:
+          'Caroline Reed in an editorial portrait for practitioner education and clinical notebooks in a quiet study.',
         layout: 'image-left' as const,
       },
       {
@@ -93,8 +96,9 @@ export const facultyContent = {
         summary:
           'The physiology of executive capacity — how autonomic state shapes judgment, team dynamics and the hidden architecture of organisational culture.',
         href: '/programs/executive-advisory',
-        imageSrc: '/placeholders/contact-hero.svg',
-        imageAlt: 'Leadership research and quiet strategic consultation setting.',
+        imageSrc: '/images/faculty/expertise-leadership-development.webp',
+        imageAlt:
+          'Caroline Reed in an editorial portrait for leadership development in a quiet strategic consultation setting.',
         layout: 'image-right' as const,
       },
       {
@@ -103,7 +107,7 @@ export const facultyContent = {
         summary:
           'Body-based approaches to regulation and integration — evaluated through clinical outcomes, physiological measurement and disciplined practitioner observation.',
         href: '/articles',
-        imageSrc: '/placeholders/faculty-hero.svg',
+        imageSrc: '/images/faculty/hero-portrait.webp',
         imageAlt: 'Somatic practice space with natural daylight.',
         layout: 'image-left' as const,
       },
