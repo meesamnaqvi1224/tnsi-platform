@@ -1,5 +1,6 @@
 import NextLink from 'next/link';
 import { buttonVariants, Container, Stack, Text } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { executiveAdvisoryContent } from '@/content/executive-advisory';
 
 const { hero } = executiveAdvisoryContent;
@@ -8,13 +9,15 @@ export function EaHero() {
   return (
     <section aria-labelledby="ea-hero-heading" className="border-border border-b">
       {/* Full-width editorial photography */}
-      <div className="bg-foreground relative min-h-[72vh] w-full">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Text size="sm" className="text-background/50 max-w-[16rem] text-center">
-            Executive meeting photography placeholder — private strategy session, natural light
-          </Text>
-        </div>
-        <span className="sr-only">{hero.imageAlt}</span>
+      <div className="bg-foreground relative min-h-[72vh] w-full overflow-hidden">
+        <ResponsiveImage
+          src={hero.imageSrc}
+          alt={hero.imageAlt}
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
       </div>
 
       {/* Editorial content block — stacked below image, not side-by-side */}

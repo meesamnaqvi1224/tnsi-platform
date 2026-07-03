@@ -24,7 +24,9 @@ export const executiveAdvisoryContent = {
       'Helping leaders build organisations that perform sustainably through nervous system-informed leadership.',
     supportingCopy:
       'Modern organisations don\u2019t just need better strategies. They need leaders capable of making clear decisions, leading through uncertainty and creating environments where people can perform without chronic stress.',
-    imageAlt: 'Executive meeting photography — private strategy session, natural light.',
+    imageSrc: '/images/programs/executive/hero-meeting.webp',
+    imageAlt:
+      'Two women in a focused private strategy conversation at a table in a calm, glass-walled room with natural light.',
     imageCaption:
       'Private advisory engagements for leaders navigating complexity, capacity and culture.',
     metadata: [

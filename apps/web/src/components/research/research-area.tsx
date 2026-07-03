@@ -1,6 +1,7 @@
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Text } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import type { ResearchAreaItem } from '@/content/research';
 
 export interface ResearchAreaProps {
@@ -13,14 +14,15 @@ export function ResearchArea({ area }: ResearchAreaProps) {
   return (
     <article className="border-border grid min-w-0 grid-cols-1 items-center overflow-hidden border-t lg:grid-cols-2">
       <div
-        className={`bg-secondary relative min-h-[45vh] ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
+        className={`bg-secondary relative min-h-[45vh] overflow-hidden ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
       >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Text size="sm" tone="muted" className="max-w-[12rem] text-center">
-            Research area photography placeholder
-          </Text>
-        </div>
-        <span className="sr-only">{area.imageAlt}</span>
+        <ResponsiveImage
+          src={area.imageSrc}
+          alt={area.imageAlt}
+          fill
+          className="object-cover"
+          sizes="(max-width: 1024px) 100vw, 50vw"
+        />
       </div>
 
       <div

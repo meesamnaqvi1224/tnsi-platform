@@ -1,6 +1,7 @@
 import type * as React from 'react';
 import NextLink from 'next/link';
 import { Eyebrow, Heading, Link, Stack, Text } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 
 export function MethodPanel() {
   return (
@@ -36,16 +37,14 @@ export function MethodPanel() {
         </Stack>
       </div>
 
-      {/* TODO: swap for the approved teacup/notebook still-life asset once added to apps/web/public */}
-      <figure className="border-border bg-secondary relative aspect-[4/3] w-full border lg:aspect-auto">
-        <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
-          <Text size="sm" tone="muted">
-            Still-life placeholder
-          </Text>
-        </div>
-        <span className="sr-only">
-          Still-life editorial photograph — teacup and notebook in warm natural light.
-        </span>
+      <figure className="border-border bg-secondary relative aspect-[4/3] w-full overflow-hidden border lg:aspect-auto">
+        <ResponsiveImage
+          src="/images/home/method-stilllife.webp"
+          alt="A still-life of a ceramic tea set, an open notebook and books on a linen-draped table in warm natural light."
+          fill
+          className="object-cover"
+          sizes="(max-width: 1024px) 100vw, 50vw"
+        />
       </figure>
     </section>
   );

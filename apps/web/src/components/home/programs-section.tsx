@@ -2,6 +2,7 @@ import type * as React from 'react';
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Container, Eyebrow, Grid, Heading, Link, Section, Stack, Text } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 
 const programs = [
   {
@@ -9,33 +10,40 @@ const programs = [
     description:
       'A foundational program for ambitious women ready to rebuild their relationship with their nervous system and reclaim sustainable capacity.',
     href: '/method',
+    imageSrc: '/images/home/program-life-beyond-trauma.webp',
+    imageAlt: 'A woman reading calmly in a sunlit chair beside a garden window.',
   },
   {
     title: 'Practitioner Certification',
     description:
       'Advanced certification for therapists, coaches and healthcare professionals integrating nervous system science into their practice.',
     href: '/programs/practitioner-certification',
+    imageSrc: '/images/home/program-practitioner.webp',
+    imageAlt: 'Women learning together around an oak table in a bright, plant-filled studio.',
   },
   {
     title: 'Executive Advisory',
     description:
       'Private advisory for senior leaders and executives navigating high-performance environments without physiological cost.',
     href: '/programs/executive-advisory',
+    imageSrc: '/images/home/program-executive.webp',
+    imageAlt:
+      'Two women in focused conversation across a table in a calm, glass-walled meeting space.',
   },
 ] as const;
 
-function ProgramCard({ title, description, href }: (typeof programs)[number]) {
+function ProgramCard({ title, description, href, imageSrc, imageAlt }: (typeof programs)[number]) {
   return (
     <article className="group">
       <NextLink href={href} className="interaction-focus block rounded-lg">
-        {/* TODO: swap for the approved program-specific lifestyle image once added to apps/web/public */}
         <figure className="border-border bg-secondary relative aspect-[4/3] w-full overflow-hidden rounded-lg border">
-          <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
-            <Text size="sm" tone="muted">
-              Image placeholder
-            </Text>
-          </div>
-          <span className="sr-only">{title} program photography placeholder.</span>
+          <ResponsiveImage
+            src={imageSrc}
+            alt={imageAlt}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
         </figure>
       </NextLink>
       <Stack gap="xs" className="mt-(--space-md)">

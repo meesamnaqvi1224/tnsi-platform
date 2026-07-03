@@ -1,6 +1,7 @@
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Container, Text } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import type { RelatedArticle } from '@/content/article-posts/types';
 
 export interface RelatedArticlesProps {
@@ -18,13 +19,14 @@ export function RelatedArticles({ articles }: RelatedArticlesProps) {
         <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-3">
           {articles.map((article) => (
             <article key={article.slug} className="flex flex-col gap-(--space-lg)">
-              <div className="bg-secondary relative aspect-[4/3] w-full">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Text size="sm" tone="muted">
-                    Related article image
-                  </Text>
-                </div>
-                <span className="sr-only">{article.imageAlt}</span>
+              <div className="bg-secondary relative aspect-[4/3] w-full overflow-hidden">
+                <ResponsiveImage
+                  src={article.imageSrc ?? '/images/articles/latest-polyvagal.webp'}
+                  alt={article.imageAlt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 33vw"
+                />
               </div>
 
               <div className="flex flex-col gap-(--space-md)">

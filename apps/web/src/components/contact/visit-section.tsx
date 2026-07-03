@@ -1,4 +1,5 @@
 import { ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { contactContent } from '@/content/contact';
 
 const { visit } = contactContent;
@@ -29,13 +30,14 @@ export function VisitSection() {
             </dl>
           </Stack>
 
-          <div
-            aria-label={visit.mapAlt}
-            className="border-border/70 bg-secondary/30 relative flex min-h-[20rem] items-center justify-center border lg:min-h-full"
-          >
-            <Text size="sm" tone="muted" className="max-w-[14rem] text-center">
-              Map placeholder — Institute location forthcoming
-            </Text>
+          <div className="border-border/70 relative min-h-[20rem] overflow-hidden border lg:min-h-full">
+            <ResponsiveImage
+              src="/images/contact/office.webp"
+              alt="A calm interior looking through a large window onto woodland, with a low bench and a vase of foliage in warm daylight."
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
           </div>
         </div>
       </Container>

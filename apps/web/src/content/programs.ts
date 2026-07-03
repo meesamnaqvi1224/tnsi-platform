@@ -5,7 +5,9 @@ export const programsOverviewContent = {
     supportingCopy:
       'Three evidence-informed programs — each designed for a different stage of transformation.',
     primaryCta: { label: 'Explore Programs', href: '#pathways' },
-    imageAlt: 'Editorial photography — Institute programs overview',
+    imageSrc: '/images/programs/overview-hero.webp',
+    imageAlt:
+      'A modern low-rise education building of oak and stone set among trees in soft evening light.',
   },
 
   navigation: [
@@ -16,7 +18,8 @@ export const programsOverviewContent = {
         'For ambitious women ready to move beyond survival and reclaim lasting wellbeing.',
       href: '/method',
       cta: 'Explore',
-      imageLabel: 'Life Beyond Trauma — lifestyle photography',
+      imageSrc: '/images/programs/nav-life-beyond-trauma.webp',
+      imageAlt: 'A woman walking a sunlit forest path among tall trees.',
     },
     {
       id: 'practitioner-certification',
@@ -25,7 +28,8 @@ export const programsOverviewContent = {
         'For professionals integrating trauma-informed nervous system education into practice.',
       href: '/programs/practitioner-certification',
       cta: 'Explore',
-      imageLabel: 'Practitioner Certification — workshop photography',
+      imageSrc: '/images/programs/nav-practitioner.webp',
+      imageAlt: 'Women listening attentively along a long table in a bright educational room.',
     },
     {
       id: 'executive-advisory',
@@ -33,7 +37,8 @@ export const programsOverviewContent = {
       description: 'For organisations building healthier leadership and workplace cultures.',
       href: '/programs/executive-advisory',
       cta: 'Explore',
-      imageLabel: 'Executive Advisory — leadership photography',
+      imageSrc: '/images/programs/nav-executive.webp',
+      imageAlt: 'A woman in a dark blazer standing thoughtfully at a window overlooking a city.',
     },
   ] as const,
 
@@ -51,7 +56,8 @@ export const programsOverviewContent = {
       ],
       href: '/method',
       cta: 'Explore Program',
-      imageLabel: 'Life Beyond Trauma — programme photography',
+      imageSrc: '/images/programs/featured-life-beyond-trauma.webp',
+      imageAlt: 'A woman walking away along a peaceful woodland path dappled with autumn light.',
       layout: 'image-left' as const,
     },
     {
@@ -67,7 +73,8 @@ export const programsOverviewContent = {
       ],
       href: '/programs/practitioner-certification',
       cta: 'Explore Program',
-      imageLabel: 'Practitioner Certification — classroom photography',
+      imageSrc: '/images/programs/featured-practitioner.webp',
+      imageAlt: 'A small group of women in a workshop circle in a calm, light-filled studio.',
       layout: 'image-right' as const,
     },
     {
@@ -83,7 +90,8 @@ export const programsOverviewContent = {
       ],
       href: '/programs/executive-advisory',
       cta: 'Explore Advisory',
-      imageLabel: 'Executive Advisory — boardroom photography',
+      imageSrc: '/images/programs/featured-executive.webp',
+      imageAlt: 'Four women meeting around a table in a light-filled boardroom with garden views.',
       layout: 'image-left' as const,
     },
   ] as const,

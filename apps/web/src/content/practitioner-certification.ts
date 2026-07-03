@@ -24,8 +24,9 @@ export const practitionerCertificationContent = {
       'Professional training for practitioners who want to integrate nervous system-informed approaches into their work.',
     supportingCopy:
       'Develop a deeper understanding of trauma, regulation and nervous system science through an evidence-informed educational framework designed for real-world application.',
-    imageSrc: '/images/shared/caroline-portrait-primary.webp',
-    imageAlt: 'Portrait of Caroline Reed, founder of The Nervous System Institute.',
+    imageSrc: '/images/programs/practitioner/hero-workshop.webp',
+    imageAlt:
+      'Practitioners discussing notes together around a table in a bright, plant-filled teaching studio.',
     imageCaption:
       'Live teaching sessions bring nervous system science into structured, practice-ready frameworks.',
     metadata: [
@@ -130,6 +131,7 @@ export const practitionerCertificationContent = {
   founder: {
     chapter: '07',
     heading: 'Why Learn With Caroline Reed',
+    imageSrc: '/images/programs/practitioner/founder-portrait.webp',
     imageAlt: 'Portrait of Caroline Reed, founder of The Nervous System Institute.',
     paragraphs: [
       'Caroline Reed brings more than twenty years of clinical experience in trauma recovery and nervous system education.',

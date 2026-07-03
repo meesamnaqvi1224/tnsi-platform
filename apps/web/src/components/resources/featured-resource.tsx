@@ -1,10 +1,12 @@
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Text } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 
 export interface FeaturedResourceProps {
   title: string;
   description: string;
+  imageSrc: string;
   imageAlt: string;
   href: string;
   cta?: string;
@@ -13,19 +15,21 @@ export interface FeaturedResourceProps {
 export function FeaturedResource({
   title,
   description,
+  imageSrc,
   imageAlt,
   href,
   cta = 'Read Guide',
 }: FeaturedResourceProps) {
   return (
     <article className="border-border grid min-w-0 grid-cols-1 overflow-hidden border-t lg:grid-cols-[3fr_2fr]">
-      <div className="bg-secondary relative min-h-[50vh] lg:min-h-[70vh]">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Text size="sm" tone="muted" className="max-w-[14rem] text-center">
-            Featured resource photography placeholder
-          </Text>
-        </div>
-        <span className="sr-only">{imageAlt}</span>
+      <div className="bg-secondary relative min-h-[50vh] overflow-hidden lg:min-h-[70vh]">
+        <ResponsiveImage
+          src={imageSrc}
+          alt={imageAlt}
+          fill
+          className="object-cover"
+          sizes="(max-width: 1024px) 100vw, 60vw"
+        />
       </div>
 
       <div className="flex flex-col justify-center px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:px-(--space-3xl)">

@@ -1,6 +1,7 @@
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Text } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import type { ArticleItem } from '@/content/articles';
 
 export interface ArticleCardProps {
@@ -36,15 +37,20 @@ function ArticleLink({ href }: { href: string }) {
   );
 }
 
-function ImagePlaceholder({ alt, className }: { alt: string; className?: string }) {
+function CardImage({
+  src,
+  alt,
+  className,
+  sizes,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  sizes: string;
+}) {
   return (
-    <div className={`bg-secondary relative ${className ?? ''}`}>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <Text size="sm" tone="muted" className="max-w-[10rem] text-center">
-          Editorial photography placeholder
-        </Text>
-      </div>
-      <span className="sr-only">{alt}</span>
+    <div className={`bg-secondary relative overflow-hidden ${className ?? ''}`}>
+      <ResponsiveImage src={src} alt={alt} fill className="object-cover" sizes={sizes} />
     </div>
   );
 }
@@ -53,7 +59,12 @@ export function ArticleCard({ article }: ArticleCardProps) {
   if (article.variant === 'large') {
     return (
       <article className="border-border grid min-w-0 grid-cols-1 overflow-hidden border-t lg:grid-cols-[1.2fr_1fr]">
-        <ImagePlaceholder alt={article.imageAlt} className="min-h-[50vh] lg:min-h-[60vh]" />
+        <CardImage
+          src={article.imageSrc}
+          alt={article.imageAlt}
+          className="min-h-[50vh] lg:min-h-[60vh]"
+          sizes="(max-width: 1024px) 100vw, 55vw"
+        />
         <div className="flex flex-col justify-center px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:px-(--space-3xl)">
           <div className="flex max-w-lg flex-col gap-(--space-xl)">
             <ArticleMeta
@@ -77,7 +88,12 @@ export function ArticleCard({ article }: ArticleCardProps) {
   if (article.variant === 'medium') {
     return (
       <article className="border-border flex flex-col border-t">
-        <ImagePlaceholder alt={article.imageAlt} className="aspect-[16/10] w-full" />
+        <CardImage
+          src={article.imageSrc}
+          alt={article.imageAlt}
+          className="aspect-[16/10] w-full"
+          sizes="(max-width: 768px) 100vw, 33vw"
+        />
         <div className="flex flex-col gap-(--space-lg) px-(--space-md) py-(--space-xl)">
           <ArticleMeta
             category={article.category}

@@ -26,8 +26,9 @@ export const resourcesContent = {
       'Evidence-informed articles, guides, research and educational resources to deepen your understanding of the nervous system.',
     supportingCopy:
       'Explore practical knowledge grounded in neuroscience, trauma recovery and nervous system education.',
+    imageSrc: '/images/resources/hero.webp',
     imageAlt:
-      'Editorial library photography — books, notebook and research papers in natural light.',
+      'A long oak library aisle lined with books, lit by soft daylight from a window at the end.',
     primaryCta: { label: 'Browse Resources', href: '#categories' },
     secondaryCta: { label: 'Latest Articles', href: '#latest' },
   },
@@ -37,7 +38,9 @@ export const resourcesContent = {
     title: 'Understanding Your Nervous System',
     description:
       'A comprehensive introduction to how the nervous system shapes behaviour, relationships and long-term wellbeing.',
-    imageAlt: 'Editorial photography — open notebook and research materials.',
+    imageSrc: '/images/resources/featured.webp',
+    imageAlt:
+      'An open handwritten journal, reading glasses and neuroscience books beside a cup of tea in warm light.',
     href: '/articles/understanding-your-nervous-system',
     cta: 'Read Guide',
   },
@@ -94,7 +97,9 @@ export const resourcesContent = {
         readingTime: '8 min read',
         publishedAt: 'June 2026',
         href: '/articles/polyvagal-theory-in-practice',
-        imageAlt: 'Research papers and annotated notes on a desk.',
+        imageSrc: '/images/resources/card-polyvagal.webp',
+        imageAlt:
+          'An open research journal and colour-spined reference volumes on an oak desk in daylight.',
         layout: 'image-left' as const,
       },
       {
@@ -106,7 +111,9 @@ export const resourcesContent = {
         readingTime: '6 min read',
         publishedAt: 'May 2026',
         href: '/articles/window-of-tolerance',
-        imageAlt: 'Quiet reading space with natural light.',
+        imageSrc: '/images/resources/card-window-tolerance.webp',
+        imageAlt:
+          'A quiet reading corner with a linen armchair and bookshelves beside a garden window.',
         layout: 'image-right' as const,
       },
       {
@@ -118,7 +125,8 @@ export const resourcesContent = {
         readingTime: '10 min read',
         publishedAt: 'May 2026',
         href: '/articles/nervous-system-of-leadership',
-        imageAlt: 'Executive journal and pen on a wooden desk.',
+        imageSrc: '/images/resources/card-executive.webp',
+        imageAlt: 'A Scandinavian writing desk with a notebook, books and mug by a bright window.',
         layout: 'image-left' as const,
       },
       {
@@ -130,7 +138,9 @@ export const resourcesContent = {
         readingTime: '12 min read',
         publishedAt: 'April 2026',
         href: '/articles/case-integration',
-        imageAlt: 'Clinical notes and reference texts.',
+        imageSrc: '/images/resources/card-case-integration.webp',
+        imageAlt:
+          'Stacked white neuroscience books, an open notebook and a mug on an oak desk by a window.',
         layout: 'image-right' as const,
       },
       {
@@ -142,7 +152,9 @@ export const resourcesContent = {
         readingTime: '7 min read',
         publishedAt: 'April 2026',
         href: '/articles/co-regulation',
-        imageAlt: 'Two chairs in a calm consultation space.',
+        imageSrc: '/images/resources/card-co-regulation.webp',
+        imageAlt:
+          'A minimal interior with a linen lounge chair, a potted plant and books by garden doors.',
         layout: 'image-left' as const,
       },
       {
@@ -154,7 +166,9 @@ export const resourcesContent = {
         readingTime: '9 min read',
         publishedAt: 'March 2026',
         href: '/articles/physiology-of-burnout',
-        imageAlt: 'Stacked books beside a window with soft daylight.',
+        imageSrc: '/images/resources/card-burnout.webp',
+        imageAlt:
+          'A neuroscience library with oak shelving and a reading chair beside a tall window.',
         layout: 'image-right' as const,
       },
     ],

@@ -1,6 +1,7 @@
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { buttonVariants, Container, Section, Stack, Text } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { programsOverviewContent } from '@/content/programs';
 
 const { navigation } = programsOverviewContent;
@@ -10,18 +11,20 @@ function DestinationCard({
   description,
   href,
   cta,
-  imageLabel,
+  imageSrc,
+  imageAlt,
 }: (typeof navigation)[number]) {
   return (
     <article className="group flex flex-col">
       <NextLink href={href} className="interaction-focus block overflow-hidden rounded-sm">
-        {/* TODO: swap for approved program-specific photography once added to apps/web/public */}
         <div className="bg-secondary relative aspect-[3/4] w-full overflow-hidden sm:aspect-[4/5]">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Text size="sm" tone="muted" className="max-w-[12rem] text-center">
-              {imageLabel}
-            </Text>
-          </div>
+          <ResponsiveImage
+            src={imageSrc}
+            alt={imageAlt}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
           <div
             aria-hidden
             className="absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_oklch,var(--background)_15%,transparent)_0%,transparent_45%)]"

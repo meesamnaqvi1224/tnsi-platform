@@ -22,8 +22,9 @@ export const researchContent = {
       'Exploring the science of the nervous system through evidence, clinical observation and practical application.',
     supportingCopy:
       'The Nervous System Institute brings together findings from neuroscience, psychology, attachment theory and somatic practice to create practical frameworks for sustainable human change.',
+    imageSrc: '/images/research/hero.webp',
     imageAlt:
-      'Editorial photograph — research papers, neuroscience journals and notebook in natural daylight.',
+      'An open neuroscience textbook with brain diagrams, handwritten notes and a mug on an oak desk in bright natural daylight.',
     primaryCta: { label: 'Explore Publications', href: '#references' },
     secondaryCta: { label: 'Research Principles', href: '#philosophy' },
   },
@@ -88,7 +89,9 @@ export const researchContent = {
         summary:
           'How autonomic state shapes daily functioning, relational capacity and the physiological prerequisites for learning and change.',
         href: '/articles',
-        imageAlt: 'Research journal open beside handwritten clinical notes.',
+        imageSrc: '/images/research/area-regulation.webp',
+        imageAlt:
+          'An open research journal beside handwritten clinical notes and a mug on an oak desk.',
         layout: 'image-left' as const,
       },
       {
@@ -97,7 +100,9 @@ export const researchContent = {
         summary:
           'The physiology of sustained excellence — examining capacity, recovery and the nervous system conditions that support performance without depletion.',
         href: '/articles',
-        imageAlt: 'Executive notebook and reference texts on a wooden desk.',
+        imageSrc: '/images/research/area-high-performance.webp',
+        imageAlt:
+          'Stacked neuroscience volumes, an open journal and a mug on an oak table in soft daylight.',
         layout: 'image-right' as const,
       },
       {
@@ -106,7 +111,9 @@ export const researchContent = {
         summary:
           'Evidence-informed pathways through trauma physiology toward regulation, integration and long-term wellbeing.',
         href: '/articles',
-        imageAlt: 'Quiet clinical consultation space with natural light.',
+        imageSrc: '/images/research/area-trauma-recovery.webp',
+        imageAlt:
+          'A quiet consultation room with a linen armchair, bookshelves and reference texts in natural light.',
         layout: 'image-left' as const,
       },
       {
@@ -115,7 +122,8 @@ export const researchContent = {
         summary:
           'How nervous system state influences executive judgment, team dynamics and the hidden physiology of organisational culture.',
         href: '/articles',
-        imageAlt: 'Leadership research papers and annotated margins.',
+        imageSrc: '/images/research/area-leadership-capacity.webp',
+        imageAlt: 'Annotated academic papers and an open book on an oak desk beside a window.',
         layout: 'image-right' as const,
       },
       {
@@ -124,7 +132,9 @@ export const researchContent = {
         summary:
           'Neuroception, safety cues and the relational conditions required for psychological safety in clinical, educational and organisational settings.',
         href: '/articles',
-        imageAlt: 'Two chairs in a calm therapeutic environment.',
+        imageSrc: '/images/research/area-emotional-safety.webp',
+        imageAlt:
+          'Two soft armchairs facing across a low table in a calm, naturally lit therapeutic space.',
         layout: 'image-left' as const,
       },
       {
@@ -133,7 +143,9 @@ export const researchContent = {
         summary:
           'The autonomic mechanisms underlying chronic stress, exhaustion and collapse — and the frameworks that address root physiology rather than symptoms alone.',
         href: '/articles',
-        imageAlt: 'Stacked volumes beside a window with soft daylight.',
+        imageSrc: '/images/research/area-burnout-prevention.webp',
+        imageAlt:
+          'A neat stack of neuroscience books on an oak table beside a window with soft daylight.',
         layout: 'image-right' as const,
       },
     ],

@@ -27,7 +27,7 @@ export function MissionSection() {
 
           <EditorialImage
             src={aboutImages.missionEditorial}
-            alt="Caroline Reed in an editorial portrait within a calm, naturally lit professional setting."
+            alt="A warm consultation room with two soft armchairs facing each other, lit by natural light from tall garden windows."
             aspect="landscape"
             className="rounded-lg"
             sizes="(max-width: 1024px) 100vw, 50vw"

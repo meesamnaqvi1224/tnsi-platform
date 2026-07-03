@@ -63,8 +63,9 @@ export const facultyContent = {
         summary:
           'Evidence-informed approaches to trauma physiology, dissociation and the pathways toward regulation — drawn from decades of clinical practice and contemporary trauma research.',
         href: '/method',
-        imageSrc: '/placeholders/discovery-hero.svg',
-        imageAlt: 'Clinical consultation space with natural light and reference texts.',
+        imageSrc: '/images/faculty/expertise-trauma-recovery.webp',
+        imageAlt:
+          'A quiet consultation room with a linen reading chair, oak shelving and reference texts in natural light.',
         layout: 'image-left' as const,
       },
       {
@@ -73,8 +74,9 @@ export const facultyContent = {
         summary:
           'The physiological foundations of regulation, threat detection and autonomic state — translated from peer-reviewed neuroscience into practical educational frameworks.',
         href: '/research',
-        imageSrc: '/placeholders/discovery-hero.svg',
-        imageAlt: 'Neuroscience journals and annotated research notes.',
+        imageSrc: '/images/faculty/expertise-nervous-system-science.webp',
+        imageAlt:
+          'An open notebook with handwritten notes, neuroscience books and a cup of tea on an oak desk, seen from above.',
         layout: 'image-right' as const,
       },
       {
@@ -83,8 +85,9 @@ export const facultyContent = {
         summary:
           'Structured certification and supervision for professionals integrating nervous system science into clinical, coaching and healthcare practice.',
         href: '/programs/practitioner-certification',
-        imageSrc: '/placeholders/contact-hero.svg',
-        imageAlt: 'Teaching materials and clinical notebooks in a quiet study.',
+        imageSrc: '/images/faculty/expertise-practitioner-education.webp',
+        imageAlt:
+          'Two women reviewing neuroscience research together at a desk in a book-lined study.',
         layout: 'image-left' as const,
       },
       {
@@ -93,8 +96,9 @@ export const facultyContent = {
         summary:
           'The physiology of executive capacity — how autonomic state shapes judgment, team dynamics and the hidden architecture of organisational culture.',
         href: '/programs/executive-advisory',
-        imageSrc: '/placeholders/contact-hero.svg',
-        imageAlt: 'Leadership research and quiet strategic consultation setting.',
+        imageSrc: '/images/faculty/expertise-leadership-development.webp',
+        imageAlt:
+          'A group of women in focused discussion around an oak table in a bright, calm meeting room.',
         layout: 'image-right' as const,
       },
       {
@@ -103,8 +107,9 @@ export const facultyContent = {
         summary:
           'Body-based approaches to regulation and integration — evaluated through clinical outcomes, physiological measurement and disciplined practitioner observation.',
         href: '/articles',
-        imageSrc: '/placeholders/faculty-hero.svg',
-        imageAlt: 'Somatic practice space with natural daylight.',
+        imageSrc: '/images/faculty/expertise-somatic-healing.webp',
+        imageAlt:
+          'A calm reading corner with a linen-and-oak lounge chair and bookshelves beside a garden window.',
         layout: 'image-left' as const,
       },
     ],

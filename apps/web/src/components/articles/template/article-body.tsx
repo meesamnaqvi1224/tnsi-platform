@@ -79,6 +79,7 @@ function renderBlock(block: ArticleBodyBlock, index: number) {
       return (
         <Figure
           key={index}
+          imageSrc={block.imageSrc}
           imageAlt={block.imageAlt}
           caption={block.caption}
           variant={block.variant}

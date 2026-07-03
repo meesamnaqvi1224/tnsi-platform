@@ -19,6 +19,7 @@ export interface ArticleItem {
   category: string;
   publishedAt: string;
   readingTime: string;
+  imageSrc: string;
   imageAlt: string;
   href: string;
   variant: ArticleVariant;
@@ -40,7 +41,9 @@ export const articlesContent = {
     supportingHeadline:
       'Thoughtful perspectives on neuroscience, trauma recovery, leadership and nervous system education.',
     supportingCopy: 'Explore our latest writing, research summaries and practical insights.',
-    imageAlt: 'Editorial photography — notebook, books and writing desk in natural light.',
+    imageSrc: '/images/articles/hero.webp',
+    imageAlt:
+      'A writing desk with an open notebook, books and a mug beside a window in soft natural light.',
     primaryCta: { label: 'Latest Articles', href: '#latest' },
     secondaryCta: { label: 'Browse Topics', href: '#topics' },
   },
@@ -53,7 +56,8 @@ export const articlesContent = {
     title: 'The Nervous System as a Framework for Understanding Human Behaviour',
     summary:
       'A long-form introduction to how autonomic state shapes perception, relationships and the capacity for change — written for curious readers and serious practitioners alike.',
-    imageAlt: 'Open journal with handwritten notes beside stacked research volumes.',
+    imageSrc: '/images/articles/featured.webp',
+    imageAlt: 'A woman writing notes in a journal at a sunlit desk beside a window.',
     href: '/articles/nervous-system-framework',
   },
 
@@ -98,7 +102,9 @@ export const articlesContent = {
         category: 'Neuroscience',
         publishedAt: 'June 2026',
         readingTime: '8 min read',
-        imageAlt: 'Annotated research papers on a wooden desk.',
+        imageSrc: '/images/articles/latest-polyvagal.webp',
+        imageAlt:
+          'A notebook, book, pen and mug arranged on a textured oak desktop, seen from above.',
         href: '/articles/polyvagal-theory-in-practice',
         variant: 'large',
       },
@@ -110,7 +116,9 @@ export const articlesContent = {
         category: 'Trauma Recovery',
         publishedAt: 'June 2026',
         readingTime: '6 min read',
-        imageAlt: 'Quiet reading corner with soft daylight.',
+        imageSrc: '/images/articles/latest-window-tolerance.webp',
+        imageAlt:
+          'A quiet reading corner with a wooden chair, throw and books beside a bright window.',
         href: '/articles/window-of-tolerance',
         variant: 'medium',
       },
@@ -123,7 +131,9 @@ export const articlesContent = {
         category: 'Leadership',
         publishedAt: 'May 2026',
         readingTime: '10 min read',
-        imageAlt: 'Executive journal and fountain pen.',
+        imageSrc: '/images/articles/latest-leadership.webp',
+        imageAlt:
+          'An editorial flat lay of white books, an open notebook and a coffee cup on a desk.',
         href: '/articles/nervous-system-of-leadership',
         variant: 'medium',
       },
@@ -135,7 +145,8 @@ export const articlesContent = {
         category: 'Neuroscience',
         publishedAt: 'May 2026',
         readingTime: '7 min read',
-        imageAlt: 'Two chairs in a calm consultation room.',
+        imageSrc: '/images/resources/card-co-regulation.webp',
+        imageAlt: 'A minimal interior with a linen lounge chair and books by garden doors.',
         href: '/articles/co-regulation',
         variant: 'compact',
       },
@@ -147,7 +158,8 @@ export const articlesContent = {
         category: 'Practitioner Education',
         publishedAt: 'May 2026',
         readingTime: '12 min read',
-        imageAlt: 'Clinical notes and reference texts.',
+        imageSrc: '/images/resources/card-case-integration.webp',
+        imageAlt: 'Stacked white neuroscience books, an open notebook and a mug on an oak desk.',
         href: '/articles/case-integration',
         variant: 'compact',
       },
@@ -159,7 +171,9 @@ export const articlesContent = {
         category: 'Trauma Recovery',
         publishedAt: 'April 2026',
         readingTime: '9 min read',
-        imageAlt: 'Stacked books beside a window.',
+        imageSrc: '/images/resources/card-burnout.webp',
+        imageAlt:
+          'A neuroscience library with oak shelving and a reading chair beside a tall window.',
         href: '/articles/physiology-of-burnout',
         variant: 'compact',
       },
@@ -172,7 +186,9 @@ export const articlesContent = {
         category: 'Research',
         publishedAt: 'April 2026',
         readingTime: '11 min read',
-        imageAlt: 'Research journal open on a linen-covered table.',
+        imageSrc: '/images/articles/latest-neuroception.webp',
+        imageAlt:
+          'An open book and cup of tea on a table beneath an arched window looking onto greenery.',
         href: '/articles/neuroception-and-safety',
         variant: 'large',
       },
@@ -185,7 +201,8 @@ export const articlesContent = {
         category: 'Interviews',
         publishedAt: 'March 2026',
         readingTime: '15 min read',
-        imageAlt: 'Editorial portrait setting with natural light.',
+        imageSrc: '/images/articles/latest-interview.webp',
+        imageAlt: 'A woman sitting reflectively at a table with a notebook beside a large window.',
         href: '/articles/interview-caroline-reed',
         variant: 'medium',
       },
@@ -198,7 +215,9 @@ export const articlesContent = {
         category: 'Practitioner Education',
         publishedAt: 'March 2026',
         readingTime: '8 min read',
-        imageAlt: 'Handwritten therapy notes and anatomy reference.',
+        imageSrc: '/images/articles/latest-somatic.webp',
+        imageAlt:
+          'An editorial desk with books, an open notebook and a mug beside a window in warm light.',
         href: '/articles/somatic-markers-in-therapy',
         variant: 'medium',
       },
@@ -210,7 +229,8 @@ export const articlesContent = {
         category: 'Leadership',
         publishedAt: 'February 2026',
         readingTime: '7 min read',
-        imageAlt: 'Conference table with notebooks.',
+        imageSrc: '/images/articles/latest-leadership.webp',
+        imageAlt: 'An editorial flat lay of books, an open notebook and a coffee cup on a desk.',
         href: '/articles/team-dysregulation',
         variant: 'compact',
       },
@@ -222,7 +242,8 @@ export const articlesContent = {
         category: 'Research',
         publishedAt: 'February 2026',
         readingTime: '10 min read',
-        imageAlt: 'Psychology texts and reading glasses.',
+        imageSrc: '/images/articles/latest-window-tolerance.webp',
+        imageAlt: 'A quiet reading corner with a wooden chair and books beside a bright window.',
         href: '/articles/attachment-and-nervous-system',
         variant: 'compact',
       },
@@ -234,7 +255,8 @@ export const articlesContent = {
         category: 'Neuroscience',
         publishedAt: 'January 2026',
         readingTime: '5 min read',
-        imageAlt: 'Morning coffee beside an open notebook.',
+        imageSrc: '/images/articles/latest-polyvagal.webp',
+        imageAlt: 'A notebook, book, pen and mug arranged on an oak desktop, seen from above.',
         href: '/articles/regulation-in-daily-life',
         variant: 'compact',
       },
@@ -271,7 +293,9 @@ export const articlesContent = {
         title: 'Building Capacity Beyond Resilience',
         summary:
           'Why resilience is an insufficient frame — and what nervous system capacity offers instead.',
-        imageAlt: 'Printed journal on a marble surface.',
+        imageSrc: '/images/articles/editors-capacity.webp',
+        imageAlt:
+          'A luxury flat lay of books, an open journal, reading glasses and a cup of coffee on a desk.',
         href: '/articles/building-capacity-beyond-resilience',
         layout: 'image-left' as const,
       },
@@ -280,7 +304,9 @@ export const articlesContent = {
         title: 'What Trauma-Informed Really Means',
         summary:
           'Moving beyond buzzwords toward physiology, safety and evidence-informed practice.',
-        imageAlt: 'Research papers with marginalia.',
+        imageSrc: '/images/articles/editors-trauma-informed.webp',
+        imageAlt:
+          'Hands writing in an open journal beside a cup of tea and books on a wooden table.',
         href: '/articles/what-trauma-informed-means',
         layout: 'image-right' as const,
       },
@@ -289,7 +315,9 @@ export const articlesContent = {
         title: 'Leadership Culture Starts in the Nervous System',
         summary:
           'How a leader\u2019s physiological state becomes the unwritten policy of an organisation.',
-        imageAlt: 'Executive office with natural materials.',
+        imageSrc: '/images/articles/editors-leadership-culture.webp',
+        imageAlt:
+          'An executive office with an oak desk, chair and bookshelves beside a garden window.',
         href: '/articles/leadership-culture-nervous-system',
         layout: 'image-left' as const,
       },
