@@ -42,9 +42,9 @@ export function SiteHeader() {
           <ResponsiveImage
             src="/images/shared/logo-mark.png"
             alt=""
-            width={36}
-            height={36}
-            className="size-8 shrink-0 sm:size-9"
+            width={320}
+            height={286}
+            className="h-8 w-auto shrink-0 sm:h-9"
           />
           <span className="font-heading text-xs leading-tight font-semibold tracking-[0.1em] uppercase sm:text-sm">
             The
