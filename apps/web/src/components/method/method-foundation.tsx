@@ -32,7 +32,7 @@ export function MethodFoundation() {
     <Section
       id="method-foundation"
       spacing="xl"
-      className="border-border border-t"
+      className="bg-secondary border-border border-t"
       aria-labelledby="method-foundation-heading"
     >
       <Container size="xl">

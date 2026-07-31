@@ -1,4 +1,4 @@
-import { CapacityJourney, ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
+import { ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
 
 const stages = [
   {
@@ -47,11 +47,12 @@ export function MethodJourney() {
             </Text>
           </Stack>
 
-          <CapacityJourney />
-
-          <div className="grid grid-cols-1 gap-(--space-xl) pt-(--space-lg) lg:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-(--space-lg) pt-(--space-lg) lg:grid-cols-2 xl:grid-cols-3">
             {stages.map(({ stage, description }) => (
-              <div key={stage} className="border-border border-t pt-(--space-lg)">
+              <div
+                key={stage}
+                className="bg-secondary border-border rounded-sm border p-(--space-lg)"
+              >
                 <p className="font-heading text-foreground mb-(--space-sm) text-sm font-semibold tracking-tight">
                   {stage}
                 </p>

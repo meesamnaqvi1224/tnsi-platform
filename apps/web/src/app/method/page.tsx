@@ -1,4 +1,4 @@
-import { Container, PageQuote, Section, TypographicMoment } from '@tnsi/ui';
+import { Container, PageQuote, Section } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { CtaBand } from '@/components/home/cta-band';
 import { SiteFooter } from '@/components/layout/site-footer';
@@ -7,6 +7,7 @@ import { MethodCredentials } from '@/components/method/method-credentials';
 import { MethodFoundation } from '@/components/method/method-foundation';
 import { MethodHero } from '@/components/method/method-hero';
 import { MethodJourney } from '@/components/method/method-journey';
+import { MethodQuote } from '@/components/method/method-quote';
 
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
@@ -37,11 +38,7 @@ export default function MethodPage() {
         <MethodHero />
 
         {/* One sentence. One viewport. The thesis of everything that follows. */}
-        <TypographicMoment variant="light" align="left">
-          Healing doesn&apos;t begin when you think differently.
-          <br />
-          It begins when your nervous system experiences safety.
-        </TypographicMoment>
+        <MethodQuote />
 
         <MethodFoundation />
 
