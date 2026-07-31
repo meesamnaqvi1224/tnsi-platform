@@ -49,6 +49,14 @@ export function SiteFooter() {
 
         <Divider className="my-(--space-xl)" />
 
+        <Text
+          size="xs"
+          tone="muted"
+          className="mb-(--space-lg) text-center tracking-[0.1em] uppercase"
+        >
+          Evidence-informed. Trauma-informed. Human-centred.
+        </Text>
+
         <Stack direction="row" justify="between" wrap="wrap" gap="sm">
           <Text size="sm" tone="muted">
             © 2026 The Nervous System Institute. All rights reserved.

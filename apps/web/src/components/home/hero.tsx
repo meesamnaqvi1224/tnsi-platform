@@ -5,7 +5,11 @@ import { homeImages } from '@/content/images';
 
 export function Hero() {
   return (
-    <Section spacing="xl" aria-labelledby="hero-heading">
+    <Section
+      spacing="xl"
+      className="pt-(--space-4xl) pb-(--space-4xl) sm:pt-(--space-5xl) sm:pb-(--space-5xl)"
+      aria-labelledby="hero-heading"
+    >
       <Container size="xl">
         <div className="grid grid-cols-1 items-center gap-(--space-2xl) lg:grid-cols-5 lg:gap-(--space-3xl)">
           <Stack gap="lg" className="lg:col-span-3">

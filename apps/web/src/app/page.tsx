@@ -1,8 +1,11 @@
 import { CtaBand } from '@/components/home/cta-band';
+import { EditorialPause } from '@/components/home/editorial-pause';
 import { FrameworkSection } from '@/components/home/framework-section';
 import { Hero } from '@/components/home/hero';
+import { InstitutionalCredibility } from '@/components/home/institutional-credibility';
 import { MethodPanel } from '@/components/home/method-panel';
 import { ProgramsSection } from '@/components/home/programs-section';
+import { TransformationSection } from '@/components/home/transformation-section';
 import { TrustBar } from '@/components/home/trust-bar';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
@@ -26,10 +29,13 @@ export default function Home() {
       <SiteHeader />
       <main id="main-content">
         <Hero />
+        <EditorialPause />
         <TrustBar />
         <FrameworkSection />
         <MethodPanel />
+        <InstitutionalCredibility />
         <ProgramsSection />
+        <TransformationSection />
         <CtaBand />
       </main>
       <SiteFooter />
