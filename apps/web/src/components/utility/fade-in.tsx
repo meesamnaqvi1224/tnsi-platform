@@ -4,7 +4,7 @@ import type * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@tnsi/ui';
 
-interface FadeInProps {
+interface FadeInProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
   className?: string;
   /** Optional stagger, in milliseconds — use sparingly, for small groups of siblings only. */
@@ -18,7 +18,13 @@ interface FadeInProps {
  * `prefers-reduced-motion` is already neutralised globally in `globals.css`
  * (transition-duration: 0.01ms), so this component doesn't special-case it.
  */
-export function FadeIn({ children, className, delayMs = 0, as: Tag = 'div' }: FadeInProps) {
+export function FadeIn({
+  children,
+  className,
+  delayMs = 0,
+  as: Tag = 'div',
+  ...rest
+}: FadeInProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -49,6 +55,7 @@ export function FadeIn({ children, className, delayMs = 0, as: Tag = 'div' }: Fa
         visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0',
         className,
       )}
+      {...rest}
     >
       {children}
     </Tag>

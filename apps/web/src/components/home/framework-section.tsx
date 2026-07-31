@@ -47,7 +47,7 @@ export function FrameworkSection() {
               <Stack gap="md" className="border-border border-t pt-(--space-lg)">
                 <Text
                   as="span"
-                  className="font-heading text-muted-foreground/50 text-5xl leading-none font-medium sm:text-6xl"
+                  className="text-muted-foreground/50 font-mono text-4xl leading-none font-medium sm:text-5xl"
                 >
                   {step.number}
                 </Text>

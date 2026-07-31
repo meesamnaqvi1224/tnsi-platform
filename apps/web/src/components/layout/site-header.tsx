@@ -15,6 +15,7 @@ import {
   Stack,
 } from '@tnsi/ui';
 import { primaryNavLinks } from '@/lib/nav-links';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = React.useState(false);
@@ -29,23 +30,27 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        'interaction-colors sticky top-0 z-(--z-sticky) w-full border-b',
-        isScrolled
-          ? 'border-border bg-background/95 backdrop-blur-sm'
-          : 'bg-background border-transparent',
+        'dark interaction-colors bg-background text-foreground sticky top-0 z-(--z-sticky) w-full border-b',
+        isScrolled ? 'border-border backdrop-blur-sm' : 'border-transparent',
       )}
     >
       <Container
         size="xl"
         className="flex h-16 min-w-0 items-center justify-between gap-2 sm:h-20 sm:gap-4"
       >
-        <NextLink
-          href="/"
-          className="interaction-focus font-heading min-w-0 shrink text-xs leading-tight font-semibold tracking-[0.1em] uppercase sm:text-sm"
-        >
-          The
-          <br />
-          Nervous System Institute
+        <NextLink href="/" className="interaction-focus flex min-w-0 shrink items-center gap-3">
+          <ResponsiveImage
+            src="/images/shared/logo-mark.png"
+            alt=""
+            width={36}
+            height={36}
+            className="size-8 shrink-0 sm:size-9"
+          />
+          <span className="font-heading text-xs leading-tight font-semibold tracking-[0.1em] uppercase sm:text-sm">
+            The
+            <br />
+            Nervous System Institute
+          </span>
         </NextLink>
 
         <nav aria-label="Primary" className="hidden items-center gap-8 lg:flex">

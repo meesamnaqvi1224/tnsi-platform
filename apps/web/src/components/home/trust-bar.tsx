@@ -10,12 +10,12 @@ export function TrustBar() {
   return (
     <Section spacing="md" aria-label="Why The Nervous System Institute">
       <Container size="xl">
-        <div className="divide-border grid grid-cols-1 divide-y md:grid-cols-3 md:divide-x md:divide-y-0">
+        <div className="grid grid-cols-1 gap-(--space-md) md:grid-cols-3">
           {pillars.map((pillar) => (
             <Stack
               key={pillar.title}
               gap="2xs"
-              className="px-(--space-lg) py-(--space-md) first:pl-0 last:pr-0"
+              className="border-border rounded-sm border px-(--space-lg) py-(--space-lg)"
             >
               <Text weight="semibold">{pillar.title}</Text>
               <Text size="sm" tone="muted">
