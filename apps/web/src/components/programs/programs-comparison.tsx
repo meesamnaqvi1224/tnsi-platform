@@ -23,7 +23,7 @@ function ComparisonCard({
   const values = { audience, format, duration, outcome };
 
   return (
-    <article className="border-border flex h-full flex-col border p-(--space-xl)">
+    <article className="border-border bg-background flex h-full flex-col rounded-lg border p-(--space-xl) shadow-sm">
       <Stack gap="xl" className="flex-1">
         <h3 className="font-heading text-foreground text-xl font-semibold tracking-tight lg:text-2xl">
           {title}
@@ -31,11 +31,11 @@ function ComparisonCard({
 
         <Stack gap="md">
           {attributes.map(({ key, label }) => (
-            <div key={key} className="border-border border-t pt-(--space-md)">
+            <div key={key} className="border-foreground/15 border-t pt-(--space-md)">
               <p className="text-muted-foreground mb-(--space-2xs) text-xs tracking-[0.15em] uppercase">
                 {label}
               </p>
-              <Text size="sm" tone="muted" className="leading-relaxed">
+              <Text size="sm" className="text-foreground leading-relaxed">
                 {values[key]}
               </Text>
             </div>

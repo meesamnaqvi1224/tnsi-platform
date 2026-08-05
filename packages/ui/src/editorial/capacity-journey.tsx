@@ -45,7 +45,10 @@ export function CapacityJourney({ current, className }: CapacityJourneyProps) {
   return (
     <div className={cn('relative', className)}>
       {/* Full-width hairline — sits behind all tick marks */}
-      <div className="absolute top-[3px] right-0 left-0 border-t border-border" aria-hidden />
+      <div
+        className="absolute top-[4px] right-0 left-0 border-t border-foreground/30"
+        aria-hidden
+      />
 
       <div
         className="flex justify-between"
@@ -58,17 +61,20 @@ export function CapacityJourney({ current, className }: CapacityJourneyProps) {
             <div
               key={stage}
               role="listitem"
-              className="flex flex-col items-center gap-(--space-xs)"
+              className="flex flex-col items-center gap-(--space-sm)"
             >
-              {/* Tick mark — foreground when current, border-color otherwise */}
+              {/* Tick mark — foreground when current, muted-but-visible otherwise */}
               <div
-                className={cn('h-[7px] w-px', isCurrent ? 'bg-foreground' : 'bg-border')}
+                className={cn(
+                  'w-px',
+                  isCurrent ? 'bg-foreground h-[10px]' : 'bg-foreground/40 h-[9px]',
+                )}
                 aria-hidden
               />
               <span
                 className={cn(
-                  'text-[0.625rem] sm:text-xs',
-                  isCurrent ? 'font-medium text-foreground' : 'text-muted-foreground',
+                  'text-xs tracking-wide sm:text-sm',
+                  isCurrent ? 'text-foreground font-medium' : 'text-foreground/70',
                 )}
               >
                 {stage}
