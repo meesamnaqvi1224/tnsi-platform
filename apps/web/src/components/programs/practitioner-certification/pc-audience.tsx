@@ -5,7 +5,7 @@ const { audience } = practitionerCertificationContent;
 
 export function PcAudience() {
   return (
-    <Section spacing="xl" className="border-border border-t" aria-label={audience.heading}>
+    <Section spacing="xl" className="border-foreground/15 border-t" aria-label={audience.heading}>
       <Container size="xl">
         <Stack gap="2xl">
           <ChapterMarker index={audience.chapter} as="h2" title={audience.heading} />
@@ -19,7 +19,7 @@ export function PcAudience() {
               <article
                 key={profession}
                 role="listitem"
-                className="border-border flex flex-col gap-(--space-sm) border-t px-(--space-md) pt-(--space-xl) pb-(--space-lg)"
+                className="border-foreground/15 flex flex-col gap-(--space-sm) border-t px-(--space-md) pt-(--space-xl) pb-(--space-lg)"
               >
                 <span className="text-muted-foreground font-mono text-xs tabular-nums">
                   {String(index + 1).padStart(2, '0')}

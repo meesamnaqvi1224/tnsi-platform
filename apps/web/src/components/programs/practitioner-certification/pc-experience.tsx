@@ -5,7 +5,7 @@ const { experience } = practitionerCertificationContent;
 
 export function PcExperience() {
   return (
-    <Section spacing="xl" className="border-border border-t" aria-label={experience.heading}>
+    <Section spacing="xl" className="border-foreground/15 border-t" aria-label={experience.heading}>
       <Container size="xl">
         <Stack gap="2xl">
           <ChapterMarker index={experience.chapter} as="h2" title={experience.heading} />
@@ -14,7 +14,7 @@ export function PcExperience() {
             {experience.features.map((feature) => (
               <article
                 key={feature.title}
-                className="border-border flex flex-col gap-(--space-lg) border-t pt-(--space-xl)"
+                className="border-foreground/15 flex flex-col gap-(--space-lg) border-t pt-(--space-xl)"
               >
                 <h3 className="font-heading text-foreground text-2xl font-semibold tracking-tight lg:text-3xl">
                   {feature.title}

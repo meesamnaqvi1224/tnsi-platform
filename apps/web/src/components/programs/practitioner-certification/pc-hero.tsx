@@ -9,7 +9,7 @@ export function PcHero() {
   return (
     <section
       aria-labelledby="pc-hero-heading"
-      className="border-border grid min-h-[90vh] grid-cols-1 border-b lg:grid-cols-[52fr_48fr]"
+      className="border-foreground/15 grid min-h-[90vh] grid-cols-1 border-b lg:grid-cols-[52fr_48fr]"
     >
       <div className="flex flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-4xl) sm:px-(--space-3xl) lg:px-(--space-3xl)">
         <Stack gap="xl" className="max-w-xl">
@@ -18,7 +18,7 @@ export function PcHero() {
               <span className="text-muted-foreground shrink-0 font-mono text-xs tracking-[0.2em] uppercase">
                 Chapter {hero.chapter}
               </span>
-              <div className="border-border flex-1 border-t" aria-hidden />
+              <div className="border-foreground/15 flex-1 border-t" aria-hidden />
             </div>
             <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
               {hero.eyebrow}
@@ -41,7 +41,7 @@ export function PcHero() {
             </Text>
           </Stack>
 
-          <dl className="border-border grid grid-cols-1 gap-(--space-md) border-y py-(--space-lg) sm:grid-cols-3">
+          <dl className="border-foreground/15 grid grid-cols-1 gap-(--space-md) border-y py-(--space-lg) sm:grid-cols-3">
             {hero.metadata.map(({ label, value }) => (
               <div key={label} className="flex flex-col gap-(--space-2xs)">
                 <dt className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">
@@ -79,7 +79,7 @@ export function PcHero() {
           sizes="(max-width: 1024px) 100vw, 48vw"
         />
         <Container size="xl" className="absolute right-0 bottom-0 left-0 p-(--space-lg)">
-          <figcaption className="border-border border-t pt-(--space-sm)">
+          <figcaption className="border-foreground/15 border-t pt-(--space-sm)">
             <p className="text-muted-foreground text-xs leading-relaxed">
               <span className="font-mono">Figure 1.</span> {hero.imageCaption}
             </p>

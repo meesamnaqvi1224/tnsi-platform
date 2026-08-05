@@ -5,7 +5,7 @@ const { curriculum } = practitionerCertificationContent;
 
 export function PcCurriculum() {
   return (
-    <Section spacing="xl" className="border-border border-t" aria-label={curriculum.heading}>
+    <Section spacing="xl" className="border-foreground/15 border-t" aria-label={curriculum.heading}>
       <Container size="xl">
         <Stack gap="2xl">
           <Stack gap="lg" className="max-w-2xl">
@@ -24,7 +24,7 @@ export function PcCurriculum() {
               return (
                 <li
                   key={module.number}
-                  className="border-border relative grid grid-cols-[auto_minmax(0,1fr)] gap-(--space-lg) border-t py-(--space-xl) sm:grid-cols-[80px_minmax(0,1fr)]"
+                  className="border-foreground/15 relative grid grid-cols-[auto_minmax(0,1fr)] gap-(--space-lg) border-t py-(--space-xl) sm:grid-cols-[80px_minmax(0,1fr)]"
                 >
                   {!isLast && (
                     <div
@@ -34,7 +34,7 @@ export function PcCurriculum() {
                   )}
 
                   <div className="relative z-10 flex flex-col items-center gap-(--space-xs)">
-                    <span className="bg-background border-border text-muted-foreground flex size-8 items-center justify-center border font-mono text-xs tabular-nums">
+                    <span className="bg-background border-foreground/15 text-muted-foreground flex size-8 items-center justify-center border font-mono text-xs tabular-nums">
                       {String(module.number).padStart(2, '0')}
                     </span>
                   </div>

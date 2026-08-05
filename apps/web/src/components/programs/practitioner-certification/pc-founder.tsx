@@ -9,9 +9,9 @@ export function PcFounder() {
   return (
     <section
       aria-labelledby="pc-founder-heading"
-      className="border-border grid grid-cols-1 border-t lg:grid-cols-2"
+      className="border-foreground/15 grid grid-cols-1 border-t lg:grid-cols-2"
     >
-      <figure className="border-border bg-secondary relative aspect-[4/5] w-full overflow-hidden border-b lg:aspect-auto lg:border-r lg:border-b-0">
+      <figure className="border-foreground/15 bg-secondary relative aspect-[4/5] w-full overflow-hidden border-b lg:aspect-auto lg:border-r lg:border-b-0">
         <ResponsiveImage
           src={founder.imageSrc}
           alt={founder.imageAlt}

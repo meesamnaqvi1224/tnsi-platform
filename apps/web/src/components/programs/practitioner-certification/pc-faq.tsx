@@ -6,14 +6,14 @@ const { faq } = practitionerCertificationContent;
 
 export function PcFaq() {
   return (
-    <Section spacing="xl" className="border-border border-t" aria-label={faq.heading}>
+    <Section spacing="xl" className="border-foreground/15 border-t" aria-label={faq.heading}>
       <Container size="xl">
         <Stack gap="2xl">
           <ChapterMarker index={faq.chapter} as="h2" title={faq.heading} />
 
           <div className="max-w-3xl">
             {faq.items.map(({ question, answer }) => (
-              <details key={question} className="group border-border border-t">
+              <details key={question} className="group border-foreground/15 border-t">
                 <summary className="interaction-accordion-summary">
                   <span className="font-heading text-foreground text-base font-semibold tracking-tight">
                     {question}
@@ -25,7 +25,7 @@ export function PcFaq() {
                 </div>
               </details>
             ))}
-            <div className="border-border border-t" aria-hidden />
+            <div className="border-foreground/15 border-t" aria-hidden />
           </div>
         </Stack>
       </Container>

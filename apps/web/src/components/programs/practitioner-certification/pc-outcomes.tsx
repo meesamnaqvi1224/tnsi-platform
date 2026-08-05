@@ -13,7 +13,7 @@ function OutcomeColumn({
   variant: 'before' | 'after';
 }) {
   return (
-    <div className="border-border flex flex-col gap-(--space-xl) border-t pt-(--space-xl)">
+    <div className="border-foreground/15 flex flex-col gap-(--space-xl) border-t pt-(--space-xl)">
       <p className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">{label}</p>
       <ul className="flex flex-col gap-(--space-lg)" role="list">
         {items.map((item) => (
@@ -33,7 +33,7 @@ function OutcomeColumn({
 
 export function PcOutcomes() {
   return (
-    <Section spacing="xl" className="border-border border-t" aria-label={outcomes.heading}>
+    <Section spacing="xl" className="border-foreground/15 border-t" aria-label={outcomes.heading}>
       <Container size="xl">
         <Stack gap="2xl">
           <ChapterMarker index={outcomes.chapter} as="h2" title={outcomes.heading} />

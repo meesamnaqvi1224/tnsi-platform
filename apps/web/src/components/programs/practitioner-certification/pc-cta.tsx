@@ -6,14 +6,18 @@ const { cta } = practitionerCertificationContent;
 
 export function PcCta() {
   return (
-    <Section spacing="xl" className="border-border border-t" aria-labelledby="pc-cta-heading">
+    <Section
+      spacing="xl"
+      className="border-foreground/15 border-t"
+      aria-labelledby="pc-cta-heading"
+    >
       <Container size="xl">
         <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-[1fr_2fr]">
           <div className="flex flex-col gap-(--space-sm) lg:pt-(--space-lg)">
             <span className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
               Chapter {cta.chapter}
             </span>
-            <div className="border-border w-12 border-t" aria-hidden />
+            <div className="border-foreground/15 w-12 border-t" aria-hidden />
           </div>
 
           <Stack gap="xl">
