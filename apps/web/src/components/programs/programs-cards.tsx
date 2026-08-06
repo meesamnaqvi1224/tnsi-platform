@@ -42,7 +42,7 @@ function DestinationCard({
           </Text>
         </Stack>
 
-        <NextLink href={href} className={buttonVariants({ variant: 'outline', size: 'lg' })}>
+        <NextLink href={href} className={buttonVariants({ variant: 'primary', size: 'lg' })}>
           {cta}
           <ArrowRight aria-hidden className="size-4" />
         </NextLink>
