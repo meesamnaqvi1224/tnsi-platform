@@ -11,6 +11,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@sanity/client": "^7.26.2",
     "@sanity/image-url": "^1.2.0",
     "@sanity/vision": "^3.99.0",
     "@tnsi/ui": "workspace:*",

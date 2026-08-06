@@ -3,6 +3,7 @@ import { ArticleCard } from '@/components/articles/article-card';
 import { Pagination } from '@/components/articles/pagination';
 import { articlesContent } from '@/content/articles';
 import type { ArticleItem } from '@/content/articles';
+import { getLatestArticles } from '@/content/cms/loaders';
 
 const { latest, pagination } = articlesContent;
 
@@ -40,9 +41,10 @@ function groupArticles(items: readonly ArticleItem[]): ArticleGroup[] {
   return groups;
 }
 
-const articleGroups = groupArticles(latest.items);
+export async function ArticlesLatest() {
+  const items = await getLatestArticles();
+  const articleGroups = groupArticles(items);
 
-export function ArticlesLatest() {
   return (
     <Section
       id="latest"

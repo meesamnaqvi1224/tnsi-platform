@@ -1,16 +1,18 @@
 import { createClient } from 'next-sanity';
-import { apiVersion, dataset, projectId, sanityConfigured } from '@/sanity/env';
+import { apiVersion, dataset, projectId, readToken, sanityConfigured } from '@/sanity/env';
 
 /**
- * Read client. When Sanity is not configured we still construct a client
- * with a placeholder projectId so imports don't throw at module load — the
- * data layer guards on `sanityConfigured` before ever calling it.
+ * Read client for the site. Server-side reads use the read token when
+ * present (works whether the dataset is public or private); otherwise it
+ * falls back to the public CDN. Guarded everywhere by `sanityConfigured`.
  */
 export const client = createClient({
   projectId: projectId || 'placeholder',
   dataset,
   apiVersion,
-  useCdn: true,
+  useCdn: !readToken,
+  token: readToken || undefined,
+  perspective: 'published',
 });
 
 export { sanityConfigured };
