@@ -1,9 +1,7 @@
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Container, Section, Stack, Text } from '@tnsi/ui';
-import { programsOverviewContent } from '@/content/programs';
-
-const { comparison } = programsOverviewContent;
+import { getComparisonPrograms, type ComparisonProgram } from '@/content/cms/loaders';
 
 const attributes = [
   { key: 'audience' as const, label: 'Best for' },
@@ -12,14 +10,7 @@ const attributes = [
   { key: 'outcome' as const, label: 'Outcome' },
 ];
 
-function ComparisonCard({
-  title,
-  audience,
-  format,
-  duration,
-  outcome,
-  href,
-}: (typeof comparison)[number]) {
+function ComparisonCard({ title, audience, format, duration, outcome, href }: ComparisonProgram) {
   const values = { audience, format, duration, outcome };
 
   return (
@@ -54,7 +45,9 @@ function ComparisonCard({
   );
 }
 
-export function ProgramsComparison() {
+export async function ProgramsComparison() {
+  const comparison = await getComparisonPrograms();
+
   return (
     <Section
       spacing="xl"

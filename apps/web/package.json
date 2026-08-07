@@ -5,19 +5,25 @@
   "prettier": "@tnsi/config/prettier",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@sanity/client": "^7.26.2",
+    "@sanity/image-url": "^1.2.0",
+    "@sanity/vision": "^3.99.0",
     "@tnsi/ui": "workspace:*",
     "@tnsi/validation": "workspace:*",
     "lucide-react": "^1.21.0",
     "next": "15.5.19",
+    "next-sanity": "^9.12.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "shadcn": "^4.11.0"
+    "sanity": "^3.99.0",
+    "shadcn": "^4.11.0",
+    "styled-components": "^6.5.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
