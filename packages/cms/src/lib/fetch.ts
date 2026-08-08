@@ -1,5 +1,5 @@
 import 'server-only';
-import { client, sanityConfigured } from '@tnsi/cms';
+import { client, sanityConfigured } from './client';
 
 /**
  * Server-side Sanity fetch. Returns `null` when the CMS is not configured
@@ -12,9 +12,10 @@ export async function sanityFetch<T>(
 ): Promise<T | null> {
   if (!sanityConfigured) return null;
   try {
-    return await client.fetch<T>(query, params, {
+    // Use type assertion for Next.js-specific fetch options (ISR/revalidation)
+    return (await client.fetch(query, params, {
       next: { revalidate: 60, tags: ['sanity'] },
-    });
+    } as unknown as Parameters<typeof client.fetch>[2])) as T | null;
   } catch (error) {
     console.error('[sanity] fetch failed:', error);
     return null;

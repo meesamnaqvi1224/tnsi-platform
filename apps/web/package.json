@@ -14,6 +14,7 @@
     "@sanity/client": "^7.26.2",
     "@sanity/image-url": "^1.2.0",
     "@sanity/vision": "^3.99.0",
+    "@tnsi/cms": "workspace:*",
     "@tnsi/ui": "workspace:*",
     "@tnsi/validation": "workspace:*",
     "lucide-react": "^1.21.0",

@@ -1,5 +1,5 @@
-import { sanityFetch } from '@/sanity/lib/fetch';
-import { ARTICLES_QUERY, PROGRAMS_QUERY } from '@/sanity/lib/queries';
+import { sanityFetch } from '@tnsi/cms/server';
+import { ARTICLES_QUERY, PROGRAMS_QUERY } from '@tnsi/cms';
 import { articlesContent, type ArticleItem } from '@/content/articles';
 import { programsOverviewContent } from '@/content/programs';
 

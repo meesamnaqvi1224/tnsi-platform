@@ -1,5 +1,5 @@
 import { createClient } from 'next-sanity';
-import { apiVersion, dataset, projectId, readToken, sanityConfigured } from '@tnsi/cms';
+import { apiVersion, dataset, projectId, readToken, sanityConfigured } from '../env';
 
 /**
  * Read client for the site. Server-side reads use the read token when
