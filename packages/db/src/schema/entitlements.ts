@@ -1,0 +1,75 @@
+import {
+  pgTable,
+  uuid,
+  text,
+  boolean,
+  timestamp,
+  jsonb,
+  index,
+  primaryKey,
+} from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+import { users } from './users';
+import { entitlementTierEnum, entitlementStatusEnum } from './enums';
+
+export const entitlements = pgTable(
+  'entitlements',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+
+    tier: entitlementTierEnum('tier').notNull().default('free'),
+
+    status: entitlementStatusEnum('status').notNull().default('active'),
+
+    programs: text('programs')
+      .array()
+      .notNull()
+      .default(sql`'{}'`),
+
+    certifications: text('certifications')
+      .array()
+      .notNull()
+      .default(sql`'{}'`),
+
+    features: text('features')
+      .array()
+      .notNull()
+      .default(sql`'{}'`),
+
+    stripeCustomerId: text('stripe_customer_id'),
+
+    stripeSubscriptionId: text('stripe_subscription_id'),
+
+    currentPeriodStart: timestamp('current_period_start', {
+      withTimezone: true,
+    }),
+
+    currentPeriodEnd: timestamp('current_period_end', {
+      withTimezone: true,
+    }),
+
+    cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
+
+    canceledAt: timestamp('canceled_at', { withTimezone: true }),
+
+    metadata: jsonb('metadata').notNull().default('{}'),
+
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId] }),
+    idxEntitlementsStripeCustomer: index('idx_entitlements_stripe_customer').on(
+      table.stripeCustomerId,
+    ),
+    idxEntitlementsStripeSubscription: index('idx_entitlements_stripe_subscription').on(
+      table.stripeSubscriptionId,
+    ),
+  }),
+);
+
+export type Entitlement = typeof entitlements.$inferSelect;
+export type NewEntitlement = typeof entitlements.$inferInsert;

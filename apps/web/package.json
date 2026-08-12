@@ -11,12 +11,16 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.0.0",
     "@sanity/client": "^7.26.2",
     "@sanity/image-url": "^1.2.0",
     "@sanity/vision": "^3.99.0",
+    "@tnsi/auth": "workspace:*",
     "@tnsi/cms": "workspace:*",
+    "@tnsi/db": "workspace:*",
     "@tnsi/ui": "workspace:*",
     "@tnsi/validation": "workspace:*",
+    "drizzle-orm": "^0.33.0",
     "lucide-react": "^1.21.0",
     "next": "15.5.19",
     "next-sanity": "^9.12.3",
