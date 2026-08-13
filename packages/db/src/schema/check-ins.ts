@@ -32,9 +32,9 @@ export const checkIns = pgTable(
 
     completedAt: timestamp('completed_at', { withTimezone: true }).notNull(),
 
-    completedDate: date('completed_date').notNull(),
+    completedDate: date('completed_date', { mode: 'date' }).notNull(),
 
-    metadata: jsonb('metadata').notNull().default('{}'),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>().notNull().default({}),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },

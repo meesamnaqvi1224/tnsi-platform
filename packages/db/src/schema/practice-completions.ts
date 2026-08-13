@@ -41,7 +41,7 @@ export const practiceCompletions = pgTable(
 
     playCount: integer('play_count').notNull().default(0),
 
-    metadata: jsonb('metadata').notNull().default('{}'),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>().notNull().default({}),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 

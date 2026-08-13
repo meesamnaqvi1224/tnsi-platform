@@ -54,7 +54,7 @@ export const entitlements = pgTable(
 
     canceledAt: timestamp('canceled_at', { withTimezone: true }),
 
-    metadata: jsonb('metadata').notNull().default('{}'),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>().notNull().default({}),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 

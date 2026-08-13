@@ -31,6 +31,11 @@ const userSyncOps: UserSyncOperations = {
     const existing = await this.findUserByClerkId(userData.clerkUserId);
 
     if (existing) {
+      // deletedAt is intentionally left untouched here. Clerk never sends an
+      // "undelete" event, so once user.deleted has set it, any user.updated
+      // for this clerkUserId is by definition stale/out-of-order and must not
+      // clear it. Restoring a soft-deleted user is a separate, explicit path
+      // (see getOrCreateUser below).
       const [updated] = await db
         .update(users)
         .set({
@@ -39,10 +44,12 @@ const userSyncOps: UserSyncOperations = {
           avatarUrl: userData.avatarUrl,
           metadata: userData.metadata,
           updatedAt: new Date(),
-          deletedAt: null,
         })
         .where(eq(users.clerkUserId, userData.clerkUserId))
         .returning();
+      if (!updated) {
+        throw new Error(`User ${userData.clerkUserId} was deleted concurrently during update`);
+      }
       return updated;
     }
 
@@ -56,6 +63,9 @@ const userSyncOps: UserSyncOperations = {
         metadata: userData.metadata,
       })
       .returning();
+    if (!created) {
+      throw new Error(`Failed to create user ${userData.clerkUserId}`);
+    }
     return created;
   },
 
@@ -71,7 +81,7 @@ const userSyncOps: UserSyncOperations = {
       })
       .where(eq(users.clerkUserId, clerkUserId))
       .returning();
-    return deleted;
+    return deleted ?? null;
   },
 
   async createDefaultEntitlements(userId: string): Promise<void> {
@@ -98,6 +108,9 @@ const userSyncOps: UserSyncOperations = {
           .set({ deletedAt: null, updatedAt: new Date() })
           .where(eq(users.clerkUserId, clerkUserId))
           .returning();
+        if (!restored) {
+          throw new Error(`User ${clerkUserId} was deleted concurrently during restore`);
+        }
         return restored;
       }
       return existing;

@@ -16,11 +16,13 @@ export const users = pgTable(
 
     avatarUrl: text('avatar_url'),
 
-    metadata: jsonb('metadata').notNull().default('{}'),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>().notNull().default({}),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
   },
   (table) => ({
     uniqueUsersClerkUserId: unique('unique_users_clerk_user_id').on(table.clerkUserId),

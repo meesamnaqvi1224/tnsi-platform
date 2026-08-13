@@ -8,6 +8,20 @@
       "when": 1786375967250,
       "tag": "0000_mixed_shadowcat",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786612154749,
+      "tag": "0001_illegal_enchantress",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786612268826,
+      "tag": "0002_mature_energizer",
+      "breakpoints": true
     }
   ]
 }
