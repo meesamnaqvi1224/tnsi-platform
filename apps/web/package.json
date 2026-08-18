@@ -18,6 +18,7 @@
     "@tnsi/auth": "workspace:*",
     "@tnsi/cms": "workspace:*",
     "@tnsi/db": "workspace:*",
+    "@tnsi/integrations": "workspace:*",
     "@tnsi/ui": "workspace:*",
     "@tnsi/validation": "workspace:*",
     "drizzle-orm": "^0.33.0",

@@ -1,13 +1,5 @@
-import {
-  buttonVariants,
-  ChapterMarker,
-  cn,
-  Container,
-  Input,
-  Section,
-  Stack,
-  Text,
-} from '@tnsi/ui';
+import { ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
+import { NewsletterForm } from '@/components/utility/newsletter-form';
 import { articlesContent } from '@/content/articles';
 
 const { newsletter } = articlesContent;
@@ -24,33 +16,7 @@ export function ArticlesNewsletter() {
               {newsletter.description}
             </Text>
 
-            <form
-              className="flex w-full min-w-0 flex-col gap-(--space-md) sm:flex-row sm:items-stretch"
-              action="/api/newsletter"
-              method="post"
-            >
-              <label htmlFor="articles-newsletter-email" className="sr-only">
-                Email address
-              </label>
-              <Input
-                id="articles-newsletter-email"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-                placeholder="your@email.com"
-                className="h-11 min-w-0 flex-1"
-              />
-              <button
-                type="submit"
-                className={cn(
-                  buttonVariants({ variant: 'primary', size: 'lg' }),
-                  'w-full shrink-0 sm:w-auto',
-                )}
-              >
-                {newsletter.submitLabel}
-              </button>
-            </form>
+            <NewsletterForm idPrefix="articles-newsletter" submitLabel={newsletter.submitLabel} />
 
             <Text size="xs" tone="muted" className="max-w-sm">
               {newsletter.privacyNote}
