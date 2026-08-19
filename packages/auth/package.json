@@ -13,11 +13,13 @@
     "./sync/user": "./src/sync/user.ts",
     "./client/web": "./src/client/web.ts",
     "./client/server": "./src/client/server.ts",
-    "./session/helpers": "./src/session/helpers.ts"
+    "./session/helpers": "./src/session/helpers.ts",
+    "./authorize/entitlements": "./src/authorize/entitlements.ts"
   },
   "scripts": {
     "lint": "eslint .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@clerk/backend": "^1.2.0",
@@ -30,6 +32,7 @@
   "devDependencies": {
     "@tnsi/config": "workspace:*",
     "eslint": "^9",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }

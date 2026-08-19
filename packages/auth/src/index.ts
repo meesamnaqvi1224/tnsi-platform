@@ -8,10 +8,14 @@
  * - Authentication error types
  * - Session utilities
  *
+ * Also contains the entitlement authorization *decision* layer
+ * (`authorize/entitlements`): a pure function of an entitlement record and
+ * a requirement, with no database access of its own.
+ *
  * DOES NOT CONTAIN:
- * - Subscription/business authorization logic
  * - Stripe integration
- * - Entitlement computation (that's in the API layer using @tnsi/db)
+ * - Fetching/computing the entitlement record itself (that's the API
+ *   layer, using @tnsi/db — see apps/web/src/lib/auth-api.ts)
  */
 
 // Types
@@ -37,5 +41,8 @@ export * from './client/server';
 
 // Session Helpers
 export * from './session/helpers';
+
+// Entitlement Authorization
+export * from './authorize/entitlements';
 
 export const VERSION = '0.1.0';
