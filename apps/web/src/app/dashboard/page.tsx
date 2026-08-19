@@ -1,10 +1,20 @@
 import NextLink from 'next/link';
-import { Container, Divider, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
+import {
+  buttonVariants,
+  Container,
+  Divider,
+  Eyebrow,
+  Heading,
+  Section,
+  Stack,
+  Text,
+} from '@tnsi/ui';
 import { CheckInForm } from '@/components/dashboard/check-in-form';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { requireAuth } from '@/lib/auth-api';
 import { getTodayCheckIn } from '@/lib/check-ins';
+import { formatContentTypeLabel, formatPracticeDuration, getTodayPractice } from '@/lib/practices';
 import { createPageMetadata } from '@/lib/seo';
 import type { Entitlement } from '@tnsi/db/schema';
 
@@ -49,6 +59,7 @@ const exploreLinks = [
 export default async function DashboardPage() {
   const user = await requireAuth();
   const todayCheckIn = await getTodayCheckIn(user.id);
+  const todayPractice = await getTodayPractice(user.id);
 
   const firstName = user.fullName?.trim().split(/\s+/)[0] || null;
   const tier = user.entitlements?.tier ?? 'free';
@@ -104,6 +115,61 @@ export default async function DashboardPage() {
                     </Stack>
 
                     {todayCheckIn ? null : <CheckInForm />}
+                  </Stack>
+                </section>
+
+                <Divider />
+
+                <section aria-labelledby="practice-heading">
+                  <Stack gap="lg">
+                    <Stack gap="sm">
+                      <Eyebrow>Today&rsquo;s Practice</Eyebrow>
+                      <Heading as="h2" id="practice-heading" size="md">
+                        {todayPractice
+                          ? todayPractice.practice.title
+                          : 'Practices are being prepared.'}
+                      </Heading>
+                      <Text tone="muted" className="text-base leading-[1.85]">
+                        {todayPractice
+                          ? (todayPractice.practice.description ??
+                            'A practice from The Nervous System Institute.')
+                          : 'The practice library will appear here as content becomes available.'}
+                      </Text>
+                    </Stack>
+
+                    {todayPractice ? (
+                      <Stack gap="sm">
+                        <Text tone="muted" size="sm">
+                          {[
+                            formatContentTypeLabel(todayPractice.practice.contentType),
+                            formatPracticeDuration(todayPractice.practice.durationSeconds),
+                            todayPractice.practice.category,
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </Text>
+
+                        {todayPractice.completed ? (
+                          <Text role="status" tone="muted">
+                            Completed
+                          </Text>
+                        ) : (
+                          <NextLink
+                            href={`/dashboard/practices/${todayPractice.practice.id}`}
+                            className={buttonVariants({ variant: 'primary', size: 'md' })}
+                          >
+                            Begin Practice
+                          </NextLink>
+                        )}
+
+                        <NextLink
+                          href="/dashboard/practices"
+                          className="interaction-text-link-underline w-fit"
+                        >
+                          View the Practice Library
+                        </NextLink>
+                      </Stack>
+                    ) : null}
                   </Stack>
                 </section>
 
