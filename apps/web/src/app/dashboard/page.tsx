@@ -16,6 +16,8 @@ import { requireAuth } from '@/lib/auth-api';
 import { getTodayCheckIn } from '@/lib/check-ins';
 import { formatContentTypeLabel, formatPracticeDuration, getTodayPractice } from '@/lib/practices';
 import { createPageMetadata } from '@/lib/seo';
+import { getLatestArticles } from '@/content/cms/loaders';
+import { articlesContent } from '@/content/articles';
 import type { Entitlement } from '@tnsi/db/schema';
 
 export const metadata = createPageMetadata({
@@ -60,6 +62,8 @@ export default async function DashboardPage() {
   const user = await requireAuth();
   const todayCheckIn = await getTodayCheckIn(user.id);
   const todayPractice = await getTodayPractice(user.id);
+  const latestArticles = await getLatestArticles();
+  const latestArticle = latestArticles[0] ?? null;
 
   const firstName = user.fullName?.trim().split(/\s+/)[0] || null;
   const tier = user.entitlements?.tier ?? 'free';
@@ -188,6 +192,26 @@ export default async function DashboardPage() {
                       </Text>
                     </Stack>
 
+                    {latestArticle ? (
+                      <Stack gap="3xs">
+                        <Eyebrow>Latest from the Institute</Eyebrow>
+                        <NextLink
+                          href={latestArticle.href}
+                          className="interaction-colors interaction-focus font-heading text-foreground hover:text-muted-foreground w-fit text-lg font-semibold"
+                        >
+                          {latestArticle.title}
+                        </NextLink>
+                        <Text tone="muted" size="sm">
+                          {[latestArticle.category, latestArticle.publishedAt]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </Text>
+                        <Text tone="muted" className="mt-(--space-2xs) text-base leading-[1.7]">
+                          {latestArticle.summary}
+                        </Text>
+                      </Stack>
+                    ) : null}
+
                     <ul className="flex flex-col gap-(--space-lg)">
                       {exploreLinks.map((item) => (
                         <li key={item.href}>
@@ -205,6 +229,23 @@ export default async function DashboardPage() {
                         </li>
                       ))}
                     </ul>
+
+                    <Stack gap="xs">
+                      <Text size="sm" weight="medium">
+                        Browse articles by category
+                      </Text>
+                      <Stack direction="row" wrap="wrap" gap="md">
+                        {articlesContent.categories.items.map((category) => (
+                          <NextLink
+                            key={category.id}
+                            href={category.href}
+                            className="interaction-text-link-underline"
+                          >
+                            {category.label}
+                          </NextLink>
+                        ))}
+                      </Stack>
+                    </Stack>
                   </Stack>
                 </section>
 
