@@ -28,6 +28,7 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/webhooks/clerk',
+  '/api/webhooks/sanity',
   '/api/health',
   '/api/newsletter',
   '/manifest.json',
@@ -43,6 +44,7 @@ const isPublicRoute = createRouteMatcher([
  */
 const isIgnoredRoute = createRouteMatcher([
   '/api/webhooks/clerk', // Webhook endpoint must be accessible without Clerk middleware
+  '/api/webhooks/sanity', // Webhook endpoint must be accessible without Clerk middleware
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
