@@ -15,6 +15,7 @@ export {
 export { schemaTypes } from './schema';
 export { article } from './schema/documents/article';
 export { program } from './schema/documents/program';
+export { practice } from './schema/documents/practice';
 export { author } from './schema/documents/author';
 export { category } from './schema/documents/category';
 export { blockContent } from './schema/objects/blockContent';

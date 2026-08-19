@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import NextLink from 'next/link';
-import { Menu } from 'lucide-react';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { LayoutDashboard, Menu } from 'lucide-react';
 import {
   buttonVariants,
   Container,
@@ -66,6 +67,27 @@ export function SiteHeader() {
         </nav>
 
         <Stack direction="row" align="center" gap="sm" className="shrink-0">
+          <SignedOut>
+            <NextLink
+              href="/sign-in"
+              className="interaction-colors interaction-focus text-foreground hover:text-muted-foreground text-xs sm:text-sm"
+            >
+              Sign In
+            </NextLink>
+          </SignedOut>
+
+          <SignedIn>
+            <UserButton appearance={{ elements: { userButtonAvatarBox: 'size-8 sm:size-9' } }}>
+              <UserButton.MenuItems>
+                <UserButton.Link
+                  label="Dashboard"
+                  href="/dashboard"
+                  labelIcon={<LayoutDashboard className="size-4" />}
+                />
+              </UserButton.MenuItems>
+            </UserButton>
+          </SignedIn>
+
           <NextLink
             href="/book-a-call"
             className={cn(
