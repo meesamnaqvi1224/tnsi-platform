@@ -2,7 +2,9 @@ import { auth } from '@clerk/nextjs/server';
 import { db, users, entitlements } from '@tnsi/db';
 import { eq } from 'drizzle-orm';
 import type { User, Entitlement } from '@tnsi/db/schema';
+import { getOrCreateUser } from '@tnsi/auth/sync/user';
 import { assertEntitlement, type EntitlementRequirement } from '@tnsi/auth/authorize/entitlements';
+import { userSyncOps } from './user-sync-ops';
 
 export interface AuthUser extends User {
   entitlements: Entitlement | null;
@@ -12,7 +14,23 @@ export async function getAuthUser(): Promise<AuthUser | null> {
   const { userId } = await auth();
   if (!userId) return null;
 
-  const dbUser = await db.select().from(users).where(eq(users.clerkUserId, userId)).limit(1);
+  let dbUser = await db.select().from(users).where(eq(users.clerkUserId, userId)).limit(1);
+
+  if (!dbUser[0]) {
+    // A valid Clerk session can arrive before the async user.created webhook
+    // has synced this user into Postgres (e.g. right after sign-up, before
+    // Clerk's callback has landed). Rather than surfacing a false
+    // "not authenticated" for a real, authenticated user, provision the row
+    // inline using the same sync path the webhook uses.
+    try {
+      await getOrCreateUser(userId, userSyncOps);
+    } catch {
+      // Lost a race with the webhook provisioning the same user
+      // concurrently (unique constraint on clerkUserId). Re-query below -
+      // the other side's write should have landed.
+    }
+    dbUser = await db.select().from(users).where(eq(users.clerkUserId, userId)).limit(1);
+  }
 
   if (!dbUser[0] || dbUser[0].deletedAt) return null;
 
