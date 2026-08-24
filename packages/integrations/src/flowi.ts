@@ -29,7 +29,27 @@ export interface FlowiUpsertContactInput {
   email: string;
   source: string;
   tags: string[];
+  /**
+   * `firstName`/`lastName` are core, built-in fields on every GHL contact
+   * object (unlike custom fields, which are per-location schema and may
+   * not exist) — safe to send even though only `email`/`source`/`tags`
+   * have been directly tested against the production account.
+   */
+  firstName?: string;
+  lastName?: string;
 }
+
+/**
+ * Deliberately NOT supported here: attaching free text (e.g. an enquiry
+ * message) to a contact. GHL's `/contacts/upsert` supports a `customFields`
+ * array, but which custom field (if any) a given Flowi location has
+ * configured for this purpose is account-specific and cannot be confirmed
+ * from this repository — nothing here documents a real field key/id, and
+ * guessing one risks the whole upsert being rejected, which would break
+ * contact capture itself. Add it back only once a real field key/id has
+ * been confirmed against the actual Flowi/GHL account (e.g. from its
+ * custom fields settings), not by assumption.
+ */
 
 export interface FlowiUpsertContactResult {
   isNew: boolean;
@@ -90,6 +110,8 @@ export async function upsertFlowiContact(
       source: input.source,
       tags: input.tags,
       locationId,
+      ...(input.firstName ? { firstName: input.firstName } : {}),
+      ...(input.lastName ? { lastName: input.lastName } : {}),
     }),
   });
 

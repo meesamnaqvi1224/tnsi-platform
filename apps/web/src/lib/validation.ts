@@ -26,3 +26,13 @@ export const practiceIdParam = z.object({
 });
 
 export type PracticeIdParam = z.infer<typeof practiceIdParam>;
+
+export const contactFormSchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  email: z.string().trim().email().max(320),
+  organisation: z.string().trim().max(200).optional(),
+  subject: z.string().trim().min(1).max(200),
+  message: z.string().trim().min(1).max(5000),
+});
+
+export type ContactFormInput = z.infer<typeof contactFormSchema>;

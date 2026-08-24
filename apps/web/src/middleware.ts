@@ -31,6 +31,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhooks/sanity',
   '/api/health',
   '/api/newsletter',
+  '/api/contact',
   '/manifest.json',
   '/robots.txt',
   '/sitemap.xml',
