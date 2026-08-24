@@ -1,5 +1,5 @@
 import { ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
-import { CalendlyEmbed } from '@/components/discovery-call/calendly-embed';
+import { FlowiBookingEmbed } from '@/components/discovery-call/flowi-booking-embed';
 import { discoveryCallContent } from '@/content/discovery-call';
 
 const { booking } = discoveryCallContent;
@@ -33,7 +33,7 @@ export function BookingSection() {
             </ul>
           </Stack>
 
-          <CalendlyEmbed />
+          <FlowiBookingEmbed />
         </div>
       </Container>
     </Section>
