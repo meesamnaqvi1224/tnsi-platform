@@ -34,8 +34,8 @@ export const practitionerCertificationContent = {
       { label: 'Duration', value: '12 months' },
       { label: 'Credential', value: 'TNSI Certification' },
     ],
-    primaryCta: { label: 'Apply for Certification', href: '/apply/practitioner-certification' },
-    secondaryCta: { label: 'Download Prospectus', href: '/prospectus/practitioner-certification' },
+    primaryCta: { label: 'Book a Discovery Call', href: '/book-a-call' },
+    secondaryCta: { label: 'Request Prospectus', href: '/contact' },
   },
 
   audience: {
@@ -178,8 +178,8 @@ export const practitionerCertificationContent = {
     headline: 'Bring nervous system-informed practice into your professional work.',
     supportingCopy:
       'Join a growing community of practitioners committed to delivering safer, evidence-informed care.',
-    primaryCta: { label: 'Apply Now', href: '/apply/practitioner-certification' },
-    secondaryCta: { label: 'Download Prospectus', href: '/prospectus/practitioner-certification' },
+    primaryCta: { label: 'Book a Discovery Call', href: '/book-a-call' },
+    secondaryCta: { label: 'Request Prospectus', href: '/contact' },
   },
 
   footerQuote: {
