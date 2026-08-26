@@ -28,11 +28,13 @@ export const searchContent = {
     'burnout',
   ] as const,
 
-  recentSearchesPlaceholder: [
-    'window of tolerance',
-    'attachment theory',
-    'Life Beyond Trauma',
-  ] as const,
+  /**
+   * A second curated term list, distinct from `suggestions` above. Named
+   * `popularSearches` deliberately — this is not per-visitor search
+   * history (nothing tracks that), so it must never be labeled "Recent
+   * searches" in the UI, which would misrepresent it as personalized.
+   */
+  popularSearches: ['window of tolerance', 'attachment theory', 'Life Beyond Trauma'] as const,
 
   groups: {
     articles: 'Articles',

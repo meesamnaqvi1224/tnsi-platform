@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 import { Input, Stack, Text } from '@tnsi/ui';
 import { searchContent, type SearchGroup, type SearchResultItem } from '@/content/search';
 
-const { hero, suggestions, recentSearchesPlaceholder, groups, emptyState, index } = searchContent;
+const { hero, suggestions, popularSearches, groups, emptyState, index } = searchContent;
 
 function filterResults(query: string): SearchResultItem[] {
   const normalized = query.trim().toLowerCase();
@@ -82,10 +82,10 @@ export function SearchInterface() {
 
           <div>
             <p className="text-muted-foreground mb-(--space-md) font-mono text-xs tracking-[0.15em] uppercase">
-              Recent searches
+              Popular searches
             </p>
             <ul className="flex flex-col gap-(--space-sm)">
-              {recentSearchesPlaceholder.map((term) => (
+              {popularSearches.map((term) => (
                 <li key={term}>
                   <button
                     type="button"
