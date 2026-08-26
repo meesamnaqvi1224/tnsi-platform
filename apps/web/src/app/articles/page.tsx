@@ -22,7 +22,13 @@ export const metadata = createPageMetadata({
   path: '/articles',
 });
 
-export default function ArticlesPage() {
+interface ArticlesPageProps {
+  searchParams: Promise<{ category?: string }>;
+}
+
+export default async function ArticlesPage({ searchParams }: ArticlesPageProps) {
+  const { category } = await searchParams;
+
   const jsonLd = [
     createWebPageJsonLd({ title: 'Articles', description: seo.description, path: '/articles' }),
     createBreadcrumbJsonLd([
@@ -39,7 +45,7 @@ export default function ArticlesPage() {
         <ArticlesHero />
         <ArticlesFeatured />
         <ArticlesCategories />
-        <ArticlesLatest />
+        <ArticlesLatest category={category} />
         <ArticlesTopics />
         <ArticlesEditorsPicks />
         <ArticlesNewsletter />

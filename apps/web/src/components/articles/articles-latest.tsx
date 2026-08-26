@@ -1,4 +1,4 @@
-import { ChapterMarker, Container, Section } from '@tnsi/ui';
+import { ChapterMarker, Container, Section, Text } from '@tnsi/ui';
 import { ArticleCard } from '@/components/articles/article-card';
 import { Pagination } from '@/components/articles/pagination';
 import { articlesContent } from '@/content/articles';
@@ -41,8 +41,22 @@ function groupArticles(items: readonly ArticleItem[]): ArticleGroup[] {
   return groups;
 }
 
-export async function ArticlesLatest() {
-  const items = await getLatestArticles();
+/** "Trauma Recovery" -> "trauma-recovery" — matches the slugs already used
+ * in articlesContent.categories.items[].id/href (?category=trauma-recovery). */
+function slugify(label: string): string {
+  return label.toLowerCase().trim().replace(/\s+/g, '-');
+}
+
+export interface ArticlesLatestProps {
+  /** From the `?category=` query param — filters to matching articles when set. */
+  category?: string;
+}
+
+export async function ArticlesLatest({ category }: ArticlesLatestProps) {
+  const allItems = await getLatestArticles();
+  const items = category
+    ? allItems.filter((item) => slugify(item.category) === category.toLowerCase())
+    : allItems;
   const articleGroups = groupArticles(items);
 
   return (
@@ -55,6 +69,14 @@ export async function ArticlesLatest() {
       <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">
         <ChapterMarker index={latest.chapter} as="h2" title={latest.heading} />
       </Container>
+
+      {items.length === 0 ? (
+        <Container size="xl" className="px-(--space-xl) pb-(--space-4xl) sm:px-(--space-2xl)">
+          <Text tone="muted">
+            No articles found in this category yet. Browse all articles below.
+          </Text>
+        </Container>
+      ) : null}
 
       <div className="flex flex-col">
         {articleGroups.map((group, groupIndex) => {
