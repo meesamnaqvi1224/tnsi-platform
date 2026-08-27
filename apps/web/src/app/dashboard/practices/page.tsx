@@ -2,7 +2,7 @@ import NextLink from 'next/link';
 import { Container, Divider, EmptyState, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
-import { requireAuth } from '@/lib/auth-api';
+import { requireAuthOrRedirect } from '@/lib/auth-api';
 import {
   formatContentTypeLabel,
   formatPracticeDuration,
@@ -31,7 +31,7 @@ function practiceMeta(practice: {
 }
 
 export default async function PracticeLibraryPage() {
-  await requireAuth();
+  await requireAuthOrRedirect();
   const practiceList = await getPublishedPractices();
 
   return (

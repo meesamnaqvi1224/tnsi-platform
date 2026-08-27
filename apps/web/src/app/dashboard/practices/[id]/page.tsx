@@ -4,7 +4,7 @@ import { Container, Divider, Eyebrow, Heading, Section, Stack, Text } from '@tns
 import { PracticeCompleteButton } from '@/components/dashboard/practice-complete-button';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
-import { requireAuth } from '@/lib/auth-api';
+import { requireAuthOrRedirect } from '@/lib/auth-api';
 import {
   formatContentTypeLabel,
   formatPracticeDuration,
@@ -41,7 +41,7 @@ const AUDIO_CONTENT_TYPES = new Set(['audio', 'meditation', 'breathwork']);
 const VIDEO_CONTENT_TYPES = new Set(['video', 'movement']);
 
 export default async function PracticeDetailPage({ params }: PracticeDetailPageProps) {
-  const user = await requireAuth();
+  const user = await requireAuthOrRedirect();
   const { id } = await params;
 
   const idResult = practiceIdParam.safeParse({ id });

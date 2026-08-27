@@ -12,7 +12,7 @@ import {
 import { CheckInForm } from '@/components/dashboard/check-in-form';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
-import { requireAuth } from '@/lib/auth-api';
+import { requireAuthOrRedirect } from '@/lib/auth-api';
 import { getTodayCheckIn } from '@/lib/check-ins';
 import { formatContentTypeLabel, formatPracticeDuration, getTodayPractice } from '@/lib/practices';
 import { createPageMetadata } from '@/lib/seo';
@@ -59,7 +59,7 @@ const exploreLinks = [
 ] as const;
 
 export default async function DashboardPage() {
-  const user = await requireAuth();
+  const user = await requireAuthOrRedirect();
   const todayCheckIn = await getTodayCheckIn(user.id);
   const todayPractice = await getTodayPractice(user.id);
   const latestArticles = await getLatestArticles();

@@ -1,4 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 import { db, users, entitlements } from '@tnsi/db';
 import { eq } from 'drizzle-orm';
 import type { User, Entitlement } from '@tnsi/db/schema';
@@ -52,6 +53,40 @@ export async function requireAuth(): Promise<AuthUser> {
     throw new Error('UNAUTHENTICATED');
   }
   return user;
+}
+
+/**
+ * Page-only variant of `requireAuth()`: redirects to `/sign-in` instead of
+ * throwing when unauthenticated.
+ *
+ * Middleware (`clerkMiddleware`/`auth.protect()`) already blocks
+ * unauthenticated requests to every `/dashboard*` route before the page
+ * ever renders — under normal conditions `requireAuth()` inside a
+ * dashboard page should never actually throw. But if it does (e.g. a
+ * session middleware accepted that this DB-backed check can't validate —
+ * seen in production as `/dashboard` rendering blank instead of
+ * redirecting), `requireAuth()`'s plain `throw new Error('UNAUTHENTICATED')`
+ * had no error boundary to catch it anywhere in the app (no
+ * `error.tsx`/`global-error.tsx` exists), so Next.js fell back to its
+ * generic, unstyled error handling instead of a clean redirect.
+ *
+ * Only the specific `UNAUTHENTICATED` case is converted to a redirect;
+ * any other error (e.g. a real database failure) is rethrown as-is rather
+ * than being misrepresented as an auth problem.
+ *
+ * Not used by `/api/v1/*` routes — those correctly catch `requireAuth()`'s
+ * throw themselves and return a 401 JSON response; redirecting from a
+ * Route Handler would be the wrong pattern there.
+ */
+export async function requireAuthOrRedirect(): Promise<AuthUser> {
+  try {
+    return await requireAuth();
+  } catch (error) {
+    if (error instanceof Error && error.message === 'UNAUTHENTICATED') {
+      redirect('/sign-in');
+    }
+    throw error;
+  }
 }
 
 /**
