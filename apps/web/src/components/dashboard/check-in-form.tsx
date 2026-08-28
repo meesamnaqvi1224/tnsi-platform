@@ -37,7 +37,7 @@ function ScaleField({ name, legend, value, onChange, disabled }: ScaleFieldProps
               />
               <label
                 htmlFor={id}
-                className="peer-checked:border-foreground peer-checked:text-foreground peer-focus-visible:ring-ring border-border text-muted-foreground duration-base ease-standard flex size-11 min-w-11 cursor-pointer items-center justify-center rounded-full border text-sm transition-colors peer-checked:border-2 peer-checked:font-semibold peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+                className="peer-checked:border-foreground peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:ring-ring border-border text-muted-foreground duration-base ease-standard flex size-11 min-w-11 cursor-pointer items-center justify-center rounded-full border text-sm font-medium transition-colors peer-checked:border-2 peer-checked:font-semibold peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
               >
                 {n}
               </label>
@@ -167,9 +167,20 @@ export function CheckInForm() {
           />
         </Stack>
 
-        <Button type="submit" disabled={submitting || mood === null || capacity === null}>
-          {submitting ? 'Saving…' : 'Save Check-In'}
-        </Button>
+        <Stack gap="xs">
+          {mood === null || capacity === null ? (
+            <Text tone="muted" size="sm">
+              Select a mood and capacity above to save your check-in.
+            </Text>
+          ) : null}
+          <Button
+            type="submit"
+            disabled={submitting || mood === null || capacity === null}
+            className="w-full shadow-sm sm:w-fit"
+          >
+            {submitting ? 'Saving…' : 'Save Check-In'}
+          </Button>
+        </Stack>
       </Stack>
     </form>
   );

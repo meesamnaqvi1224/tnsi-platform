@@ -1,5 +1,17 @@
 import NextLink from 'next/link';
-import { Container, Divider, EmptyState, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Container,
+  EmptyState,
+  Eyebrow,
+  Grid,
+  Heading,
+  Section,
+  Stack,
+  Text,
+} from '@tnsi/ui';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { requireAuthOrRedirect } from '@/lib/auth-api';
@@ -40,7 +52,7 @@ export default async function PracticeLibraryPage() {
       <main id="main-content">
         <Section spacing="xl">
           <Container size="xl">
-            <div className="mx-auto max-w-3xl">
+            <div className="mx-auto max-w-5xl">
               <Stack gap="2xl">
                 <header className="border-border flex flex-col gap-(--space-md) border-b pb-(--space-2xl)">
                   <Eyebrow>Practice Library</Eyebrow>
@@ -58,29 +70,37 @@ export default async function PracticeLibraryPage() {
                     description="The practice library will appear here as content becomes available."
                   />
                 ) : (
-                  <ul className="flex flex-col">
-                    {practiceList.map((practice, index) => (
-                      <li key={practice.id}>
-                        {index > 0 ? <Divider className="my-(--space-xl)" /> : null}
-                        <Stack gap="3xs">
-                          <NextLink
-                            href={`/dashboard/practices/${practice.id}`}
-                            className="interaction-colors interaction-focus font-heading text-foreground hover:text-muted-foreground w-fit text-lg font-semibold"
-                          >
-                            {practice.title}
-                          </NextLink>
-                          <Text tone="muted" size="sm">
-                            {practiceMeta(practice)}
-                          </Text>
-                          {practice.description ? (
-                            <Text tone="muted" className="mt-(--space-2xs) text-base leading-[1.7]">
-                              {practice.description}
+                  <Grid cols="2" gap="lg">
+                    {practiceList.map((practice) => (
+                      <NextLink
+                        key={practice.id}
+                        href={`/dashboard/practices/${practice.id}`}
+                        className="interaction-focus interaction-colors rounded-lg"
+                      >
+                        <Card className="hover:border-foreground/40 duration-base ease-standard h-full transition-colors">
+                          <CardHeader>
+                            <Text tone="muted" size="xs" className="tracking-[0.1em] uppercase">
+                              {practiceMeta(practice)}
                             </Text>
+                            <Heading
+                              as="h2"
+                              size="xs"
+                              className="font-heading text-foreground text-lg font-semibold"
+                            >
+                              {practice.title}
+                            </Heading>
+                          </CardHeader>
+                          {practice.description ? (
+                            <CardContent>
+                              <Text tone="muted" className="text-sm leading-[1.7]">
+                                {practice.description}
+                              </Text>
+                            </CardContent>
                           ) : null}
-                        </Stack>
-                      </li>
+                        </Card>
+                      </NextLink>
                     ))}
-                  </ul>
+                  </Grid>
                 )}
               </Stack>
             </div>

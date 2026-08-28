@@ -1,9 +1,15 @@
 import NextLink from 'next/link';
 import {
   buttonVariants,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Container,
   Divider,
+  EmptyState,
   Eyebrow,
+  Grid,
   Heading,
   Section,
   Stack,
@@ -58,6 +64,9 @@ const exploreLinks = [
   },
 ] as const;
 
+/** Shared title style so Card headings match the site's serif display type instead of CardTitle's default sans style. */
+const cardTitleClassName = 'font-heading text-2xl font-semibold tracking-tight text-foreground';
+
 export default async function DashboardPage() {
   const user = await requireAuthOrRedirect();
   const todayCheckIn = await getTodayCheckIn(user.id);
@@ -79,7 +88,7 @@ export default async function DashboardPage() {
       <main id="main-content">
         <Section spacing="xl">
           <Container size="xl">
-            <div className="mx-auto max-w-3xl">
+            <div className="mx-auto max-w-5xl">
               <Stack gap="3xl">
                 <header className="border-border flex flex-col gap-(--space-md) border-b pb-(--space-2xl)">
                   <Heading as="h1" size="xl">
@@ -90,91 +99,108 @@ export default async function DashboardPage() {
                   </Text>
                 </header>
 
-                <section aria-labelledby="access-heading">
-                  <Stack gap="sm">
-                    <Eyebrow>Your Access</Eyebrow>
-                    <Heading as="h2" id="access-heading" size="md">
-                      {accessLabel}
-                    </Heading>
-                    <Text tone="muted" className="text-base leading-[1.85]">
-                      {accessDescription}
-                    </Text>
-                  </Stack>
-                </section>
+                <Grid cols="2" gap="xl" className="items-start">
+                  <section aria-labelledby="access-heading">
+                    <Card>
+                      <CardHeader>
+                        <Eyebrow>Your Access</Eyebrow>
+                        <CardTitle id="access-heading" className={cardTitleClassName}>
+                          {accessLabel}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <Text tone="muted" className="text-base leading-[1.85]">
+                          {accessDescription}
+                        </Text>
+                      </CardContent>
+                    </Card>
+                  </section>
 
-                <Divider />
+                  <section aria-labelledby="checkin-heading">
+                    <Card>
+                      <CardHeader>
+                        <Eyebrow>Check In</Eyebrow>
+                        <CardTitle id="checkin-heading" className={cardTitleClassName}>
+                          {todayCheckIn ? "You've checked in today." : 'Pause for a moment.'}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <Stack gap="lg">
+                          <Text tone="muted" className="text-base leading-[1.85]">
+                            {todayCheckIn
+                              ? 'Take a moment to notice where you are, and return whenever you need to pause.'
+                              : 'Notice where you are today, without needing to change anything.'}
+                          </Text>
 
-                <section aria-labelledby="checkin-heading">
-                  <Stack gap="lg">
-                    <Stack gap="sm">
-                      <Eyebrow>Check In</Eyebrow>
-                      <Heading as="h2" id="checkin-heading" size="md">
-                        {todayCheckIn ? "You've checked in today." : 'Pause for a moment.'}
-                      </Heading>
-                      <Text tone="muted" className="text-base leading-[1.85]">
-                        {todayCheckIn
-                          ? 'Take a moment to notice where you are, and return whenever you need to pause.'
-                          : 'Notice where you are today, without needing to change anything.'}
-                      </Text>
-                    </Stack>
-
-                    {todayCheckIn ? null : <CheckInForm />}
-                  </Stack>
-                </section>
-
-                <Divider />
+                          {todayCheckIn ? null : <CheckInForm />}
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </section>
+                </Grid>
 
                 <section aria-labelledby="practice-heading">
-                  <Stack gap="lg">
-                    <Stack gap="sm">
+                  <Card>
+                    <CardHeader>
                       <Eyebrow>Today&rsquo;s Practice</Eyebrow>
-                      <Heading as="h2" id="practice-heading" size="md">
-                        {todayPractice
-                          ? todayPractice.practice.title
-                          : 'Practices are being prepared.'}
-                      </Heading>
-                      <Text tone="muted" className="text-base leading-[1.85]">
-                        {todayPractice
-                          ? (todayPractice.practice.description ??
-                            'A practice from The Nervous System Institute.')
-                          : 'The practice library will appear here as content becomes available.'}
-                      </Text>
-                    </Stack>
-
-                    {todayPractice ? (
-                      <Stack gap="sm">
-                        <Text tone="muted" size="sm">
-                          {[
-                            formatContentTypeLabel(todayPractice.practice.contentType),
-                            formatPracticeDuration(todayPractice.practice.durationSeconds),
-                            todayPractice.practice.category,
-                          ]
-                            .filter(Boolean)
-                            .join(' · ')}
+                      <CardTitle id="practice-heading" className={cardTitleClassName}>
+                        {todayPractice ? todayPractice.practice.title : "Today's Practice"}
+                      </CardTitle>
+                      {todayPractice?.practice.description ? (
+                        <Text tone="muted" className="text-base leading-[1.85]">
+                          {todayPractice.practice.description}
                         </Text>
-
-                        {todayPractice.completed ? (
-                          <Text role="status" tone="muted">
-                            Completed
+                      ) : null}
+                    </CardHeader>
+                    <CardContent>
+                      {todayPractice ? (
+                        <Stack gap="sm">
+                          <Text tone="muted" size="sm">
+                            {[
+                              formatContentTypeLabel(todayPractice.practice.contentType),
+                              formatPracticeDuration(todayPractice.practice.durationSeconds),
+                              todayPractice.practice.category,
+                            ]
+                              .filter(Boolean)
+                              .join(' · ')}
                           </Text>
-                        ) : (
-                          <NextLink
-                            href={`/dashboard/practices/${todayPractice.practice.id}`}
-                            className={buttonVariants({ variant: 'primary', size: 'md' })}
-                          >
-                            Begin Practice
-                          </NextLink>
-                        )}
 
-                        <NextLink
-                          href="/dashboard/practices"
-                          className="interaction-text-link-underline w-fit"
-                        >
-                          View the Practice Library
-                        </NextLink>
-                      </Stack>
-                    ) : null}
-                  </Stack>
+                          {todayPractice.completed ? (
+                            <Text role="status" tone="muted">
+                              Completed
+                            </Text>
+                          ) : (
+                            <NextLink
+                              href={`/dashboard/practices/${todayPractice.practice.id}`}
+                              className={buttonVariants({ variant: 'primary', size: 'md' })}
+                            >
+                              Begin Practice
+                            </NextLink>
+                          )}
+
+                          <NextLink
+                            href="/dashboard/practices"
+                            className="interaction-text-link-underline w-fit"
+                          >
+                            View the Practice Library
+                          </NextLink>
+                        </Stack>
+                      ) : (
+                        <EmptyState
+                          title="Practices are being prepared."
+                          description="The practice library will appear here as content becomes available."
+                          action={
+                            <NextLink
+                              href="/dashboard/practices"
+                              className={buttonVariants({ variant: 'outline', size: 'sm' })}
+                            >
+                              Visit the Practice Library
+                            </NextLink>
+                          }
+                        />
+                      )}
+                    </CardContent>
+                  </Card>
                 </section>
 
                 <Divider />
