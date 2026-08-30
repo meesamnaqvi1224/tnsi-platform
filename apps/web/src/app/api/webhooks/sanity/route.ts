@@ -86,10 +86,17 @@ export async function POST(request: NextRequest) {
 
   const result = sanityPracticeWebhookSchema.safeParse(body);
   if (!result.success) {
-    console.error('[Sanity Webhook] Invalid payload', {
-      issues: result.error.flatten(),
-      receivedKeys: body && typeof body === 'object' ? Object.keys(body) : null,
-    });
+    // JSON.stringify rather than passing the object directly to console.error:
+    // Node's default object formatting truncates nested arrays/objects past a
+    // shallow depth (they print as "[Array]"), which is exactly the detail
+    // needed here (the actual received value and Zod's message for it).
+    console.error(
+      '[Sanity Webhook] Invalid payload',
+      JSON.stringify({
+        issues: result.error.flatten(),
+        receivedBody: body,
+      }),
+    );
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
   }
 
