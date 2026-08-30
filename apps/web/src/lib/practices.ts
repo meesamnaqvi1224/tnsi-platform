@@ -114,3 +114,21 @@ export function formatPracticeDuration(seconds: number | null): string | null {
 export function formatContentTypeLabel(contentType: string): string {
   return contentType.charAt(0).toUpperCase() + contentType.slice(1);
 }
+
+const GOOGLE_DRIVE_FILE_ID_PATTERN =
+  /drive\.google\.com\/(?:file\/d\/([^/?]+)|open\?id=([^&]+)|uc\?.*[?&]id=([^&]+))/;
+
+/**
+ * A Google Drive "share" link (.../file/d/<id>/view, .../open?id=<id>, etc.)
+ * points at an HTML viewer page, not a raw media file — an <audio>/<video>
+ * element can't play it. Drive's own /preview endpoint is the officially
+ * supported embeddable player for any file type Drive can preview (video,
+ * audio, ...), so a Drive URL needs an <iframe> pointed at that instead.
+ * Returns null for any non-Drive URL, which callers use to fall back to the
+ * existing <audio>/<video> rendering unchanged.
+ */
+export function toGoogleDriveEmbedUrl(url: string): string | null {
+  const match = url.match(GOOGLE_DRIVE_FILE_ID_PATTERN);
+  const fileId = match?.[1] ?? match?.[2] ?? match?.[3];
+  return fileId ? `https://drive.google.com/file/d/${fileId}/preview` : null;
+}

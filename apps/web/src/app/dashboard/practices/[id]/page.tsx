@@ -10,6 +10,7 @@ import {
   formatPracticeDuration,
   getPublishedPracticeById,
   isPracticeCompleted,
+  toGoogleDriveEmbedUrl,
 } from '@/lib/practices';
 import { createPageMetadata } from '@/lib/seo';
 import { practiceIdParam } from '@/lib/validation';
@@ -52,6 +53,7 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
 
   const completed = await isPracticeCompleted(user.id, practice.id);
   const duration = formatPracticeDuration(practice.durationSeconds);
+  const driveEmbedUrl = practice.mediaUrl ? toGoogleDriveEmbedUrl(practice.mediaUrl) : null;
 
   const metaParts = [formatContentTypeLabel(practice.contentType)];
   if (duration) metaParts.push(duration);
@@ -84,7 +86,14 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
                   ) : null}
                 </header>
 
-                {practice.mediaUrl && AUDIO_CONTENT_TYPES.has(practice.contentType) ? (
+                {driveEmbedUrl ? (
+                  <iframe
+                    src={driveEmbedUrl}
+                    className="aspect-video w-full rounded-sm"
+                    allow="autoplay"
+                    title={practice.title}
+                  />
+                ) : practice.mediaUrl && AUDIO_CONTENT_TYPES.has(practice.contentType) ? (
                   <audio controls src={practice.mediaUrl} className="w-full">
                     Your browser does not support the audio element.
                   </audio>
