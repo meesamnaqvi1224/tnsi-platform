@@ -36,3 +36,24 @@ export const contactFormSchema = z.object({
 });
 
 export type ContactFormInput = z.infer<typeof contactFormSchema>;
+
+/**
+ * Shape-level validation for an assessment submission — confirms the
+ * request is well-formed (a real slug, a valid email, answers keyed and
+ * valued by plain non-empty strings). This narrows `answers` from the DB
+ * column's `Record<string, unknown>` down to the `Record<string, string>`
+ * shape packages/core's scoring engine expects — that boundary was
+ * previously unvalidated (see the C9 hardening review). It does not know
+ * whether the keys/values refer to real questions/choices for the named
+ * assessment — that check needs the assessment's live Sanity definition
+ * and is done by `prepareAssessmentSubmission` (@tnsi/core) instead.
+ * `score`/`resultTier` are deliberately not accepted here at all: they are
+ * always computed server-side, never trusted from the client.
+ */
+export const assessmentSubmissionSchema = z.object({
+  assessmentSlug: z.string().trim().min(1).max(200),
+  email: z.string().trim().email().max(320),
+  answers: z.record(z.string().min(1).max(200), z.string().min(1).max(200)),
+});
+
+export type AssessmentSubmissionInput = z.infer<typeof assessmentSubmissionSchema>;

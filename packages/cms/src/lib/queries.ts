@@ -58,3 +58,27 @@ export const PROGRAMS_QUERY = groq`
 
 /** Slugs for static generation. */
 export const ARTICLE_SLUGS_QUERY = groq`*[_type == "article" && defined(slug.current)].slug.current`;
+
+/**
+ * A single published assessment by slug, with its full question/scoring
+ * definition. Generic across every assessment the `assessment` document
+ * type can define — `$slug` is the only thing that picks out a specific
+ * one (e.g. Capacity Assessment); nothing here is specific to that content.
+ */
+export const ASSESSMENT_BY_SLUG_QUERY = groq`
+  *[_type == "assessment" && slug.current == $slug && status == "published"][0] {
+    "id": _id,
+    title,
+    "slug": slug.current,
+    questions[] {
+      key,
+      text,
+      choices[] { key, label, value }
+    },
+    "scoringMethod": scoringLogic.method,
+    resultTiers[] { key, title, minScore, maxScore, description },
+    emailSequence,
+    crmPipeline,
+    seo { seoTitle, seoDescription }
+  }
+`;

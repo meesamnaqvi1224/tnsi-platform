@@ -6,12 +6,14 @@ import { category } from './documents/category';
 import { article } from './documents/article';
 import { program } from './documents/program';
 import { practice } from './documents/practice';
+import { assessment } from './documents/assessment';
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   // documents
   article,
   program,
   practice,
+  assessment,
   author,
   category,
   // objects

@@ -1,5 +1,5 @@
 import { sanityFetch } from '@tnsi/cms/server';
-import { ARTICLES_QUERY, PROGRAMS_QUERY } from '@tnsi/cms';
+import { ARTICLES_QUERY, ASSESSMENT_BY_SLUG_QUERY, PROGRAMS_QUERY } from '@tnsi/cms';
 import { articlesContent, type ArticleItem } from '@/content/articles';
 import { programsOverviewContent } from '@/content/programs';
 
@@ -95,4 +95,60 @@ export async function getComparisonPrograms(): Promise<readonly ComparisonProgra
     outcome: doc.outcome ?? '',
     href: doc.ctaHref ?? `/programs/${doc.slug}`,
   }));
+}
+
+export interface AssessmentChoice {
+  key: string;
+  label: string;
+  value: number;
+}
+
+export interface AssessmentQuestion {
+  key: string;
+  text: string;
+  choices: AssessmentChoice[];
+}
+
+export interface AssessmentResultTier {
+  key: string;
+  title: string;
+  minScore: number;
+  maxScore: number;
+  description?: string;
+}
+
+/**
+ * An assessment's full editorial definition, as authored in Sanity. Generic
+ * across every assessment the `assessment` document type can define — no
+ * field here is specific to Capacity Assessment or any other single
+ * assessment. `scoringMethod` is left as the raw string Sanity returns
+ * (rather than narrowed to packages/core's `AssessmentScoringMethod` union)
+ * since this loader has no opinion on which methods are valid — that's
+ * `scoreAssessment`'s job, and it already fails safe on one it doesn't
+ * recognise.
+ */
+export interface Assessment {
+  id: string;
+  title: string;
+  slug: string;
+  questions: AssessmentQuestion[];
+  scoringMethod: string;
+  resultTiers: AssessmentResultTier[];
+  /** Unwired identifiers, carried through for a future email/CRM mapping — see packages/cms/src/schema/documents/assessment.ts. */
+  emailSequence?: string;
+  crmPipeline?: string;
+  seo?: { seoTitle?: string; seoDescription?: string };
+}
+
+/**
+ * Loads a single published assessment by slug. Returns `null` when Sanity
+ * is not configured, the slug doesn't exist, or the matching document isn't
+ * published — every case is treated as "not currently available" rather
+ * than an error, so callers can render a safe empty state instead of
+ * inventing placeholder assessment content. Deliberately has no hardcoded
+ * fallback content (unlike `getLatestArticles`/`getComparisonPrograms`
+ * above): there is no approved placeholder for real assessment questions.
+ */
+export async function getAssessmentBySlug(slug: string): Promise<Assessment | null> {
+  return sanityFetch<Assessment>(ASSESSMENT_BY_SLUG_QUERY, { slug });
 }

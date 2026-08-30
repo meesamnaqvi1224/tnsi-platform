@@ -17,6 +17,7 @@
     "@sanity/vision": "^3.99.0",
     "@tnsi/auth": "workspace:*",
     "@tnsi/cms": "workspace:*",
+    "@tnsi/core": "workspace:*",
     "@tnsi/db": "workspace:*",
     "@tnsi/integrations": "workspace:*",
     "@tnsi/ui": "workspace:*",
