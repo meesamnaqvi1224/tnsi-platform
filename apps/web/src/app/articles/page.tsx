@@ -4,12 +4,10 @@ import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { ArticlesCategories } from '@/components/articles/articles-categories';
 import { ArticlesClosing } from '@/components/articles/articles-closing';
-import { ArticlesEditorsPicks } from '@/components/articles/articles-editors-picks';
 import { ArticlesFeatured } from '@/components/articles/articles-featured';
 import { ArticlesHero } from '@/components/articles/articles-hero';
 import { ArticlesLatest } from '@/components/articles/articles-latest';
 import { ArticlesNewsletter } from '@/components/articles/articles-newsletter';
-import { ArticlesTopics } from '@/components/articles/articles-topics';
 import { articlesContent } from '@/content/articles';
 
 const { seo, footerQuote } = articlesContent;
@@ -46,8 +44,6 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
         <ArticlesFeatured />
         <ArticlesCategories />
         <ArticlesLatest category={category} />
-        <ArticlesTopics />
-        <ArticlesEditorsPicks />
         <ArticlesNewsletter />
         <ArticlesClosing />
 
