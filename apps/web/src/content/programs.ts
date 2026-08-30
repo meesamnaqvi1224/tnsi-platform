@@ -103,7 +103,7 @@ export const programsOverviewContent = {
       format: 'Live group programme',
       duration: 'Ongoing cohorts',
       outcome: 'Regulated nervous system, expanded capacity',
-      href: '/method',
+      href: '/programs/life-beyond-trauma',
     },
     {
       title: 'Practitioner Certification',

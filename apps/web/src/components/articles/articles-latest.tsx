@@ -1,11 +1,10 @@
 import { ChapterMarker, Container, Section, Text } from '@tnsi/ui';
 import { ArticleCard } from '@/components/articles/article-card';
-import { Pagination } from '@/components/articles/pagination';
 import { articlesContent } from '@/content/articles';
 import type { ArticleItem } from '@/content/articles';
 import { getLatestArticles } from '@/content/cms/loaders';
 
-const { latest, pagination } = articlesContent;
+const { latest } = articlesContent;
 
 type ArticleGroup =
   | { type: 'large'; items: [ArticleItem] }
@@ -114,17 +113,6 @@ export async function ArticlesLatest({ category }: ArticlesLatestProps) {
           );
         })}
       </div>
-
-      {items.length > 0 ? (
-        <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">
-          {/* Every matching article is already rendered above — there is no
-              slicing/paging logic anywhere in this component, so this is
-              always truthfully a single page. Previously this rendered
-              content's hardcoded `totalPages: 3`, producing clickable
-              Page 2/3/Next links that silently reloaded the identical list. */}
-          <Pagination currentPage={1} totalPages={1} baseHref={pagination.baseHref} />
-        </Container>
-      ) : null}
     </Section>
   );
 }

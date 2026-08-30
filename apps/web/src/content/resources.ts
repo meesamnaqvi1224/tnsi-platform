@@ -41,8 +41,8 @@ export const resourcesContent = {
     imageSrc: '/images/resources/featured.webp',
     imageAlt:
       'An open handwritten journal, reading glasses and neuroscience books beside a cup of tea in warm light.',
-    href: '/articles/understanding-your-nervous-system',
-    cta: 'Read Guide',
+    href: '/articles/nervous-system-framework',
+    cta: 'Read Article',
   },
 
   categories: {
@@ -54,32 +54,28 @@ export const resourcesContent = {
         title: 'Neuroscience',
         description:
           'Foundational articles on nervous system science, polyvagal theory and the physiology of regulation.',
-        count: '12 resources',
-        href: '/resources/neuroscience',
+        href: '/articles?category=neuroscience',
       },
       {
         id: 'trauma-recovery',
         title: 'Trauma Recovery',
         description:
           'Evidence-informed perspectives on trauma physiology, recovery pathways and long-term healing.',
-        count: '9 resources',
-        href: '/resources/trauma-recovery',
+        href: '/articles?category=trauma-recovery',
       },
       {
         id: 'leadership',
         title: 'Leadership',
         description:
           'How nervous system capacity shapes executive decision-making, culture and organisational performance.',
-        count: '7 resources',
-        href: '/resources/leadership',
+        href: '/articles?category=leadership',
       },
       {
         id: 'practitioner-education',
         title: 'Practitioner Education',
         description:
           'Clinical frameworks, case integration and professional development for trauma-informed practitioners.',
-        count: '11 resources',
-        href: '/resources/practitioner-education',
+        href: '/articles?category=practitioner-education',
       },
     ],
   },

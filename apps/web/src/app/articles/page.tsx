@@ -9,6 +9,8 @@ import { ArticlesHero } from '@/components/articles/articles-hero';
 import { ArticlesLatest } from '@/components/articles/articles-latest';
 import { ArticlesNewsletter } from '@/components/articles/articles-newsletter';
 import { articlesContent } from '@/content/articles';
+import { getLatestArticles } from '@/content/cms/loaders';
+import { getArticleCategoryCounts } from '@/lib/articles';
 
 const { seo, footerQuote } = articlesContent;
 
@@ -27,6 +29,9 @@ interface ArticlesPageProps {
 export default async function ArticlesPage({ searchParams }: ArticlesPageProps) {
   const { category } = await searchParams;
 
+  const allArticles = await getLatestArticles();
+  const categoryCounts = getArticleCategoryCounts(allArticles);
+
   const jsonLd = [
     createWebPageJsonLd({ title: 'Articles', description: seo.description, path: '/articles' }),
     createBreadcrumbJsonLd([
@@ -42,7 +47,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
       <main id="main-content">
         <ArticlesHero />
         <ArticlesFeatured />
-        <ArticlesCategories />
+        <ArticlesCategories categories={categoryCounts} activeCategory={category} />
         <ArticlesLatest category={category} />
         <ArticlesNewsletter />
         <ArticlesClosing />
