@@ -22,6 +22,12 @@ export {
   type InvoicePaymentFailedInput,
 } from './stripe/sync-plan';
 export {
+  createCheckoutSession,
+  UnpurchasableTierError,
+  type CreateCheckoutSessionInput,
+} from './stripe/checkout';
+export { createBillingPortalSession, NoStripeCustomerError } from './stripe/portal';
+export {
   ENTITLEMENT_TIERS,
   PURCHASABLE_TIERS,
   ENTITLEMENT_STATUSES,

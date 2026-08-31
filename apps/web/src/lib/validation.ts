@@ -1,5 +1,6 @@
 import { z } from '@tnsi/validation';
 import { practiceContentTypeEnum } from '@tnsi/db/schema';
+import { PURCHASABLE_TIERS } from '@tnsi/integrations';
 
 export const practiceContentType = z.enum(practiceContentTypeEnum.enumValues);
 
@@ -57,3 +58,17 @@ export const assessmentSubmissionSchema = z.object({
 });
 
 export type AssessmentSubmissionInput = z.infer<typeof assessmentSubmissionSchema>;
+
+/**
+ * The only thing a checkout request is allowed to specify: which of the
+ * three already-configured, purchasable tiers to buy. There is no price,
+ * product, or amount field here — the server resolves the real Stripe
+ * Price id from `tier` alone (see `resolvePriceId` in
+ * `@tnsi/integrations`), so a client can never influence what gets
+ * charged beyond picking one of these three names.
+ */
+export const checkoutRequestSchema = z.object({
+  tier: z.enum(PURCHASABLE_TIERS),
+});
+
+export type CheckoutRequestInput = z.infer<typeof checkoutRequestSchema>;
