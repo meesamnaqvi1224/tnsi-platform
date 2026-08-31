@@ -4,9 +4,7 @@ import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { ResourcesCategories } from '@/components/resources/resources-categories';
 import { ResourcesClosing } from '@/components/resources/resources-closing';
-import { ResourcesCollections } from '@/components/resources/resources-collections';
 import { ResourcesFeatured } from '@/components/resources/resources-featured';
-import { ResourcesGuides } from '@/components/resources/resources-guides';
 import { ResourcesHero } from '@/components/resources/resources-hero';
 import { ResourcesLatest } from '@/components/resources/resources-latest';
 import { ResourcesNewsletter } from '@/components/resources/resources-newsletter';
@@ -40,8 +38,6 @@ export default function ResourcesPage() {
         <ResourcesFeatured />
         <ResourcesCategories />
         <ResourcesLatest />
-        <ResourcesCollections />
-        <ResourcesGuides />
         <ResourcesNewsletter />
         <ResourcesClosing />
 
