@@ -6,12 +6,17 @@
   "types": "./src/index.ts",
   "scripts": {
     "lint": "eslint .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "stripe": "^17.4.0"
   },
   "devDependencies": {
     "@tnsi/config": "workspace:*",
     "@types/node": "^20",
     "typescript": "^5",
-    "eslint": "^9"
+    "eslint": "^9",
+    "vitest": "^3.2.4"
   }
 }
