@@ -8,6 +8,10 @@ export interface PracticePlayerProps {
   mediaKind: 'audio' | 'video';
   thumbnailUrl?: string | null;
   initialPlayCount: number;
+  /** Saved position from a previous session, in seconds. 0 if there is none. */
+  initialPositionSeconds: number;
+  /** An already-completed practice always starts from the beginning. */
+  completed: boolean;
 }
 
 /**
@@ -39,11 +43,32 @@ export function PracticePlayer({
   mediaKind,
   thumbnailUrl,
   initialPlayCount,
+  initialPositionSeconds,
+  completed,
 }: PracticePlayerProps) {
   const mediaRef = React.useRef<HTMLAudioElement | HTMLVideoElement>(null);
   const lastSavedAtRef = React.useRef(0);
   const playCountRef = React.useRef(initialPlayCount);
   const hasCountedPlayRef = React.useRef(false);
+
+  /**
+   * Seeks to the saved position once the browser knows the media's
+   * duration (seeking any earlier has no effect). Deliberately does
+   * nothing — rather than clamping or erroring — for every case where
+   * resuming wouldn't make sense: no saved position, a zero/negative value,
+   * a completed practice (always restarts from the beginning), an unknown
+   * duration, or a saved position at/past the end (stale data from before
+   * the file's real duration was known, e.g. after the source media
+   * changed).
+   */
+  function handleLoadedMetadata() {
+    const media = mediaRef.current;
+    if (!media || completed) return;
+    if (!initialPositionSeconds || initialPositionSeconds <= 0) return;
+    if (!Number.isFinite(media.duration) || media.duration <= 0) return;
+    if (initialPositionSeconds >= media.duration) return;
+    media.currentTime = initialPositionSeconds;
+  }
 
   const persistProgress = React.useCallback(
     (overrides: { completed?: boolean; progressPct?: number } = {}) => {
@@ -118,6 +143,7 @@ export function PracticePlayer({
         src={mediaUrl}
         poster={thumbnailUrl ?? undefined}
         className="w-full rounded-sm"
+        onLoadedMetadata={handleLoadedMetadata}
         onPlay={handlePlay}
         onTimeUpdate={handleTimeUpdate}
         onPause={handlePause}
@@ -134,6 +160,7 @@ export function PracticePlayer({
       controls
       src={mediaUrl}
       className="w-full"
+      onLoadedMetadata={handleLoadedMetadata}
       onPlay={handlePlay}
       onTimeUpdate={handleTimeUpdate}
       onPause={handlePause}

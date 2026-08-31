@@ -101,6 +101,8 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
                     mediaUrl={practice.mediaUrl}
                     mediaKind="audio"
                     initialPlayCount={completion?.playCount ?? 0}
+                    initialPositionSeconds={completion?.positionSeconds ?? 0}
+                    completed={completed}
                   />
                 ) : practice.mediaUrl && VIDEO_CONTENT_TYPES.has(practice.contentType) ? (
                   <PracticePlayer
@@ -109,6 +111,8 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
                     mediaKind="video"
                     thumbnailUrl={practice.thumbnailUrl}
                     initialPlayCount={completion?.playCount ?? 0}
+                    initialPositionSeconds={completion?.positionSeconds ?? 0}
+                    completed={completed}
                   />
                 ) : null}
 
