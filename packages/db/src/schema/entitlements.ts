@@ -5,7 +5,7 @@ import {
   boolean,
   timestamp,
   jsonb,
-  index,
+  unique,
   primaryKey,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
@@ -62,10 +62,16 @@ export const entitlements = pgTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.userId] }),
-    idxEntitlementsStripeCustomer: index('idx_entitlements_stripe_customer').on(
+    // Unique, not just indexed: a Stripe customer/subscription must never
+    // resolve to more than one of our users — that's the exact invariant
+    // the webhook path depends on when it looks up "which user does this
+    // event belong to" by these ids. Postgres unique indexes permit
+    // multiple NULLs, so this doesn't constrain the (common) rows that
+    // have never had a Stripe customer at all.
+    uniqueEntitlementsStripeCustomer: unique('unique_entitlements_stripe_customer').on(
       table.stripeCustomerId,
     ),
-    idxEntitlementsStripeSubscription: index('idx_entitlements_stripe_subscription').on(
+    uniqueEntitlementsStripeSubscription: unique('unique_entitlements_stripe_subscription').on(
       table.stripeSubscriptionId,
     ),
   }),
