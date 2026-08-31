@@ -109,9 +109,17 @@ export default async function DashboardPage() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <Text tone="muted" className="text-base leading-[1.85]">
-                          {accessDescription}
-                        </Text>
+                        <Stack gap="sm">
+                          <Text tone="muted" className="text-base leading-[1.85]">
+                            {accessDescription}
+                          </Text>
+                          <NextLink
+                            href="/dashboard/billing"
+                            className="interaction-text-link-underline w-fit text-sm"
+                          >
+                            Manage billing
+                          </NextLink>
+                        </Stack>
                       </CardContent>
                     </Card>
                   </section>
