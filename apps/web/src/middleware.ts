@@ -20,6 +20,8 @@ const isPublicRoute = createRouteMatcher([
   '/method(.*)',
   '/contact',
   '/book-a-call',
+  '/apply(.*)',
+  '/prospectus(.*)',
   '/privacy(.*)',
   '/terms(.*)',
   '/cookies(.*)',
