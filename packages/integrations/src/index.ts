@@ -10,6 +10,17 @@ export {
 
 export { getStripeConfig, StripeConfigError, type StripeConfig } from './stripe/config';
 export { getStripeClient, isStripeConfigured } from './stripe/client';
+export { verifyStripeWebhookEvent, StripeWebhookVerificationError } from './stripe/verify';
+export {
+  planForCheckoutSessionCompleted,
+  planForSubscriptionEvent,
+  planForInvoicePaymentFailed,
+  type EntitlementSyncPlan,
+  type SubscriptionSyncValues,
+  type CheckoutSessionCompletedInput,
+  type SubscriptionEventInput,
+  type InvoicePaymentFailedInput,
+} from './stripe/sync-plan';
 export {
   ENTITLEMENT_TIERS,
   PURCHASABLE_TIERS,
