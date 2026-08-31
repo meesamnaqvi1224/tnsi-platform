@@ -9,7 +9,9 @@ export interface PaginationProps {
 }
 
 function pageHref(baseHref: string, page: number) {
-  return page === 1 ? baseHref : `${baseHref}?page=${page}`;
+  if (page === 1) return baseHref;
+  const separator = baseHref.includes('?') ? '&' : '?';
+  return `${baseHref}${separator}page=${page}`;
 }
 
 export function Pagination({ currentPage, totalPages, baseHref, className }: PaginationProps) {

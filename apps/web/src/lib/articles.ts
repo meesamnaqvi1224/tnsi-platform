@@ -1,4 +1,5 @@
 import { articlesContent } from '@/content/articles';
+import type { ArticleItem } from '@/content/articles';
 import { nervousSystemFrameworkPost } from '@/content/article-posts/nervous-system-framework';
 import type { ArticlePost } from '@/content/article-posts/types';
 
@@ -61,4 +62,26 @@ export function getArticleBySlug(slug: string): ArticlePost | null {
   }
 
   return mergeListingMeta(slug, { ...defaultPost, slug });
+}
+
+export interface ArticleCategoryCount {
+  category: string;
+  count: number;
+}
+
+/**
+ * Derives the real category list — with real counts — directly from a given
+ * list of articles, in first-seen order. This is the single source of truth
+ * for category filtering; there is no separately maintained category list.
+ */
+export function getArticleCategoryCounts(
+  items: readonly Pick<ArticleItem, 'category'>[],
+): ArticleCategoryCount[] {
+  const counts = new Map<string, number>();
+
+  for (const item of items) {
+    counts.set(item.category, (counts.get(item.category) ?? 0) + 1);
+  }
+
+  return Array.from(counts.entries()).map(([category, count]) => ({ category, count }));
 }

@@ -48,20 +48,14 @@ export function ArticlesHero() {
             </Text>
           </Stack>
 
-          <Stack direction="row" gap="sm" wrap="wrap">
+          <div>
             <NextLink
               href={hero.primaryCta.href}
               className={buttonVariants({ variant: 'primary', size: 'lg' })}
             >
               {hero.primaryCta.label}
             </NextLink>
-            <NextLink
-              href={hero.secondaryCta.href}
-              className={buttonVariants({ variant: 'outline', size: 'lg' })}
-            >
-              {hero.secondaryCta.label}
-            </NextLink>
-          </Stack>
+          </div>
         </Stack>
       </Container>
     </section>

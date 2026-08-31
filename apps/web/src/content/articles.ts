@@ -45,7 +45,6 @@ export const articlesContent = {
     imageAlt:
       'A writing desk with an open notebook, books and a mug beside a window in soft natural light.',
     primaryCta: { label: 'Latest Articles', href: '#latest' },
-    secondaryCta: { label: 'Browse Topics', href: '#topics' },
   },
 
   featured: {
@@ -263,69 +262,18 @@ export const articlesContent = {
     ] satisfies ArticleItem[],
   },
 
-  topics: {
-    chapter: '05',
-    heading: 'Popular Topics',
-    items: [
-      {
-        id: 'polyvagal-theory',
-        label: 'Polyvagal Theory',
-        href: '/articles?topic=polyvagal-theory',
-      },
-      { id: 'capacity', label: 'Capacity', href: '/articles?topic=capacity' },
-      { id: 'burnout', label: 'Burnout', href: '/articles?topic=burnout' },
-      { id: 'leadership', label: 'Leadership', href: '/articles?topic=leadership' },
-      { id: 'safety', label: 'Safety', href: '/articles?topic=safety' },
-      { id: 'trauma', label: 'Trauma', href: '/articles?topic=trauma' },
-      { id: 'regulation', label: 'Regulation', href: '/articles?topic=regulation' },
-      { id: 'healing', label: 'Healing', href: '/articles?topic=healing' },
-      { id: 'practitioner', label: 'Practitioner', href: '/articles?topic=practitioner' },
-      { id: 'neuroscience', label: 'Neuroscience', href: '/articles?topic=neuroscience' },
-    ],
-  },
+  // Topics were removed in Batch C2 — no article ever carried a `topic`
+  // field; the chips were pure decoration with no data model behind them.
+  // See the Batch C1 audit and the Batch C2 report.
 
-  editorsPicks: {
-    chapter: '06',
-    heading: 'Editor\u2019s Picks',
-    items: [
-      {
-        id: 'pick-capacity',
-        title: 'Building Capacity Beyond Resilience',
-        summary:
-          'Why resilience is an insufficient frame — and what nervous system capacity offers instead.',
-        imageSrc: '/images/articles/editors-capacity.webp',
-        imageAlt:
-          'A luxury flat lay of books, an open journal, reading glasses and a cup of coffee on a desk.',
-        href: '/articles/building-capacity-beyond-resilience',
-        layout: 'image-left' as const,
-      },
-      {
-        id: 'pick-trauma-informed',
-        title: 'What Trauma-Informed Really Means',
-        summary:
-          'Moving beyond buzzwords toward physiology, safety and evidence-informed practice.',
-        imageSrc: '/images/articles/editors-trauma-informed.webp',
-        imageAlt:
-          'Hands writing in an open journal beside a cup of tea and books on a wooden table.',
-        href: '/articles/what-trauma-informed-means',
-        layout: 'image-right' as const,
-      },
-      {
-        id: 'pick-leadership-culture',
-        title: 'Leadership Culture Starts in the Nervous System',
-        summary:
-          'How a leader\u2019s physiological state becomes the unwritten policy of an organisation.',
-        imageSrc: '/images/articles/editors-leadership-culture.webp',
-        imageAlt:
-          'An executive office with an oak desk, chair and bookshelves beside a garden window.',
-        href: '/articles/leadership-culture-nervous-system',
-        layout: 'image-left' as const,
-      },
-    ],
-  },
+  // Editor's Picks were removed in Batch C2 — all three pointed at article
+  // slugs that were never written. Repointing them to unrelated existing
+  // articles would have misrepresented one piece of writing as three, so
+  // the section was removed rather than patched with a dishonest redirect.
+  // See the Batch C1 audit and the Batch C2 report.
 
   newsletter: {
-    chapter: '07',
+    chapter: '05',
     heading: 'Stay informed.',
     description:
       'Receive new articles, research updates and educational insights directly from The Nervous System Institute.',
@@ -334,7 +282,7 @@ export const articlesContent = {
   },
 
   closing: {
-    chapter: '08',
+    chapter: '06',
     headline: 'Ideas become meaningful when they improve the way we live and lead.',
     primaryCta: { label: 'Browse Resources', href: '/resources' },
     secondaryCta: { label: 'Book a Discovery Call', href: '/book-a-call' },
@@ -354,4 +302,3 @@ export const articlesContent = {
 
 export type ArticlesContent = typeof articlesContent;
 export type ArticleCategory = (typeof articlesContent.categories.items)[number];
-export type EditorsPickItem = (typeof articlesContent.editorsPicks.items)[number];
