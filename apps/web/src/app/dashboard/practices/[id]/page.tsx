@@ -2,14 +2,15 @@ import { notFound } from 'next/navigation';
 import NextLink from 'next/link';
 import { Container, Divider, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { PracticeCompleteButton } from '@/components/dashboard/practice-complete-button';
+import { PracticePlayer } from '@/components/dashboard/practice-player';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { requireAuthOrRedirect } from '@/lib/auth-api';
 import {
   formatContentTypeLabel,
   formatPracticeDuration,
+  getPracticeCompletion,
   getPublishedPracticeById,
-  isPracticeCompleted,
   toGoogleDriveEmbedUrl,
 } from '@/lib/practices';
 import { createPageMetadata } from '@/lib/seo';
@@ -51,7 +52,8 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
   const practice = await getPublishedPracticeById(idResult.data.id);
   if (!practice) notFound();
 
-  const completed = await isPracticeCompleted(user.id, practice.id);
+  const completion = await getPracticeCompletion(user.id, practice.id);
+  const completed = completion?.completed ?? false;
   const duration = formatPracticeDuration(practice.durationSeconds);
   const driveEmbedUrl = practice.mediaUrl ? toGoogleDriveEmbedUrl(practice.mediaUrl) : null;
 
@@ -94,18 +96,20 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
                     title={practice.title}
                   />
                 ) : practice.mediaUrl && AUDIO_CONTENT_TYPES.has(practice.contentType) ? (
-                  <audio controls src={practice.mediaUrl} className="w-full">
-                    Your browser does not support the audio element.
-                  </audio>
+                  <PracticePlayer
+                    practiceId={practice.id}
+                    mediaUrl={practice.mediaUrl}
+                    mediaKind="audio"
+                    initialPlayCount={completion?.playCount ?? 0}
+                  />
                 ) : practice.mediaUrl && VIDEO_CONTENT_TYPES.has(practice.contentType) ? (
-                  <video
-                    controls
-                    src={practice.mediaUrl}
-                    poster={practice.thumbnailUrl ?? undefined}
-                    className="w-full rounded-sm"
-                  >
-                    Your browser does not support the video element.
-                  </video>
+                  <PracticePlayer
+                    practiceId={practice.id}
+                    mediaUrl={practice.mediaUrl}
+                    mediaKind="video"
+                    thumbnailUrl={practice.thumbnailUrl}
+                    initialPlayCount={completion?.playCount ?? 0}
+                  />
                 ) : null}
 
                 <Divider />

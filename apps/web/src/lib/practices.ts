@@ -100,6 +100,40 @@ export async function isPracticeCompleted(userId: string, practiceId: string): P
   return result[0]?.completed ?? false;
 }
 
+export interface PracticeCompletionState {
+  progressPct: number;
+  positionSeconds: number;
+  completed: boolean;
+  playCount: number;
+}
+
+/**
+ * The full completion row for one user+practice, or `null` if they've never
+ * started it. Unlike `isPracticeCompleted` above (which exists purely for
+ * the boolean badge/gate case), the practice player needs `positionSeconds`
+ * to resume playback and `playCount` to avoid re-incrementing it on every
+ * throttled progress save — neither is derivable from a boolean, so this is
+ * a genuinely separate read, not a duplicate of the existing one.
+ */
+export async function getPracticeCompletion(
+  userId: string,
+  practiceId: string,
+): Promise<PracticeCompletionState | null> {
+  const result = await db
+    .select({
+      progressPct: practiceCompletions.progressPct,
+      positionSeconds: practiceCompletions.positionSeconds,
+      completed: practiceCompletions.completed,
+      playCount: practiceCompletions.playCount,
+    })
+    .from(practiceCompletions)
+    .where(
+      and(eq(practiceCompletions.userId, userId), eq(practiceCompletions.practiceId, practiceId)),
+    )
+    .limit(1);
+  return result[0] ?? null;
+}
+
 /** "300" -> "5 min"; "90" -> "1 hr 30 min". `null` when no duration is set. */
 export function formatPracticeDuration(seconds: number | null): string | null {
   if (!seconds || seconds <= 0) return null;
