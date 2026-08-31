@@ -2,6 +2,9 @@ import NextLink from 'next/link';
 import { buttonVariants, Eyebrow, Stack, Text } from '@tnsi/ui';
 import { SectionImage } from '@/components/utility/section-image';
 import { methodImages } from '@/content/images';
+import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
+
+const { hero } = humanExpansionTheoryContent;
 
 export function MethodHero() {
   return (
@@ -13,29 +16,26 @@ export function MethodHero() {
         <Stack gap="xl" className="max-w-lg">
           <div>
             <div className="border-border mb-(--space-md) w-10 border-t-2" />
-            <Eyebrow className="text-muted-foreground">The Method</Eyebrow>
+            <Eyebrow className="text-muted-foreground">{hero.eyebrow}</Eyebrow>
           </div>
 
           <h1
             id="method-hero-heading"
             className="font-heading text-foreground text-4xl leading-[1.02] font-semibold tracking-tight sm:text-5xl lg:text-[4.5rem] xl:text-[5.5rem]"
           >
-            Life Beyond
-            <br />
-            Trauma.
+            {hero.headline}
           </h1>
 
           <Stack gap="lg">
-            <Text size="lg" tone="muted" className="max-w-[18rem]">
-              Not a technique for managing symptoms. A different physiological foundation — built at
-              the level where patterns actually live.
+            <Text size="lg" tone="muted" className="max-w-[22rem]">
+              {hero.tagline}
             </Text>
             <div>
               <NextLink
-                href="#method-foundation"
+                href={hero.cta.href}
                 className={buttonVariants({ variant: 'primary', size: 'lg' })}
               >
-                Explore the Method
+                {hero.cta.label}
               </NextLink>
             </div>
           </Stack>
@@ -45,7 +45,7 @@ export function MethodHero() {
       <div className="bg-secondary relative hidden lg:block">
         <SectionImage
           src={methodImages.heroPortrait}
-          alt="Caroline Reed in a warm editorial portrait for the Life Beyond Trauma method."
+          alt="Caroline Reed in a warm editorial portrait for The Nervous System Institute."
           priority
           sizes="55vw"
         />

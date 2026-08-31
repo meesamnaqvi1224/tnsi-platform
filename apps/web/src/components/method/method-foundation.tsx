@@ -1,61 +1,62 @@
-import { Container, Section } from '@tnsi/ui';
+import { ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
+import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
 
-const columns = [
-  {
-    id: 'challenge',
-    label: 'The Challenge',
-    body: `Achievement culture does not create dysregulation. It selects for it.
-The people most rewarded by this culture are often those who have learned most
-efficiently to override their physiological signals — which is not resilience.
-It is delay.`,
-  },
-  {
-    id: 'science',
-    label: 'The Science',
-    body: `Polyvagal theory describes three physiological states: social engagement,
-mobilisation, and shutdown. Sustainable performance requires access to the first.
-Most high-achieving adults spend their productive years cycling between the
-second and third, mistaking activation for capacity.`,
-  },
-  {
-    id: 'transformation',
-    label: 'The Transformation',
-    body: `Change at this level is not psychological. It is physiological — new neural
-pathways built through structured education, not insight alone. The method does
-not teach you to manage the pattern. It teaches the nervous system to no longer
-need it.`,
-  },
-] as const;
+const { whyNewFramework, centralProposition } = humanExpansionTheoryContent;
 
 export function MethodFoundation() {
   return (
-    <Section
-      id="method-foundation"
-      spacing="xl"
-      className="bg-secondary border-border border-t"
-      aria-labelledby="method-foundation-heading"
-    >
-      <Container size="xl">
-        <p className="text-muted-foreground mb-(--space-3xl) text-xs tracking-[0.15em] uppercase">
-          Three perspectives
-        </p>
+    <>
+      <Section
+        id="why-a-new-framework"
+        spacing="xl"
+        className="border-border border-t"
+        aria-label={whyNewFramework.heading}
+      >
+        <Container size="xl">
+          <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-2 lg:gap-(--space-4xl)">
+            <ChapterMarker
+              index={whyNewFramework.chapter}
+              as="h2"
+              size="2xl"
+              title={whyNewFramework.heading}
+            />
+            <Stack gap="lg" className="lg:pt-(--space-2xl)">
+              {whyNewFramework.paragraphs.map((paragraph) => (
+                <Text key={paragraph} tone="muted" className="text-base leading-relaxed">
+                  {paragraph}
+                </Text>
+              ))}
+            </Stack>
+          </div>
+        </Container>
+      </Section>
 
-        <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-3">
-          {columns.map((col) => (
-            <div key={col.id} className="border-border border-t pt-(--space-xl)">
-              <h2
-                id={col.id === 'challenge' ? 'method-foundation-heading' : undefined}
-                className="font-heading text-foreground mb-(--space-lg) text-base font-semibold tracking-tight"
-              >
-                {col.label}
-              </h2>
-              <p className="text-muted-foreground text-base leading-relaxed whitespace-pre-line">
-                {col.body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </Container>
-    </Section>
+      <Section
+        spacing="xl"
+        className="border-border bg-secondary border-t"
+        aria-label={centralProposition.heading}
+      >
+        <Container size="xl">
+          <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-[1fr_1.1fr] lg:gap-(--space-5xl)">
+            <ChapterMarker
+              index={centralProposition.chapter}
+              as="h2"
+              title={centralProposition.heading}
+              className="lg:sticky lg:top-(--space-3xl) lg:self-start"
+            />
+            <Stack gap="xl" className="lg:pt-(--space-md)">
+              <Text className="text-foreground text-lg leading-relaxed font-medium">
+                {centralProposition.statement}
+              </Text>
+              {centralProposition.paragraphs.map((paragraph) => (
+                <Text key={paragraph} tone="muted" className="text-base leading-relaxed">
+                  {paragraph}
+                </Text>
+              ))}
+            </Stack>
+          </div>
+        </Container>
+      </Section>
+    </>
   );
 }
