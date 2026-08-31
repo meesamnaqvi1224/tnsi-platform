@@ -19,6 +19,7 @@ import {
   formatContentTypeLabel,
   formatPracticeDuration,
   getPublishedPractices,
+  isPracticeCompleted,
 } from '@/lib/practices';
 import { createPageMetadata } from '@/lib/seo';
 
@@ -43,8 +44,16 @@ function practiceMeta(practice: {
 }
 
 export default async function PracticeLibraryPage() {
-  await requireAuthOrRedirect();
+  const user = await requireAuthOrRedirect();
   const practiceList = await getPublishedPractices();
+
+  // Reuses the existing per-practice `isPracticeCompleted` lookup (same
+  // query the practice detail page already runs) rather than introducing a
+  // new batched query — run in parallel so N practices cost one round of
+  // concurrent indexed lookups, not N sequential ones.
+  const completions = await Promise.all(
+    practiceList.map((practice) => isPracticeCompleted(user.id, practice.id)),
+  );
 
   return (
     <>
@@ -71,7 +80,7 @@ export default async function PracticeLibraryPage() {
                   />
                 ) : (
                   <Grid cols="2" gap="lg">
-                    {practiceList.map((practice) => (
+                    {practiceList.map((practice, index) => (
                       <NextLink
                         key={practice.id}
                         href={`/dashboard/practices/${practice.id}`}
@@ -79,9 +88,20 @@ export default async function PracticeLibraryPage() {
                       >
                         <Card className="hover:border-foreground/40 duration-base ease-standard h-full transition-colors">
                           <CardHeader>
-                            <Text tone="muted" size="xs" className="tracking-[0.1em] uppercase">
-                              {practiceMeta(practice)}
-                            </Text>
+                            <Stack
+                              direction="row"
+                              gap="sm"
+                              className="items-center justify-between"
+                            >
+                              <Text tone="muted" size="xs" className="tracking-[0.1em] uppercase">
+                                {practiceMeta(practice)}
+                              </Text>
+                              {completions[index] ? (
+                                <Text role="status" tone="muted" size="xs" className="shrink-0">
+                                  Completed
+                                </Text>
+                              ) : null}
+                            </Stack>
                             <Heading
                               as="h2"
                               size="xs"
