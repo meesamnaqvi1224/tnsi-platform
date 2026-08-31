@@ -1,6 +1,9 @@
 import { Container, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { EditorialImage } from '@/components/utility/editorial-image';
 import { aboutImages } from '@/content/images';
+import { aboutContent } from '@/content/about';
+
+const { institute } = aboutContent;
 
 export function MissionSection() {
   return (
@@ -8,21 +11,15 @@ export function MissionSection() {
       <Container size="xl">
         <div className="grid grid-cols-1 items-center gap-[var(--space-2xl)] lg:grid-cols-2 lg:gap-[var(--space-3xl)]">
           <Stack gap="md">
-            <Eyebrow>The Institute</Eyebrow>
+            <Eyebrow>{institute.eyebrow}</Eyebrow>
             <Heading as="h2" id="mission-heading" size="xl">
-              Why TNSI exists.
+              {institute.headline}
             </Heading>
-            <Text tone="muted" className="max-w-prose">
-              Achievement culture rewards performance at any physiological cost. The women and
-              leaders who reach us have often succeeded by every external measure — and are
-              exhausted, dysregulated, or quietly burning out behind their accomplishments.
-            </Text>
-            <Text tone="muted" className="max-w-prose">
-              Our Institute was founded on a single premise: that sustainable success is only
-              possible from a regulated nervous system. We translate the science — polyvagal theory,
-              attachment research, somatic approaches — into structured education that creates
-              lasting change rather than temporary relief.
-            </Text>
+            {institute.paragraphs.map((paragraph) => (
+              <Text key={paragraph} tone="muted" className="max-w-prose">
+                {paragraph}
+              </Text>
+            ))}
           </Stack>
 
           <EditorialImage
