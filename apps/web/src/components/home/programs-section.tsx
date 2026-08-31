@@ -9,8 +9,8 @@ const programs = [
   {
     title: 'Life Beyond Trauma',
     description:
-      'A foundational program for ambitious women ready to rebuild their relationship with their nervous system and reclaim sustainable capacity.',
-    href: '/method',
+      'A foundational pathway for individuals ready to rebuild their relationship with their nervous system and reclaim sustainable capacity.',
+    href: '/programs/life-beyond-trauma',
     imageSrc: '/images/home/program-life-beyond-trauma.webp',
     imageAlt: 'A woman reading calmly in a sunlit chair beside a garden window.',
   },

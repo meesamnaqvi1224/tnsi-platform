@@ -20,8 +20,7 @@ export const executiveAdvisoryContent = {
     chapter: '01',
     eyebrow: 'Executive Advisory',
     headline: 'Executive Advisory',
-    supportingHeadline:
-      'Helping leaders build organisations that perform sustainably through nervous system-informed leadership.',
+    supportingHeadline: 'Building leadership capacity under sustained pressure.',
     supportingCopy:
       'Modern organisations don\u2019t just need better strategies. They need leaders capable of making clear decisions, leading through uncertainty and creating environments where people can perform without chronic stress.',
     imageSrc: '/images/programs/executive/hero-meeting.webp',

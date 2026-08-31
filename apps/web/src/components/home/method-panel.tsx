@@ -30,11 +30,11 @@ export function MethodPanel() {
                   React.AnchorHTMLAttributes<HTMLAnchorElement>
                 >
               }
-              href="/method"
+              href="/programs/life-beyond-trauma"
               tone="inherit"
               className="font-medium"
             >
-              Learn the Method
+              Explore Life Beyond Trauma
             </Link>
           </Stack>
         </FadeIn>

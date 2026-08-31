@@ -13,17 +13,28 @@ export function CtaBand() {
         <FadeIn>
           <Stack gap="lg" align="center" className="text-center">
             <Heading as="h2" id="cta-heading" size="2xl" className="text-4xl sm:text-5xl">
-              Ready to begin?
+              Find Your Pathway
             </Heading>
-            <Text tone="muted" size="lg" className="max-w-md">
-              Not everyone needs the same pathway. Let&apos;s discover where yours begins.
+            <Text tone="muted" size="lg" className="max-w-xl">
+              Every journey through The Nervous System Institute is different. Whether you&apos;re
+              seeking personal development, advancing your professional practice, or exploring how
+              Human Expansion Theory™ can inform your organization, we&apos;ll help you find the
+              pathway that&apos;s right for you.
             </Text>
-            <NextLink
-              href="/book-a-call"
-              className={buttonVariants({ variant: 'primary', size: 'lg' })}
-            >
-              Book a Discovery Call
-            </NextLink>
+            <Stack direction="row" gap="sm" wrap="wrap" className="justify-center">
+              <NextLink
+                href="/programs"
+                className={buttonVariants({ variant: 'primary', size: 'lg' })}
+              >
+                Explore Our Pathways
+              </NextLink>
+              <NextLink
+                href="/book-a-call"
+                className={buttonVariants({ variant: 'outline', size: 'lg' })}
+              >
+                Book a Discovery Call
+              </NextLink>
+            </Stack>
           </Stack>
         </FadeIn>
       </Container>

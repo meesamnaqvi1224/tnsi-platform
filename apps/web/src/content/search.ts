@@ -95,7 +95,7 @@ export const searchContent = {
       id: 'program-method',
       title: 'The Life Beyond Trauma Method',
       excerpt: 'The Institute\u2019s evidence-informed methodology for sustainable human change.',
-      href: '/method',
+      href: '/programs/life-beyond-trauma',
       group: 'programs' as const,
       keywords: ['life beyond trauma', 'method', 'programme', 'recovery'],
     },
