@@ -1,5 +1,6 @@
 import NextLink from 'next/link';
 import {
+  buttonVariants,
   Card,
   CardContent,
   CardHeader,
@@ -43,9 +44,95 @@ function practiceMeta(practice: {
   return parts.join(' · ');
 }
 
-export default async function PracticeLibraryPage() {
+interface PracticeLibraryPageProps {
+  searchParams: Promise<{ category?: string; contentType?: string }>;
+}
+
+/** Builds a `/dashboard/practices` link carrying whichever filters are still active. */
+function filterHref(params: { category?: string; contentType?: string }): string {
+  const search = new URLSearchParams();
+  if (params.category) search.set('category', params.category);
+  if (params.contentType) search.set('contentType', params.contentType);
+  const query = search.toString();
+  return query ? `/dashboard/practices?${query}` : '/dashboard/practices';
+}
+
+function FilterRow({
+  label,
+  options,
+  active,
+  hrefFor,
+}: {
+  label: string;
+  options: { value: string; label: string }[];
+  active?: string;
+  hrefFor: (value: string | undefined) => string;
+}) {
+  if (options.length < 2) return null;
+
+  return (
+    <nav aria-label={label}>
+      <Stack direction="row" gap="sm" wrap="wrap" className="items-center">
+        <Text tone="muted" size="xs" className="tracking-[0.1em] uppercase">
+          {label}
+        </Text>
+        <NextLink
+          href={hrefFor(undefined)}
+          aria-current={!active ? 'page' : undefined}
+          className={
+            !active
+              ? 'text-foreground font-medium underline underline-offset-4'
+              : 'text-muted-foreground'
+          }
+        >
+          All
+        </NextLink>
+        {options.map((option) => (
+          <NextLink
+            key={option.value}
+            href={hrefFor(option.value)}
+            aria-current={active === option.value ? 'page' : undefined}
+            className={
+              active === option.value
+                ? 'text-foreground font-medium underline underline-offset-4'
+                : 'text-muted-foreground'
+            }
+          >
+            {option.label}
+          </NextLink>
+        ))}
+      </Stack>
+    </nav>
+  );
+}
+
+export default async function PracticeLibraryPage({ searchParams }: PracticeLibraryPageProps) {
   const user = await requireAuthOrRedirect();
-  const practiceList = await getPublishedPractices();
+  const { category: categoryParam, contentType: contentTypeParam } = await searchParams;
+  const allPractices = await getPublishedPractices();
+
+  // Filter option lists are derived from the real, currently-published
+  // practices — same principle as the Articles category filter — rather
+  // than a fixed/invented list, since `category` is free text with no
+  // canonical set (see packages/cms/src/schema/documents/practice.ts).
+  const categories = Array.from(
+    new Set(allPractices.map((p) => p.category).filter((c): c is string => Boolean(c))),
+  ).sort();
+  const contentTypes = Array.from(new Set(allPractices.map((p) => p.contentType))).sort();
+
+  // An unrecognised filter value (stale link, typo) is treated as no
+  // filter — same "never a fabricated filter, never a thrown error"
+  // approach already used for article category filtering.
+  const activeCategory =
+    categoryParam && categories.includes(categoryParam) ? categoryParam : undefined;
+  const activeContentType =
+    contentTypeParam && contentTypes.includes(contentTypeParam) ? contentTypeParam : undefined;
+
+  const practiceList = allPractices.filter((practice) => {
+    if (activeCategory && practice.category !== activeCategory) return false;
+    if (activeContentType && practice.contentType !== activeContentType) return false;
+    return true;
+  });
 
   // Reuses the existing per-practice `isPracticeCompleted` lookup (same
   // query the practice detail page already runs) rather than introducing a
@@ -73,10 +160,47 @@ export default async function PracticeLibraryPage() {
                   </Text>
                 </header>
 
-                {practiceList.length === 0 ? (
+                {(categories.length > 1 || contentTypes.length > 1) && allPractices.length > 0 ? (
+                  <Stack gap="sm">
+                    <FilterRow
+                      label="Category"
+                      active={activeCategory}
+                      options={categories.map((value) => ({ value, label: value }))}
+                      hrefFor={(value) =>
+                        filterHref({ category: value, contentType: activeContentType })
+                      }
+                    />
+                    <FilterRow
+                      label="Type"
+                      active={activeContentType}
+                      options={contentTypes.map((value) => ({
+                        value,
+                        label: formatContentTypeLabel(value),
+                      }))}
+                      hrefFor={(value) =>
+                        filterHref({ category: activeCategory, contentType: value })
+                      }
+                    />
+                  </Stack>
+                ) : null}
+
+                {allPractices.length === 0 ? (
                   <EmptyState
                     title="Practices are being prepared."
                     description="The practice library will appear here as content becomes available."
+                  />
+                ) : practiceList.length === 0 ? (
+                  <EmptyState
+                    title="No practices match these filters."
+                    description="Try a different category or type, or clear the filters to see the full library."
+                    action={
+                      <NextLink
+                        href="/dashboard/practices"
+                        className={buttonVariants({ variant: 'outline', size: 'sm' })}
+                      >
+                        Clear filters
+                      </NextLink>
+                    }
                   />
                 ) : (
                   <Grid cols="2" gap="lg">
