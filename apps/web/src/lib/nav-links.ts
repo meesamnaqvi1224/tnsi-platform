@@ -19,7 +19,7 @@ export const footerColumns = [
   {
     title: 'Programs',
     links: [
-      { label: 'Life Beyond Trauma', href: '/method' },
+      { label: 'Life Beyond Trauma', href: '/programs/life-beyond-trauma' },
       { label: 'Practitioner Certification', href: '/programs/practitioner-certification' },
       { label: 'Executive Advisory', href: '/programs/executive-advisory' },
     ],
