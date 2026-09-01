@@ -34,7 +34,7 @@ export const executiveAdvisoryContent = {
       { label: 'Delivery', value: 'Virtual & In-Person' },
     ],
     primaryCta: { label: 'Book an Executive Consultation', href: '/book-a-call' },
-    secondaryCta: { label: 'Request Advisory Overview', href: '/contact' },
+    secondaryCta: { label: 'Request Advisory Overview', href: '/prospectus/executive-advisory' },
   },
 
   challenge: {

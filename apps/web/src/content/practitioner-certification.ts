@@ -35,7 +35,7 @@ export const practitionerCertificationContent = {
       { label: 'Credential', value: 'TNSI Certification' },
     ],
     primaryCta: { label: 'Book a Discovery Call', href: '/book-a-call' },
-    secondaryCta: { label: 'Request Prospectus', href: '/contact' },
+    secondaryCta: { label: 'Request Prospectus', href: '/prospectus/practitioner-certification' },
   },
 
   audience: {
@@ -179,7 +179,7 @@ export const practitionerCertificationContent = {
     supportingCopy:
       'Join a growing community of practitioners committed to delivering safer, evidence-informed care.',
     primaryCta: { label: 'Book a Discovery Call', href: '/book-a-call' },
-    secondaryCta: { label: 'Request Prospectus', href: '/contact' },
+    secondaryCta: { label: 'Request Prospectus', href: '/prospectus/practitioner-certification' },
   },
 
   footerQuote: {
