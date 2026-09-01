@@ -39,11 +39,6 @@ const nextConfig: NextConfig = {
         destination: '/terms',
         permanent: true,
       },
-      {
-        source: '/programs/life-beyond-trauma',
-        destination: '/method',
-        permanent: false,
-      },
     ];
   },
 };

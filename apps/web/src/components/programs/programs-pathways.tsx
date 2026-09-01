@@ -37,7 +37,10 @@ export function ProgramsPathways() {
 
                       <Stack gap="lg">
                         <Stack gap="md">
-                          {pathway.paragraphs.map((paragraph) => (
+                          {/* Hub shows a teaser only (first approved paragraph); the full
+                              paragraph set stays on the pathway's own dedicated page, so
+                              clicking through adds real depth instead of repeating verbatim. */}
+                          {pathway.paragraphs.slice(0, 1).map((paragraph) => (
                             <Text
                               key={paragraph}
                               tone="muted"
