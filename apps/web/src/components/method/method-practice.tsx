@@ -45,7 +45,11 @@ export function MethodPractice() {
         </Container>
       </Section>
 
-      <Section spacing="xl" className="border-border border-t" aria-label={evolving.heading}>
+      <Section
+        spacing="xl"
+        className="border-border bg-secondary border-t"
+        aria-label={evolving.heading}
+      >
         <Container size="xl">
           <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-2 lg:gap-(--space-4xl)">
             <ChapterMarker index={evolving.chapter} as="h2" title={evolving.heading} />
