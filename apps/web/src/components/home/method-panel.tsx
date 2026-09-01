@@ -15,27 +15,46 @@ export function MethodPanel() {
       <div className="dark bg-background text-foreground flex items-center px-(--space-lg) py-(--space-4xl) sm:px-(--space-2xl) lg:col-span-2 lg:px-(--space-3xl) lg:py-(--space-5xl)">
         <FadeIn>
           <Stack gap="md" className="max-w-md">
-            <Eyebrow className="text-muted-foreground">The Method</Eyebrow>
+            <Eyebrow className="text-muted-foreground">Our Approach</Eyebrow>
             <Heading as="h2" id="method-heading" size="xl" className="text-3xl sm:text-4xl">
-              Life Beyond Trauma
+              Human Expansion Theory™
             </Heading>
             <Text tone="muted">
-              A proprietary methodology developed over fifteen years of clinical practice and
-              research. Integrating polyvagal theory, attachment science, and somatic approaches
-              into a coherent educational framework for lasting transformation.
+              The Human Expansion Theory™ is the conceptual foundation of The Nervous System
+              Institute. It explores how the conditions surrounding an individual influence their
+              capacity to grow, adapt, and participate throughout life.
             </Text>
-            <Link
-              as={
-                NextLink as unknown as React.ComponentType<
-                  React.AnchorHTMLAttributes<HTMLAnchorElement>
-                >
-              }
-              href="/programs/life-beyond-trauma"
-              tone="inherit"
-              className="font-medium"
-            >
-              Explore Life Beyond Trauma
-            </Link>
+            <Text tone="muted">
+              Life Beyond Trauma™ is the Institute&apos;s flagship educational pathway built on this
+              foundation — one of several pathways that each apply the theory within a different
+              context.
+            </Text>
+            <Stack direction="row" gap="md" wrap="wrap">
+              <Link
+                as={
+                  NextLink as unknown as React.ComponentType<
+                    React.AnchorHTMLAttributes<HTMLAnchorElement>
+                  >
+                }
+                href="/method"
+                tone="inherit"
+                className="font-medium"
+              >
+                Explore Human Expansion Theory™
+              </Link>
+              <Link
+                as={
+                  NextLink as unknown as React.ComponentType<
+                    React.AnchorHTMLAttributes<HTMLAnchorElement>
+                  >
+                }
+                href="/programs/life-beyond-trauma"
+                tone="inherit"
+                className="font-medium"
+              >
+                Explore Life Beyond Trauma
+              </Link>
+            </Stack>
           </Stack>
         </FadeIn>
       </div>

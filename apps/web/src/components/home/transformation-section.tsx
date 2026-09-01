@@ -1,4 +1,4 @@
-import { Container, Eyebrow } from '@tnsi/ui';
+import { Container } from '@tnsi/ui';
 import { FadeIn } from '@/components/utility/fade-in';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
 
@@ -20,21 +20,25 @@ export function TransformationSection() {
         className="object-cover"
         sizes="100vw"
       />
-      <div className="absolute inset-0 bg-black/60" aria-hidden />
+      {/* Deep Slate tint (not plain black) so this full-bleed treatment reads as a
+          deliberate variation on Editorial Pause's overlay, not a repeat of it. */}
+      <div className="absolute inset-0 bg-[var(--deep-slate)]/60" aria-hidden />
 
       <div className="dark text-foreground relative py-(--space-4xl)">
         <Container size="md" className="text-center">
           <FadeIn>
-            <Eyebrow className="text-muted-foreground mb-(--space-2xl)">What Changes</Eyebrow>
+            <h2
+              id="transformation-heading"
+              className="text-muted-foreground mb-(--space-2xl) text-xs font-medium tracking-[0.15em] uppercase"
+            >
+              What Changes
+            </h2>
           </FadeIn>
 
           <div className="flex flex-col items-center">
             {outcomes.map((outcome, index) => (
               <FadeIn key={outcome} delayMs={index * 90} className="flex flex-col items-center">
-                <p
-                  id={index === 0 ? 'transformation-heading' : undefined}
-                  className="font-heading text-foreground text-2xl font-medium tracking-tight sm:text-3xl"
-                >
+                <p className="font-heading text-foreground text-2xl font-medium tracking-tight sm:text-3xl">
                   {outcome}
                 </p>
                 {index < outcomes.length - 1 && (

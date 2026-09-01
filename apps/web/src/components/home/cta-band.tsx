@@ -1,5 +1,5 @@
 import NextLink from 'next/link';
-import { buttonVariants, Container, Heading, Section, Stack, Text } from '@tnsi/ui';
+import { buttonVariants, cn, Container, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { FadeIn } from '@/components/utility/fade-in';
 
 export function CtaBand() {
@@ -30,11 +30,17 @@ export function CtaBand() {
               </NextLink>
               <NextLink
                 href="/book-a-call"
-                className={buttonVariants({ variant: 'outline', size: 'lg' })}
+                className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'bg-card')}
               >
                 Book a Discovery Call
               </NextLink>
             </Stack>
+            <Text size="sm" tone="muted">
+              Or start lighter —{' '}
+              <NextLink href="/assessment" className="interaction-text-link-underline font-medium">
+                take the Capacity Assessment
+              </NextLink>
+            </Text>
           </Stack>
         </FadeIn>
       </Container>
