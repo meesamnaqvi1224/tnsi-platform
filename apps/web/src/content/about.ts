@@ -81,11 +81,12 @@ export const aboutContent = {
       'Her work explores the relationship between nervous system functioning, human capacity, and lifelong development, with a particular interest in how the conditions surrounding an individual shape their ability to learn, adapt, connect, lead, and participate in life.',
       'Through The Nervous System Institute, Caroline leads the development of educational programmes, professional training, original frameworks, and research initiatives dedicated to advancing the practical understanding of nervous system science.',
     ],
+    cta: { label: 'Meet the Faculty', href: '/faculty' },
   },
 
   glance: {
     eyebrow: 'The Institute at a Glance',
-    headline: 'Three pathways. One shared purpose.',
+    headline: 'Three audiences. One shared purpose.',
     items: [
       {
         title: 'For Individuals',

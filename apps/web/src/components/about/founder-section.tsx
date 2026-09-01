@@ -1,4 +1,6 @@
-import { Eyebrow, Heading, Stack, Text } from '@tnsi/ui';
+import type * as React from 'react';
+import NextLink from 'next/link';
+import { Eyebrow, Heading, Link, Stack, Text } from '@tnsi/ui';
 import { EditorialImage } from '@/components/utility/editorial-image';
 import { aboutImages } from '@/content/images';
 import { aboutContent } from '@/content/about';
@@ -32,6 +34,20 @@ export function FounderSection() {
               {paragraph}
             </Text>
           ))}
+          <div>
+            <Link
+              as={
+                NextLink as unknown as React.ComponentType<
+                  React.AnchorHTMLAttributes<HTMLAnchorElement>
+                >
+              }
+              href={founder.cta.href}
+              tone="inherit"
+              className="font-medium"
+            >
+              {founder.cta.label} →
+            </Link>
+          </div>
         </Stack>
       </div>
     </section>

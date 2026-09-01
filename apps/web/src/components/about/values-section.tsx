@@ -5,7 +5,7 @@ const { principles } = aboutContent;
 
 export function ValuesSection() {
   return (
-    <Section spacing="lg" className="bg-secondary" aria-labelledby="values-heading">
+    <Section spacing="lg" aria-labelledby="values-heading">
       <Container size="xl">
         <Stack gap="sm" className="max-w-2xl">
           <Eyebrow>{principles.eyebrow}</Eyebrow>

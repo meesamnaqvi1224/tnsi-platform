@@ -27,6 +27,12 @@ export function AboutClosing() {
             >
               {closing.cta.label}
             </NextLink>
+            <Text size="sm" tone="muted">
+              Or start lighter —{' '}
+              <NextLink href="/assessment" className="interaction-text-link-underline font-medium">
+                take the Capacity Assessment
+              </NextLink>
+            </Text>
           </Stack>
         </FadeIn>
       </Container>
