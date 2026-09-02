@@ -29,7 +29,7 @@ const STATIC_ROUTES = [
   '/cookies',
 ] as const;
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticEntries = STATIC_ROUTES.map((path) => ({
@@ -39,7 +39,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === '/' ? 1 : 0.8,
   }));
 
-  const articleEntries = getAllArticleSlugs().map((slug) => ({
+  const articleSlugs = await getAllArticleSlugs();
+  const articleEntries = articleSlugs.map((slug) => ({
     url: absoluteUrl(`/articles/${slug}`),
     lastModified: now,
     changeFrequency: 'monthly' as const,

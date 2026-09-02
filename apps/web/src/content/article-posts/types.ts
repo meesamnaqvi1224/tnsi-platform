@@ -57,10 +57,12 @@ export interface ArticlePost {
     };
   };
   body: ArticleBodyBlock[];
-  takeaways: string[];
+  /** Not part of the Sanity `article` schema — only the static demo template supplies these. */
+  takeaways?: string[];
   author: ArticleAuthor;
   related: RelatedArticle[];
-  footerQuote: {
+  /** Not part of the Sanity `article` schema — only the static demo template supplies this. */
+  footerQuote?: {
     quote: string;
     author: string;
   };

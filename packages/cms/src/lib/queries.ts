@@ -30,7 +30,10 @@ export const ARTICLE_BY_SLUG_QUERY = groq`
     author->{ name, role, bio, "photo": photo${imageProjection} },
     readingTime,
     publishedAt,
-    body,
+    body[]{
+      ...,
+      _type == "figure" => { "url": asset->url }
+    },
     seo,
     "related": relatedArticles[]->{
       title, "slug": slug.current, excerpt,

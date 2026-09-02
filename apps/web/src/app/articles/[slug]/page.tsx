@@ -19,12 +19,13 @@ interface ArticlePageProps {
 }
 
 export async function generateStaticParams() {
-  return getAllArticleSlugs().map((slug) => ({ slug }));
+  const slugs = await getAllArticleSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const article = await getArticleBySlug(slug);
 
   if (!article) {
     return createPageMetadata({
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: ArticlePageProps) {
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const article = await getArticleBySlug(slug);
 
   if (!article) {
     notFound();
@@ -81,21 +82,25 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
               <article id="article-content" className="min-w-0">
                 <ArticleBody blocks={article.body} />
-                <ArticleTakeaways items={article.takeaways} />
+                {article.takeaways && article.takeaways.length > 0 ? (
+                  <ArticleTakeaways items={article.takeaways} />
+                ) : null}
               </article>
             </div>
           </Container>
         </Section>
 
         <AuthorCard author={article.author} />
-        <RelatedArticles articles={article.related} />
+        {article.related.length > 0 ? <RelatedArticles articles={article.related} /> : null}
         <ArticleContinueLearning />
 
-        <Section spacing="md" className="border-border border-t">
-          <Container size="xl">
-            <PageQuote quote={article.footerQuote.quote} author={article.footerQuote.author} />
-          </Container>
-        </Section>
+        {article.footerQuote ? (
+          <Section spacing="md" className="border-border border-t">
+            <Container size="xl">
+              <PageQuote quote={article.footerQuote.quote} author={article.footerQuote.author} />
+            </Container>
+          </Section>
+        ) : null}
       </main>
       <SiteFooter />
     </>
