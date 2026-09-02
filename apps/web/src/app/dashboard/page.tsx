@@ -16,11 +16,16 @@ import {
   Text,
 } from '@tnsi/ui';
 import { CheckInForm } from '@/components/dashboard/check-in-form';
-import { SiteFooter } from '@/components/layout/site-footer';
-import { SiteHeader } from '@/components/layout/site-header';
 import { requireAuthOrRedirect } from '@/lib/auth-api';
 import { getTodayCheckIn } from '@/lib/check-ins';
-import { formatContentTypeLabel, formatPracticeDuration, getTodayPractice } from '@/lib/practices';
+import {
+  formatContentTypeLabel,
+  formatPracticeDuration,
+  getCompletedPracticeCount,
+  getInProgressPractices,
+  getRecentCompletions,
+  getTodayPractice,
+} from '@/lib/practices';
 import { createPageMetadata } from '@/lib/seo';
 import { getLatestArticles } from '@/content/cms/loaders';
 import { articlesContent } from '@/content/articles';
@@ -46,6 +51,8 @@ const TIER_LABELS: Record<Entitlement['tier'], string> = {
   lifetime: 'Lifetime Member',
 };
 
+const RECENT_COMPLETIONS_LIMIT = 5;
+
 const exploreLinks = [
   {
     title: 'Articles',
@@ -62,6 +69,11 @@ const exploreLinks = [
     description: "Find the pathway that's right for you.",
     href: '/programs',
   },
+  {
+    title: 'Capacity Assessment',
+    description: 'Not sure where to begin? Take the 2-minute Capacity Assessment.',
+    href: '/assessment',
+  },
 ] as const;
 
 /** Shared title style so Card headings match the site's serif display type instead of CardTitle's default sans style. */
@@ -71,7 +83,14 @@ export default async function DashboardPage() {
   const user = await requireAuthOrRedirect();
   const todayCheckIn = await getTodayCheckIn(user.id);
   const todayPractice = await getTodayPractice(user.id);
-  const latestArticles = await getLatestArticles();
+  const [inProgressPractices, completedCount, recentCompletions, latestArticles] =
+    await Promise.all([
+      getInProgressPractices(user.id, 1),
+      getCompletedPracticeCount(user.id),
+      getRecentCompletions(user.id, RECENT_COMPLETIONS_LIMIT),
+      getLatestArticles(),
+    ]);
+  const continuePractice = inProgressPractices[0] ?? null;
   const latestArticle = latestArticles[0] ?? null;
 
   const firstName = user.fullName?.trim().split(/\s+/)[0] || null;
@@ -84,7 +103,6 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <SiteHeader />
       <main id="main-content">
         <Section spacing="xl">
           <Container size="xl">
@@ -99,120 +117,201 @@ export default async function DashboardPage() {
                   </Text>
                 </header>
 
-                <Grid cols="2" gap="xl" className="items-start">
-                  <section aria-labelledby="access-heading">
-                    <Card>
-                      <CardHeader>
-                        <Eyebrow>Your Access</Eyebrow>
-                        <CardTitle id="access-heading" className={cardTitleClassName}>
-                          {accessLabel}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <Stack gap="sm">
-                          <Text tone="muted" className="text-base leading-[1.85]">
-                            {accessDescription}
-                          </Text>
-                          <NextLink
-                            href="/dashboard/billing"
-                            className="interaction-text-link-underline w-fit text-sm"
-                          >
-                            Manage billing
-                          </NextLink>
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  </section>
-
-                  <section aria-labelledby="checkin-heading">
-                    <Card>
-                      <CardHeader>
-                        <Eyebrow>Check In</Eyebrow>
-                        <CardTitle id="checkin-heading" className={cardTitleClassName}>
-                          {todayCheckIn ? "You've checked in today." : 'Pause for a moment.'}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <Stack gap="lg">
-                          <Text tone="muted" className="text-base leading-[1.85]">
-                            {todayCheckIn
-                              ? 'Take a moment to notice where you are, and return whenever you need to pause.'
-                              : 'Notice where you are today, without needing to change anything.'}
-                          </Text>
-
-                          {todayCheckIn ? null : <CheckInForm />}
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  </section>
-                </Grid>
-
-                <section aria-labelledby="practice-heading">
+                {/* Where am I */}
+                <section aria-labelledby="access-heading">
                   <Card>
                     <CardHeader>
-                      <Eyebrow>Today&rsquo;s Practice</Eyebrow>
-                      <CardTitle id="practice-heading" className={cardTitleClassName}>
-                        {todayPractice ? todayPractice.practice.title : "Today's Practice"}
+                      <Eyebrow>Your Access</Eyebrow>
+                      <CardTitle id="access-heading" className={cardTitleClassName}>
+                        {accessLabel}
                       </CardTitle>
-                      {todayPractice?.practice.description ? (
-                        <Text tone="muted" className="text-base leading-[1.85]">
-                          {todayPractice.practice.description}
-                        </Text>
-                      ) : null}
                     </CardHeader>
                     <CardContent>
-                      {todayPractice ? (
-                        <Stack gap="sm">
-                          <Text tone="muted" size="sm">
-                            {[
-                              formatContentTypeLabel(todayPractice.practice.contentType),
-                              formatPracticeDuration(todayPractice.practice.durationSeconds),
-                              todayPractice.practice.category,
-                            ]
-                              .filter(Boolean)
-                              .join(' · ')}
-                          </Text>
-
-                          {todayPractice.completed ? (
-                            <Text role="status" tone="muted">
-                              Completed
-                            </Text>
-                          ) : (
-                            <NextLink
-                              href={`/dashboard/practices/${todayPractice.practice.id}`}
-                              className={buttonVariants({ variant: 'primary', size: 'md' })}
-                            >
-                              Begin Practice
-                            </NextLink>
-                          )}
-
-                          <NextLink
-                            href="/dashboard/practices"
-                            className="interaction-text-link-underline w-fit"
-                          >
-                            View the Practice Library
-                          </NextLink>
-                        </Stack>
-                      ) : (
-                        <EmptyState
-                          title="Practices are being prepared."
-                          description="The practice library will appear here as content becomes available."
-                          action={
-                            <NextLink
-                              href="/dashboard/practices"
-                              className={buttonVariants({ variant: 'outline', size: 'sm' })}
-                            >
-                              Visit the Practice Library
-                            </NextLink>
-                          }
-                        />
-                      )}
+                      <Stack gap="sm">
+                        <Text tone="muted" className="text-base leading-[1.85]">
+                          {accessDescription}
+                        </Text>
+                        <NextLink
+                          href="/dashboard/billing"
+                          className="interaction-text-link-underline w-fit text-sm"
+                        >
+                          Manage billing
+                        </NextLink>
+                      </Stack>
                     </CardContent>
                   </Card>
                 </section>
 
+                {/* Today */}
+                <Stack gap="xl">
+                  <Eyebrow>Today</Eyebrow>
+                  <Grid cols="2" gap="xl" className="items-start">
+                    <section aria-labelledby="checkin-heading">
+                      <Card>
+                        <CardHeader>
+                          <Eyebrow>Check In</Eyebrow>
+                          <CardTitle id="checkin-heading" className={cardTitleClassName}>
+                            {todayCheckIn ? "You've checked in today." : 'Pause for a moment.'}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Stack gap="lg">
+                            <Text tone="muted" className="text-base leading-[1.85]">
+                              {todayCheckIn
+                                ? 'Take a moment to notice where you are, and return whenever you need to pause.'
+                                : 'Notice where you are today, without needing to change anything.'}
+                            </Text>
+
+                            {todayCheckIn ? null : <CheckInForm />}
+                          </Stack>
+                        </CardContent>
+                      </Card>
+                    </section>
+
+                    <section aria-labelledby="practice-heading">
+                      <Card>
+                        <CardHeader>
+                          <Eyebrow>Today&rsquo;s Practice</Eyebrow>
+                          <CardTitle id="practice-heading" className={cardTitleClassName}>
+                            {todayPractice ? todayPractice.practice.title : "Today's Practice"}
+                          </CardTitle>
+                          {todayPractice?.practice.description ? (
+                            <Text tone="muted" className="text-base leading-[1.85]">
+                              {todayPractice.practice.description}
+                            </Text>
+                          ) : null}
+                        </CardHeader>
+                        <CardContent>
+                          {todayPractice ? (
+                            <Stack gap="sm">
+                              <Text tone="muted" size="sm">
+                                {[
+                                  formatContentTypeLabel(todayPractice.practice.contentType),
+                                  formatPracticeDuration(todayPractice.practice.durationSeconds),
+                                  todayPractice.practice.category,
+                                ]
+                                  .filter(Boolean)
+                                  .join(' · ')}
+                              </Text>
+
+                              {todayPractice.completed ? (
+                                <Text role="status" tone="muted">
+                                  Completed
+                                </Text>
+                              ) : (
+                                <NextLink
+                                  href={`/dashboard/practices/${todayPractice.practice.id}`}
+                                  className={buttonVariants({ variant: 'primary', size: 'md' })}
+                                >
+                                  Begin Practice
+                                </NextLink>
+                              )}
+
+                              <NextLink
+                                href="/dashboard/practices"
+                                className="interaction-text-link-underline w-fit"
+                              >
+                                View the Practice Library
+                              </NextLink>
+                            </Stack>
+                          ) : (
+                            <EmptyState
+                              title="Practices are being prepared."
+                              description="The practice library will appear here as content becomes available."
+                              action={
+                                <NextLink
+                                  href="/dashboard/practices"
+                                  className={buttonVariants({ variant: 'outline', size: 'sm' })}
+                                >
+                                  Visit the Practice Library
+                                </NextLink>
+                              }
+                            />
+                          )}
+                        </CardContent>
+                      </Card>
+                    </section>
+                  </Grid>
+                </Stack>
+
+                {/* Continue where you left off — omitted entirely when there's nothing in progress. */}
+                {continuePractice ? (
+                  <section aria-labelledby="continue-heading">
+                    <Card>
+                      <CardHeader>
+                        <Eyebrow>Continue Where You Left Off</Eyebrow>
+                        <CardTitle id="continue-heading" className={cardTitleClassName}>
+                          {continuePractice.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <Stack gap="sm">
+                          <Text tone="muted" size="sm">
+                            {[
+                              formatContentTypeLabel(continuePractice.contentType),
+                              formatPracticeDuration(continuePractice.durationSeconds),
+                              `${Math.round(continuePractice.progressPct * 100)}% complete`,
+                            ]
+                              .filter(Boolean)
+                              .join(' · ')}
+                          </Text>
+                          <NextLink
+                            href={`/dashboard/practices/${continuePractice.id}`}
+                            className={buttonVariants({ variant: 'primary', size: 'md' })}
+                          >
+                            Resume Practice
+                          </NextLink>
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </section>
+                ) : null}
+
+                {/* Completed — omitted entirely for a member with nothing completed yet. */}
+                {completedCount > 0 ? (
+                  <section aria-labelledby="completed-heading">
+                    <Stack gap="lg">
+                      <Stack gap="sm">
+                        <Eyebrow>Completed</Eyebrow>
+                        <Heading as="h2" id="completed-heading" size="md">
+                          {completedCount}{' '}
+                          {completedCount === 1 ? 'practice completed' : 'practices completed'}
+                        </Heading>
+                      </Stack>
+
+                      <ul className="flex flex-col gap-(--space-md)">
+                        {recentCompletions.map((practice) => (
+                          <li key={practice.id} className="border-border border-t pt-(--space-md)">
+                            <NextLink
+                              href={`/dashboard/practices/${practice.id}`}
+                              className="interaction-colors interaction-focus font-heading text-foreground hover:text-muted-foreground w-fit text-base font-semibold"
+                            >
+                              {practice.title}
+                            </NextLink>
+                            <Text tone="muted" size="sm">
+                              {[
+                                formatContentTypeLabel(practice.contentType),
+                                practice.completedAt
+                                  ? new Date(practice.completedAt).toLocaleDateString('en-GB', {
+                                      day: 'numeric',
+                                      month: 'long',
+                                      year: 'numeric',
+                                    })
+                                  : null,
+                              ]
+                                .filter(Boolean)
+                                .join(' · ')}
+                            </Text>
+                          </li>
+                        ))}
+                      </ul>
+                    </Stack>
+                  </section>
+                ) : null}
+
                 <Divider />
 
+                {/* Next */}
                 <section aria-labelledby="explore-heading">
                   <Stack gap="xl">
                     <Stack gap="sm">
@@ -302,7 +401,6 @@ export default async function DashboardPage() {
           </Container>
         </Section>
       </main>
-      <SiteFooter />
     </>
   );
 }

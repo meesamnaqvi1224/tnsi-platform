@@ -13,14 +13,12 @@ import {
   Stack,
   Text,
 } from '@tnsi/ui';
-import { SiteFooter } from '@/components/layout/site-footer';
-import { SiteHeader } from '@/components/layout/site-header';
 import { requireAuthOrRedirect } from '@/lib/auth-api';
 import {
   formatContentTypeLabel,
   formatPracticeDuration,
+  getPracticeCompletion,
   getPublishedPractices,
-  isPracticeCompleted,
 } from '@/lib/practices';
 import { createPageMetadata } from '@/lib/seo';
 
@@ -134,17 +132,18 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
     return true;
   });
 
-  // Reuses the existing per-practice `isPracticeCompleted` lookup (same
+  // Reuses the existing per-practice `getPracticeCompletion` lookup (same
   // query the practice detail page already runs) rather than introducing a
   // new batched query — run in parallel so N practices cost one round of
-  // concurrent indexed lookups, not N sequential ones.
+  // concurrent indexed lookups, not N sequential ones. Already carries
+  // `progressPct`, so "In progress" needs no extra query beyond what
+  // "Completed" already required.
   const completions = await Promise.all(
-    practiceList.map((practice) => isPracticeCompleted(user.id, practice.id)),
+    practiceList.map((practice) => getPracticeCompletion(user.id, practice.id)),
   );
 
   return (
     <>
-      <SiteHeader />
       <main id="main-content">
         <Section spacing="xl">
           <Container size="xl">
@@ -204,46 +203,55 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                   />
                 ) : (
                   <Grid cols="2" gap="lg">
-                    {practiceList.map((practice, index) => (
-                      <NextLink
-                        key={practice.id}
-                        href={`/dashboard/practices/${practice.id}`}
-                        className="interaction-focus interaction-colors rounded-lg"
-                      >
-                        <Card className="hover:border-foreground/40 duration-base ease-standard h-full transition-colors">
-                          <CardHeader>
-                            <Stack
-                              direction="row"
-                              gap="sm"
-                              className="items-center justify-between"
-                            >
-                              <Text tone="muted" size="xs" className="tracking-[0.1em] uppercase">
-                                {practiceMeta(practice)}
-                              </Text>
-                              {completions[index] ? (
-                                <Text role="status" tone="muted" size="xs" className="shrink-0">
-                                  Completed
+                    {practiceList.map((practice, index) => {
+                      const completion = completions[index];
+                      const statusLabel = completion?.completed
+                        ? 'Completed'
+                        : completion && completion.progressPct > 0
+                          ? 'In progress'
+                          : null;
+
+                      return (
+                        <NextLink
+                          key={practice.id}
+                          href={`/dashboard/practices/${practice.id}`}
+                          className="interaction-focus interaction-colors rounded-lg"
+                        >
+                          <Card className="hover:border-foreground/40 duration-base ease-standard h-full transition-colors">
+                            <CardHeader>
+                              <Stack
+                                direction="row"
+                                gap="sm"
+                                className="items-center justify-between"
+                              >
+                                <Text tone="muted" size="xs" className="tracking-[0.1em] uppercase">
+                                  {practiceMeta(practice)}
                                 </Text>
-                              ) : null}
-                            </Stack>
-                            <Heading
-                              as="h2"
-                              size="xs"
-                              className="font-heading text-foreground text-lg font-semibold"
-                            >
-                              {practice.title}
-                            </Heading>
-                          </CardHeader>
-                          {practice.description ? (
-                            <CardContent>
-                              <Text tone="muted" className="text-sm leading-[1.7]">
-                                {practice.description}
-                              </Text>
-                            </CardContent>
-                          ) : null}
-                        </Card>
-                      </NextLink>
-                    ))}
+                                {statusLabel ? (
+                                  <Text role="status" tone="muted" size="xs" className="shrink-0">
+                                    {statusLabel}
+                                  </Text>
+                                ) : null}
+                              </Stack>
+                              <Heading
+                                as="h2"
+                                size="xs"
+                                className="font-heading text-foreground text-lg font-semibold"
+                              >
+                                {practice.title}
+                              </Heading>
+                            </CardHeader>
+                            {practice.description ? (
+                              <CardContent>
+                                <Text tone="muted" className="text-sm leading-[1.7]">
+                                  {practice.description}
+                                </Text>
+                              </CardContent>
+                            ) : null}
+                          </Card>
+                        </NextLink>
+                      );
+                    })}
                   </Grid>
                 )}
               </Stack>
@@ -251,7 +259,6 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
           </Container>
         </Section>
       </main>
-      <SiteFooter />
     </>
   );
 }

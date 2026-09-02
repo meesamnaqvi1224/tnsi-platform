@@ -1,5 +1,5 @@
 import { db, practices, practiceCompletions } from '@tnsi/db';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc, gt, count } from 'drizzle-orm';
 
 /**
  * Fields the member-facing UI is allowed to see. Deliberately excludes
@@ -132,6 +132,95 @@ export async function getPracticeCompletion(
     )
     .limit(1);
   return result[0] ?? null;
+}
+
+export interface InProgressPractice extends PracticeSummary {
+  progressPct: number;
+  positionSeconds: number;
+  lastPlayedAt: Date;
+}
+
+/**
+ * Practices this user has started but not finished, most recently played
+ * first — powers "Continue where you left off". Reads only the existing
+ * `progressPct`/`positionSeconds`/`lastPlayedAt` columns the practice player
+ * already writes (see `PracticePlayer`'s `persistProgress`); no new
+ * progress calculation.
+ */
+export async function getInProgressPractices(
+  userId: string,
+  limit: number,
+): Promise<InProgressPractice[]> {
+  return db
+    .select({
+      ...PRACTICE_SUMMARY_COLUMNS,
+      progressPct: practiceCompletions.progressPct,
+      positionSeconds: practiceCompletions.positionSeconds,
+      lastPlayedAt: practiceCompletions.lastPlayedAt,
+    })
+    .from(practiceCompletions)
+    .innerJoin(practices, eq(practiceCompletions.practiceId, practices.id))
+    .where(
+      and(
+        eq(practiceCompletions.userId, userId),
+        eq(practiceCompletions.completed, false),
+        gt(practiceCompletions.progressPct, 0),
+        eq(practices.isPublished, true),
+      ),
+    )
+    .orderBy(desc(practiceCompletions.lastPlayedAt))
+    .limit(limit);
+}
+
+export interface CompletedPractice extends PracticeSummary {
+  completedAt: Date | null;
+}
+
+/**
+ * This user's most recently completed practices, newest first — powers the
+ * dashboard's "Completed" summary list. Reads the existing `completedAt`
+ * column only.
+ */
+export async function getRecentCompletions(
+  userId: string,
+  limit: number,
+): Promise<CompletedPractice[]> {
+  return db
+    .select({
+      ...PRACTICE_SUMMARY_COLUMNS,
+      completedAt: practiceCompletions.completedAt,
+    })
+    .from(practiceCompletions)
+    .innerJoin(practices, eq(practiceCompletions.practiceId, practices.id))
+    .where(
+      and(
+        eq(practiceCompletions.userId, userId),
+        eq(practiceCompletions.completed, true),
+        eq(practices.isPublished, true),
+      ),
+    )
+    .orderBy(desc(practiceCompletions.completedAt))
+    .limit(limit);
+}
+
+/**
+ * Total completed-practice count for this user — a plain `COUNT(*)`, not a
+ * derived/invented metric, so the dashboard's "X completed" figure stays
+ * accurate even when the recent-completions list above is capped by `limit`.
+ */
+export async function getCompletedPracticeCount(userId: string): Promise<number> {
+  const [row] = await db
+    .select({ count: count() })
+    .from(practiceCompletions)
+    .innerJoin(practices, eq(practiceCompletions.practiceId, practices.id))
+    .where(
+      and(
+        eq(practiceCompletions.userId, userId),
+        eq(practiceCompletions.completed, true),
+        eq(practices.isPublished, true),
+      ),
+    );
+  return row?.count ?? 0;
 }
 
 /** "300" -> "5 min"; "90" -> "1 hr 30 min". `null` when no duration is set. */

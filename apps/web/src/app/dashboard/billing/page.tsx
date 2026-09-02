@@ -13,8 +13,6 @@ import {
   Text,
 } from '@tnsi/ui';
 import { ManageBillingButton, SubscribeButton } from '@/components/dashboard/billing-actions';
-import { SiteFooter } from '@/components/layout/site-footer';
-import { SiteHeader } from '@/components/layout/site-header';
 import { requireAuthOrRedirect } from '@/lib/auth-api';
 import { getBillingState } from '@/lib/billing';
 import { createPageMetadata } from '@/lib/seo';
@@ -54,7 +52,6 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
   return (
     <>
-      <SiteHeader />
       <main id="main-content">
         <Section spacing="xl">
           <Container size="xl">
@@ -123,7 +120,6 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
           </Container>
         </Section>
       </main>
-      <SiteFooter />
     </>
   );
 }

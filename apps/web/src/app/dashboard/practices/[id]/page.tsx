@@ -3,8 +3,6 @@ import NextLink from 'next/link';
 import { Container, Divider, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { PracticeCompleteButton } from '@/components/dashboard/practice-complete-button';
 import { PracticePlayer } from '@/components/dashboard/practice-player';
-import { SiteFooter } from '@/components/layout/site-footer';
-import { SiteHeader } from '@/components/layout/site-header';
 import { requireAuthOrRedirect } from '@/lib/auth-api';
 import {
   formatContentTypeLabel,
@@ -63,7 +61,6 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
 
   return (
     <>
-      <SiteHeader />
       <main id="main-content">
         <Section spacing="xl">
           <Container size="xl">
@@ -127,7 +124,6 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
           </Container>
         </Section>
       </main>
-      <SiteFooter />
     </>
   );
 }
