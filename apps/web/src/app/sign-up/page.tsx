@@ -11,15 +11,15 @@ export default function SignUpPage() {
     <main className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <SignUp
-          path="/sign-up"
           appearance={{
             elements: {
               formButtonPrimary: 'bg-neutral-900 hover:bg-neutral-800 text-white',
               card: 'shadow-lg border border-neutral-200 dark:border-neutral-800',
             },
           }}
-          routing="path"
+          routing="hash"
           signInUrl="/sign-in"
+          fallbackRedirectUrl="/dashboard"
         />
       </div>
     </main>

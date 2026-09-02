@@ -11,15 +11,15 @@ export default function SignInPage() {
     <main className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <SignIn
-          path="/sign-in"
           appearance={{
             elements: {
               formButtonPrimary: 'bg-neutral-900 hover:bg-neutral-800 text-white',
               card: 'shadow-lg border border-neutral-200 dark:border-neutral-800',
             },
           }}
-          routing="path"
+          routing="hash"
           signUpUrl="/sign-up"
+          fallbackRedirectUrl="/dashboard"
         />
       </div>
     </main>
