@@ -109,8 +109,11 @@ export default async function DashboardPage() {
             <div className="mx-auto max-w-5xl">
               <Stack gap="3xl">
                 <header className="border-border flex flex-col gap-(--space-md) border-b pb-(--space-2xl)">
+                  <Eyebrow>Academy Home</Eyebrow>
                   <Heading as="h1" size="xl">
-                    {firstName ? `Welcome, ${firstName}.` : 'Welcome.'}
+                    {firstName
+                      ? `Welcome to the Academy, ${firstName}.`
+                      : 'Welcome to the Academy.'}
                   </Heading>
                   <Text tone="muted" className="text-base leading-[1.85] lg:text-lg">
                     Your space for exploring the work of The Nervous System Institute.
