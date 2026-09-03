@@ -223,6 +223,28 @@ export async function getCompletedPracticeCount(userId: string): Promise<number>
   return row?.count ?? 0;
 }
 
+/**
+ * Total in-progress-practice count for this user — a plain `COUNT(*)`,
+ * mirroring `getCompletedPracticeCount` above, so the dashboard's "X in
+ * progress" figure stays accurate even when the in-progress list shown is
+ * capped by `limit`.
+ */
+export async function getInProgressPracticeCount(userId: string): Promise<number> {
+  const [row] = await db
+    .select({ count: count() })
+    .from(practiceCompletions)
+    .innerJoin(practices, eq(practiceCompletions.practiceId, practices.id))
+    .where(
+      and(
+        eq(practiceCompletions.userId, userId),
+        eq(practiceCompletions.completed, false),
+        gt(practiceCompletions.progressPct, 0),
+        eq(practices.isPublished, true),
+      ),
+    );
+  return row?.count ?? 0;
+}
+
 /** "300" -> "5 min"; "90" -> "1 hr 30 min". `null` when no duration is set. */
 export function formatPracticeDuration(seconds: number | null): string | null {
   if (!seconds || seconds <= 0) return null;

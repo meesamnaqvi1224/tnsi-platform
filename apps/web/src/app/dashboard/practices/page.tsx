@@ -34,13 +34,13 @@ export const metadata = createPageMetadata({
   noIndex: true,
 });
 
-function practiceMeta(practice: {
-  contentType: string;
+/** Meta line below the title — content type has its own badge, so this excludes it. */
+function practiceSecondaryMeta(practice: {
   durationSeconds: number | null;
   category: string | null;
   difficulty: number;
 }): string {
-  const parts = [formatContentTypeLabel(practice.contentType)];
+  const parts: string[] = [];
   const duration = formatPracticeDuration(practice.durationSeconds);
   if (duration) parts.push(duration);
   if (practice.category) parts.push(practice.category);
@@ -338,22 +338,29 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                                 gap="sm"
                                 className="items-center justify-between"
                               >
-                                <Text tone="muted" size="xs" className="tracking-[0.1em] uppercase">
-                                  {practiceMeta(practice)}
-                                </Text>
+                                <Badge variant="outline">
+                                  {formatContentTypeLabel(practice.contentType)}
+                                </Badge>
                                 {statusLabel ? (
-                                  <Text role="status" tone="muted" size="xs" className="shrink-0">
+                                  <Badge
+                                    role="status"
+                                    variant={completion?.completed ? 'success' : 'secondary'}
+                                    className="shrink-0"
+                                  >
                                     {statusLabel}
-                                  </Text>
+                                  </Badge>
                                 ) : null}
                               </Stack>
                               <Heading
                                 as="h2"
                                 size="xs"
-                                className="font-heading text-foreground text-lg font-semibold"
+                                className="font-heading text-foreground mt-(--space-xs) text-lg font-semibold"
                               >
                                 {practice.title}
                               </Heading>
+                              <Text tone="muted" size="xs" className="tracking-[0.02em]">
+                                {practiceSecondaryMeta(practice)}
+                              </Text>
                             </CardHeader>
                             {practice.description || practice.tags.length > 0 ? (
                               <CardContent>

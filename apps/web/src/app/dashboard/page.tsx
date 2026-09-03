@@ -22,6 +22,7 @@ import {
   formatContentTypeLabel,
   formatPracticeDuration,
   getCompletedPracticeCount,
+  getInProgressPracticeCount,
   getInProgressPractices,
   getRecentCompletions,
   getTodayPractice,
@@ -52,6 +53,7 @@ const TIER_LABELS: Record<Entitlement['tier'], string> = {
 };
 
 const RECENT_COMPLETIONS_LIMIT = 5;
+const IN_PROGRESS_LIMIT = 5;
 
 const exploreLinks = [
   {
@@ -79,18 +81,34 @@ const exploreLinks = [
 /** Shared title style so Card headings match the site's serif display type instead of CardTitle's default sans style. */
 const cardTitleClassName = 'font-heading text-2xl font-semibold tracking-tight text-foreground';
 
+/** Shared "type · duration · X% complete" meta line for an in-progress practice. */
+function inProgressMeta(practice: {
+  contentType: string;
+  durationSeconds: number | null;
+  progressPct: number;
+}): string {
+  return [
+    formatContentTypeLabel(practice.contentType),
+    formatPracticeDuration(practice.durationSeconds),
+    `${Math.round(practice.progressPct * 100)}% complete`,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
 export default async function DashboardPage() {
   const user = await requireAuthOrRedirect();
   const todayCheckIn = await getTodayCheckIn(user.id);
   const todayPractice = await getTodayPractice(user.id);
-  const [inProgressPractices, completedCount, recentCompletions, latestArticles] =
+  const [inProgressPractices, inProgressCount, completedCount, recentCompletions, latestArticles] =
     await Promise.all([
-      getInProgressPractices(user.id, 1),
+      getInProgressPractices(user.id, IN_PROGRESS_LIMIT),
+      getInProgressPracticeCount(user.id),
       getCompletedPracticeCount(user.id),
       getRecentCompletions(user.id, RECENT_COMPLETIONS_LIMIT),
       getLatestArticles(),
     ]);
-  const continuePractice = inProgressPractices[0] ?? null;
+  const [continuePractice, ...moreInProgress] = inProgressPractices;
   const latestArticle = latestArticles[0] ?? null;
 
   const firstName = user.fullName?.trim().split(/\s+/)[0] || null;
@@ -134,6 +152,10 @@ export default async function DashboardPage() {
                         <Text tone="muted" className="text-base leading-[1.85]">
                           {accessDescription}
                         </Text>
+                        <Text tone="muted" size="sm">
+                          {completedCount} {completedCount === 1 ? 'practice' : 'practices'}{' '}
+                          completed · {inProgressCount} in progress
+                        </Text>
                         <NextLink
                           href="/dashboard/billing"
                           className="interaction-text-link-underline w-fit text-sm"
@@ -144,6 +166,68 @@ export default async function DashboardPage() {
                     </CardContent>
                   </Card>
                 </section>
+
+                {/* Continue Learning — prioritized above Today's Practice whenever there's
+                    unfinished work; omitted entirely when there's nothing in progress. */}
+                {continuePractice ? (
+                  <section aria-labelledby="continue-heading">
+                    <Stack gap="lg">
+                      <Eyebrow>Continue Learning</Eyebrow>
+
+                      <Card>
+                        <CardHeader>
+                          <Eyebrow>Continue Where You Left Off</Eyebrow>
+                          <CardTitle id="continue-heading" className={cardTitleClassName}>
+                            {continuePractice.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Stack gap="sm">
+                            <Text tone="muted" size="sm">
+                              {inProgressMeta(continuePractice)}
+                            </Text>
+                            <NextLink
+                              href={`/dashboard/practices/${continuePractice.id}`}
+                              className={buttonVariants({ variant: 'primary', size: 'md' })}
+                            >
+                              Resume Practice
+                            </NextLink>
+                          </Stack>
+                        </CardContent>
+                      </Card>
+
+                      {moreInProgress.length > 0 ? (
+                        <ul className="flex flex-col gap-(--space-md)">
+                          {moreInProgress.map((practice) => (
+                            <li
+                              key={practice.id}
+                              className="border-border border-t pt-(--space-md)"
+                            >
+                              <NextLink
+                                href={`/dashboard/practices/${practice.id}`}
+                                className="interaction-colors interaction-focus font-heading text-foreground hover:text-muted-foreground w-fit text-base font-semibold"
+                              >
+                                {practice.title}
+                              </NextLink>
+                              <Text tone="muted" size="sm">
+                                {inProgressMeta(practice)}
+                              </Text>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+
+                      {inProgressCount > inProgressPractices.length ? (
+                        <NextLink
+                          href="/dashboard/practices?status=in-progress"
+                          className="interaction-text-link-underline w-fit"
+                        >
+                          View all in-progress practices
+                        </NextLink>
+                      ) : null}
+                    </Stack>
+                  </section>
+                ) : null}
 
                 {/* Today */}
                 <Stack gap="xl">
@@ -192,6 +276,7 @@ export default async function DashboardPage() {
                                   formatContentTypeLabel(todayPractice.practice.contentType),
                                   formatPracticeDuration(todayPractice.practice.durationSeconds),
                                   todayPractice.practice.category,
+                                  `Level ${todayPractice.practice.difficulty}`,
                                 ]
                                   .filter(Boolean)
                                   .join(' · ')}
@@ -236,45 +321,6 @@ export default async function DashboardPage() {
                     </section>
                   </Grid>
                 </Stack>
-
-                {/* Continue where you left off — omitted entirely when there's nothing in progress. */}
-                {continuePractice ? (
-                  <section aria-labelledby="continue-heading">
-                    <Card>
-                      <CardHeader>
-                        <Eyebrow>Continue Where You Left Off</Eyebrow>
-                        <CardTitle id="continue-heading" className={cardTitleClassName}>
-                          {continuePractice.title}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <Stack gap="sm">
-                          <Text tone="muted" size="sm">
-                            {[
-                              formatContentTypeLabel(continuePractice.contentType),
-                              formatPracticeDuration(continuePractice.durationSeconds),
-                              `${Math.round(continuePractice.progressPct * 100)}% complete`,
-                            ]
-                              .filter(Boolean)
-                              .join(' · ')}
-                          </Text>
-                          <NextLink
-                            href={`/dashboard/practices/${continuePractice.id}`}
-                            className={buttonVariants({ variant: 'primary', size: 'md' })}
-                          >
-                            Resume Practice
-                          </NextLink>
-                          <NextLink
-                            href="/dashboard/practices?status=in-progress"
-                            className="interaction-text-link-underline w-fit"
-                          >
-                            View all in-progress practices
-                          </NextLink>
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  </section>
-                ) : null}
 
                 {/* Completed — omitted entirely for a member with nothing completed yet. */}
                 {completedCount > 0 ? (

@@ -127,6 +127,11 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
 
                 <Stack gap="lg">
                   <Eyebrow>Practice</Eyebrow>
+                  {!completed && completion && completion.progressPct > 0 ? (
+                    <Text role="status" tone="muted" size="sm">
+                      {Math.round(completion.progressPct * 100)}% complete
+                    </Text>
+                  ) : null}
                   <PracticeCompleteButton practiceId={practice.id} initialCompleted={completed} />
                 </Stack>
               </Stack>
