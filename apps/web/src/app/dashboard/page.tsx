@@ -264,6 +264,12 @@ export default async function DashboardPage() {
                           >
                             Resume Practice
                           </NextLink>
+                          <NextLink
+                            href="/dashboard/practices?status=in-progress"
+                            className="interaction-text-link-underline w-fit"
+                          >
+                            View all in-progress practices
+                          </NextLink>
                         </Stack>
                       </CardContent>
                     </Card>
@@ -395,7 +401,7 @@ export default async function DashboardPage() {
                     </Heading>
                     <Text tone="muted" className="text-base leading-[1.85]">
                       Manage your account details and sign-in settings from the account menu in the
-                      site header.
+                      top navigation.
                     </Text>
                   </Stack>
                 </section>

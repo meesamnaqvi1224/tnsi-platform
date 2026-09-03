@@ -1,3 +1,11 @@
+/**
+ * Standalone public API surface for a single practice, mirroring
+ * `lib/practices.ts`'s `getPublishedPracticeById`. Not currently called by
+ * this app's own UI — the practice detail page queries Postgres directly
+ * via `lib/practices.ts` instead — so this exists for a future
+ * external/mobile client rather than this web app itself. Kept, not
+ * removed, in case one already depends on it.
+ */
 import { getAuthUser } from '@/lib/auth-api';
 import { db } from '@tnsi/db';
 import { practices, practiceCompletions } from '@tnsi/db/schema';

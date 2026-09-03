@@ -1,5 +1,6 @@
 import NextLink from 'next/link';
 import {
+  Badge,
   buttonVariants,
   Card,
   CardContent,
@@ -9,6 +10,8 @@ import {
   Eyebrow,
   Grid,
   Heading,
+  Input,
+  Label,
   Section,
   Stack,
   Text,
@@ -19,6 +22,8 @@ import {
   formatPracticeDuration,
   getPracticeCompletion,
   getPublishedPractices,
+  type PracticeCompletionState,
+  type PracticeSummary,
 } from '@/lib/practices';
 import { createPageMetadata } from '@/lib/seo';
 
@@ -39,18 +44,38 @@ function practiceMeta(practice: {
   const duration = formatPracticeDuration(practice.durationSeconds);
   if (duration) parts.push(duration);
   if (practice.category) parts.push(practice.category);
+  parts.push(`Level ${practice.difficulty}`);
   return parts.join(' · ');
 }
 
+type StatusFilter = 'in-progress' | 'completed';
+
+const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
+  { value: 'in-progress', label: 'In Progress' },
+  { value: 'completed', label: 'Completed' },
+];
+
 interface PracticeLibraryPageProps {
-  searchParams: Promise<{ category?: string; contentType?: string }>;
+  searchParams: Promise<{
+    category?: string;
+    contentType?: string;
+    status?: string;
+    q?: string;
+  }>;
 }
 
-/** Builds a `/dashboard/practices` link carrying whichever filters are still active. */
-function filterHref(params: { category?: string; contentType?: string }): string {
+/** Builds a `/dashboard/practices` link carrying whichever filters/search are still active. */
+function filterHref(params: {
+  category?: string;
+  contentType?: string;
+  status?: string;
+  q?: string;
+}): string {
   const search = new URLSearchParams();
   if (params.category) search.set('category', params.category);
   if (params.contentType) search.set('contentType', params.contentType);
+  if (params.status) search.set('status', params.status);
+  if (params.q) search.set('q', params.q);
   const query = search.toString();
   return query ? `/dashboard/practices?${query}` : '/dashboard/practices';
 }
@@ -104,10 +129,31 @@ function FilterRow({
   );
 }
 
+function matchesStatus(
+  status: StatusFilter | undefined,
+  completion: PracticeCompletionState | null,
+): boolean {
+  if (!status) return true;
+  if (status === 'completed') return completion?.completed ?? false;
+  return !completion?.completed && (completion?.progressPct ?? 0) > 0;
+}
+
+function matchesQuery(q: string, practice: PracticeSummary): boolean {
+  if (!q) return true;
+  const haystack = `${practice.title} ${practice.description ?? ''}`.toLowerCase();
+  return haystack.includes(q);
+}
+
 export default async function PracticeLibraryPage({ searchParams }: PracticeLibraryPageProps) {
   const user = await requireAuthOrRedirect();
-  const { category: categoryParam, contentType: contentTypeParam } = await searchParams;
+  const {
+    category: categoryParam,
+    contentType: contentTypeParam,
+    status: statusParam,
+    q: qParam,
+  } = await searchParams;
   const allPractices = await getPublishedPractices();
+  const q = (qParam ?? '').trim().toLowerCase();
 
   // Filter option lists are derived from the real, currently-published
   // practices — same principle as the Articles category filter — rather
@@ -125,22 +171,30 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
     categoryParam && categories.includes(categoryParam) ? categoryParam : undefined;
   const activeContentType =
     contentTypeParam && contentTypes.includes(contentTypeParam) ? contentTypeParam : undefined;
+  const activeStatus =
+    statusParam && STATUS_OPTIONS.some((o) => o.value === statusParam)
+      ? (statusParam as StatusFilter)
+      : undefined;
 
-  const practiceList = allPractices.filter((practice) => {
-    if (activeCategory && practice.category !== activeCategory) return false;
-    if (activeContentType && practice.contentType !== activeContentType) return false;
-    return true;
-  });
-
-  // Reuses the existing per-practice `getPracticeCompletion` lookup (same
-  // query the practice detail page already runs) rather than introducing a
-  // new batched query — run in parallel so N practices cost one round of
-  // concurrent indexed lookups, not N sequential ones. Already carries
-  // `progressPct`, so "In progress" needs no extra query beyond what
-  // "Completed" already required.
+  // Completions are fetched for every published practice up front — status
+  // is an orthogonal filter (like category/type), not a narrowing of an
+  // already-filtered list, so every practice needs its completion state
+  // regardless of which other filters are active. Reuses the existing
+  // per-practice `getPracticeCompletion` lookup (same query the practice
+  // detail page already runs), run in parallel.
   const completions = await Promise.all(
-    practiceList.map((practice) => getPracticeCompletion(user.id, practice.id)),
+    allPractices.map((practice) => getPracticeCompletion(user.id, practice.id)),
   );
+
+  const practiceList = allPractices
+    .map((practice, index) => ({ practice, completion: completions[index] ?? null }))
+    .filter(({ practice, completion }) => {
+      if (activeCategory && practice.category !== activeCategory) return false;
+      if (activeContentType && practice.contentType !== activeContentType) return false;
+      if (!matchesStatus(activeStatus, completion)) return false;
+      if (!matchesQuery(q, practice)) return false;
+      return true;
+    });
 
   return (
     <>
@@ -159,27 +213,88 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                   </Text>
                 </header>
 
-                {(categories.length > 1 || contentTypes.length > 1) && allPractices.length > 0 ? (
-                  <Stack gap="sm">
-                    <FilterRow
-                      label="Category"
-                      active={activeCategory}
-                      options={categories.map((value) => ({ value, label: value }))}
-                      hrefFor={(value) =>
-                        filterHref({ category: value, contentType: activeContentType })
-                      }
-                    />
-                    <FilterRow
-                      label="Type"
-                      active={activeContentType}
-                      options={contentTypes.map((value) => ({
-                        value,
-                        label: formatContentTypeLabel(value),
-                      }))}
-                      hrefFor={(value) =>
-                        filterHref({ category: activeCategory, contentType: value })
-                      }
-                    />
+                {allPractices.length > 0 ? (
+                  <Stack gap="lg">
+                    <form
+                      method="get"
+                      action="/dashboard/practices"
+                      className="flex flex-col gap-(--space-sm) sm:flex-row sm:items-end"
+                    >
+                      {activeCategory ? (
+                        <input type="hidden" name="category" value={activeCategory} />
+                      ) : null}
+                      {activeContentType ? (
+                        <input type="hidden" name="contentType" value={activeContentType} />
+                      ) : null}
+                      {activeStatus ? (
+                        <input type="hidden" name="status" value={activeStatus} />
+                      ) : null}
+                      <Stack gap="2xs" className="w-full sm:max-w-xs">
+                        <Label htmlFor="practice-search" className="sr-only">
+                          Search practices
+                        </Label>
+                        <Input
+                          id="practice-search"
+                          type="search"
+                          name="q"
+                          defaultValue={qParam ?? ''}
+                          placeholder="Search practices…"
+                        />
+                      </Stack>
+                      <button
+                        type="submit"
+                        className={buttonVariants({ variant: 'outline', size: 'sm' })}
+                      >
+                        Search
+                      </button>
+                    </form>
+
+                    <Stack gap="sm">
+                      <FilterRow
+                        label="Category"
+                        active={activeCategory}
+                        options={categories.map((value) => ({ value, label: value }))}
+                        hrefFor={(value) =>
+                          filterHref({
+                            category: value,
+                            contentType: activeContentType,
+                            status: activeStatus,
+                            q: qParam,
+                          })
+                        }
+                      />
+                      <FilterRow
+                        label="Type"
+                        active={activeContentType}
+                        options={contentTypes.map((value) => ({
+                          value,
+                          label: formatContentTypeLabel(value),
+                        }))}
+                        hrefFor={(value) =>
+                          filterHref({
+                            category: activeCategory,
+                            contentType: value,
+                            status: activeStatus,
+                            q: qParam,
+                          })
+                        }
+                      />
+                      {completions.some((c) => c) ? (
+                        <FilterRow
+                          label="Status"
+                          active={activeStatus}
+                          options={STATUS_OPTIONS}
+                          hrefFor={(value) =>
+                            filterHref({
+                              category: activeCategory,
+                              contentType: activeContentType,
+                              status: value,
+                              q: qParam,
+                            })
+                          }
+                        />
+                      ) : null}
+                    </Stack>
                   </Stack>
                 ) : null}
 
@@ -191,7 +306,7 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                 ) : practiceList.length === 0 ? (
                   <EmptyState
                     title="No practices match these filters."
-                    description="Try a different category or type, or clear the filters to see the full library."
+                    description="Try different filters or search terms, or clear everything to see the full library."
                     action={
                       <NextLink
                         href="/dashboard/practices"
@@ -203,8 +318,7 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                   />
                 ) : (
                   <Grid cols="2" gap="lg">
-                    {practiceList.map((practice, index) => {
-                      const completion = completions[index];
+                    {practiceList.map(({ practice, completion }) => {
                       const statusLabel = completion?.completed
                         ? 'Completed'
                         : completion && completion.progressPct > 0
@@ -241,11 +355,24 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                                 {practice.title}
                               </Heading>
                             </CardHeader>
-                            {practice.description ? (
+                            {practice.description || practice.tags.length > 0 ? (
                               <CardContent>
-                                <Text tone="muted" className="text-sm leading-[1.7]">
-                                  {practice.description}
-                                </Text>
+                                <Stack gap="sm">
+                                  {practice.description ? (
+                                    <Text tone="muted" className="text-sm leading-[1.7]">
+                                      {practice.description}
+                                    </Text>
+                                  ) : null}
+                                  {practice.tags.length > 0 ? (
+                                    <Stack direction="row" gap="2xs" wrap="wrap">
+                                      {practice.tags.map((tag) => (
+                                        <Badge key={tag} variant="secondary">
+                                          {tag}
+                                        </Badge>
+                                      ))}
+                                    </Stack>
+                                  ) : null}
+                                </Stack>
                               </CardContent>
                             ) : null}
                           </Card>

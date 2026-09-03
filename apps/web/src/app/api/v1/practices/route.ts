@@ -1,3 +1,11 @@
+/**
+ * Standalone public API surface for the practice library, mirroring
+ * `lib/practices.ts`'s `getPublishedPractices`. Not currently called by
+ * this app's own UI — the dashboard's Server Components query Postgres
+ * directly via `lib/practices.ts` instead — so this exists for a future
+ * external/mobile client rather than this web app itself. Kept, not
+ * removed, in case one already depends on it.
+ */
 import { getAuthUser } from '@/lib/auth-api';
 import { db, practices, practiceCompletions } from '@tnsi/db';
 import { eq, and, inArray, desc } from 'drizzle-orm';

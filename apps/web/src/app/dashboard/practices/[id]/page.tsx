@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import NextLink from 'next/link';
-import { Container, Divider, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
+import { Badge, Container, Divider, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { PracticeCompleteButton } from '@/components/dashboard/practice-complete-button';
 import { PracticePlayer } from '@/components/dashboard/practice-player';
 import { requireAuthOrRedirect } from '@/lib/auth-api';
@@ -58,6 +58,7 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
   const metaParts = [formatContentTypeLabel(practice.contentType)];
   if (duration) metaParts.push(duration);
   if (practice.category) metaParts.push(practice.category);
+  metaParts.push(`Level ${practice.difficulty}`);
 
   return (
     <>
@@ -82,6 +83,15 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
                     <Text tone="muted" className="text-base leading-[1.85] lg:text-lg">
                       {practice.description}
                     </Text>
+                  ) : null}
+                  {practice.tags.length > 0 ? (
+                    <Stack direction="row" gap="2xs" wrap="wrap">
+                      {practice.tags.map((tag) => (
+                        <Badge key={tag} variant="secondary">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </Stack>
                   ) : null}
                 </header>
 

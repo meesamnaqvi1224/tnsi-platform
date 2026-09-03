@@ -1,3 +1,12 @@
+/**
+ * Standalone public API surface for "today's" check-in + practices,
+ * mirroring `lib/check-ins.ts`'s `getTodayCheckIn` and
+ * `lib/practices.ts`'s `getTodayPractice`. Not currently called by this
+ * app's own UI — Dashboard Home queries Postgres directly via those lib
+ * functions instead — so this exists for a future external/mobile client
+ * rather than this web app itself. Kept, not removed, in case one already
+ * depends on it.
+ */
 import { getAuthUser } from '@/lib/auth-api';
 import { db, checkIns, practices, practiceCompletions } from '@tnsi/db';
 import { eq, and, desc, inArray, gte, lte } from 'drizzle-orm';

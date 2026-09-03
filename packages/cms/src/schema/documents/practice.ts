@@ -10,10 +10,11 @@ import { defineField, defineType } from 'sanity';
  * No `slug`, `author`, or `seo` fields: practices aren't public pages the
  * way articles/programs are, and Postgres has no columns for them.
  *
- * This schema establishes the editorial source only. There is not yet a
- * Sanity → Postgres sync mechanism that reads these documents into the
- * `practices` table — that is a separate, not-yet-made decision (see the
- * C7.4 audit report), not something this schema implements.
+ * This schema establishes the editorial source. A Sanity → Postgres sync
+ * exists via the `/api/webhooks/sanity` webhook
+ * (apps/web/src/lib/sync-practice.ts, packages/cms/src/webhook/sync-plan.ts)
+ * — publishing or unpublishing a practice document here updates the
+ * `practices` table automatically.
  */
 export const practice = defineType({
   name: 'practice',
