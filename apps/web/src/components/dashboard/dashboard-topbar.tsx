@@ -17,15 +17,24 @@ export function DashboardTopbar({ firstName }: DashboardTopbarProps) {
             {firstName ? `Welcome back, ${firstName}` : 'Welcome back'}
           </Text>
         </Stack>
-        <UserButton appearance={{ elements: { userButtonAvatarBox: 'size-8' } }}>
-          <UserButton.MenuItems>
-            <UserButton.Link
-              label="Dashboard"
-              href="/dashboard"
-              labelIcon={<LayoutDashboard className="size-4" />}
-            />
-          </UserButton.MenuItems>
-        </UserButton>
+        <Stack direction="row" align="center" gap="md" className="shrink-0">
+          <Text
+            size="sm"
+            tone="muted"
+            className="hidden tracking-[0.05em] whitespace-nowrap uppercase lg:block"
+          >
+            This is your system. Use it.
+          </Text>
+          <UserButton appearance={{ elements: { userButtonAvatarBox: 'size-8' } }}>
+            <UserButton.MenuItems>
+              <UserButton.Link
+                label="Dashboard"
+                href="/dashboard"
+                labelIcon={<LayoutDashboard className="size-4" />}
+              />
+            </UserButton.MenuItems>
+          </UserButton>
+        </Stack>
       </Container>
     </div>
   );

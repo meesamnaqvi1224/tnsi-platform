@@ -84,14 +84,14 @@ function NavRowContent({ item }: { item: NavItem }) {
 
 const linkClass = (active: boolean) =>
   cn(
-    'interaction-colors interaction-focus flex items-center gap-3 rounded-sm px-3 py-2 text-sm',
+    'interaction-colors interaction-focus flex items-center gap-3 rounded-sm border-l-2 px-3 py-2 text-sm',
     active
-      ? 'bg-foreground/10 text-foreground font-medium'
-      : 'text-muted-foreground hover:bg-foreground/5 hover:text-foreground',
+      ? 'border-foreground bg-foreground/10 text-foreground font-medium'
+      : 'border-transparent text-muted-foreground hover:bg-foreground/5 hover:text-foreground',
   );
 
 const disabledClass =
-  'text-muted-foreground/60 flex cursor-not-allowed items-center gap-3 rounded-sm px-3 py-2 text-sm';
+  'text-muted-foreground/60 flex cursor-not-allowed items-center gap-3 rounded-sm border-l-2 border-transparent px-3 py-2 text-sm';
 
 function PowerDropsCallout() {
   return (
