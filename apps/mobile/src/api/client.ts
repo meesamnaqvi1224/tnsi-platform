@@ -57,6 +57,7 @@ export function createApiClient(getToken: TokenGetter) {
         failure?.message ?? 'Request failed',
         response.status,
         failure?.code ?? 'UNKNOWN_ERROR',
+        failure?.details,
       );
     }
 
