@@ -9,5 +9,13 @@ import sharedConfig from "@tnsi/config/eslint";
  * `core-web-vitals` rules for apps/web) still runs per-package via
  * `pnpm lint` / `turbo run lint`, where each package's own eslint.config.mjs
  * is used with that package as cwd.
+ *
+ * apps/mobile is excluded here: its own eslint.config.mjs pulls in
+ * `eslint-config-expo` (react-hooks/react-native rules this generic
+ * fallback has no plugin for, so an inline `eslint-disable` comment
+ * referencing one of those rules errors as "rule not found" instead of
+ * disabling anything) and ignores its CJS tooling configs
+ * (metro.config.js/babel.config.js). `pnpm lint`/`turbo run lint` remain
+ * the authoritative check for apps/mobile, same as apps/web.
  */
-export default sharedConfig;
+export default [...sharedConfig, { ignores: ["apps/mobile/**"] }];

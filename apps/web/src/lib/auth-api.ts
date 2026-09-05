@@ -1,18 +1,53 @@
 import { auth } from '@clerk/nextjs/server';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db, users, entitlements } from '@tnsi/db';
 import { eq } from 'drizzle-orm';
 import type { User, Entitlement } from '@tnsi/db/schema';
 import { getOrCreateUser } from '@tnsi/auth/sync/user';
 import { assertEntitlement, type EntitlementRequirement } from '@tnsi/auth/authorize/entitlements';
+import { extractBearerToken, verifyToken } from '@tnsi/auth/verify/jwt';
 import { userSyncOps } from './user-sync-ops';
 
 export interface AuthUser extends User {
   entitlements: Entitlement | null;
 }
 
-export async function getAuthUser(): Promise<AuthUser | null> {
+/**
+ * Resolve the Clerk user id for the current request.
+ *
+ * The web dashboard authenticates via Clerk's cookie session (`auth()`).
+ * The native mobile app has no cookie jar, so it sends
+ * `Authorization: Bearer <clerk-session-jwt>` instead (obtained from Clerk
+ * Expo's `getToken()`). A bearer token is only ever present on an explicit
+ * API call from a non-browser client, never on a normal web
+ * page/asset request, so checking it first and falling back to the cookie
+ * session is purely additive: existing web requests never carry an
+ * `Authorization` header and are unaffected.
+ *
+ * A *present but invalid/expired* bearer token is treated as unauthenticated
+ * outright rather than falling back to the cookie session - a bad mobile
+ * token must never silently succeed by riding along on an unrelated cookie.
+ */
+async function resolveClerkUserId(): Promise<string | null> {
+  const headerList = await headers();
+  const bearerToken = extractBearerToken(headerList.get('authorization'));
+
+  if (bearerToken) {
+    try {
+      const payload = await verifyToken(bearerToken);
+      return payload.sub;
+    } catch {
+      return null;
+    }
+  }
+
   const { userId } = await auth();
+  return userId ?? null;
+}
+
+export async function getAuthUser(): Promise<AuthUser | null> {
+  const userId = await resolveClerkUserId();
   if (!userId) return null;
 
   let dbUser = await db.select().from(users).where(eq(users.clerkUserId, userId)).limit(1);

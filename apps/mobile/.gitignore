@@ -1,0 +1,12 @@
+# Expo
+.expo/
+expo-env.d.ts
+
+# Generated native projects (created by `expo run:ios`/`expo run:android`
+# or `expo prebuild` - this app is config-plugin-driven, not a checked-in
+# native project)
+ios/
+android/
+
+# EAS
+.eas/
