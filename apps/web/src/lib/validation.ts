@@ -72,3 +72,22 @@ export const checkoutRequestSchema = z.object({
 });
 
 export type CheckoutRequestInput = z.infer<typeof checkoutRequestSchema>;
+
+/**
+ * Query params for GET /api/v1/articles. `category` is a Sanity `category`
+ * document slug (not a title/label) — matches `ARTICLES_LIST_API_QUERY`'s
+ * `category->slug.current` filter, so a filter value only ever narrows
+ * against real category documents rather than an invented taxonomy.
+ */
+export const articlesListQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+  category: z.string().trim().min(1).max(200).optional(),
+});
+
+export type ArticlesListQuery = z.infer<typeof articlesListQuerySchema>;
+
+/** Route param for GET /api/v1/articles/[slug]. */
+export const articleSlugParamSchema = z.object({
+  slug: z.string().trim().min(1).max(200),
+});

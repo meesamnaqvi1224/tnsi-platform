@@ -37,6 +37,12 @@ const isPublicRoute = createRouteMatcher([
   '/api/newsletter',
   '/api/contact',
   '/api/assessments(.*)',
+  // Articles/Resources are public, unauthenticated content on the web (see
+  // '/articles(.*)'/'/resources(.*)' above) - the mobile read API for the
+  // same content must not be gated behind a Clerk session either. Scoped
+  // to just this one /api/v1 subpath so every other /api/v1/* route (all
+  // of which are genuinely auth-required) stays protected.
+  '/api/v1/articles(.*)',
   '/manifest.json',
   '/robots.txt',
   '/sitemap.xml',
