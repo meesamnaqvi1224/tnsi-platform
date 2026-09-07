@@ -4,17 +4,35 @@ import { ThemedText } from '@/components/ThemedText';
 import { ArticleThumbnail } from './ArticleThumbnail';
 import { formatArticleDate } from '@/lib/format';
 import { colors, spacing } from '@/theme';
-import type { ArticleListItem } from '@/api/types';
+import type { ArticleCategory, ArticleImage } from '@/api/types';
+
+/**
+ * The fields this card actually renders - deliberately narrower than
+ * `ArticleListItem`, so `ArticleRelated` (which has no `author`/`featured`,
+ * see api/types.ts) structurally satisfies this too. Lets the detail
+ * screen's "Related Articles" section reuse this exact card rather than
+ * needing a near-duplicate compact variant.
+ */
+export interface ArticleCardSummary {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  coverImage: ArticleImage | null;
+  category: ArticleCategory | null;
+  publishedAt: string | null;
+  readingTime: string | null;
+}
 
 interface ArticleCardProps {
-  article: ArticleListItem;
+  article: ArticleCardSummary;
   /**
-   * Left undefined until the article detail route exists (Phase 4.3) - a
-   * card with no handler renders as a plain, non-interactive View rather
-   * than a Pressable with nowhere to go, which would be a broken
-   * accessibility affordance (a "button" that does nothing).
+   * Left undefined until there's nowhere to navigate - a card with no
+   * handler renders as a plain, non-interactive View rather than a
+   * Pressable with nowhere to go, which would be a broken accessibility
+   * affordance (a "button" that does nothing).
    */
-  onPress?: (article: ArticleListItem) => void;
+  onPress?: (article: ArticleCardSummary) => void;
 }
 
 /**

@@ -184,3 +184,57 @@ export interface ArticlesListResponse {
   articles: ArticleListItem[];
   pagination: { limit: number; offset: number; total: number; hasMore: boolean };
 }
+
+/** Mirrors apps/web/src/lib/article-api.ts's `ApiAuthorDetail` - the detail-only author shape, with a photo. */
+export interface ArticleAuthorDetail extends ArticleAuthorSummary {
+  photo: ArticleImage | null;
+}
+
+/**
+ * Mirrors apps/web/src/lib/article-api.ts's `ApiArticleBodyBlock` exactly -
+ * every block type `GET /api/v1/articles/[slug]` can currently return.
+ * Inline marks (bold/italic/links) are flattened to plain text by the API
+ * itself (see that file's own doc comment) - there is no richer inline
+ * shape to render here, so none is invented.
+ */
+export type ArticleBodyBlock =
+  | { type: 'paragraph'; text: string }
+  | { type: 'heading'; level: 2 | 3; text: string; id: string }
+  | { type: 'pullQuote'; quote: string }
+  | { type: 'orderedList'; items: string[] }
+  | { type: 'unorderedList'; items: string[] }
+  | { type: 'figure'; imageSrc: string | null; imageAlt: string; caption: string }
+  | { type: 'callout'; title: string | null; text: string };
+
+/**
+ * Mirrors apps/web/src/lib/article-api.ts's `ApiRelatedArticle` - a
+ * compact summary, deliberately without `author`/`featured` (the detail
+ * API never nests a related article's own body/related, preventing
+ * recursive expansion).
+ */
+export interface ArticleRelated {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  coverImage: ArticleImage | null;
+  category: ArticleCategory | null;
+  publishedAt: string | null;
+  readingTime: string | null;
+}
+
+/** Response shape of GET /api/v1/articles/[slug], per apps/web/src/app/api/v1/articles/[slug]/route.ts. */
+export interface ArticleDetail {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  coverImage: ArticleImage | null;
+  category: ArticleCategory | null;
+  author: ArticleAuthorDetail | null;
+  publishedAt: string | null;
+  readingTime: string | null;
+  featured: boolean;
+  body: ArticleBodyBlock[];
+  related: ArticleRelated[];
+}

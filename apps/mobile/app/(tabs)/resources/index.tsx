@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
-import { ArticleCard } from '@/components/resources/ArticleCard';
+import { ArticleCard, type ArticleCardSummary } from '@/components/resources/ArticleCard';
 import {
   ArticleFilterBar,
   type ArticleCategoryOption,
@@ -20,14 +21,18 @@ import { colors, spacing } from '@/theme';
  *
  * Copy mirrors apps/web/src/content/resources.ts's existing, already-
  * approved positioning verbatim rather than inventing new brand language.
- *
- * Cards render without a navigation handler this phase - the article
- * detail route (resources/[slug]) doesn't exist yet (Phase 4.3), so
- * wiring `onPress` now would navigate into a route that doesn't exist.
  */
 export default function ResourcesScreen() {
+  const router = useRouter();
   const { state, reload } = useArticles();
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+
+  const openArticle = useCallback(
+    (article: ArticleCardSummary) => {
+      router.push({ pathname: '/resources/[slug]', params: { slug: article.slug } });
+    },
+    [router],
+  );
 
   const articles = useMemo(() => (state.status === 'success' ? state.articles : []), [state]);
 
@@ -73,7 +78,7 @@ export default function ResourcesScreen() {
 
       {state.status === 'success' && (
         <>
-          {featured ? <FeaturedArticle article={featured} /> : null}
+          {featured ? <FeaturedArticle article={featured} onPress={openArticle} /> : null}
 
           <ArticleFilterBar
             categories={categories}
@@ -88,7 +93,9 @@ export default function ResourcesScreen() {
                 : 'No resources found in this category.'}
             </ThemedText>
           ) : (
-            filtered.map((article) => <ArticleCard key={article.id} article={article} />)
+            filtered.map((article) => (
+              <ArticleCard key={article.id} article={article} onPress={openArticle} />
+            ))
           )}
         </>
       )}

@@ -3,11 +3,11 @@ import { ThemedText } from '@/components/ThemedText';
 import { ArticleThumbnail } from './ArticleThumbnail';
 import { formatArticleDate } from '@/lib/format';
 import { colors, radius, spacing } from '@/theme';
-import type { ArticleListItem } from '@/api/types';
+import type { ArticleCardSummary } from './ArticleCard';
 
 interface FeaturedArticleProps {
-  article: ArticleListItem;
-  onPress?: (article: ArticleListItem) => void;
+  article: ArticleCardSummary;
+  onPress?: (article: ArticleCardSummary) => void;
 }
 
 /**
