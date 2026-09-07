@@ -8,6 +8,7 @@ interface ThemedTextProps extends PropsWithChildren {
   variant?: Variant;
   color?: string;
   style?: TextStyle;
+  numberOfLines?: number;
 }
 
 export function ThemedText({
@@ -15,6 +16,11 @@ export function ThemedText({
   variant = 'body',
   color = colors.charcoal,
   style,
+  numberOfLines,
 }: ThemedTextProps) {
-  return <Text style={[typography[variant], { color }, style]}>{children}</Text>;
+  return (
+    <Text style={[typography[variant], { color }, style]} numberOfLines={numberOfLines}>
+      {children}
+    </Text>
+  );
 }

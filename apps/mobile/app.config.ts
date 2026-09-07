@@ -20,7 +20,7 @@ const config: ExpoConfig = {
   android: {
     package: 'org.tnsi.mobile',
   },
-  plugins: ['expo-router', 'expo-secure-store'],
+  plugins: ['expo-router', 'expo-secure-store', 'expo-video', 'expo-audio'],
   experiments: {
     typedRoutes: true,
   },

@@ -86,14 +86,24 @@ export interface PracticeProgress {
   lastPlayedAt: string | null;
 }
 
-export interface TodayPractice {
+/**
+ * The practice fields safe to expose to the UI - deliberately excludes
+ * `sanityId`/`sanityData` (internal Sanity-sync bookkeeping), which the
+ * `/api/v1/practices*` routes return in the raw row but which must never
+ * reach a screen. Used by Home's Today's Practice card, the Practices
+ * library, and practice detail alike - one shape, one source of truth.
+ */
+export interface Practice {
   id: string;
   title: string;
   description: string | null;
   contentType: PracticeContentType;
+  mediaUrl: string | null;
   thumbnailUrl: string | null;
   durationSeconds: number | null;
   category: string | null;
+  tags: string[];
+  difficulty: number;
   progress: PracticeProgress | null;
 }
 
@@ -101,5 +111,32 @@ export interface TodayPractice {
 export interface TodayResponse {
   date: string;
   checkIn: CheckIn | null;
-  practices: TodayPractice[];
+  practices: Practice[];
+}
+
+/** Response shape of GET /api/v1/practices, per apps/web/src/app/api/v1/practices/route.ts. */
+export interface PracticesListResponse {
+  practices: Practice[];
+  pagination: { limit: number; offset: number };
+}
+
+/** Request body for POST /api/v1/practices/[id]/complete, per apps/web/src/lib/validation.ts's `practiceCompletionSchema`. */
+export interface PracticeCompletionInput {
+  progressPct?: number;
+  positionSeconds?: number;
+  completed?: boolean;
+  playCount?: number;
+}
+
+/**
+ * Response shape of POST /api/v1/practices/[id]/complete - the fields the
+ * UI actually reads. The real response also nests a `practice` summary,
+ * unused here since the detail screen already has the full `Practice`.
+ */
+export interface PracticeCompletionResult {
+  progressPct: number;
+  positionSeconds: number;
+  completed: boolean;
+  completedAt: string | null;
+  playCount: number;
 }
