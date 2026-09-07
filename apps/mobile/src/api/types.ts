@@ -140,3 +140,47 @@ export interface PracticeCompletionResult {
   completedAt: string | null;
   playCount: number;
 }
+
+/** Mirrors apps/web/src/lib/article-api.ts's `ApiImage`. */
+export interface ArticleImage {
+  url: string;
+  alt: string;
+}
+
+/** Mirrors apps/web/src/lib/article-api.ts's `ApiCategory` - a real Sanity `category` document, never invented. */
+export interface ArticleCategory {
+  title: string;
+  slug: string | null;
+}
+
+/** Mirrors apps/web/src/lib/article-api.ts's `ApiAuthorSummary`. */
+export interface ArticleAuthorSummary {
+  name: string;
+  role: string | null;
+}
+
+/**
+ * The article fields the Resources library needs, per
+ * apps/web/src/app/api/v1/articles/route.ts's response shape. Deliberately
+ * only what GET /api/v1/articles actually returns - no `body`/`related`
+ * (detail-only, added in Phase 4.3), no invented fields (tags, views,
+ * likes, popularity never exist on the Sanity `article` schema).
+ */
+export interface ArticleListItem {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  coverImage: ArticleImage | null;
+  category: ArticleCategory | null;
+  author: ArticleAuthorSummary | null;
+  publishedAt: string | null;
+  readingTime: string | null;
+  featured: boolean;
+}
+
+/** Response shape of GET /api/v1/articles, per apps/web/src/app/api/v1/articles/route.ts. */
+export interface ArticlesListResponse {
+  articles: ArticleListItem[];
+  pagination: { limit: number; offset: number; total: number; hasMore: boolean };
+}

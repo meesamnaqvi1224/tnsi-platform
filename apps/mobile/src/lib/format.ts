@@ -8,3 +8,10 @@ export function formatDuration(seconds: number): string {
 export function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
+
+/** "2026-06-12T00:00:00.000Z" -> "June 2026" - mirrors apps/web/src/content/cms/loaders.ts's `formatMonth`. */
+export function formatArticleDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+}
