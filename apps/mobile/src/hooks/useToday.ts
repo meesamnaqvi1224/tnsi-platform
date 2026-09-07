@@ -28,9 +28,10 @@ export function useToday() {
   }, [api]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- standard fetch-on-mount, see app/(tabs)/index.tsx for the same pattern
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- standard fetch-on-mount
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch-once-on-mount is intentional: `load` depends on `api`, whose identity can change every render (Clerk's `getToken` isn't guaranteed stable - see useApiClient.ts), so depending on `[load]` here would re-fire on every render instead of once per mount.
+  }, []);
 
   /** Lets a caller (a successful check-in submission) update the cached checkIn without a refetch. */
   const setCheckIn = useCallback((checkIn: TodayResponse['checkIn']) => {

@@ -37,9 +37,10 @@ export function usePracticeDetail(id: string) {
   }, [api, id]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- standard fetch-on-mount, see app/(tabs)/index.tsx for the same pattern
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- standard fetch-on-mount
     load();
-  }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- depends on `id`, not `load`: `load` also depends on `api`, whose identity can change every render (Clerk's `getToken` isn't guaranteed stable - see useApiClient.ts), so depending on `[load]` here would re-fire on every render instead of once per mount (or when `id` genuinely changes).
+  }, [id]);
 
   const submitCompletion = useCallback(
     async (input: PracticeCompletionInput) => {
