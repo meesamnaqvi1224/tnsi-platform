@@ -259,3 +259,51 @@ export interface Entitlements {
   features: string[];
   currentPeriodEnd: string | null;
 }
+
+/** Mirrors apps/web/src/lib/assessment-api.ts's `ApiAssessmentChoice` - deliberately no score `value`, the server owns scoring. */
+export interface AssessmentChoice {
+  key: string;
+  label: string;
+}
+
+/** Mirrors apps/web/src/lib/assessment-api.ts's `ApiAssessmentQuestion`. */
+export interface AssessmentQuestion {
+  key: string;
+  text: string;
+  choices: AssessmentChoice[];
+}
+
+/** Mirrors apps/web/src/lib/assessment-api.ts's `ApiAssessmentResultTier` - no `minScore`/`maxScore`, those never leave the server. */
+export interface AssessmentResultTier {
+  key: string;
+  title: string;
+  description: string | null;
+}
+
+/** Response shape of GET /api/v1/assessments/[slug], per apps/web/src/app/api/v1/assessments/[slug]/route.ts. */
+export interface AssessmentDefinition {
+  id: string;
+  slug: string;
+  title: string;
+  questions: AssessmentQuestion[];
+  resultTiers: AssessmentResultTier[];
+}
+
+/**
+ * Response shape of POST /api/assessments/submit, per
+ * apps/web/src/app/api/assessments/submit/route.ts. Deliberately NOT
+ * wrapped in the `{data}`/`{error}` envelope every `/api/v1/*` route
+ * uses - this is the pre-existing, unversioned submission endpoint the
+ * web assessment already calls directly, returned exactly as-is here
+ * rather than forced through a mismatched envelope.
+ */
+export interface AssessmentSubmitResult {
+  key: string;
+  title: string;
+  description: string | null;
+}
+
+export interface AssessmentSubmitResponse {
+  submitted: boolean;
+  result: AssessmentSubmitResult | null;
+}

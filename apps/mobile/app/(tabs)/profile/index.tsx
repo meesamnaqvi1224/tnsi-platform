@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Alert, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Card, PrimaryButton, ScreenContainer, ThemedText } from '@/components';
 import { Avatar } from '@/components/profile/Avatar';
@@ -38,6 +39,7 @@ function initialsFor(
 }
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { user } = useUser();
   const { signOut } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
@@ -132,6 +134,19 @@ export default function ProfileScreen() {
             </ThemedText>
           </View>
         ) : null}
+
+        <View style={styles.assessmentDivider} />
+        <Pressable
+          onPress={() => router.push('/profile/assessment')}
+          accessibilityRole="button"
+          accessibilityLabel="Capacity Assessment"
+          style={styles.linkRow}
+        >
+          <ThemedText variant="body">Capacity Assessment</ThemedText>
+          <ThemedText variant="body" color={colors.charcoal}>
+            ›
+          </ThemedText>
+        </Pressable>
       </Card>
 
       <SectionLabel>Support</SectionLabel>
@@ -259,6 +274,12 @@ const styles = StyleSheet.create({
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.border,
+  },
+  assessmentDivider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.border,
+    marginTop: spacing.md,
+    marginBottom: spacing.md,
   },
   signOut: {
     marginBottom: spacing.xl,
