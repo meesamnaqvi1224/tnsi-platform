@@ -13,6 +13,7 @@ export default function ProfileLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: 'Profile' }} />
+      <Stack.Screen name="progress" options={{ title: '' }} />
       <Stack.Screen name="membership" options={{ title: '' }} />
       {/*
        * `headerBackButtonMenuEnabled: false` disables iOS's long-press-back-

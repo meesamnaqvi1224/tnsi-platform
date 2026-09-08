@@ -137,6 +137,18 @@ export default function ProfileScreen() {
 
         <View style={styles.assessmentDivider} />
         <Pressable
+          onPress={() => router.push('/profile/progress')}
+          accessibilityRole="button"
+          accessibilityLabel="Progress"
+          style={styles.linkRow}
+        >
+          <ThemedText variant="body">Progress</ThemedText>
+          <ThemedText variant="body" color={colors.charcoal}>
+            ›
+          </ThemedText>
+        </Pressable>
+        <View style={styles.divider} />
+        <Pressable
           onPress={() => router.push('/profile/membership')}
           accessibilityRole="button"
           accessibilityLabel="Membership & Access"

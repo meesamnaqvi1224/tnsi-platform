@@ -73,6 +73,27 @@ export interface CheckInInput {
   notes?: string;
 }
 
+/**
+ * One entry from GET /api/v1/check-ins, per that route's `toCheckInSummary`
+ * (apps/web/src/app/api/v1/check-ins/route.ts) - deliberately narrower than
+ * `CheckIn` above (no `userId`, `metadata`, `createdAt`): this is read-only
+ * history for display, not the full DB row.
+ */
+export interface CheckInSummary {
+  id: string;
+  completedDate: string;
+  moodScore: number;
+  capacityScore: number;
+  notes: string | null;
+  completedAt: string;
+}
+
+/** Response shape of GET /api/v1/check-ins, per that route. */
+export interface CheckInsListResponse {
+  checkIns: CheckInSummary[];
+  pagination: { limit: number; offset: number; hasMore: boolean };
+}
+
 /** Mirrors packages/db/src/schema/practices.ts's `practices` row shape (fields this app uses). */
 export type PracticeContentType =
   'audio' | 'video' | 'meditation' | 'breathwork' | 'movement' | 'journal';
