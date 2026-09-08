@@ -238,3 +238,24 @@ export interface ArticleDetail {
   body: ArticleBodyBlock[];
   related: ArticleRelated[];
 }
+
+/** Mirrors packages/db/src/schema/enums.ts's `entitlement_tier`/`entitlement_status` enums. */
+export type EntitlementTier = 'free' | 'monthly' | 'annual' | 'lifetime';
+export type EntitlementStatus = 'active' | 'past_due' | 'canceled' | 'trialing' | 'expired';
+
+/**
+ * Response shape of GET /api/v1/me/entitlements, per
+ * apps/web/src/app/api/v1/me/entitlements/route.ts - only the fields
+ * meaningful to a member-facing account screen. The real response also
+ * includes `stripeCustomerId`/`stripeSubscriptionId` (internal billing
+ * ids) - deliberately not modeled here since nothing in this app should
+ * ever display them.
+ */
+export interface Entitlements {
+  tier: EntitlementTier;
+  status: EntitlementStatus;
+  programs: string[];
+  certifications: string[];
+  features: string[];
+  currentPeriodEnd: string | null;
+}
