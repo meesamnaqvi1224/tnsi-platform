@@ -1,5 +1,5 @@
 import { db, checkIns } from '@tnsi/db';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import type { CheckIn } from '@tnsi/db/schema';
 
 /**
@@ -21,4 +21,33 @@ export async function getTodayCheckIn(userId: string): Promise<CheckIn | null> {
     .limit(1);
 
   return result[0] ?? null;
+}
+
+/**
+ * This user's check-in history, newest first. `completedDate` alone is a
+ * deterministic sort key — `check_ins` has a `unique(userId, completedDate)`
+ * constraint (see `packages/db/src/schema/check-ins.ts`), so no two rows for
+ * the same user can share a date, and no secondary ordering is needed.
+ *
+ * Fetches `limit + 1` rows to derive `hasMore` without a separate `COUNT(*)`
+ * query, mirroring the one-extra-row pagination pattern already used
+ * elsewhere in this codebase; the caller slices back to `limit`.
+ */
+export async function getCheckInHistory(
+  userId: string,
+  limit: number,
+  offset: number,
+): Promise<{ checkIns: CheckIn[]; hasMore: boolean }> {
+  const rows = await db
+    .select()
+    .from(checkIns)
+    .where(eq(checkIns.userId, userId))
+    .orderBy(desc(checkIns.completedDate))
+    .limit(limit + 1)
+    .offset(offset);
+
+  return {
+    checkIns: rows.slice(0, limit),
+    hasMore: rows.length > limit,
+  };
 }

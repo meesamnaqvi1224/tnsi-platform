@@ -13,6 +13,14 @@ export const checkInSchema = z.object({
 
 export type CheckInInput = z.infer<typeof checkInSchema>;
 
+/** Query params for GET /api/v1/check-ins, mirroring `articlesListQuerySchema`'s bounds. */
+export const checkInsListQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
+export type CheckInsListQuery = z.infer<typeof checkInsListQuerySchema>;
+
 export const practiceCompletionSchema = z.object({
   progressPct: z.number().min(0).max(1).optional(),
   positionSeconds: z.number().int().min(0).optional(),
