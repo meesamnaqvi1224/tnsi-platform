@@ -43,6 +43,11 @@ const isPublicRoute = createRouteMatcher([
   // to just this one /api/v1 subpath so every other /api/v1/* route (all
   // of which are genuinely auth-required) stays protected.
   '/api/v1/articles(.*)',
+  // Same reasoning as the articles entry above, for the Capacity
+  // Assessment's native mobile read API - '/api/assessments(.*)' already
+  // covers the existing public submit endpoint; this is the equivalent
+  // /api/v1 entry for GET /api/v1/assessments/[slug].
+  '/api/v1/assessments(.*)',
   '/manifest.json',
   '/robots.txt',
   '/sitemap.xml',

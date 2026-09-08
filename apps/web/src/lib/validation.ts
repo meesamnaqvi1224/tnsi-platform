@@ -91,3 +91,8 @@ export type ArticlesListQuery = z.infer<typeof articlesListQuerySchema>;
 export const articleSlugParamSchema = z.object({
   slug: z.string().trim().min(1).max(200),
 });
+
+/** Route param for GET /api/v1/assessments/[slug] — generic across every assessment slug, not just Capacity Assessment. */
+export const assessmentSlugParamSchema = z.object({
+  slug: z.string().trim().min(1).max(200),
+});
