@@ -258,6 +258,10 @@ export interface Entitlements {
   certifications: string[];
   features: string[];
   currentPeriodEnd: string | null;
+  /** Real field, already returned by the API - the account was canceled but access continues until `currentPeriodEnd`. */
+  cancelAtPeriodEnd: boolean;
+  /** Real field, already returned by the API - null unless the membership has actually been canceled. */
+  canceledAt: string | null;
 }
 
 /** Mirrors apps/web/src/lib/assessment-api.ts's `ApiAssessmentChoice` - deliberately no score `value`, the server owns scoring. */

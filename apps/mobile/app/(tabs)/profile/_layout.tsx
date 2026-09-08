@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { colors, typography } from '@/theme';
 
-/** Profile tab's own stack: account at the root, Capacity Assessment pushed on top. */
+/** Profile tab's own stack: account at the root, Capacity Assessment and Membership & Access pushed on top. */
 export default function ProfileLayout() {
   return (
     <Stack
@@ -13,6 +13,7 @@ export default function ProfileLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: 'Profile' }} />
+      <Stack.Screen name="membership" options={{ title: '' }} />
       {/*
        * `headerBackButtonMenuEnabled: false` disables iOS's long-press-back-
        * button menu, which can pop multiple screens at once outside the

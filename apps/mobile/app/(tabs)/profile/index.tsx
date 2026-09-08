@@ -137,6 +137,18 @@ export default function ProfileScreen() {
 
         <View style={styles.assessmentDivider} />
         <Pressable
+          onPress={() => router.push('/profile/membership')}
+          accessibilityRole="button"
+          accessibilityLabel="Membership & Access"
+          style={styles.linkRow}
+        >
+          <ThemedText variant="body">Membership & Access</ThemedText>
+          <ThemedText variant="body" color={colors.charcoal}>
+            ›
+          </ThemedText>
+        </Pressable>
+        <View style={styles.divider} />
+        <Pressable
           onPress={() => router.push('/profile/assessment')}
           accessibilityRole="button"
           accessibilityLabel="Capacity Assessment"
