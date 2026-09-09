@@ -4,6 +4,7 @@ import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
 import { PracticeCard } from '@/components/practices/PracticeCard';
 import { PracticeFilterBar } from '@/components/practices/PracticeFilterBar';
 import { PracticesSkeleton } from '@/components/practices/PracticesSkeleton';
+import { PowerDropsEntryCard } from '@/components/powerdrops/PowerDropsEntryCard';
 import { usePractices } from '@/hooks/usePractices';
 import { colors, spacing } from '@/theme';
 import type { PracticeContentType } from '@/api/types';
@@ -35,6 +36,8 @@ export default function PracticesScreen() {
       <ThemedText variant="body" color={colors.charcoal} style={styles.subtitle}>
         A library of practices to support your nervous system.
       </ThemedText>
+
+      <PowerDropsEntryCard />
 
       {state.status === 'loading' && <PracticesSkeleton />}
 

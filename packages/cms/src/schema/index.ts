@@ -7,6 +7,7 @@ import { article } from './documents/article';
 import { program } from './documents/program';
 import { practice } from './documents/practice';
 import { assessment } from './documents/assessment';
+import { powerDrop } from './documents/powerDrop';
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   // documents
@@ -14,6 +15,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   program,
   practice,
   assessment,
+  powerDrop,
   author,
   category,
   // objects

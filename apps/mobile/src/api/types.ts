@@ -332,3 +332,51 @@ export interface AssessmentSubmitResponse {
   submitted: boolean;
   result: AssessmentSubmitResult | null;
 }
+
+/** Mirrors apps/web/src/lib/power-drop-api.ts's `ApiPowerDropImage`. */
+export interface PowerDropImage {
+  url: string;
+  alt: string;
+}
+
+/**
+ * PowerDrops™ are short, practical interventions for a specific moment -
+ * conceptually distinct from `Practice` (a library to learn and practise
+ * over time). Fields the library/card view needs, per
+ * apps/web/src/app/api/v1/powerdrops/route.ts's response shape.
+ */
+export interface PowerDropSummary {
+  id: string;
+  title: string;
+  slug: string;
+  category: string | null;
+  description: string;
+  cardImage: PowerDropImage | null;
+  focus: string;
+  featured: boolean;
+}
+
+/** Response shape of GET /api/v1/powerdrops, per that route. */
+export interface PowerDropsListResponse {
+  powerDrops: PowerDropSummary[];
+  pagination: { limit: number; offset: number; total: number; hasMore: boolean };
+}
+
+/**
+ * Response shape of GET /api/v1/powerdrops/[slug] - adds the fields only
+ * the detail screen needs (instructions, anchor statement, duration) on
+ * top of `PowerDropSummary`.
+ */
+export interface PowerDrop extends PowerDropSummary {
+  duration: string | null;
+  instructions: string[];
+  anchorStatement: string;
+}
+
+/** Response shape of POST /api/v1/powerdrops/[slug]/usage, per that route. */
+export interface PowerDropUsageResult {
+  id: string;
+  powerDropId: string;
+  powerDropSlug: string;
+  usedAt: string;
+}

@@ -104,3 +104,26 @@ export const articleSlugParamSchema = z.object({
 export const assessmentSlugParamSchema = z.object({
   slug: z.string().trim().min(1).max(200),
 });
+
+/**
+ * Query params for GET /api/v1/powerdrops. `category` matches
+ * `POWER_DROPS_LIST_API_QUERY`'s plain `category` string field (the
+ * controlled taxonomy values on `powerDrop` — see
+ * packages/cms/src/schema/documents/powerDrop.ts), not a reference slug.
+ * `featured` is a literal `"true"`/`"false"` string (query params are
+ * always strings) rather than `z.coerce.boolean()`, which would treat any
+ * non-empty string — including `"false"` — as `true`.
+ */
+export const powerDropsListQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+  category: z.string().trim().min(1).max(200).optional(),
+  featured: z.enum(['true', 'false']).optional(),
+});
+
+export type PowerDropsListQuery = z.infer<typeof powerDropsListQuerySchema>;
+
+/** Route param for GET/POST /api/v1/powerdrops/[slug]* — generic across every PowerDrop slug. */
+export const powerDropSlugParamSchema = z.object({
+  slug: z.string().trim().min(1).max(200),
+});

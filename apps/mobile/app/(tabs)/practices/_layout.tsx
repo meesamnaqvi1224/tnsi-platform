@@ -14,6 +14,8 @@ export default function PracticesLayout() {
     >
       <Stack.Screen name="index" options={{ title: 'Practices' }} />
       <Stack.Screen name="[id]" options={{ title: '' }} />
+      <Stack.Screen name="powerdrops/index" options={{ title: 'PowerDrops' }} />
+      <Stack.Screen name="powerdrops/[slug]" options={{ title: '' }} />
     </Stack>
   );
 }

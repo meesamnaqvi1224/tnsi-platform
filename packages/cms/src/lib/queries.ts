@@ -157,3 +157,53 @@ export const ASSESSMENT_BY_SLUG_QUERY = groq`
     seo { seoTitle, seoDescription }
   }
 `;
+
+/**
+ * Published PowerDrops for the native mobile library, optionally narrowed
+ * by category and/or featured-only — same `{"items", "total"}` dual-query
+ * shape as `ARTICLES_LIST_API_QUERY` so pagination metadata reflects the
+ * identical filtered set in one round trip. `$category` is `""` and
+ * `$featuredOnly` is `false` when no filter is requested. Ordered by the
+ * editor's manual `sortOrder` first (undefined sorts last), then title, so
+ * the product owner controls display order rather than publish date.
+ */
+export const POWER_DROPS_LIST_API_QUERY = groq`
+  {
+    "items": *[
+      _type == "powerDrop" && defined(slug.current) && status == "published"
+      && ($category == "" || category == $category)
+      && (!$featuredOnly || featured == true)
+    ] | order(sortOrder asc, title asc) [$offset...$end] {
+      "id": _id,
+      title,
+      "slug": slug.current,
+      category,
+      description,
+      cardImage ${imageProjection},
+      focus,
+      featured
+    },
+    "total": count(*[
+      _type == "powerDrop" && defined(slug.current) && status == "published"
+      && ($category == "" || category == $category)
+      && (!$featuredOnly || featured == true)
+    ])
+  }
+`;
+
+/** A single published PowerDrop by slug, with the fields the detail screen needs. */
+export const POWER_DROP_API_BY_SLUG_QUERY = groq`
+  *[_type == "powerDrop" && slug.current == $slug && status == "published"][0] {
+    "id": _id,
+    title,
+    "slug": slug.current,
+    category,
+    description,
+    cardImage ${imageProjection},
+    duration,
+    focus,
+    instructions,
+    anchorStatement,
+    featured
+  }
+`;

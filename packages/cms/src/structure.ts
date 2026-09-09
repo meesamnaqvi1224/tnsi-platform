@@ -13,6 +13,7 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem('program').title('Programs'),
       S.documentTypeListItem('practice').title('Practices'),
       S.documentTypeListItem('assessment').title('Assessments'),
+      S.documentTypeListItem('powerDrop').title('PowerDrops'),
       S.divider(),
       S.documentTypeListItem('author').title('Authors'),
       S.documentTypeListItem('category').title('Categories'),

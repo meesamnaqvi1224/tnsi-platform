@@ -5,19 +5,25 @@ import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import { TodayPracticeCard } from '@/components/home/TodayPracticeCard';
 import { HomeSkeleton } from '@/components/home/HomeSkeleton';
 import { CheckInCard } from '@/components/check-in/CheckInCard';
+import { PowerDropsEntryCard } from '@/components/powerdrops/PowerDropsEntryCard';
 import { useToday } from '@/hooks/useToday';
+import { usePowerDrops } from '@/hooks/usePowerDrops';
 import { spacing } from '@/theme';
 
 /**
  * Home: today's orientation and the daily check-in - the app's first real
  * product experience. Fetches GET /api/v1/today once; the only other
- * network call this screen makes is the check-in submission itself
- * (owned by CheckInCard). No fabricated content, no gamification, no
+ * network calls this screen makes are the check-in submission (owned by
+ * CheckInCard) and a small featured-PowerDrops-only lookup for the
+ * compact entry card below. No fabricated content, no gamification, no
  * practice player/detail navigation yet (Phase 3).
  */
 export default function HomeScreen() {
   const { user } = useUser();
   const { state, reload, setCheckIn } = useToday();
+  const { state: powerDropsState } = usePowerDrops({ featured: true });
+  const featuredPowerDrop =
+    powerDropsState.status === 'success' ? (powerDropsState.powerDrops[0] ?? null) : null;
 
   return (
     <ScreenContainer scroll>
@@ -38,6 +44,10 @@ export default function HomeScreen() {
             <TodayPracticeCard practice={state.data.practices[0] ?? null} />
           </>
         )}
+
+        <PowerDropsEntryCard
+          subtitle={featuredPowerDrop ? `Featured: ${featuredPowerDrop.title}` : undefined}
+        />
       </KeyboardAvoidingView>
     </ScreenContainer>
   );

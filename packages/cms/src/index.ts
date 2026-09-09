@@ -12,6 +12,8 @@ export {
   ASSESSMENT_BY_SLUG_QUERY,
   ARTICLES_LIST_API_QUERY,
   ARTICLE_API_BY_SLUG_QUERY,
+  POWER_DROPS_LIST_API_QUERY,
+  POWER_DROP_API_BY_SLUG_QUERY,
 } from './lib/queries';
 
 // Schema
@@ -20,6 +22,7 @@ export { article } from './schema/documents/article';
 export { program } from './schema/documents/program';
 export { practice } from './schema/documents/practice';
 export { assessment } from './schema/documents/assessment';
+export { powerDrop } from './schema/documents/powerDrop';
 export { author } from './schema/documents/author';
 export { category } from './schema/documents/category';
 export { blockContent } from './schema/objects/blockContent';
