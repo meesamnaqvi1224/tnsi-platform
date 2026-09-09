@@ -2,12 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { ThemedText } from '@/components/ThemedText';
+import { PrimaryButton } from '@/components/PrimaryButton';
 import { colors, radius, spacing } from '@/theme';
 
 interface AudioPlayerProps {
   uri: string;
+  /** Where to resume from, in seconds - the member's last saved position for this practice, if any. Ignored if it doesn't fall meaningfully within the track. */
+  initialPositionSeconds?: number;
   /** Called once, the first time playback reaches the end. */
   onComplete: () => void;
+  /** Called on unmount (leaving the screen) with the last known position - lets the practice be resumed later. Never called after `onComplete` has already fired. */
+  onProgress?: (positionSeconds: number, durationSeconds: number) => void;
+  /** Called when the member taps "Try Again" after a load error. */
+  onRetry?: () => void;
 }
 
 /** "125" -> "2:05". */
@@ -25,11 +32,18 @@ function formatTime(seconds: number): string {
  * own width, matching the calm/restrained direction rather than a
  * Spotify-style transport bar.
  */
-export function AudioPlayer({ uri, onComplete }: AudioPlayerProps) {
+export function AudioPlayer({
+  uri,
+  initialPositionSeconds = 0,
+  onComplete,
+  onProgress,
+  onRetry,
+}: AudioPlayerProps) {
   const player = useAudioPlayer(uri);
   const status = useAudioPlayerStatus(player);
   const [trackWidth, setTrackWidth] = useState(0);
   const hasCompletedRef = useRef(false);
+  const hasResumedRef = useRef(false);
 
   useEffect(() => {
     if (status.didJustFinish && !hasCompletedRef.current) {
@@ -37,6 +51,41 @@ export function AudioPlayer({ uri, onComplete }: AudioPlayerProps) {
       onComplete();
     }
   }, [status.didJustFinish, onComplete]);
+
+  // Resume from the last saved position, once, the first time the player
+  // reports it's actually loaded (seeking before then has no effect).
+  // Skipped for a position that's effectively the start or already past
+  // the track's own duration (e.g. stale data from a shorter re-upload).
+  useEffect(() => {
+    if (!status.isLoaded || hasResumedRef.current) return;
+    hasResumedRef.current = true;
+    if (initialPositionSeconds > 1 && initialPositionSeconds < status.duration - 1) {
+      player.seekTo(initialPositionSeconds);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- resume-once-on-load is intentional; re-running on every status tick would fight the member's own seeking.
+  }, [status.isLoaded]);
+
+  // Reports the last known position on unmount (navigating away) so the
+  // practice can resume from here later - not on every pause, so this
+  // never fires more often than once per visit. Read via refs rather than
+  // effect deps so the cleanup always sees the latest values regardless of
+  // how often the parent's `onProgress` identity changes.
+  const latestStatusRef = useRef({ currentTime: 0, duration: 0 });
+  useEffect(() => {
+    latestStatusRef.current = { currentTime: status.currentTime, duration: status.duration };
+  });
+  const onProgressRef = useRef(onProgress);
+  useEffect(() => {
+    onProgressRef.current = onProgress;
+  });
+  useEffect(() => {
+    return () => {
+      const { currentTime, duration } = latestStatusRef.current;
+      if (duration > 0 && !hasCompletedRef.current) {
+        onProgressRef.current?.(currentTime, duration);
+      }
+    };
+  }, []);
 
   const progress = status.duration > 0 ? status.currentTime / status.duration : 0;
 
@@ -54,9 +103,10 @@ export function AudioPlayer({ uri, onComplete }: AudioPlayerProps) {
   if (status.error) {
     return (
       <View style={styles.container}>
-        <ThemedText variant="body" color={colors.error}>
-          This audio couldn&apos;t be loaded. Please try again.
+        <ThemedText variant="body" color={colors.error} style={styles.errorText}>
+          This audio couldn&apos;t be loaded. Please check your connection and try again.
         </ThemedText>
+        {onRetry ? <PrimaryButton label="Try Again" variant="secondary" onPress={onRetry} /> : null}
       </View>
     );
   }
@@ -76,31 +126,37 @@ export function AudioPlayer({ uri, onComplete }: AudioPlayerProps) {
           </ThemedText>
         </Pressable>
 
-        <View style={styles.timeGroup}>
-          <Pressable
-            onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
-            onPress={(e) => handleSeek(e.nativeEvent.locationX)}
-            accessibilityRole="adjustable"
-            accessibilityLabel="Seek"
-            accessibilityValue={{
-              min: 0,
-              max: Math.round(status.duration),
-              now: Math.round(status.currentTime),
-            }}
-            style={styles.track}
-          >
-            <View style={styles.trackBackground} />
-            <View style={[styles.trackFill, { width: `${progress * 100}%` }]} />
-          </Pressable>
-          <View style={styles.timeRow}>
-            <ThemedText variant="caption" color={colors.charcoal}>
-              {formatTime(status.currentTime)}
-            </ThemedText>
-            <ThemedText variant="caption" color={colors.charcoal}>
-              {formatTime(status.duration)}
-            </ThemedText>
+        {status.isLoaded ? (
+          <View style={styles.timeGroup}>
+            <Pressable
+              onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
+              onPress={(e) => handleSeek(e.nativeEvent.locationX)}
+              accessibilityRole="adjustable"
+              accessibilityLabel="Seek"
+              accessibilityValue={{
+                min: 0,
+                max: Math.round(status.duration),
+                now: Math.round(status.currentTime),
+              }}
+              style={styles.track}
+            >
+              <View style={styles.trackBackground} />
+              <View style={[styles.trackFill, { width: `${progress * 100}%` }]} />
+            </Pressable>
+            <View style={styles.timeRow}>
+              <ThemedText variant="caption" color={colors.charcoal}>
+                {formatTime(status.currentTime)}
+              </ThemedText>
+              <ThemedText variant="caption" color={colors.charcoal}>
+                {formatTime(status.duration)}
+              </ThemedText>
+            </View>
           </View>
-        </View>
+        ) : (
+          <ThemedText variant="caption" color={colors.charcoal} style={styles.loadingLabel}>
+            Loading audio…
+          </ThemedText>
+        )}
       </View>
     </View>
   );
@@ -129,6 +185,9 @@ const styles = StyleSheet.create({
   timeGroup: {
     flex: 1,
   },
+  loadingLabel: {
+    flex: 1,
+  },
   track: {
     height: 24,
     justifyContent: 'center',
@@ -149,5 +208,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: spacing.xs,
+  },
+  errorText: {
+    marginBottom: spacing.md,
   },
 });

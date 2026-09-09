@@ -18,6 +18,10 @@ export default function PracticeDetailScreen() {
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const { state, reload, submitCompletion } = usePracticeDetail(id);
   const [submitting, setSubmitting] = useState(false);
+  // Bumped to force the audio/video player to fully remount (a fresh
+  // native player instance, a fresh load attempt) when the member taps
+  // "Try Again" after a playback error.
+  const [mediaAttempt, setMediaAttempt] = useState(0);
 
   const handleMarkComplete = useCallback(async () => {
     if (submitting) return;
@@ -41,6 +45,40 @@ export default function PracticeDetailScreen() {
       // "complete" state won't be reflected until they revisit the screen.
     });
   }, [submitCompletion]);
+
+  // Saves the member's last playback position when they leave an
+  // unfinished practice, so it can resume from there next time - reusing
+  // the existing progressPct/positionSeconds fields the completion API
+  // already accepts (see PracticeCompletionInput). `playCount` is passed
+  // through unchanged so a position save is never mistaken for a new play
+  // - only real completions (handlePlaybackComplete/handleMarkComplete)
+  // advance it, exactly as before this change.
+  //
+  // `positionSeconds <= 1` is treated as "didn't actually play" and
+  // skipped entirely - opening a practice and leaving without pressing
+  // play (or reopening an already-completed one without playing) must not
+  // create or overwrite a practice_completions row. This mirrors the same
+  // threshold the resume logic already uses.
+  const handleProgress = useCallback(
+    (positionSeconds: number, durationSeconds: number) => {
+      if (state.status !== 'success' || durationSeconds <= 0 || positionSeconds <= 1) return;
+      const progressPct = Math.min(1, Math.max(0, positionSeconds / durationSeconds));
+      submitCompletion({
+        progressPct,
+        positionSeconds: Math.round(positionSeconds),
+        playCount: state.practice.progress?.playCount ?? 0,
+      }).catch(() => {
+        // Best-effort: the member is already navigating away; a failed
+        // save just means resume-from-position won't be available next
+        // time, not a broken experience now.
+      });
+    },
+    [state, submitCompletion],
+  );
+
+  const handleMediaRetry = useCallback(() => {
+    setMediaAttempt((attempt) => attempt + 1);
+  }, []);
 
   if (state.status === 'loading') {
     return (
@@ -103,10 +141,24 @@ export default function PracticeDetailScreen() {
       ) : null}
 
       {mediaKind === 'audio' && practice.mediaUrl ? (
-        <AudioPlayer uri={practice.mediaUrl} onComplete={handlePlaybackComplete} />
+        <AudioPlayer
+          key={mediaAttempt}
+          uri={practice.mediaUrl}
+          initialPositionSeconds={completed ? 0 : (practice.progress?.positionSeconds ?? 0)}
+          onComplete={handlePlaybackComplete}
+          onProgress={handleProgress}
+          onRetry={handleMediaRetry}
+        />
       ) : null}
       {mediaKind === 'video' && practice.mediaUrl ? (
-        <VideoPlayer uri={practice.mediaUrl} onComplete={handlePlaybackComplete} />
+        <VideoPlayer
+          key={mediaAttempt}
+          uri={practice.mediaUrl}
+          initialPositionSeconds={completed ? 0 : (practice.progress?.positionSeconds ?? 0)}
+          onComplete={handlePlaybackComplete}
+          onProgress={handleProgress}
+          onRetry={handleMediaRetry}
+        />
       ) : null}
       {mediaKind === 'external' && practice.mediaUrl ? (
         <ExternalMediaNotice mediaUrl={practice.mediaUrl} />
