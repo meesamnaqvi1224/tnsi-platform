@@ -15,10 +15,12 @@ const config: ExpoConfig = {
   userInterfaceStyle: 'automatic',
   ios: {
     bundleIdentifier: 'org.tnsi.mobile',
+    buildNumber: '1',
     supportsTablet: false,
   },
   android: {
     package: 'org.tnsi.mobile',
+    versionCode: 1,
   },
   plugins: ['expo-router', 'expo-secure-store', 'expo-video', 'expo-audio'],
   experiments: {
