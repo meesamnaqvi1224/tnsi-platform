@@ -57,6 +57,10 @@ export async function POST(_request: Request, { params }: RouteParams) {
     })
     .returning();
 
+  if (!usage) {
+    throw new Error('Insert into power_drop_usages did not return a row');
+  }
+
   return success(
     {
       id: usage.id,
