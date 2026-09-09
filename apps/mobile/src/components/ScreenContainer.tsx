@@ -14,7 +14,7 @@ interface ScreenContainerProps extends PropsWithChildren {
  */
 export function ScreenContainer({ children, scroll = false, style }: ScreenContainerProps) {
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
       {scroll ? (
         <ScrollView contentContainerStyle={[styles.content, style]}>{children}</ScrollView>
       ) : (
@@ -33,5 +33,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
+    // The safe-area inset alone is 0 on some layouts (e.g. non-scrolling
+    // screens, or devices without a home indicator) - this extra padding
+    // guarantees bottom content/buttons always have breathing room above
+    // the edge, not just flush against it.
+    paddingBottom: spacing.lg,
   },
 });

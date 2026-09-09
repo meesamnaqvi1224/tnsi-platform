@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   },
   chip: {
     paddingHorizontal: spacing.md,
-    minHeight: 40,
+    minHeight: 44,
     borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',

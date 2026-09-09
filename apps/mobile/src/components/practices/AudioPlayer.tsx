@@ -138,6 +138,7 @@ export function AudioPlayer({
                 max: Math.round(status.duration),
                 now: Math.round(status.currentTime),
               }}
+              hitSlop={{ top: 12, bottom: 12 }}
               style={styles.track}
             >
               <View style={styles.trackBackground} />
