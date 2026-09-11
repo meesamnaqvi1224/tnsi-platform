@@ -14,13 +14,13 @@ export const fontFamily = {
 export const typography = {
   display: {
     fontFamily: fontFamily.serif,
-    fontSize: 32,
-    lineHeight: 38,
+    fontSize: 30,
+    lineHeight: 36,
   },
   heading: {
     fontFamily: fontFamily.serif,
-    fontSize: 22,
-    lineHeight: 28,
+    fontSize: 20,
+    lineHeight: 26,
   },
   body: {
     fontFamily: fontFamily.system,
@@ -31,7 +31,7 @@ export const typography = {
     fontFamily: fontFamily.system,
     fontSize: 13,
     lineHeight: 18,
-    letterSpacing: 0.4,
+    letterSpacing: 0.6,
   },
   caption: {
     fontFamily: fontFamily.system,

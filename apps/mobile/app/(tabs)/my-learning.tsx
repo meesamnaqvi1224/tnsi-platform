@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ScreenContainer, ErrorNotice, ThemedText, PrimaryButton } from '@/components';
+import { ScreenContainer, ErrorNotice, ThemedText, PrimaryButton, PageHeader } from '@/components';
 import { PracticeCard } from '@/components/practices/PracticeCard';
 import { PracticesSkeleton } from '@/components/practices/PracticesSkeleton';
 import { usePractices } from '@/hooks/usePractices';
@@ -54,15 +54,11 @@ export default function MyLearningScreen() {
 
   return (
     <ScreenContainer scroll>
-      <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
-        My Learning
-      </ThemedText>
-      <ThemedText variant="display" style={styles.heading}>
-        Return to what you&apos;ve been practising.
-      </ThemedText>
-      <ThemedText variant="body" color={colors.charcoal} style={styles.subtitle}>
-        Continue practices you&apos;ve started or revisit practices you&apos;ve completed.
-      </ThemedText>
+      <PageHeader
+        eyebrow="My Learning"
+        title="Return to what you've been practising."
+        description="Continue practices you've started or revisit practices you've completed."
+      />
 
       {state.status === 'loading' && <PracticesSkeleton />}
 
@@ -162,16 +158,6 @@ function completedTime(practice: Practice): number {
 }
 
 const styles = StyleSheet.create({
-  eyebrow: {
-    textTransform: 'uppercase',
-    marginBottom: spacing.sm,
-  },
-  heading: {
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    marginBottom: spacing.xl,
-  },
   section: {
     marginBottom: spacing.xl,
   },

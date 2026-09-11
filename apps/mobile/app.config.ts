@@ -1,10 +1,9 @@
 import type { ExpoConfig } from 'expo/config';
 
 /**
- * Phase 1: native shell + auth only. No production icon/splash assets exist
- * yet (deliberately not fabricated this phase - see PHASE1_REPORT.md) so
- * this config omits `icon`/`splash` and lets Expo fall back to its
- * defaults; add real brand assets before any EAS/store-facing build.
+ * Real brand assets: the lotus mark from Caroline's "The Nervous System
+ * Institute" lockup, supplied directly by her (see
+ * assets/images/icon.png / adaptive-icon.png / splash.png).
  */
 const config: ExpoConfig = {
   name: 'TNSI',
@@ -13,6 +12,7 @@ const config: ExpoConfig = {
   version: '0.1.0',
   orientation: 'portrait',
   userInterfaceStyle: 'automatic',
+  icon: './assets/images/icon.png',
   ios: {
     bundleIdentifier: 'org.tnsi.mobile',
     buildNumber: '1',
@@ -21,8 +21,31 @@ const config: ExpoConfig = {
   android: {
     package: 'org.tnsi.mobile',
     versionCode: 1,
+    adaptiveIcon: {
+      foregroundImage: './assets/images/adaptive-icon.png',
+      backgroundColor: '#0D141C',
+    },
   },
-  plugins: ['expo-router', 'expo-secure-store', 'expo-video', 'expo-audio'],
+  plugins: [
+    'expo-router',
+    'expo-secure-store',
+    'expo-video',
+    'expo-audio',
+    [
+      'expo-splash-screen',
+      {
+        image: './assets/images/splash.png',
+        backgroundColor: '#0D141C',
+        resizeMode: 'contain',
+      },
+    ],
+    [
+      'expo-image-picker',
+      {
+        photosPermission: 'Allow TNSI to access your photos to set a profile picture.',
+      },
+    ],
+  ],
   experiments: {
     typedRoutes: true,
   },

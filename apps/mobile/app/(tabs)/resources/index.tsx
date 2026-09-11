@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
-import { StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
+import { ScreenContainer, ErrorNotice, ThemedText, PageHeader } from '@/components';
 import { ArticleCard, type ArticleCardSummary } from '@/components/resources/ArticleCard';
 import {
   ArticleFilterBar,
@@ -10,7 +9,7 @@ import {
 import { FeaturedArticle } from '@/components/resources/FeaturedArticle';
 import { ResourcesSkeleton } from '@/components/resources/ResourcesSkeleton';
 import { useArticles } from '@/hooks/useArticles';
-import { colors, spacing } from '@/theme';
+import { colors } from '@/theme';
 
 /**
  * The Resources library - the mobile presentation of the TNSI Article
@@ -64,13 +63,10 @@ export default function ResourcesScreen() {
 
   return (
     <ScreenContainer scroll>
-      <ThemedText variant="display" style={styles.heading}>
-        Resources
-      </ThemedText>
-      <ThemedText variant="body" color={colors.charcoal} style={styles.subtitle}>
-        Evidence-informed articles, guides, research and educational resources to deepen your
-        understanding of the nervous system.
-      </ThemedText>
+      <PageHeader
+        eyebrow="Resources"
+        title="Evidence-informed articles, guides, research and educational resources to deepen your understanding of the nervous system."
+      />
 
       {state.status === 'loading' && <ResourcesSkeleton />}
 
@@ -102,12 +98,3 @@ export default function ResourcesScreen() {
     </ScreenContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  heading: {
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    marginBottom: spacing.xl,
-  },
-});

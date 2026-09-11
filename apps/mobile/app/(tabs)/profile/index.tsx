@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { Alert, Linking, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth, useUser } from '@clerk/clerk-expo';
-import { Card, PrimaryButton, ScreenContainer, ThemedText } from '@/components';
-import { Avatar } from '@/components/profile/Avatar';
+import { Card, PrimaryButton, ScreenContainer, ThemedText, PageHeader } from '@/components';
+import { EditableAvatar } from '@/components/profile/EditableAvatar';
 import { useEntitlements } from '@/hooks/useEntitlements';
 import { usePractices } from '@/hooks/usePractices';
 import { formatArticleDate } from '@/lib/format';
@@ -80,12 +80,10 @@ export default function ProfileScreen() {
 
   return (
     <ScreenContainer scroll>
-      <ThemedText variant="display" style={styles.heading}>
-        Profile
-      </ThemedText>
+      <PageHeader eyebrow="Profile" title="Your account, membership and progress." />
 
       <View style={styles.identityRow}>
-        <Avatar
+        <EditableAvatar
           imageUrl={user?.imageUrl ?? null}
           hasImage={user?.hasImage ?? false}
           initials={initials}
@@ -258,9 +256,6 @@ function MembershipSummary({ entitlements }: { entitlements: import('@/api/types
 }
 
 const styles = StyleSheet.create({
-  heading: {
-    marginBottom: spacing.xl,
-  },
   identityRow: {
     flexDirection: 'row',
     alignItems: 'center',

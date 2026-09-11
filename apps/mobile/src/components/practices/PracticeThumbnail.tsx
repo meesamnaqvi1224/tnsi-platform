@@ -57,12 +57,12 @@ export function PracticeThumbnail({
 const styles = StyleSheet.create({
   image: {
     width: '100%',
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     backgroundColor: colors.creamMuted,
   },
   surface: {
     width: '100%',
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     backgroundColor: colors.navy,
     alignItems: 'center',
     justifyContent: 'center',

@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
+import { ScreenContainer, ErrorNotice, PageHeader, ThemedText } from '@/components';
 import { PracticeCard } from '@/components/practices/PracticeCard';
 import { PracticeFilterBar } from '@/components/practices/PracticeFilterBar';
 import { PracticesSkeleton } from '@/components/practices/PracticesSkeleton';
 import { PowerDropsEntryCard } from '@/components/powerdrops/PowerDropsEntryCard';
 import { usePractices } from '@/hooks/usePractices';
-import { colors, spacing } from '@/theme';
+import { colors } from '@/theme';
 import type { PracticeContentType } from '@/api/types';
 
 /**
@@ -30,12 +29,10 @@ export default function PracticesScreen() {
 
   return (
     <ScreenContainer scroll>
-      <ThemedText variant="display" style={styles.heading}>
-        Practices
-      </ThemedText>
-      <ThemedText variant="body" color={colors.charcoal} style={styles.subtitle}>
-        A library of practices to support your nervous system.
-      </ThemedText>
+      <PageHeader
+        eyebrow="Practices"
+        title="A library of practices to support your nervous system."
+      />
 
       <PowerDropsEntryCard />
 
@@ -65,12 +62,3 @@ export default function PracticesScreen() {
     </ScreenContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  heading: {
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    marginBottom: spacing.xl,
-  },
-});

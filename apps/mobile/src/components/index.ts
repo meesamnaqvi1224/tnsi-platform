@@ -2,6 +2,8 @@ export { ScreenContainer } from './ScreenContainer';
 export { ThemedText } from './ThemedText';
 export { PrimaryButton } from './PrimaryButton';
 export { Card } from './Card';
+export { SectionLabel } from './SectionLabel';
+export { PageHeader } from './PageHeader';
 export { TextField } from './TextField';
 export { PlaceholderScreen } from './PlaceholderScreen';
 export { ErrorNotice } from './ErrorNotice';

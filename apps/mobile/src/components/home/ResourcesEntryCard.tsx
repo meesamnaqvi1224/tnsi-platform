@@ -20,7 +20,7 @@ export function ResourcesEntryCard() {
       accessibilityLabel="Explore Resources"
       style={({ pressed }) => pressed && styles.pressed}
     >
-      <Card style={styles.card}>
+      <Card variant="accent" style={styles.card}>
         <View style={styles.row}>
           <View style={styles.textColumn}>
             <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>

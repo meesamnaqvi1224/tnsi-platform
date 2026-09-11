@@ -24,17 +24,17 @@ export function PowerDropsEntryCard({ subtitle }: PowerDropsEntryCardProps) {
       accessibilityLabel="Explore PowerDrops"
       style={({ pressed }) => pressed && styles.pressed}
     >
-      <Card style={styles.card}>
+      <Card variant="inverted" style={styles.card}>
         <View style={styles.row}>
           <View style={styles.textColumn}>
-            <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
+            <ThemedText variant="label" color={colors.bronzeMuted} style={styles.eyebrow}>
               POWERDROPS™
             </ThemedText>
-            <ThemedText variant="body" color={colors.charcoal}>
+            <ThemedText variant="body" color={colors.cream}>
               {subtitle ?? 'A small practice for the moment you’re in.'}
             </ThemedText>
           </View>
-          <ThemedText variant="label" color={colors.navy}>
+          <ThemedText variant="label" color={colors.cream}>
             Explore →
           </ThemedText>
         </View>

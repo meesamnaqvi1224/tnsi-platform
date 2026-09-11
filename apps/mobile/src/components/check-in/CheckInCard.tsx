@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
@@ -38,6 +39,7 @@ interface CheckInCardProps {
  */
 export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
   const api = useApiClient();
+  const router = useRouter();
   const [phase, setPhase] = useState<Phase>(() =>
     initialCheckIn
       ? { kind: 'recorded', checkIn: initialCheckIn, justSubmitted: false }
@@ -104,6 +106,16 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
             {phase.checkIn.notes}
           </ThemedText>
         ) : null}
+        <Pressable
+          onPress={() => router.push('/profile/progress')}
+          accessibilityRole="link"
+          accessibilityLabel="View check-in history"
+          style={styles.historyLink}
+        >
+          <ThemedText variant="label" color={colors.bronze}>
+            View History →
+          </ThemedText>
+        </Pressable>
       </Card>
     );
   }
@@ -118,6 +130,9 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
       <ThemedText variant="heading" style={styles.prompt}>
         How are you arriving today?
       </ThemedText>
+      <ThemedText variant="body" color={colors.charcoal} style={styles.subtitle}>
+        A quick check-in helps you notice and stay connected.
+      </ThemedText>
 
       <ScoreSelector
         label="Mood"
@@ -125,6 +140,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
         onChange={(mood) => setPhase({ ...phase, mood })}
         lowLabel="Very low"
         highLabel="Very good"
+        valueLabels={['Very low', 'Low', 'Okay', 'Good', 'Very good']}
         disabled={phase.submitting}
       />
       <ScoreSelector
@@ -133,6 +149,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
         onChange={(capacity) => setPhase({ ...phase, capacity })}
         lowLabel="Very limited"
         highLabel="Plenty available"
+        valueLabels={['Very limited', 'Limited', 'Okay', 'Good', 'Plenty available']}
         disabled={phase.submitting}
       />
 
@@ -154,12 +171,24 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
         </ThemedText>
       ) : null}
 
-      <PrimaryButton
-        label="Check In"
-        onPress={handleSubmit}
-        loading={phase.submitting}
-        disabled={!canSubmit}
-      />
+      <View style={styles.actionsRow}>
+        <PrimaryButton
+          label="Save Check-In"
+          onPress={handleSubmit}
+          loading={phase.submitting}
+          disabled={!canSubmit}
+          style={styles.saveButton}
+        />
+        <Pressable
+          onPress={() => router.push('/profile/progress')}
+          accessibilityRole="link"
+          accessibilityLabel="View check-in history"
+        >
+          <ThemedText variant="label" color={colors.bronze}>
+            View History
+          </ThemedText>
+        </Pressable>
+      </View>
     </Card>
   );
 }
@@ -170,10 +199,13 @@ const styles = StyleSheet.create({
   },
   label: {
     textTransform: 'uppercase',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   prompt: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xs,
+  },
+  subtitle: {
+    marginBottom: spacing.md,
   },
   noteInput: {
     minHeight: 80,
@@ -189,5 +221,17 @@ const styles = StyleSheet.create({
   },
   notesReadout: {
     marginTop: spacing.md,
+  },
+  historyLink: {
+    marginTop: spacing.lg,
+    alignSelf: 'flex-start',
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+  },
+  saveButton: {
+    flex: 1,
   },
 });

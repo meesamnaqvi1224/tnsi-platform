@@ -133,6 +133,15 @@ export interface TodayResponse {
   date: string;
   checkIn: CheckIn | null;
   practices: Practice[];
+  /**
+   * Deterministic content-routing pick from the user's latest capacity
+   * check-in (see apps/web/src/lib/practices.ts's getRecommendedPractice) -
+   * not "the first practice in the list" like the old client-side pick was.
+   * `null` when the user has no check-in yet, or no published practice is
+   * tagged with the recommended category yet (no fallback is silently
+   * substituted).
+   */
+  todayPractice: Practice | null;
 }
 
 /** Response shape of GET /api/v1/practices, per apps/web/src/app/api/v1/practices/route.ts. */

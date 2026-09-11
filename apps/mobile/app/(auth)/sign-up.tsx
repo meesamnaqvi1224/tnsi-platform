@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { useSignUp } from '@clerk/clerk-expo';
 import { Link, useRouter } from 'expo-router';
 import { PrimaryButton, ScreenContainer, TextField, ThemedText } from '@/components';
 import { extractClerkErrorMessage } from '@/lib/clerk-errors';
 import { colors, spacing } from '@/theme';
+
+const logoMark = require('../../assets/images/logo-mark.png');
 
 export default function SignUpScreen() {
   const { signUp, setActive, isLoaded } = useSignUp();
@@ -61,6 +63,7 @@ export default function SignUpScreen() {
         style={styles.flex}
       >
         <View style={styles.header}>
+          <Image source={logoMark} style={styles.logo} resizeMode="contain" />
           <ThemedText variant="display">Create your account</ThemedText>
           <ThemedText variant="body" color={colors.charcoal} style={styles.subtitle}>
             {pendingVerification
@@ -126,9 +129,16 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: spacing.xl,
+    alignItems: 'center',
+  },
+  logo: {
+    width: 72,
+    height: 61,
+    marginBottom: spacing.lg,
   },
   subtitle: {
     marginTop: spacing.sm,
+    textAlign: 'center',
   },
   footer: {
     flexDirection: 'row',
