@@ -51,3 +51,15 @@ export async function getCheckInHistory(
     hasMore: rows.length > limit,
   };
 }
+
+/**
+ * This user's single most recent check-in (by `completedDate`), regardless
+ * of whether it's today's — unlike `getTodayCheckIn`, which only matches the
+ * current calendar day. Powers the "today's recommended practice" content
+ * routing, which should still use yesterday's capacity reading if the user
+ * hasn't checked in yet today, rather than having no signal at all.
+ */
+export async function getLatestCheckIn(userId: string): Promise<CheckIn | null> {
+  const { checkIns: rows } = await getCheckInHistory(userId, 1, 0);
+  return rows[0] ?? null;
+}

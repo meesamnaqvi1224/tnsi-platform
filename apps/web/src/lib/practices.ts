@@ -1,5 +1,7 @@
 import { db, practices, practiceCompletions } from '@tnsi/db';
 import { eq, and, desc, gt, count } from 'drizzle-orm';
+import { categoryForCapacityScore, pickDeterministicCandidate } from '@tnsi/core';
+import { getLatestCheckIn } from './check-ins';
 
 /**
  * Fields the member-facing UI is allowed to see. Deliberately excludes
@@ -81,6 +83,36 @@ export async function getTodayPractice(
 
   const completed = await isPracticeCompleted(userId, practice.id);
   return { practice, completed };
+}
+
+/**
+ * "Today's recommended practice" — deterministic content routing from the
+ * user's latest capacity check-in to a practice category (see
+ * `@tnsi/core`'s `categoryForCapacityScore`), not a display-order pick like
+ * `getTodayPractice` above. Mechanical only: no LLM, no clinical inference,
+ * just a fixed capacity-state -> category table.
+ *
+ * Returns `null` (never a silent `practices[0]`-style fallback) when:
+ * - the user has no check-in yet (no capacity signal to route on), or
+ * - no published practice is tagged with the mapped category yet.
+ * Both are real, expected states right now since no practice in the
+ * database currently carries any of the five category values this routes
+ * to — that's a content-tagging gap in Sanity, not a bug here. A caller
+ * wanting a guaranteed non-null result must pass an explicitly-designated
+ * fallback practice id once one exists; none is hardcoded here.
+ */
+export async function getRecommendedPractice(userId: string): Promise<PracticeSummary | null> {
+  const latestCheckIn = await getLatestCheckIn(userId);
+  if (!latestCheckIn) return null;
+
+  const category = categoryForCapacityScore(latestCheckIn.capacityScore);
+
+  const candidates = await db
+    .select(PRACTICE_SUMMARY_COLUMNS)
+    .from(practices)
+    .where(and(eq(practices.isPublished, true), eq(practices.category, category)));
+
+  return pickDeterministicCandidate(candidates);
 }
 
 /**

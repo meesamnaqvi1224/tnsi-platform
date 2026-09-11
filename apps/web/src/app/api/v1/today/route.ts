@@ -9,8 +9,9 @@
  */
 import { getAuthUser } from '@/lib/auth-api';
 import { db, checkIns, practices, practiceCompletions } from '@tnsi/db';
-import { eq, and, desc, inArray, gte, lte } from 'drizzle-orm';
+import { eq, and, inArray, gte, lte } from 'drizzle-orm';
 import { success, unauthorized } from '@/lib/api-response';
+import { getRecommendedPractice } from '@/lib/practices';
 
 export const runtime = 'nodejs';
 
@@ -77,9 +78,50 @@ export async function GET() {
     };
   });
 
+  // "Today's recommended practice" — deterministic content routing from the
+  // user's latest capacity check-in (see lib/practices.ts's
+  // getRecommendedPractice), not the display-order pick above. Genuinely
+  // independent of `recentPractices`: the recommended category may not be
+  // among the first 10 practices in category/difficulty order, so this is
+  // its own lookup, not a re-slice of `practicesWithProgress`.
+  const recommendedPractice = await getRecommendedPractice(user.id);
+  let todayPractice = null;
+  if (recommendedPractice) {
+    const existingCompletion = completionsMap.get(recommendedPractice.id);
+    const completion =
+      existingCompletion ??
+      (
+        await db
+          .select()
+          .from(practiceCompletions)
+          .where(
+            and(
+              eq(practiceCompletions.userId, user.id),
+              eq(practiceCompletions.practiceId, recommendedPractice.id),
+            ),
+          )
+          .limit(1)
+      )[0];
+
+    todayPractice = {
+      ...recommendedPractice,
+      progress: completion
+        ? {
+            progressPct: completion.progressPct,
+            positionSeconds: completion.positionSeconds,
+            completed: completion.completed,
+            completedAt: completion.completedAt,
+            playCount: completion.playCount,
+            lastPlayedAt: completion.lastPlayedAt,
+          }
+        : null,
+    };
+  }
+
   return success({
     date: startOfDay.toISOString().split('T')[0],
     checkIn: todayCheckIn[0] ?? null,
     practices: practicesWithProgress,
+    todayPractice,
   });
 }

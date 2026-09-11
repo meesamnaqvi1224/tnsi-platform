@@ -69,7 +69,16 @@ export const practice = defineType({
       name: 'category',
       type: 'string',
       description:
-        'Free text — matches the existing free-text `category` column in Postgres. No fixed category list exists yet; do not invent one here.',
+        "The approved capacity-routing taxonomy (see packages/core/src/practices/recommendation.ts) — GET /api/v1/today's recommended-practice logic matches a user's latest capacity check-in to exactly one of these five values by an exact string match, so a value outside this list (or a free-text typo, from before this field had a fixed list) simply never gets recommended, silently. Still a plain string column in Postgres, so old non-matching values aren't invalid, just unreachable by that feature. Leave unset if the practice doesn't clearly fit one.",
+      options: {
+        list: [
+          { title: 'Grounding', value: 'GROUNDING' },
+          { title: 'Regulation', value: 'REGULATION' },
+          { title: 'Centering', value: 'CENTERING' },
+          { title: 'Embodiment', value: 'EMBODIMENT' },
+          { title: 'Expansion', value: 'EXPANSION' },
+        ],
+      },
     }),
     defineField({
       name: 'tags',
