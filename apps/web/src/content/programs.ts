@@ -80,6 +80,12 @@ export const programsOverviewContent = {
       imageSrc: '/images/programs/nav-life-beyond-trauma.webp',
       imageAlt:
         'A woman in a cream sweater walks alone along a winding path through a sunlit forest.',
+      heroImageSrc: '/images/programs/life-beyond-trauma/hero.webp',
+      heroImageAlt: 'Sunbeams breaking through a green forest canopy onto a quiet dirt path.',
+      externalCta: {
+        label: 'Visit Life Beyond Trauma',
+        href: 'https://lifebeyondtrauma.co.uk',
+      },
     },
     {
       id: 'nervous-system-academy',

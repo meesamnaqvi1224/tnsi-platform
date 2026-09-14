@@ -1,6 +1,6 @@
 import NextLink from 'next/link';
-import { buttonVariants, Eyebrow, Stack, Text } from '@tnsi/ui';
-import { SectionImage } from '@/components/utility/section-image';
+import { buttonVariants, Container, Eyebrow, Section, Stack, Text } from '@tnsi/ui';
+import { EditorialImage } from '@/components/utility/editorial-image';
 import { methodImages } from '@/content/images';
 import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
 
@@ -8,28 +8,27 @@ const { hero } = humanExpansionTheoryContent;
 
 export function MethodHero() {
   return (
-    <section
+    <Section
+      spacing="xl"
+      className="pt-(--space-4xl) pb-(--space-4xl) sm:pt-(--space-5xl) sm:pb-(--space-5xl)"
       aria-labelledby="method-hero-heading"
-      className="grid min-h-screen grid-cols-1 overflow-hidden lg:grid-cols-[45fr_55fr]"
     >
-      <div className="dark bg-background text-foreground flex flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-4xl) sm:px-(--space-3xl) lg:px-(--space-3xl)">
-        <Stack gap="xl" className="max-w-lg">
-          <div>
-            <div className="border-border mb-(--space-md) w-10 border-t-2" />
-            <Eyebrow className="text-muted-foreground">{hero.eyebrow}</Eyebrow>
-          </div>
+      <Container size="xl">
+        <div className="grid grid-cols-1 items-center gap-(--space-2xl) lg:grid-cols-5 lg:gap-(--space-3xl)">
+          <Stack gap="lg" className="lg:col-span-3">
+            <Eyebrow>{hero.eyebrow}</Eyebrow>
 
-          <h1
-            id="method-hero-heading"
-            className="font-heading text-foreground text-4xl leading-[1.02] font-semibold tracking-tight sm:text-5xl lg:text-[4.5rem] xl:text-[5.5rem]"
-          >
-            {hero.headline}
-          </h1>
+            <h1
+              id="method-hero-heading"
+              className="font-heading text-foreground text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl"
+            >
+              {hero.headline}
+            </h1>
 
-          <Stack gap="lg">
-            <Text size="lg" tone="muted" className="max-w-[22rem]">
+            <Text size="lg" tone="muted" className="max-w-prose">
               {hero.tagline}
             </Text>
+
             <div>
               <NextLink
                 href={hero.cta.href}
@@ -39,17 +38,17 @@ export function MethodHero() {
               </NextLink>
             </div>
           </Stack>
-        </Stack>
-      </div>
 
-      <div className="bg-secondary relative hidden lg:block">
-        <SectionImage
-          src={methodImages.heroPortrait}
-          alt="Caroline Reed in a warm editorial portrait for The Nervous System Institute."
-          priority
-          sizes="55vw"
-        />
-      </div>
-    </section>
+          <EditorialImage
+            src={methodImages.heroPortrait}
+            alt="A sunlit study corner with a desk, chair and a large monstera plant beside a window, warm afternoon light on the wood floor."
+            aspect="portrait"
+            className="rounded-lg lg:col-span-2"
+            priority
+            sizes="(max-width: 1024px) 100vw, 40vw"
+          />
+        </div>
+      </Container>
+    </Section>
   );
 }

@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import NextLink from 'next/link';
-import { buttonVariants, Container, Heading, Section, Stack, Text } from '@tnsi/ui';
+import { buttonVariants, cn, Container, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
+import { EditorialImage } from '@/components/utility/editorial-image';
 import { getPathway } from '@/content/programs';
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
@@ -54,6 +55,24 @@ export default function LifeBeyondTraumaPage() {
             </Stack>
           </Container>
         </Section>
+
+        {'heroImageSrc' in pathway ? (
+          <Section
+            spacing="xl"
+            className="border-foreground/15 border-t"
+            aria-label="Life Beyond Trauma"
+          >
+            <Container size="xl">
+              <EditorialImage
+                src={pathway.heroImageSrc}
+                alt={pathway.heroImageAlt}
+                aspect="landscape"
+                className="rounded-lg"
+                sizes="(max-width: 1024px) 100vw, 1152px"
+              />
+            </Container>
+          </Section>
+        ) : null}
 
         <Section
           spacing="xl"
@@ -115,14 +134,24 @@ export default function LifeBeyondTraumaPage() {
                 </Text>
               </Stack>
 
-              <div>
+              <Stack direction="row" gap="sm" wrap="wrap">
                 <NextLink
                   href="/book-a-call"
                   className={buttonVariants({ variant: 'primary', size: 'lg' })}
                 >
                   Book a Discovery Call
                 </NextLink>
-              </div>
+                {'externalCta' in pathway ? (
+                  <a
+                    href={pathway.externalCta.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'bg-card')}
+                  >
+                    {pathway.externalCta.label} ↗
+                  </a>
+                ) : null}
+              </Stack>
             </Stack>
           </Container>
         </Section>

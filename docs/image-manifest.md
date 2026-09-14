@@ -106,3 +106,15 @@ required). Downloaded directly from Unsplash's CDN and stored under
 | `programs/academy/hero.webp`                 | Nervous System Academy  | Body (landscape)            | https://unsplash.com/photos/bright-room-with-bookshelves-and-two-desks-by-windows-Mb-lGau6K5U | Clay Banks    | A bright study room with a wall of bookshelves, a long wooden desk and two chairs facing tall windows onto trees.       |
 | `programs/nav-organisational-advisory.webp`  | Programs                | Pathways — Org. Advisory    | https://unsplash.com/photos/brown-wooden-9-piece-office-table-and-chairs-1RT4txDDAbM          | Social.cut    | An empty boardroom with a curved wooden table, tan leather chairs and a small plant, seen through glass-walled offices. |
 | `programs/organisational-advisory/hero.webp` | Organisational Advisory | Body (landscape)            | https://unsplash.com/photos/brown-wooden-9-piece-office-table-and-chairs-1RT4txDDAbM          | Social.cut    | A boardroom with a curved wooden table, tan leather chairs and a small plant, glass-walled offices visible beyond.      |
+
+`method/hero-portrait.webp` was replaced (2026-09) — the original was a
+close, casually-cropped personal photo unsuited to an editorial hero at full
+viewport height; the hero section itself was also resized from a full-screen
+split layout down to the site's standard contained hero. The `programs/life-beyond-trauma/hero.webp`
+file is net new — the pathway's detail page previously had no body image, unlike
+its three siblings above.
+
+| Filename                                | Page                               | Section          | Source                                                                                    | Photographer  | Alt text                                                                                                                     |
+| --------------------------------------- | ---------------------------------- | ---------------- | ----------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `method/hero-portrait.webp`             | Human Expansion Theory (`/method`) | Hero (portrait)  | https://unsplash.com/photos/swiss-cheese-plant-near-brown-sofa-AlkC0ts6a70                | Jade Stephens | A sunlit study corner with a desk, chair and a large monstera plant beside a window, warm afternoon light on the wood floor. |
+| `programs/life-beyond-trauma/hero.webp` | Life Beyond Trauma                 | Body (landscape) | https://unsplash.com/photos/green-trees-and-brown-dried-leaves-during-daytime-6fRHGqbp1_4 | Michael Held  | Sunbeams breaking through a green forest canopy onto a quiet dirt path.                                                      |
