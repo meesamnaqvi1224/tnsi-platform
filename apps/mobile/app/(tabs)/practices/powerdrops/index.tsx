@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
 import { PowerDropCard } from '@/components/powerdrops/PowerDropCard';
 import { PowerDropCategoryBar } from '@/components/powerdrops/PowerDropCategoryBar';
@@ -12,11 +13,14 @@ import { colors, spacing } from '@/theme';
  * not the Practices library (a set of things to learn and practise over
  * time). Fetches GET /api/v1/powerdrops once; category filtering happens
  * client-side against the already-fetched list, same as
- * PracticeFilterBar/usePractices.
+ * PracticeFilterBar/usePractices. `category` can arrive pre-selected via
+ * a route param (Home's QuickPracticeRow tiles); the category bar still
+ * lets the user change or clear it from there like any other selection.
  */
 export default function PowerDropsLibraryScreen() {
   const { state, reload } = usePowerDrops();
-  const [category, setCategory] = useState<string | null>(null);
+  const params = useLocalSearchParams<{ category?: string }>();
+  const [category, setCategory] = useState<string | null>(params.category ?? null);
 
   const powerDrops = useMemo(() => (state.status === 'success' ? state.powerDrops : []), [state]);
 

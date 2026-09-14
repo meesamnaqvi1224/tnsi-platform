@@ -11,10 +11,12 @@ const reconnectImage = require('../../../assets/images/quick-reconnect.jpg');
 /**
  * Three tiles naming real PowerDrop categories from the approved taxonomy
  * (Regulation, Grounding, Interoception - see packages/cms's powerDrop
- * schema). Phase 1 (this pass): all three open the PowerDrops library,
- * same as the existing PowerDropsEntryCard - there is no per-duration
- * content model to filter by yet. Phase 2: wire each tile to actually
- * pre-filter PowerDrops by its category once that's worth building.
+ * schema). Each tile pre-filters the PowerDrops library to its category via
+ * a route param (see app/(tabs)/practices/powerdrops/index.tsx), the same
+ * category filter that screen's own category bar already offers - this
+ * just arrives pre-selected. If nothing is tagged with a tile's category
+ * yet, that screen already handles it honestly ("No PowerDrops match this
+ * category."), same as picking that chip manually would.
  * Durations shown are illustrative labels matching the category's own
  * spirit, not a real queryable field.
  */
@@ -51,7 +53,12 @@ export function QuickPracticeRow() {
         {TILES.map((tile) => (
           <Pressable
             key={tile.label}
-            onPress={() => router.push('/practices/powerdrops')}
+            onPress={() =>
+              router.push({
+                pathname: '/practices/powerdrops',
+                params: { category: tile.category },
+              })
+            }
             accessibilityRole="button"
             accessibilityLabel={`${tile.label}, ${tile.duration}`}
             style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
