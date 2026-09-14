@@ -14,9 +14,6 @@ export function EaCta() {
       <Container size="xl">
         <Stack gap="3xl" className="mx-auto max-w-3xl text-center">
           <div className="flex flex-col items-center gap-(--space-sm)">
-            <span className="text-background/50 font-mono text-xs tracking-[0.2em] uppercase">
-              Chapter {cta.chapter}
-            </span>
             <div className="border-background/20 w-12 border-t" aria-hidden />
           </div>
 

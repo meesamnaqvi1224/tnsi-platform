@@ -4,8 +4,10 @@ import type { HeadingProps } from '../primitives/heading';
 
 export interface ChapterMarkerProps {
   /**
-   * Short chapter identifier — roman numeral, arabic, or word.
-   * Appears in the mono label: "Chapter I", "Chapter 01", "Chapter One".
+   * Short chapter identifier — roman numeral, arabic, or word. Retained on
+   * the type for call-site compatibility; no longer rendered (site-wide
+   * "chapter" labelling removed per Caroline Reed's revision feedback,
+   * 2026-09). The hairline rule below still marks the section transition.
    */
   index: string;
   /** The chapter title, rendered as the primary heading. */
@@ -37,7 +39,6 @@ export interface ChapterMarkerProps {
  * transitions only. Sub-sections within a chapter use `Heading` directly.
  */
 export function ChapterMarker({
-  index,
   title,
   as = 'h2',
   size = 'xl',
@@ -46,13 +47,8 @@ export function ChapterMarker({
 }: ChapterMarkerProps) {
   return (
     <div className={cn('flex flex-col gap-(--space-sm)', className)}>
-      {/* Chapter label + full-width rule — the editorial provenance mark */}
-      <div className="flex items-center gap-(--space-md)">
-        <span className="shrink-0 font-mono text-xs uppercase tracking-widest text-muted-foreground">
-          Chapter {index}
-        </span>
-        <div className="flex-1 border-t border-border" aria-hidden />
-      </div>
+      {/* Full-width rule — the editorial section-transition mark */}
+      <div className="border-t border-border" aria-hidden />
 
       <Heading as={as} id={headingId} size={size}>
         {title}

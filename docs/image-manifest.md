@@ -87,3 +87,22 @@ all cropped with intelligent focal positioning (never stretched).
 _Compact article cards (co-regulation, case-integration, burnout, team,
 attachment, regulation) reuse the resource/article editorial images above,
 as those card variants are text-only in the layout._
+
+## Stock photography (temporary, added 2026-09)
+
+Caroline approved temporary stock photography for three pathways that had no
+production imagery (Regulation Suite, Nervous System Academy, Organisational
+Advisory) — a full Caroline photo shoot for these is expected eventually to
+replace them. Each is licensed under the [Unsplash License](https://unsplash.com/license)
+(free for commercial and non-commercial use, no permission or attribution
+required). Downloaded directly from Unsplash's CDN and stored under
+`apps/web/public/images/` as with every other asset — never hotlinked.
+
+| Filename                                     | Page                    | Section                     | Source                                                                                        | Photographer  | Alt text                                                                                                                |
+| -------------------------------------------- | ----------------------- | --------------------------- | --------------------------------------------------------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `programs/nav-regulation-suite.webp`         | Programs                | Pathways — Regulation Suite | https://unsplash.com/photos/white-and-gray-checked-board-q3blHqtnhog                          | Kelly Sikkema | An open blank notebook and pencil beside a small succulent plant on a wooden table.                                     |
+| `programs/regulation-suite/hero.webp`        | Regulation Suite        | Body (landscape)            | https://unsplash.com/photos/white-and-gray-checked-board-q3blHqtnhog                          | Kelly Sikkema | An open blank notebook and pencil beside a small succulent plant on a wooden table, seen from above.                    |
+| `programs/nav-academy.webp`                  | Programs                | Pathways — Academy          | https://unsplash.com/photos/bright-room-with-bookshelves-and-two-desks-by-windows-Mb-lGau6K5U | Clay Banks    | A bright study room with a wall of bookshelves, a long wooden desk and two chairs facing tall windows onto trees.       |
+| `programs/academy/hero.webp`                 | Nervous System Academy  | Body (landscape)            | https://unsplash.com/photos/bright-room-with-bookshelves-and-two-desks-by-windows-Mb-lGau6K5U | Clay Banks    | A bright study room with a wall of bookshelves, a long wooden desk and two chairs facing tall windows onto trees.       |
+| `programs/nav-organisational-advisory.webp`  | Programs                | Pathways — Org. Advisory    | https://unsplash.com/photos/brown-wooden-9-piece-office-table-and-chairs-1RT4txDDAbM          | Social.cut    | An empty boardroom with a curved wooden table, tan leather chairs and a small plant, seen through glass-walled offices. |
+| `programs/organisational-advisory/hero.webp` | Organisational Advisory | Body (landscape)            | https://unsplash.com/photos/brown-wooden-9-piece-office-table-and-chairs-1RT4txDDAbM          | Social.cut    | A boardroom with a curved wooden table, tan leather chairs and a small plant, glass-walled offices visible beyond.      |

@@ -29,7 +29,7 @@ export const articlesContent = {
   slug: 'articles',
 
   seo: {
-    title: 'Articles — The Nervous System Institute',
+    title: 'Insights — The Nervous System Institute',
     description:
       'Thoughtful perspectives on neuroscience, trauma recovery, leadership and nervous system education from The Nervous System Institute.',
   },
@@ -37,14 +37,14 @@ export const articlesContent = {
   hero: {
     chapter: '01',
     eyebrow: 'Institute Publication',
-    headline: 'Articles',
+    headline: 'Insights',
     supportingHeadline:
       'Thoughtful perspectives on neuroscience, trauma recovery, leadership and nervous system education.',
     supportingCopy: 'Explore our latest writing, research summaries and practical insights.',
     imageSrc: '/images/articles/hero.webp',
     imageAlt:
       'A writing desk with an open notebook, books and a mug beside a window in soft natural light.',
-    primaryCta: { label: 'Latest Articles', href: '#latest' },
+    primaryCta: { label: 'Latest Insights', href: '#latest' },
   },
 
   featured: {
@@ -90,7 +90,7 @@ export const articlesContent = {
 
   latest: {
     chapter: '04',
-    heading: 'Latest Articles',
+    heading: 'Latest Insights',
     items: [
       {
         id: 'polyvagal-everyday',

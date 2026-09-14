@@ -245,7 +245,7 @@ export const resourcesContent = {
     headline: 'Knowledge becomes transformation when it is put into practice.',
     supportingCopy:
       'Every resource published by The Nervous System Institute exists to help individuals, practitioners and leaders build greater nervous system capacity.',
-    primaryCta: { label: 'Explore Articles', href: '/articles' },
+    primaryCta: { label: 'Explore Insights', href: '/articles' },
     secondaryCta: { label: 'Book a Discovery Call', href: '/book-a-call' },
   },
 

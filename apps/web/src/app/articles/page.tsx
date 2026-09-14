@@ -17,7 +17,7 @@ const { seo, footerQuote } = articlesContent;
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
 export const metadata = createPageMetadata({
-  title: 'Articles',
+  title: 'Insights',
   description: seo.description,
   path: '/articles',
 });
@@ -33,10 +33,10 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
   const categoryCounts = getArticleCategoryCounts(allArticles);
 
   const jsonLd = [
-    createWebPageJsonLd({ title: 'Articles', description: seo.description, path: '/articles' }),
+    createWebPageJsonLd({ title: 'Insights', description: seo.description, path: '/articles' }),
     createBreadcrumbJsonLd([
       { name: 'Home', path: '/' },
-      { name: 'Articles', path: '/articles' },
+      { name: 'Insights', path: '/articles' },
     ]),
   ];
 

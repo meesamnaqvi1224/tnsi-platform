@@ -26,7 +26,7 @@ export function CategoryNavigation({ categories, activeCategory }: CategoryNavig
             aria-current={isAllActive ? 'page' : undefined}
             className="interaction-opacity interaction-focus group flex flex-col gap-(--space-xs) rounded-sm hover:opacity-80"
           >
-            <span className={categoryLabelClasses(isAllActive)}>All Articles</span>
+            <span className={categoryLabelClasses(isAllActive)}>All Insights</span>
           </NextLink>
         </li>
 

@@ -35,12 +35,17 @@ export function CtaBand() {
                 Book a Discovery Call
               </NextLink>
             </Stack>
-            <Text size="sm" tone="muted">
-              Or start lighter —{' '}
-              <NextLink href="/assessment" className="interaction-text-link-underline font-medium">
-                take the Capacity Assessment
+            <Stack gap="xs" align="center">
+              <Text size="sm" tone="muted">
+                Or start lighter
+              </Text>
+              <NextLink
+                href="/assessment"
+                className={buttonVariants({ variant: 'primary', size: 'lg' })}
+              >
+                Take the Capacity Assessment
               </NextLink>
-            </Text>
+            </Stack>
           </Stack>
         </FadeIn>
       </Container>

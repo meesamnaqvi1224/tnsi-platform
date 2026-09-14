@@ -13,7 +13,7 @@ export function RelatedArticles({ articles }: RelatedArticlesProps) {
     <section aria-label="Related articles" className="border-border border-t">
       <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">
         <h2 className="font-heading text-foreground mb-(--space-3xl) text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
-          Related Articles
+          Related Insights
         </h2>
 
         <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-3">

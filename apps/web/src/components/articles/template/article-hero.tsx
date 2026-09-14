@@ -18,7 +18,7 @@ export function ArticleHero({ hero }: ArticleHeroProps) {
           className="interaction-text-link mb-(--space-xl) inline-flex items-center gap-(--space-sm) text-sm font-medium"
         >
           <ArrowLeft aria-hidden className="size-4" />
-          Back to Articles
+          Back to Insights
         </NextLink>
       </Container>
 
@@ -34,7 +34,7 @@ export function ArticleHero({ hero }: ArticleHeroProps) {
       </div>
 
       <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">
-        <Stack gap="xl" className="mx-auto max-w-[760px]">
+        <Stack gap="xl" className="mx-auto max-w-[860px]">
           <div className="flex flex-wrap items-center gap-x-(--space-lg) gap-y-(--space-xs)">
             <span className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">
               {hero.category}

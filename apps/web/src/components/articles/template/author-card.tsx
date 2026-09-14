@@ -10,7 +10,7 @@ export interface AuthorCardProps {
 export function AuthorCard({ author }: AuthorCardProps) {
   return (
     <section aria-label="About the author" className="border-border border-t">
-      <div className="mx-auto grid max-w-[760px] grid-cols-1 gap-(--space-xl) px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:grid-cols-[120px_1fr]">
+      <div className="mx-auto grid max-w-[860px] grid-cols-1 gap-(--space-xl) px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:grid-cols-[120px_1fr]">
         <div className="bg-secondary relative aspect-square w-[120px] shrink-0 overflow-hidden">
           <ResponsiveImage
             src={author.imageSrc ?? '/images/shared/caroline-portrait-editorial.webp'}

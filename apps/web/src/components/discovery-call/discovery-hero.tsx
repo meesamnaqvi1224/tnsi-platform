@@ -32,9 +32,6 @@ export function DiscoveryHero() {
       >
         <Stack gap="3xl" className="mx-auto max-w-3xl text-center">
           <div className="flex flex-col items-center gap-(--space-sm)">
-            <span className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
-              Chapter {hero.chapter}
-            </span>
             <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
               {hero.eyebrow}
             </p>

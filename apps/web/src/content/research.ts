@@ -332,7 +332,7 @@ export const researchContent = {
     headline: 'Knowledge becomes meaningful when it improves human lives.',
     supportingCopy:
       'Every programme, article and educational experience developed by The Nervous System Institute begins with one commitment: Understand deeply. Teach responsibly. Continue learning.',
-    primaryCta: { label: 'Explore Articles', href: '/articles' },
+    primaryCta: { label: 'Explore Insights', href: '/articles' },
     secondaryCta: { label: 'View Programs', href: '/programs' },
   },
 

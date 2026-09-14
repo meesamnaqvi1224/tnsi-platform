@@ -53,6 +53,12 @@ export const programsOverviewContent = {
         'Maintaining progress after Life Beyond Trauma™',
       ],
       cta: { label: 'Explore the Regulation Suite', href: '/programs/regulation-suite' },
+      imageSrc: '/images/programs/nav-regulation-suite.webp',
+      imageAlt:
+        'An open blank notebook and pencil beside a small succulent plant on a wooden table.',
+      heroImageSrc: '/images/programs/regulation-suite/hero.webp',
+      heroImageAlt:
+        'An open blank notebook and pencil beside a small succulent plant on a wooden table, seen from above.',
     },
     {
       id: 'life-beyond-trauma',
@@ -71,6 +77,9 @@ export const programsOverviewContent = {
         'Individuals committed to long-term growth',
       ],
       cta: { label: 'Explore Life Beyond Trauma', href: '/programs/life-beyond-trauma' },
+      imageSrc: '/images/programs/nav-life-beyond-trauma.webp',
+      imageAlt:
+        'A woman in a cream sweater walks alone along a winding path through a sunlit forest.',
     },
     {
       id: 'nervous-system-academy',
@@ -96,6 +105,12 @@ export const programsOverviewContent = {
           'Our current certification programme, Practitioner Certification, is available today.',
         href: '/programs/practitioner-certification',
       },
+      imageSrc: '/images/programs/nav-academy.webp',
+      imageAlt:
+        'A bright study room with a wall of bookshelves, a long wooden desk and two chairs facing tall windows onto trees.',
+      heroImageSrc: '/images/programs/academy/hero.webp',
+      heroImageAlt:
+        'A bright study room with a wall of bookshelves, a long wooden desk and two chairs facing tall windows onto trees.',
     },
     {
       id: 'executive-advisory',
@@ -115,6 +130,9 @@ export const programsOverviewContent = {
         'High-responsibility decision-makers',
       ],
       cta: { label: 'Explore Executive Advisory', href: '/programs/executive-advisory' },
+      imageSrc: '/images/programs/nav-executive.webp',
+      imageAlt:
+        'A woman in a tailored blazer stands by a floor-to-ceiling window overlooking a city skyline, beside a stack of books.',
     },
     {
       id: 'organisational-advisory',
@@ -135,6 +153,12 @@ export const programsOverviewContent = {
         'Corporate organisations',
       ],
       cta: { label: 'Explore Organisational Advisory', href: '/programs/organisational-advisory' },
+      imageSrc: '/images/programs/nav-organisational-advisory.webp',
+      imageAlt:
+        'An empty boardroom with a curved wooden table, tan leather chairs and a small plant, seen through glass-walled offices.',
+      heroImageSrc: '/images/programs/organisational-advisory/hero.webp',
+      heroImageAlt:
+        'A boardroom with a curved wooden table, tan leather chairs and a small plant, glass-walled offices visible beyond.',
     },
   ] as const,
 

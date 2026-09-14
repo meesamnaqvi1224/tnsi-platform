@@ -14,12 +14,7 @@ export function PcHero() {
       <div className="flex flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-4xl) sm:px-(--space-3xl) lg:px-(--space-3xl)">
         <Stack gap="xl" className="max-w-xl">
           <div className="flex flex-col gap-(--space-sm)">
-            <div className="flex items-center gap-(--space-md)">
-              <span className="text-muted-foreground shrink-0 font-mono text-xs tracking-[0.2em] uppercase">
-                Chapter {hero.chapter}
-              </span>
-              <div className="border-foreground/15 flex-1 border-t" aria-hidden />
-            </div>
+            <div className="border-foreground/15 border-t" aria-hidden />
             <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
               {hero.eyebrow}
             </p>

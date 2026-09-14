@@ -12,13 +12,13 @@ export function TheoryTeaser() {
       className="border-border bg-secondary border-t"
       aria-labelledby="theory-teaser-heading"
     >
-      <Container size="xl">
-        <Stack gap="lg" className="max-w-3xl">
+      <Container size="md">
+        <Stack gap="lg" align="center" className="text-center">
           <Eyebrow>{theoryTeaser.eyebrow}</Eyebrow>
           <Heading as="h2" id="theory-teaser-heading" size="xl">
             {theoryTeaser.headline}
           </Heading>
-          <Stack gap="sm">
+          <Stack gap="sm" align="center">
             {theoryTeaser.paragraphs.map((paragraph) => (
               <Text key={paragraph} tone="muted" className="max-w-prose leading-relaxed">
                 {paragraph}

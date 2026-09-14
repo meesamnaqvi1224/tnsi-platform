@@ -35,12 +35,19 @@ export function Hero() {
                 Book a Discovery Call
               </NextLink>
             </Stack>
-            <Text size="sm" tone="muted">
-              Not sure where to start?{' '}
-              <NextLink href="/assessment" className="interaction-text-link-underline font-medium">
-                Take the 2-minute Capacity Assessment
-              </NextLink>
-            </Text>
+            <Stack gap="xs">
+              <Text size="sm" tone="muted">
+                Not sure where to start?
+              </Text>
+              <div>
+                <NextLink
+                  href="/assessment"
+                  className={buttonVariants({ variant: 'primary', size: 'lg' })}
+                >
+                  Take the 2-minute Capacity Assessment
+                </NextLink>
+              </div>
+            </Stack>
           </Stack>
 
           <EditorialImage

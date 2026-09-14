@@ -24,9 +24,6 @@ export function EaHero() {
       <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">
         <Stack gap="2xl" className="max-w-4xl">
           <div className="flex flex-col gap-(--space-sm)">
-            <span className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
-              Chapter {hero.chapter}
-            </span>
             <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
               {hero.eyebrow}
             </p>

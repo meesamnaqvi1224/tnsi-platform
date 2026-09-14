@@ -62,7 +62,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     }),
     createBreadcrumbJsonLd([
       { name: 'Home', path: '/' },
-      { name: 'Articles', path: '/articles' },
+      { name: 'Insights', path: '/articles' },
       { name: article.hero.headline, path: `/articles/${slug}` },
     ]),
   ];
@@ -77,10 +77,17 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         <Section spacing="xl" className="border-border border-b">
           <Container size="xl" className="px-(--space-xl) sm:px-(--space-2xl)">
-            <div className="mx-auto grid w-full max-w-6xl min-w-0 grid-cols-1 gap-(--space-4xl) xl:grid-cols-[200px_minmax(0,760px)]">
+            <div className="mx-auto grid w-full max-w-7xl min-w-0 grid-cols-1 gap-(--space-4xl) xl:grid-cols-[200px_minmax(0,860px)]">
               <TableOfContents blocks={article.body} />
 
-              <article id="article-content" className="min-w-0">
+              {/*
+                Explicit column placement — when `TableOfContents` renders
+                null (articles with no H2 headings), this is the grid's only
+                child, and CSS grid auto-placement would otherwise drop it
+                into the first (200px TOC) track instead of the wide content
+                track. `xl:col-start-2` pins it correctly either way.
+              */}
+              <article id="article-content" className="min-w-0 xl:col-start-2">
                 <ArticleBody blocks={article.body} />
                 {article.takeaways && article.takeaways.length > 0 ? (
                   <ArticleTakeaways items={article.takeaways} />

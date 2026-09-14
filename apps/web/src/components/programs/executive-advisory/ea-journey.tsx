@@ -14,9 +14,6 @@ export function EaJourney() {
         <Stack gap="3xl">
           <div className="max-w-2xl">
             <div className="flex flex-col gap-(--space-sm)">
-              <span className="text-background/50 font-mono text-xs tracking-[0.2em] uppercase">
-                Chapter {journey.chapter}
-              </span>
               <div className="border-background/20 border-t" aria-hidden />
             </div>
             <h2 className="font-heading mt-(--space-sm) text-3xl leading-[1.1] font-semibold tracking-tight sm:text-4xl lg:text-5xl">

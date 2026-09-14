@@ -16,6 +16,9 @@ const isPublicRoute = createRouteMatcher([
   '/articles(.*)',
   '/resources(.*)',
   '/research(.*)',
+  // Not a live route — the /faculty page was removed (Caroline's request),
+  // but must stay public so a visit 404s cleanly via Next's own routing
+  // instead of Clerk's middleware redirecting it to sign-in first.
   '/faculty(.*)',
   '/method(.*)',
   '/contact',

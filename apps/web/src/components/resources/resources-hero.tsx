@@ -24,9 +24,6 @@ export function ResourcesHero() {
       >
         <Stack gap="2xl" className="max-w-3xl">
           <div className="flex flex-col gap-(--space-sm)">
-            <span className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
-              Chapter {hero.chapter}
-            </span>
             <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
               {hero.eyebrow}
             </p>

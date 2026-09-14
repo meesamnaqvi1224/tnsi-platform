@@ -32,7 +32,7 @@ export function ProgramsHero() {
             {hero.headline}
           </h1>
 
-          <Text size="lg" tone="muted" className="max-w-md">
+          <Text size="lg" className="text-foreground max-w-md">
             {hero.supportingCopy}
           </Text>
 

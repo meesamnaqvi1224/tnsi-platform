@@ -1,6 +1,7 @@
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { buttonVariants, Container, Heading, Section, Stack, Text } from '@tnsi/ui';
+import { EditorialImage } from '@/components/utility/editorial-image';
 import { programsOverviewContent } from '@/content/programs';
 
 const { pathways, pathwayGroups } = programsOverviewContent;
@@ -26,13 +27,23 @@ export function ProgramsPathways() {
                       key={pathway.id}
                       className="border-border grid grid-cols-1 gap-(--space-xl) border-t py-(--space-3xl) lg:grid-cols-[1fr_2fr] lg:gap-(--space-4xl)"
                     >
-                      <div className="flex flex-col gap-(--space-sm)">
-                        <h3 className="font-heading text-foreground text-2xl leading-[1.08] font-semibold tracking-tight sm:text-3xl">
-                          {pathway.title}
-                        </h3>
-                        <Text tone="muted" className="text-base font-medium">
-                          {pathway.tagline}
-                        </Text>
+                      <div className="flex flex-col gap-(--space-lg)">
+                        {'imageSrc' in pathway && pathway.imageSrc ? (
+                          <EditorialImage
+                            src={pathway.imageSrc}
+                            alt={pathway.imageAlt}
+                            aspect="portrait"
+                            sizes="(max-width: 1024px) 100vw, 33vw"
+                          />
+                        ) : null}
+                        <div className="flex flex-col gap-(--space-sm)">
+                          <h3 className="font-heading text-foreground text-2xl leading-[1.08] font-semibold tracking-tight sm:text-3xl">
+                            {pathway.title}
+                          </h3>
+                          <Text tone="muted" className="text-base font-medium">
+                            {pathway.tagline}
+                          </Text>
+                        </div>
                       </div>
 
                       <Stack gap="lg">

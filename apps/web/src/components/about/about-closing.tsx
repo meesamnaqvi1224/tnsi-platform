@@ -33,6 +33,9 @@ export function AboutClosing() {
                 take the Capacity Assessment
               </NextLink>
             </Text>
+            <Text size="xs" tone="muted" className="tracking-[0.1em] uppercase">
+              {closing.brandLine}
+            </Text>
           </Stack>
         </FadeIn>
       </Container>

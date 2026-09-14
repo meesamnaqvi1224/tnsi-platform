@@ -1,9 +1,9 @@
 export const primaryNavLinks = [
   { label: 'About', href: '/about' },
-  { label: 'The Method', href: '/method' },
+  { label: 'Human Expansion Theory', href: '/method' },
   { label: 'Programs', href: '/programs' },
   { label: 'Resources', href: '/resources' },
-  { label: 'Articles', href: '/articles' },
+  { label: 'Insights', href: '/articles' },
 ] as const;
 
 export const footerColumns = [
@@ -11,8 +11,7 @@ export const footerColumns = [
     title: 'Institute',
     links: [
       { label: 'About', href: '/about' },
-      { label: 'The Method', href: '/method' },
-      { label: 'Faculty', href: '/faculty' },
+      { label: 'Human Expansion Theory', href: '/method' },
       { label: 'Research', href: '/research' },
     ],
   },
@@ -27,7 +26,7 @@ export const footerColumns = [
   {
     title: 'Connect',
     links: [
-      { label: 'Articles', href: '/articles' },
+      { label: 'Insights', href: '/articles' },
       { label: 'Resources', href: '/resources' },
       { label: 'Book a Call', href: '/book-a-call' },
       { label: 'Contact', href: '/contact' },

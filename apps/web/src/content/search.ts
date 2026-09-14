@@ -37,7 +37,7 @@ export const searchContent = {
   popularSearches: ['window of tolerance', 'attachment theory', 'Life Beyond Trauma'] as const,
 
   groups: {
-    articles: 'Articles',
+    articles: 'Insights',
     programs: 'Programs',
     resources: 'Resources',
   } as const,

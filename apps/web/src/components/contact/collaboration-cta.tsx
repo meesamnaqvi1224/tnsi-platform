@@ -14,9 +14,6 @@ export function CollaborationCTA() {
       <Container size="xl">
         <Stack gap="2xl" className="mx-auto max-w-3xl text-center">
           <div className="flex flex-col items-center gap-(--space-sm)">
-            <span className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
-              Chapter {collaboration.chapter}
-            </span>
             <div className="border-border w-12 border-t" aria-hidden />
           </div>
 

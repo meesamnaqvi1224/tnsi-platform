@@ -4,6 +4,7 @@ import { buttonVariants, Container, Heading, Section, Stack, Text } from '@tnsi/
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
+import { EditorialImage } from '@/components/utility/editorial-image';
 import { getPathway } from '@/content/programs';
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
@@ -54,6 +55,24 @@ export default function RegulationSuitePage() {
             </Stack>
           </Container>
         </Section>
+
+        {'heroImageSrc' in pathway ? (
+          <Section
+            spacing="xl"
+            className="border-foreground/15 border-t"
+            aria-label="Regulation Suite"
+          >
+            <Container size="xl">
+              <EditorialImage
+                src={pathway.heroImageSrc}
+                alt={pathway.heroImageAlt}
+                aspect="landscape"
+                className="rounded-lg"
+                sizes="(max-width: 1024px) 100vw, 1152px"
+              />
+            </Container>
+          </Section>
+        ) : null}
 
         <Section
           spacing="xl"

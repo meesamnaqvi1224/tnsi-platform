@@ -16,9 +16,17 @@ export const aboutContent = {
 
   purpose: {
     eyebrow: 'Our Purpose',
-    headline: 'Science-led. Humanity-centred.',
-    paragraphs: [
+    /**
+     * Was "Science-led. Humanity-centred." — moved to `closing.brandLine`
+     * per Caroline's revision feedback (2026-09): the phrase should sit as
+     * a closing brand statement, not the hero headline. The headline below
+     * is the first sentence of the original hero paragraph, promoted to
+     * that role rather than inventing new copy; the rest of that paragraph
+     * remains below as supporting text.
+     */
+    headline:
       'The Nervous System Institute exists to advance human development through the science of the nervous system.',
+    paragraphs: [
       'We believe that understanding how the nervous system shapes learning, adaptation, relationships, leadership, and participation has the potential to transform the way individuals, professionals, and organisations support human growth. Through research, education, and advisory, we develop evidence-informed frameworks that bridge scientific understanding with practical application, creating pathways for meaningful and sustainable development.',
     ],
   },
@@ -81,7 +89,6 @@ export const aboutContent = {
       'Her work explores the relationship between nervous system functioning, human capacity, and lifelong development, with a particular interest in how the conditions surrounding an individual shape their ability to learn, adapt, connect, lead, and participate in life.',
       'Through The Nervous System Institute, Caroline leads the development of educational programmes, professional training, original frameworks, and research initiatives dedicated to advancing the practical understanding of nervous system science.',
     ],
-    cta: { label: 'Meet the Faculty', href: '/faculty' },
   },
 
   glance: {
@@ -112,6 +119,8 @@ export const aboutContent = {
     supportingCopy:
       'Whether supporting an individual, educating a professional, or partnering with an organisation, our purpose remains the same: to deepen understanding, expand capacity, and contribute to a future in which more people are able to participate fully in the opportunities and responsibilities of life.',
     cta: { label: 'Explore Our Work', href: '/programs' },
+    /** Relocated here from `purpose.headline` — see that field's comment. */
+    brandLine: 'Science-led. Humanity-centred.',
   },
 } as const;
 

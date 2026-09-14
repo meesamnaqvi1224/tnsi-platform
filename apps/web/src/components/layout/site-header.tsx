@@ -45,7 +45,7 @@ export function SiteHeader() {
             alt=""
             width={320}
             height={286}
-            className="h-8 w-auto shrink-0 sm:h-9"
+            className="h-10 w-auto shrink-0 sm:h-12"
           />
           <span className="font-heading text-xs leading-tight font-semibold tracking-[0.1em] uppercase sm:text-sm">
             The

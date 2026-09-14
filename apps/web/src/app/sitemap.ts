@@ -20,7 +20,6 @@ const STATIC_ROUTES = [
   '/articles',
   '/research',
   '/assessment',
-  '/faculty',
   '/book-a-call',
   '/contact',
   '/privacy',

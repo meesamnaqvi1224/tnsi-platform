@@ -5,7 +5,7 @@ export function ArticleContinueLearning() {
   return (
     <section aria-labelledby="continue-learning-heading" className="border-border border-t">
       <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">
-        <Stack gap="xl" className="mx-auto max-w-[760px] text-center">
+        <Stack gap="xl" className="mx-auto max-w-[860px] text-center">
           <h2
             id="continue-learning-heading"
             className="font-heading text-foreground text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl"
@@ -24,7 +24,7 @@ export function ArticleContinueLearning() {
               href="/articles"
               className={buttonVariants({ variant: 'outline', size: 'lg' })}
             >
-              Browse Articles
+              Browse Insights
             </NextLink>
           </Stack>
         </Stack>
