@@ -41,7 +41,7 @@ export function MethodHero() {
 
           <EditorialImage
             src={methodImages.heroPortrait}
-            alt="A sunlit study corner with a desk, chair and a large monstera plant beside a window, warm afternoon light on the wood floor."
+            alt="Caroline Reed, Founder and Director of The Nervous System Institute, in a professional portrait with warm natural light."
             aspect="portrait"
             className="rounded-lg lg:col-span-2"
             priority

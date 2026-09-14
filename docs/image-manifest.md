@@ -107,14 +107,21 @@ required). Downloaded directly from Unsplash's CDN and stored under
 | `programs/nav-organisational-advisory.webp`  | Programs                | Pathways — Org. Advisory    | https://unsplash.com/photos/brown-wooden-9-piece-office-table-and-chairs-1RT4txDDAbM          | Social.cut    | An empty boardroom with a curved wooden table, tan leather chairs and a small plant, seen through glass-walled offices. |
 | `programs/organisational-advisory/hero.webp` | Organisational Advisory | Body (landscape)            | https://unsplash.com/photos/brown-wooden-9-piece-office-table-and-chairs-1RT4txDDAbM          | Social.cut    | A boardroom with a curved wooden table, tan leather chairs and a small plant, glass-walled offices visible beyond.      |
 
-`method/hero-portrait.webp` was replaced (2026-09) — the original was a
-close, casually-cropped personal photo unsuited to an editorial hero at full
-viewport height; the hero section itself was also resized from a full-screen
-split layout down to the site's standard contained hero. The `programs/life-beyond-trauma/hero.webp`
-file is net new — the pathway's detail page previously had no body image, unlike
-its three siblings above.
+`method/hero-portrait.webp` was updated (2026-09) — the original was a close,
+casually-cropped personal photo unsuited to an editorial hero at full
+viewport height. Per the Caroline-photography policy above, Method keeps a
+real Caroline photo rather than switching to stock: it now reuses the same
+file as `home/hero-portrait.webp` (the sepia portrait, hand under chin,
+glasses on head) — already the best-composed of her available photos, and
+proven to crop well at the `EditorialImage` portrait aspect since Home uses
+it identically. No new sourcing involved; alt text is unchanged from the
+Home entry above. The hero section itself was also resized (2026-09) from a
+full-screen split layout down to the site's standard contained hero.
 
-| Filename                                | Page                               | Section          | Source                                                                                    | Photographer  | Alt text                                                                                                                     |
-| --------------------------------------- | ---------------------------------- | ---------------- | ----------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `method/hero-portrait.webp`             | Human Expansion Theory (`/method`) | Hero (portrait)  | https://unsplash.com/photos/swiss-cheese-plant-near-brown-sofa-AlkC0ts6a70                | Jade Stephens | A sunlit study corner with a desk, chair and a large monstera plant beside a window, warm afternoon light on the wood floor. |
-| `programs/life-beyond-trauma/hero.webp` | Life Beyond Trauma                 | Body (landscape) | https://unsplash.com/photos/green-trees-and-brown-dried-leaves-during-daytime-6fRHGqbp1_4 | Michael Held  | Sunbeams breaking through a green forest canopy onto a quiet dirt path.                                                      |
+The `programs/life-beyond-trauma/hero.webp` file is net new — the pathway's
+detail page previously had no body image, unlike its three siblings above —
+and is genuine stock photography (not a Caroline slot per the policy above).
+
+| Filename                                | Page               | Section          | Source                                                                                    | Photographer | Alt text                                                                |
+| --------------------------------------- | ------------------ | ---------------- | ----------------------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------------- |
+| `programs/life-beyond-trauma/hero.webp` | Life Beyond Trauma | Body (landscape) | https://unsplash.com/photos/green-trees-and-brown-dried-leaves-during-daytime-6fRHGqbp1_4 | Michael Held | Sunbeams breaking through a green forest canopy onto a quiet dirt path. |
