@@ -1,4 +1,5 @@
 import { ChapterMarker, Container, EditorialFigure, Section, Stack, Text } from '@tnsi/ui';
+import { PolyvagalHierarchyFigure } from '@/components/method/polyvagal-hierarchy-figure';
 import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
 
 const { developmentalConditions, polyvagalFigure } = humanExpansionTheoryContent;
@@ -35,18 +36,13 @@ export function MethodJourney() {
             ))}
           </div>
 
-          {/*
-            No approved Polyvagal Hierarchy diagram exists in the repository —
-            confirmed by search (see implementation report). EditorialFigure
-            renders its built-in "Figure — placeholder" box when no children
-            are supplied, so this uses Caroline's exact supplied caption and
-            source without fabricating a diagram.
-          */}
           <EditorialFigure
             number={1}
             caption={polyvagalFigure.caption}
             source={polyvagalFigure.source}
-          />
+          >
+            <PolyvagalHierarchyFigure />
+          </EditorialFigure>
         </Stack>
       </Container>
     </Section>
