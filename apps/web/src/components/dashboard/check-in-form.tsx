@@ -12,13 +12,35 @@ interface ScaleFieldProps {
   legend: string;
   value: number | null;
   onChange: (value: number) => void;
+  lowLabel: string;
+  highLabel: string;
+  /** A word for each of the 5 points (1 to 5), e.g. ['Very low', 'Low',
+   * 'Okay', 'Good', 'Very good'] - named in the readout next to the legend
+   * and on each option's aria-label, so nobody has to guess what "4" means.
+   * Matches the native app's ScoreSelector, which names every point the
+   * same way via a slider readout. */
+  valueLabels: readonly [string, string, string, string, string];
   disabled: boolean;
 }
 
-function ScaleField({ name, legend, value, onChange, disabled }: ScaleFieldProps) {
+function ScaleField({
+  name,
+  legend,
+  value,
+  onChange,
+  lowLabel,
+  highLabel,
+  valueLabels,
+  disabled,
+}: ScaleFieldProps) {
   return (
     <fieldset className="flex flex-col gap-(--space-sm)">
-      <legend className="text-foreground text-sm font-medium">{legend}</legend>
+      <div className="flex items-baseline justify-between gap-(--space-sm)">
+        <legend className="text-foreground text-sm font-medium">{legend}</legend>
+        <Text tone={value !== null ? undefined : 'muted'} size="sm">
+          {value !== null ? `${value} · ${valueLabels[value - 1]}` : 'Select a value'}
+        </Text>
+      </div>
       <div className="flex gap-(--space-sm)">
         {SCALE.map((n) => {
           const id = `${name}-${n}`;
@@ -37,6 +59,7 @@ function ScaleField({ name, legend, value, onChange, disabled }: ScaleFieldProps
               />
               <label
                 htmlFor={id}
+                aria-label={`${n} - ${valueLabels[n - 1]}`}
                 className="peer-checked:border-foreground peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:ring-ring border-border text-muted-foreground duration-base ease-standard flex size-11 min-w-11 cursor-pointer items-center justify-center rounded-full border text-sm font-medium transition-colors peer-checked:border-2 peer-checked:font-semibold peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
               >
                 {n}
@@ -47,10 +70,10 @@ function ScaleField({ name, legend, value, onChange, disabled }: ScaleFieldProps
       </div>
       <Stack direction="row" justify="between">
         <Text tone="muted" size="xs">
-          Low
+          {lowLabel}
         </Text>
         <Text tone="muted" size="xs">
-          High
+          {highLabel}
         </Text>
       </Stack>
     </fieldset>
@@ -143,6 +166,9 @@ export function CheckInForm() {
           legend="Mood"
           value={mood}
           onChange={setMood}
+          lowLabel="Very low"
+          highLabel="Very good"
+          valueLabels={['Very low', 'Low', 'Okay', 'Good', 'Very good']}
           disabled={submitting}
         />
         <ScaleField
@@ -150,6 +176,9 @@ export function CheckInForm() {
           legend="Capacity"
           value={capacity}
           onChange={setCapacity}
+          lowLabel="Very limited"
+          highLabel="Plenty available"
+          valueLabels={['Very limited', 'Limited', 'Okay', 'Good', 'Plenty available']}
           disabled={submitting}
         />
 

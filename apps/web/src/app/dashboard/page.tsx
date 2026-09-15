@@ -16,8 +16,9 @@ import {
   Text,
 } from '@tnsi/ui';
 import { CheckInForm } from '@/components/dashboard/check-in-form';
+import { WeekAtAGlance } from '@/components/dashboard/week-at-a-glance';
 import { requireAuthOrRedirect } from '@/lib/auth-api';
-import { getTodayCheckIn } from '@/lib/check-ins';
+import { getCheckInHistory, getTodayCheckIn } from '@/lib/check-ins';
 import {
   formatContentTypeLabel,
   formatPracticeDuration,
@@ -54,6 +55,10 @@ const TIER_LABELS: Record<Entitlement['tier'], string> = {
 
 const RECENT_COMPLETIONS_LIMIT = 5;
 const IN_PROGRESS_LIMIT = 5;
+/** Matches the native app's own fetch size for this same "week at a
+ * glance" reflection - enough rows to cover the last 7 calendar days even
+ * with gaps, since at most one check-in exists per day. */
+const RECENT_CHECK_INS_LIMIT = 20;
 
 const exploreLinks = [
   {
@@ -100,14 +105,21 @@ export default async function DashboardPage() {
   const user = await requireAuthOrRedirect();
   const todayCheckIn = await getTodayCheckIn(user.id);
   const todayPractice = await getTodayPractice(user.id);
-  const [inProgressPractices, inProgressCount, completedCount, recentCompletions, latestArticles] =
-    await Promise.all([
-      getInProgressPractices(user.id, IN_PROGRESS_LIMIT),
-      getInProgressPracticeCount(user.id),
-      getCompletedPracticeCount(user.id),
-      getRecentCompletions(user.id, RECENT_COMPLETIONS_LIMIT),
-      getLatestArticles(),
-    ]);
+  const [
+    inProgressPractices,
+    inProgressCount,
+    completedCount,
+    recentCompletions,
+    latestArticles,
+    checkInHistory,
+  ] = await Promise.all([
+    getInProgressPractices(user.id, IN_PROGRESS_LIMIT),
+    getInProgressPracticeCount(user.id),
+    getCompletedPracticeCount(user.id),
+    getRecentCompletions(user.id, RECENT_COMPLETIONS_LIMIT),
+    getLatestArticles(),
+    getCheckInHistory(user.id, RECENT_CHECK_INS_LIMIT, 0),
+  ]);
   const [continuePractice, ...moreInProgress] = inProgressPractices;
   const latestArticle = latestArticles[0] ?? null;
 
@@ -321,6 +333,8 @@ export default async function DashboardPage() {
                     </section>
                   </Grid>
                 </Stack>
+
+                <WeekAtAGlance recentCheckIns={checkInHistory.checkIns} />
 
                 {/* Completed — omitted entirely for a member with nothing completed yet. */}
                 {completedCount > 0 ? (
