@@ -1,8 +1,9 @@
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, radius, spacing } from '@/theme';
+import { colors, imageHeight, imageOverlayGradient, radius, spacing } from '@/theme';
 
 const powerDropsImage = require('../../../assets/images/explore-powerdrops.jpg');
 const resourcesImage = require('../../../assets/images/explore-resources.jpg');
@@ -35,6 +36,7 @@ export function ExploreTiles() {
           style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
         >
           <Image source={powerDropsImage} style={styles.tileImage} />
+          <LinearGradient colors={imageOverlayGradient} style={StyleSheet.absoluteFill} />
           <View style={styles.tileOverlay}>
             <ThemedText variant="body" color={colors.cream} style={styles.tileTitle}>
               PowerDrops
@@ -55,6 +57,7 @@ export function ExploreTiles() {
           style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
         >
           <Image source={resourcesImage} style={styles.tileImage} />
+          <LinearGradient colors={imageOverlayGradient} style={StyleSheet.absoluteFill} />
           <View style={styles.tileOverlay}>
             <ThemedText variant="body" color={colors.cream} style={styles.tileTitle}>
               Resources
@@ -73,43 +76,18 @@ export function ExploreTiles() {
 }
 
 const styles = StyleSheet.create({
-  section: {
-    marginBottom: spacing.xl,
-  },
-  sectionTitle: {
-    marginBottom: spacing.xs,
-  },
-  sectionSubtitle: {
-    marginBottom: spacing.md,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  pressed: {
-    opacity: 0.85,
-  },
-  tile: {
-    flex: 1,
-    height: 170,
-    borderRadius: radius.xl,
-    overflow: 'hidden',
-  },
-  tileImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-  },
+  section: { marginBottom: spacing.xl },
+  sectionTitle: { marginBottom: spacing.xs },
+  sectionSubtitle: { marginBottom: spacing.md },
+  row: { flexDirection: 'row', gap: spacing.sm },
+  pressed: { opacity: 0.85 },
+  tile: { flex: 1, height: imageHeight.tertiary, borderRadius: radius.xl, overflow: 'hidden' },
+  tileImage: { width: '100%', height: '100%', position: 'absolute' },
   tileOverlay: {
     flex: 1,
     justifyContent: 'flex-end',
     padding: spacing.md,
-    backgroundColor: 'rgba(11,21,38,0.45)',
   },
-  tileTitle: {
-    marginBottom: 2,
-  },
-  tileCaption: {
-    marginBottom: spacing.sm,
-  },
+  tileTitle: { marginBottom: 2 },
+  tileCaption: { marginBottom: spacing.sm },
 });

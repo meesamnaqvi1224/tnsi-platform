@@ -16,6 +16,18 @@ export default function PracticesLayout() {
       <Stack.Screen name="[id]" options={{ title: '' }} />
       <Stack.Screen name="powerdrops/index" options={{ title: 'PowerDrops' }} />
       <Stack.Screen name="powerdrops/[slug]" options={{ title: '' }} />
+      {/* The breathing flow builds its own header/close controls to match
+          its immersive, non-standard chrome (see each screen) - the stack
+          header stays off for all three. The session screen also disables
+          the swipe-back gesture: leaving mid-session must always go
+          through its own confirmation, the same reason Android's hardware
+          back button is intercepted inside that screen. */}
+      <Stack.Screen name="breathing/index" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="breathing/session"
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <Stack.Screen name="breathing/complete" options={{ headerShown: false }} />
     </Stack>
   );
 }

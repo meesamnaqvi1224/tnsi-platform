@@ -1,10 +1,11 @@
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { capitalize, formatDuration } from '@/lib/format';
-import { colors, radius, spacing } from '@/theme';
+import { colors, imageHeight, imageOverlayGradient, radius, spacing } from '@/theme';
 import type { Practice } from '@/api/types';
 
 const journeyImage = require('../../../assets/images/journey-dock.jpg');
@@ -14,14 +15,16 @@ interface ContinuePractiseCardProps {
 }
 
 /**
- * A single, real "pick up where you left off" entry - the practice the
+ * A large image-led "pick up where you left off" card - the practice the
  * member most recently played that isn't finished yet. Home decides
  * *whether* to show this (see (tabs)/index.tsx's findContinueCandidate);
  * this component only renders a real practice it's given. The percentage
  * and bar are `practice.progress.progressPct` as already returned by
- * GET /api/v1/today - not a new computation, just now actually shown
- * (the previous version fetched this field and never displayed it). The
- * thumbnail is the same placeholder-photo approach as ForThisMomentCard.
+ * GET /api/v1/today - not a new computation. Restructured this engagement
+ * from a compact list row into an image-dominant card (title/meta/progress
+ * overlaid on the photo, matching For This Moment's treatment) per the
+ * editorial redesign direction - the underlying data and navigation are
+ * unchanged.
  */
 export function ContinuePractiseCard({ practice }: ContinuePractiseCardProps) {
   const router = useRouter();
@@ -30,41 +33,46 @@ export function ContinuePractiseCard({ practice }: ContinuePractiseCardProps) {
   if (practice.durationSeconds) meta.push(formatDuration(practice.durationSeconds));
   const pct = Math.round((practice.progress?.progressPct ?? 0) * 100);
 
+  function open() {
+    router.push({ pathname: '/practices/[id]', params: { id: practice.id } });
+  }
+
   return (
     <Animated.View entering={FadeInDown.duration(450).delay(80)} style={styles.section}>
       <ThemedText variant="heading" style={styles.sectionTitle}>
         Continue where you left off
       </ThemedText>
+      <ThemedText variant="body" color={colors.charcoal} style={styles.sectionSubtitle}>
+        Pick up right where you paused.
+      </ThemedText>
+
       <Pressable
-        onPress={() => router.push({ pathname: '/practices/[id]', params: { id: practice.id } })}
+        onPress={open}
         accessibilityRole="button"
         accessibilityLabel={`Continue ${title}, ${meta.join(', ')}, ${pct} percent complete`}
-        style={({ pressed }) => pressed && styles.pressed}
+        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
       >
-        <Card style={styles.card}>
-          <View style={styles.row}>
-            <Image
-              source={practice.thumbnailUrl ? { uri: practice.thumbnailUrl } : journeyImage}
-              style={styles.thumb}
-            />
-            <View style={styles.textColumn}>
-              <ThemedText variant="body" style={styles.title}>
-                {title}
-              </ThemedText>
-              <ThemedText variant="caption" color={colors.charcoal}>
-                {meta.join(' · ')}
-              </ThemedText>
-              <View style={styles.barTrack}>
-                <View style={[styles.barFill, { width: `${Math.min(100, Math.max(0, pct))}%` }]} />
-              </View>
-            </View>
-            <View style={styles.percentBadge}>
-              <ThemedText variant="label" color={colors.navy}>
-                {pct}%
-              </ThemedText>
+        <Image
+          source={practice.thumbnailUrl ? { uri: practice.thumbnailUrl } : journeyImage}
+          style={styles.image}
+        />
+        <LinearGradient colors={imageOverlayGradient} style={StyleSheet.absoluteFill} />
+        <View style={styles.overlay}>
+          <View style={styles.textColumn}>
+            <ThemedText variant="heading" color={colors.cream} style={styles.title}>
+              {title}
+            </ThemedText>
+            <ThemedText variant="caption" color={colors.creamMuted} style={styles.meta}>
+              {meta.join(' · ')}
+            </ThemedText>
+            <View style={styles.barTrack}>
+              <View style={[styles.barFill, { width: `${Math.min(100, Math.max(0, pct))}%` }]} />
             </View>
           </View>
-        </Card>
+          <View style={styles.playButton}>
+            <Ionicons name="play" size={20} color={colors.navy} />
+          </View>
+        </View>
       </Pressable>
     </Animated.View>
   );
@@ -75,48 +83,58 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   sectionTitle: {
+    marginBottom: spacing.xs,
+  },
+  sectionSubtitle: {
     marginBottom: spacing.md,
   },
   pressed: {
-    opacity: 0.85,
+    opacity: 0.92,
   },
   card: {
-    padding: spacing.md,
+    height: imageHeight.secondary,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
   },
-  row: {
+  image: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+  overlay: {
+    flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  thumb: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.md,
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    padding: spacing.lg,
   },
   textColumn: {
     flex: 1,
+    marginRight: spacing.md,
   },
   title: {
     marginBottom: 2,
   },
+  meta: {
+    marginBottom: spacing.sm,
+  },
   barTrack: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.creamMuted,
-    marginTop: spacing.sm,
+    backgroundColor: 'rgba(247,243,234,0.3)',
     overflow: 'hidden',
+    maxWidth: 200,
   },
   barFill: {
     height: 4,
     borderRadius: 2,
     backgroundColor: colors.bronze,
   },
-  percentBadge: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: colors.border,
+  playButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.cream,
     alignItems: 'center',
     justifyContent: 'center',
   },

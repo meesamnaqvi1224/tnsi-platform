@@ -1,7 +1,7 @@
 import { Image, ImageBackground, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, spacing } from '@/theme';
+import { colors, imageHeight, spacing } from '@/theme';
 
 const logoMark = require('../../../assets/images/logo-mark.png');
 const heroImage = require('../../../assets/images/home-hero.jpg');
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   },
   hero: {
     width: '100%',
-    minHeight: 320,
+    minHeight: imageHeight.hero,
   },
   heroImage: {
     resizeMode: 'cover',
@@ -100,6 +100,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   heading: {
+    fontSize: 38,
+    lineHeight: 44,
     marginBottom: spacing.md,
   },
   taglineRule: {

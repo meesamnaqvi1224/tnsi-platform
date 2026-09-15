@@ -5,7 +5,7 @@ import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { capitalize, formatDuration } from '@/lib/format';
-import { colors, spacing } from '@/theme';
+import { colors, imageHeight, spacing } from '@/theme';
 import type { Practice } from '@/api/types';
 
 const momentImage = require('../../../assets/images/practice-moment.jpg');
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200,
+    height: imageHeight.feature,
     borderRadius: 0,
   },
   title: {

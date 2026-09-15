@@ -9,8 +9,6 @@ interface ScoreSelectorProps {
   label: string;
   value: number | null;
   onChange: (value: number) => void;
-  lowLabel: string;
-  highLabel: string;
   /** A word for each of the 5 points (1 to 5), e.g. ['Very low', 'Low',
    * 'Okay', 'Good', 'Very good'] - shown in the readout above the slider
    * and announced by screen readers as the slider moves. */
@@ -23,15 +21,17 @@ interface ScoreSelectorProps {
  * gesture reimplementation), so it inherits correct platform accessibility
  * behaviour (VoiceOver/TalkBack already know how to operate a native
  * slider). Snaps to whole numbers via `step={1}`. The current value is
- * always named in words, not just a number, both in the readout above and
- * via `accessibilityIncrements`, so nobody has to guess what "4" means.
+ * always named in words, not just a number, in the readout above and via
+ * `accessibilityIncrements`, so nobody has to guess what "4" means - no
+ * separate 1-5 tick row or "Very low"/"Very good" captions underneath as
+ * well, which read as dense form-control chrome the editorial direction
+ * explicitly avoids; the two bare endpoint numerals are the only other
+ * numbers left on screen.
  */
 export function ScoreSelector({
   label,
   value,
   onChange,
-  lowLabel,
-  highLabel,
   valueLabels,
   disabled = false,
 }: ScoreSelectorProps) {
@@ -41,49 +41,35 @@ export function ScoreSelector({
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <ThemedText variant="label" color={colors.charcoal} style={styles.label}>
+        <ThemedText variant="body" color={colors.charcoal} style={styles.label}>
           {label}
         </ThemedText>
-        <ThemedText variant="label" color={touched ? colors.bronze : colors.charcoal}>
-          {touched ? `${current} · ${valueLabels[current - 1]}` : 'Slide to select'}
+        <ThemedText variant="body" color={touched ? colors.bronze : colors.charcoal}>
+          {touched ? `${current}/5 · ${valueLabels[current - 1]}` : 'Slide to select'}
         </ThemedText>
       </View>
 
-      <Slider
-        value={current}
-        onValueChange={onChange}
-        minimumValue={1}
-        maximumValue={5}
-        step={1}
-        disabled={disabled}
-        minimumTrackTintColor={touched ? colors.bronze : colors.border}
-        maximumTrackTintColor={colors.border}
-        thumbTintColor={touched ? colors.bronze : colors.charcoal}
-        style={styles.slider}
-        accessibilityLabel={label}
-        accessibilityUnits="rating"
-        accessibilityIncrements={valueLabels as unknown as string[]}
-      />
-
-      <View style={styles.tickRow}>
-        {TICKS.map((tick) => (
-          <ThemedText
-            key={tick}
-            variant="label"
-            color={touched && tick === current ? colors.bronze : colors.border}
-            style={styles.tick}
-          >
-            {tick}
-          </ThemedText>
-        ))}
-      </View>
-
-      <View style={styles.endpointRow}>
-        <ThemedText variant="caption" color={colors.charcoal}>
-          {lowLabel}
+      <View style={styles.sliderRow}>
+        <ThemedText variant="caption" color={colors.charcoal} style={styles.endpoint}>
+          {TICKS[0]}
         </ThemedText>
-        <ThemedText variant="caption" color={colors.charcoal}>
-          {highLabel}
+        <Slider
+          value={current}
+          onValueChange={onChange}
+          minimumValue={1}
+          maximumValue={5}
+          step={1}
+          disabled={disabled}
+          minimumTrackTintColor={touched ? colors.bronze : colors.border}
+          maximumTrackTintColor={colors.border}
+          thumbTintColor={touched ? colors.bronze : colors.charcoal}
+          style={styles.slider}
+          accessibilityLabel={label}
+          accessibilityUnits="rating"
+          accessibilityIncrements={valueLabels as unknown as string[]}
+        />
+        <ThemedText variant="caption" color={colors.charcoal} style={styles.endpoint}>
+          {TICKS[TICKS.length - 1]}
         </ThemedText>
       </View>
     </View>
@@ -92,7 +78,7 @@ export function ScoreSelector({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
   headerRow: {
     flexDirection: 'row',
@@ -100,25 +86,18 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     marginBottom: spacing.xs,
   },
-  label: {
-    textTransform: 'uppercase',
+  label: {},
+  sliderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   slider: {
-    width: '100%',
+    flex: 1,
     height: 32,
   },
-  tickRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: -spacing.xs,
-    paddingHorizontal: 2,
-  },
-  tick: {
-    fontWeight: '500',
-  },
-  endpointRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: spacing.xs,
+  endpoint: {
+    width: 12,
+    textAlign: 'center',
   },
 });

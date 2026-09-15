@@ -1,7 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Tabs, usePathname } from 'expo-router';
 import type { ColorValue } from 'react-native';
 import { colors, typography } from '@/theme';
+
+/** The one route that should feel like a dedicated full-screen experience
+ * rather than a tab of the app - everywhere else (including breathing's
+ * own setup and completion screens) keeps the normal tab bar. Kept as an
+ * exact-path check rather than a prefix match so this stays scoped to
+ * exactly the immersive session screen, not the whole breathing flow. */
+const TAB_BAR_HIDDEN_ROUTES = new Set(['/practices/breathing/session']);
 
 /** Outline when inactive, filled when active - standard, restrained icon
  * treatment rather than a bespoke set (no brand icon set exists yet). */
@@ -21,13 +28,24 @@ function tabIcon(outline: keyof typeof Ionicons.glyphMap, filled: keyof typeof I
 }
 
 export default function TabsLayout() {
+  const pathname = usePathname();
+  const hideTabBar = TAB_BAR_HIDDEN_ROUTES.has(pathname);
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.navy,
         tabBarInactiveTintColor: colors.charcoal + '80',
-        tabBarStyle: { backgroundColor: colors.cream, borderTopColor: colors.border },
+        // `display: 'none'` rather than unmounting anything - the tab bar
+        // is still the same persistent React Navigation component, just
+        // not drawn while the session route is active, so nothing about
+        // the tab state (active tab, navigation stack) is disturbed and
+        // it reappears exactly as it was the moment the pathname changes
+        // again (leaving the session, e.g. via End or natural completion).
+        tabBarStyle: hideTabBar
+          ? { display: 'none' }
+          : { backgroundColor: colors.cream, borderTopColor: colors.border },
         tabBarLabelStyle: { fontFamily: typography.caption.fontFamily, fontSize: 11 },
       }}
     >

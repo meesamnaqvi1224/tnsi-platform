@@ -86,7 +86,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
 
   if (phase.kind === 'recorded') {
     return (
-      <Card style={styles.card}>
+      <Card variant="warm" style={styles.card}>
         <ThemedText variant="label" color={colors.bronze} style={styles.label}>
           Daily Check-In
         </ThemedText>
@@ -123,11 +123,11 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
   const canSubmit = phase.mood !== null && phase.capacity !== null && !phase.submitting;
 
   return (
-    <Card style={styles.card}>
+    <Card variant="warm" style={styles.card}>
       <ThemedText variant="label" color={colors.bronze} style={styles.label}>
         Daily Check-In
       </ThemedText>
-      <ThemedText variant="heading" style={styles.prompt}>
+      <ThemedText variant="display" style={styles.prompt}>
         How are you arriving today?
       </ThemedText>
       <ThemedText variant="body" color={colors.charcoal} style={styles.subtitle}>
@@ -138,8 +138,6 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
         label="Mood"
         value={phase.mood}
         onChange={(mood) => setPhase({ ...phase, mood })}
-        lowLabel="Very low"
-        highLabel="Very good"
         valueLabels={['Very low', 'Low', 'Okay', 'Good', 'Very good']}
         disabled={phase.submitting}
       />
@@ -147,8 +145,6 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
         label="Capacity"
         value={phase.capacity}
         onChange={(capacity) => setPhase({ ...phase, capacity })}
-        lowLabel="Very limited"
-        highLabel="Plenty available"
         valueLabels={['Very limited', 'Limited', 'Okay', 'Good', 'Plenty available']}
         disabled={phase.submitting}
       />
@@ -210,6 +206,12 @@ const styles = StyleSheet.create({
   noteInput: {
     minHeight: 80,
     textAlignVertical: 'top',
+    backgroundColor: colors.cream,
+    borderWidth: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    borderRadius: 0,
+    paddingHorizontal: spacing.xs,
   },
   errorText: {
     marginBottom: spacing.md,

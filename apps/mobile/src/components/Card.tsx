@@ -8,11 +8,14 @@ interface CardProps extends PropsWithChildren {
    * the one or two most distinctive features on a screen - not a general
    * dark-card option. 'accent' is a quieter alternative: a bronze edge
    * stripe on an otherwise-white card, for secondary entry points that
-   * still deserve some visual distinction. Default 'default' is the
-   * standard white card - a soft shadow and a larger radius rather than a
-   * hard border, so a stack of cards reads as gently layered rather than
-   * boxed/blocky. */
-  variant?: 'default' | 'inverted' | 'accent';
+   * still deserve some visual distinction. 'warm' trades the white fill
+   * and shadow for a flat warm-sand surface with no shadow at all - for
+   * the one or two sections (Daily Check-In) that should read as part of
+   * the page rather than a raised panel sitting on top of it. Default
+   * 'default' is the standard white card - a soft shadow and a larger
+   * radius rather than a hard border, so a stack of cards reads as gently
+   * layered rather than boxed/blocky. */
+  variant?: 'default' | 'inverted' | 'accent' | 'warm';
 }
 
 export function Card({ children, style, variant = 'default' }: CardProps) {
@@ -22,6 +25,7 @@ export function Card({ children, style, variant = 'default' }: CardProps) {
         styles.card,
         variant === 'inverted' && styles.cardInverted,
         variant === 'accent' && styles.cardAccent,
+        variant === 'warm' && styles.cardWarm,
         style,
       ]}
     >
@@ -55,5 +59,12 @@ const styles = StyleSheet.create({
     borderLeftColor: colors.bronze,
     borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
+  },
+  cardWarm: {
+    backgroundColor: colors.creamMuted,
+    ...Platform.select({
+      ios: { shadowOpacity: 0, shadowRadius: 0 },
+      android: { elevation: 0 },
+    }),
   },
 });

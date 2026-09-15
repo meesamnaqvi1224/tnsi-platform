@@ -9,6 +9,11 @@ interface ThemedTextProps extends PropsWithChildren {
   color?: string;
   style?: TextStyle;
   numberOfLines?: number;
+  /** Passed straight through to the underlying `Text` - lets a screen
+   * announce content changes (e.g. a breathing phase flipping from
+   * "Inhale" to "Exhale") to VoiceOver/TalkBack without a bespoke
+   * accessibility wrapper. */
+  accessibilityLiveRegion?: 'none' | 'polite' | 'assertive';
 }
 
 export function ThemedText({
@@ -17,6 +22,7 @@ export function ThemedText({
   color = colors.charcoal,
   style,
   numberOfLines,
+  accessibilityLiveRegion,
 }: ThemedTextProps) {
   const variantStyle = typography[variant];
   // RN auto-scales fontSize for Dynamic Type but never the numeric
@@ -37,6 +43,7 @@ export function ThemedText({
         style,
       ]}
       numberOfLines={numberOfLines}
+      accessibilityLiveRegion={accessibilityLiveRegion}
     >
       {children}
     </Text>

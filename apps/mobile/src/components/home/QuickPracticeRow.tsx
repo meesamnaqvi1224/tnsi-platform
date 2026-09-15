@@ -1,75 +1,94 @@
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, radius, spacing } from '@/theme';
+import { colors, imageOverlayGradient, radius, spacing } from '@/theme';
 
+const breatheImage = require('../../../assets/images/quick-breathe.jpg');
 const regulateImage = require('../../../assets/images/quick-regulate.jpg');
 const groundImage = require('../../../assets/images/quick-ground.jpg');
 const reconnectImage = require('../../../assets/images/quick-reconnect.jpg');
 
+type Tile =
+  | { label: string; caption: string; image: number; kind: 'breathing' }
+  | { label: string; caption: string; image: number; kind: 'powerdrops'; category: string };
+
 /**
- * Three tiles naming real PowerDrop categories from the approved taxonomy
- * (Regulation, Grounding, Interoception - see packages/cms's powerDrop
- * schema). Each tile pre-filters the PowerDrops library to its category via
- * a route param (see app/(tabs)/practices/powerdrops/index.tsx), the same
- * category filter that screen's own category bar already offers - this
- * just arrives pre-selected. If nothing is tagged with a tile's category
- * yet, that screen already handles it honestly ("No PowerDrops match this
- * category."), same as picking that chip manually would.
- * Durations shown are illustrative labels matching the category's own
- * spirit, not a real queryable field.
+ * Four simple choices, image-led, 2x2. Breathe is the one native
+ * interactive experience this engagement adds (see
+ * app/(tabs)/practices/breathing); the other three name real PowerDrop
+ * categories from the approved taxonomy (Regulation, Grounding,
+ * Interoception - see packages/cms's powerDrop schema) and pre-filter the
+ * PowerDrops library to that category via a route param, same as before -
+ * only the addition of Breathe and the grid layout changed here.
  */
-const TILES = [
-  { label: 'Regulate', duration: '90 seconds', category: 'Regulation', image: regulateImage },
-  { label: 'Ground', duration: '3 minutes', category: 'Grounding', image: groundImage },
-  { label: 'Reconnect', duration: '5 minutes', category: 'Interoception', image: reconnectImage },
-] as const;
+const TILES: Tile[] = [
+  { label: 'Breathe', caption: 'Calm now', image: breatheImage, kind: 'breathing' },
+  {
+    label: 'Regulate',
+    caption: 'Find balance',
+    image: regulateImage,
+    kind: 'powerdrops',
+    category: 'Regulation',
+  },
+  {
+    label: 'Ground',
+    caption: 'Be present',
+    image: groundImage,
+    kind: 'powerdrops',
+    category: 'Grounding',
+  },
+  {
+    label: 'Reconnect',
+    caption: 'Feel steady',
+    image: reconnectImage,
+    kind: 'powerdrops',
+    category: 'Interoception',
+  },
+];
 
 export function QuickPracticeRow() {
   const router = useRouter();
 
+  function openTile(tile: Tile) {
+    if (tile.kind === 'breathing') {
+      router.push('/practices/breathing');
+      return;
+    }
+    router.push({ pathname: '/practices/powerdrops', params: { category: tile.category } });
+  }
+
   return (
     <Animated.View entering={FadeInDown.duration(450).delay(40)} style={styles.section}>
-      <View style={styles.headerRow}>
-        <ThemedText variant="heading" style={styles.sectionTitle}>
-          Quick practice
-        </ThemedText>
-        <Pressable
-          onPress={() => router.push('/practices/powerdrops')}
-          accessibilityRole="link"
-          accessibilityLabel="View all quick practices"
-        >
-          <ThemedText variant="label" color={colors.bronze}>
-            View All →
-          </ThemedText>
-        </Pressable>
-      </View>
+      <ThemedText variant="heading" style={styles.sectionTitle}>
+        Quick practice
+      </ThemedText>
       <ThemedText variant="body" color={colors.charcoal} style={styles.sectionSubtitle}>
-        Need a moment? Try a short practice.
+        A few minutes can change how you meet this moment.
       </ThemedText>
 
-      <View style={styles.row}>
+      <View style={styles.grid}>
         {TILES.map((tile) => (
           <Pressable
             key={tile.label}
-            onPress={() =>
-              router.push({
-                pathname: '/practices/powerdrops',
-                params: { category: tile.category },
-              })
-            }
+            onPress={() => openTile(tile)}
             accessibilityRole="button"
-            accessibilityLabel={`${tile.label}, ${tile.duration}`}
+            accessibilityLabel={
+              tile.kind === 'breathing'
+                ? `${tile.label}, ${tile.caption}. Opens a guided breathing exercise.`
+                : `${tile.label}, ${tile.caption}`
+            }
             style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
           >
             <Image source={tile.image} style={styles.tileImage} />
+            <LinearGradient colors={imageOverlayGradient} style={StyleSheet.absoluteFill} />
             <View style={styles.tileOverlay}>
-              <ThemedText variant="label" color={colors.cream} style={styles.tileDuration}>
-                {tile.duration}
-              </ThemedText>
               <ThemedText variant="body" color={colors.cream} style={styles.tileLabel}>
                 {tile.label}
+              </ThemedText>
+              <ThemedText variant="caption" color={colors.creamMuted}>
+                {tile.caption}
               </ThemedText>
             </View>
           </Pressable>
@@ -83,28 +102,23 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: spacing.xl,
   },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
   sectionTitle: {
-    flex: 1,
+    marginBottom: spacing.xs,
   },
   sectionSubtitle: {
     marginBottom: spacing.md,
   },
-  row: {
+  grid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.sm,
   },
   pressed: {
     opacity: 0.85,
   },
   tile: {
-    flex: 1,
-    aspectRatio: 1,
+    width: '48%',
+    aspectRatio: 1.05,
     borderRadius: radius.lg,
     overflow: 'hidden',
   },
@@ -116,13 +130,9 @@ const styles = StyleSheet.create({
   tileOverlay: {
     flex: 1,
     justifyContent: 'flex-end',
-    padding: spacing.sm,
-    backgroundColor: 'rgba(11,21,38,0.35)',
-  },
-  tileDuration: {
-    marginBottom: 2,
+    padding: spacing.md,
   },
   tileLabel: {
-    fontSize: 15,
+    marginBottom: 1,
   },
 });
