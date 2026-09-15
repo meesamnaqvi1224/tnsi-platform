@@ -16,6 +16,7 @@ import {
   Text,
 } from '@tnsi/ui';
 import { CheckInForm } from '@/components/dashboard/check-in-form';
+import { ProgressBar } from '@/components/dashboard/progress-bar';
 import { WeekAtAGlance } from '@/components/dashboard/week-at-a-glance';
 import { requireAuthOrRedirect } from '@/lib/auth-api';
 import { getCheckInHistory, getTodayCheckIn } from '@/lib/check-ins';
@@ -86,19 +87,66 @@ const exploreLinks = [
 /** Shared title style so Card headings match the site's serif display type instead of CardTitle's default sans style. */
 const cardTitleClassName = 'font-heading text-2xl font-semibold tracking-tight text-foreground';
 
-/** Shared "type · duration · X% complete" meta line for an in-progress practice. */
-function inProgressMeta(practice: {
-  contentType: string;
-  durationSeconds: number | null;
-  progressPct: number;
-}): string {
-  return [
+/**
+ * An in-progress practice's type/duration line plus a quiet visual
+ * progress indicator — replaces a previous bare "45% complete" string
+ * (the raw number was the most prominent thing next to every title) with
+ * a thin bar, the same softening the native app's own ContinuePractiseCard
+ * already applies to this identical `progressPct` field. The percentage
+ * is still shown, just as a small secondary label beside the bar rather
+ * than headline text.
+ */
+function InProgressMeta({
+  practice,
+}: {
+  practice: { contentType: string; durationSeconds: number | null; progressPct: number };
+}) {
+  const meta = [
     formatContentTypeLabel(practice.contentType),
     formatPracticeDuration(practice.durationSeconds),
-    `${Math.round(practice.progressPct * 100)}% complete`,
   ]
     .filter(Boolean)
     .join(' · ');
+
+  return (
+    <Stack gap="xs">
+      <Text tone="muted" size="sm">
+        {meta}
+      </Text>
+      <Stack direction="row" align="center" gap="sm">
+        <ProgressBar value={practice.progressPct} className="max-w-40" />
+        <Text tone="muted" size="xs">
+          {Math.round(practice.progressPct * 100)}%
+        </Text>
+      </Stack>
+    </Stack>
+  );
+}
+
+/**
+ * The "Your Access" card's activity line — a sentence, not a stat pair.
+ * Previously read "{N} practices completed · {M} in progress" as a bare
+ * KPI-tile-style line; this keeps both real numbers but folds them into
+ * prose, and omits the line entirely when there's nothing to report yet
+ * rather than showing zeroes (mirroring the native app's own preference
+ * for hiding empty/zero quantified states over displaying them).
+ */
+function accessActivitySentence(completedCount: number, inProgressCount: number): string | null {
+  if (completedCount === 0 && inProgressCount === 0) return null;
+
+  const completedPart =
+    completedCount > 0
+      ? `completed ${completedCount} ${completedCount === 1 ? 'practice' : 'practices'}`
+      : null;
+  const inProgressPart = inProgressCount > 0 ? `${inProgressCount} under way` : null;
+
+  if (completedPart && inProgressPart) {
+    return `You've ${completedPart} and have ${inProgressPart}.`;
+  }
+  if (completedPart) {
+    return `You've ${completedPart} so far.`;
+  }
+  return `You have ${inProgressPart} right now.`;
 }
 
 export default async function DashboardPage() {
@@ -130,6 +178,7 @@ export default async function DashboardPage() {
     tier === 'free'
       ? "You're currently exploring the institute as a free member."
       : `Your current membership tier is ${accessLabel}.`;
+  const accessActivity = accessActivitySentence(completedCount, inProgressCount);
 
   return (
     <>
@@ -164,10 +213,11 @@ export default async function DashboardPage() {
                         <Text tone="muted" className="text-base leading-[1.85]">
                           {accessDescription}
                         </Text>
-                        <Text tone="muted" size="sm">
-                          {completedCount} {completedCount === 1 ? 'practice' : 'practices'}{' '}
-                          completed · {inProgressCount} in progress
-                        </Text>
+                        {accessActivity ? (
+                          <Text tone="muted" size="sm">
+                            {accessActivity}
+                          </Text>
+                        ) : null}
                         <NextLink
                           href="/dashboard/billing"
                           className="interaction-text-link-underline w-fit text-sm"
@@ -194,10 +244,8 @@ export default async function DashboardPage() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <Stack gap="sm">
-                            <Text tone="muted" size="sm">
-                              {inProgressMeta(continuePractice)}
-                            </Text>
+                          <Stack gap="md">
+                            <InProgressMeta practice={continuePractice} />
                             <NextLink
                               href={`/dashboard/practices/${continuePractice.id}`}
                               className={buttonVariants({ variant: 'primary', size: 'md' })}
@@ -221,9 +269,7 @@ export default async function DashboardPage() {
                               >
                                 {practice.title}
                               </NextLink>
-                              <Text tone="muted" size="sm">
-                                {inProgressMeta(practice)}
-                              </Text>
+                              <InProgressMeta practice={practice} />
                             </li>
                           ))}
                         </ul>
