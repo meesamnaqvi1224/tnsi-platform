@@ -17,9 +17,11 @@ import {
 } from '@tnsi/ui';
 import { primaryNavLinks } from '@/lib/nav-links';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
+import { ProgramsDesktopMenu, ProgramsMobileMenu } from '@/components/layout/programs-nav-menu';
 
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const [isProgramsOpen, setIsProgramsOpen] = React.useState(false);
 
   React.useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 8);
@@ -55,15 +57,19 @@ export function SiteHeader() {
         </NextLink>
 
         <nav aria-label="Primary" className="hidden items-center gap-8 lg:flex">
-          {primaryNavLinks.map((link) => (
-            <NextLink
-              key={link.href}
-              href={link.href}
-              className="interaction-colors interaction-focus text-foreground hover:text-muted-foreground text-sm"
-            >
-              {link.label}
-            </NextLink>
-          ))}
+          {primaryNavLinks.map((link) =>
+            link.href === '/programs' ? (
+              <ProgramsDesktopMenu key={link.href} />
+            ) : (
+              <NextLink
+                key={link.href}
+                href={link.href}
+                className="interaction-colors interaction-focus text-foreground hover:text-muted-foreground text-sm"
+              >
+                {link.label}
+              </NextLink>
+            ),
+          )}
         </nav>
 
         <Stack direction="row" align="center" gap="sm" className="shrink-0">
@@ -112,20 +118,28 @@ export function SiteHeader() {
             <DrawerContent title="Menu" side="right">
               <nav aria-label="Primary">
                 <Stack gap="lg">
-                  {primaryNavLinks.map((link) => (
-                    <DrawerClose
-                      key={link.href}
-                      nativeButton={false}
-                      render={
-                        <NextLink
-                          href={link.href}
-                          className="interaction-text-link text-foreground text-base"
-                        >
-                          {link.label}
-                        </NextLink>
-                      }
-                    />
-                  ))}
+                  {primaryNavLinks.map((link) =>
+                    link.href === '/programs' ? (
+                      <ProgramsMobileMenu
+                        key={link.href}
+                        isOpen={isProgramsOpen}
+                        onToggle={() => setIsProgramsOpen((open) => !open)}
+                      />
+                    ) : (
+                      <DrawerClose
+                        key={link.href}
+                        nativeButton={false}
+                        render={
+                          <NextLink
+                            href={link.href}
+                            className="interaction-text-link text-foreground text-base"
+                          >
+                            {link.label}
+                          </NextLink>
+                        }
+                      />
+                    ),
+                  )}
                 </Stack>
               </nav>
             </DrawerContent>
