@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Cormorant_Garamond, Geist_Mono, Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { SkipLink } from '@/components/layout/skip-link';
+import { GoogleAnalytics } from '@/components/seo/google-analytics';
 import { JsonLd } from '@/components/seo/json-ld';
 import { createOrganizationJsonLd, createPageMetadata, createWebSiteJsonLd } from '@/lib/seo';
 import './globals.css';
@@ -31,12 +32,21 @@ const geistMono = Geist_Mono({
   adjustFontFallback: true,
 });
 
-export const metadata: Metadata = createPageMetadata({
-  title: 'The Nervous System Institute',
-  description:
-    'Evidence-informed education for ambitious women, leaders and practitioners who want sustainable success without sacrificing their wellbeing.',
-  path: '/',
-});
+export const metadata: Metadata = {
+  ...createPageMetadata({
+    title: 'The Nervous System Institute',
+    description:
+      'Evidence-informed education for ambitious women, leaders and practitioners who want sustainable success without sacrificing their wellbeing.',
+    path: '/',
+  }),
+  // Site-wide Search Console verification - only the root layout sets this
+  // Metadata key, so every route inherits it (Next merges unset keys from
+  // the parent layout into each page's own metadata) without needing it
+  // repeated per page.
+  verification: {
+    google: 'TxaSrtKV7JBQmNqH5fZt31TD6cHywspOibV_0OjAgCI',
+  },
+};
 
 export default function RootLayout({
   children,
@@ -50,6 +60,7 @@ export default function RootLayout({
           className={`${sansBody.variable} ${displaySerif.variable} ${geistMono.variable} antialiased`}
         >
           <SkipLink />
+          <GoogleAnalytics />
           <JsonLd data={[createOrganizationJsonLd(), createWebSiteJsonLd()]} />
           {children}
         </body>
