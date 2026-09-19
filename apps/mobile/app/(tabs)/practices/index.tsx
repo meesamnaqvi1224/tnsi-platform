@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { ScreenContainer, ErrorNotice, PageHeader, ThemedText } from '@/components';
 import { PracticeCard } from '@/components/practices/PracticeCard';
 import { PracticeFilterBar } from '@/components/practices/PracticeFilterBar';
 import { PracticesSkeleton } from '@/components/practices/PracticesSkeleton';
 import { PowerDropsEntryCard } from '@/components/powerdrops/PowerDropsEntryCard';
 import { usePractices } from '@/hooks/usePractices';
-import { colors } from '@/theme';
+import { colors, spacing } from '@/theme';
 import type { PracticeContentType } from '@/api/types';
 
 /**
@@ -14,6 +16,7 @@ import type { PracticeContentType } from '@/api/types';
  * usePractices) rather than re-querying per tap.
  */
 export default function PracticesScreen() {
+  const router = useRouter();
   const { state, reload } = usePractices();
   const [filter, setFilter] = useState<PracticeContentType | null>(null);
 
@@ -33,6 +36,36 @@ export default function PracticesScreen() {
         eyebrow="Practices"
         title="A library of practices to support your nervous system."
       />
+
+      <View style={styles.linkRow}>
+        <Pressable
+          onPress={() => router.push('/practices/saved')}
+          accessibilityRole="link"
+          accessibilityLabel="View Saved Practices"
+        >
+          <ThemedText variant="label" color={colors.bronze}>
+            Saved →
+          </ThemedText>
+        </Pressable>
+        <Pressable
+          onPress={() => router.push('/practices/journey')}
+          accessibilityRole="link"
+          accessibilityLabel="View My Journey"
+        >
+          <ThemedText variant="label" color={colors.bronze}>
+            My Journey →
+          </ThemedText>
+        </Pressable>
+        <Pressable
+          onPress={() => router.push('/practices/history')}
+          accessibilityRole="link"
+          accessibilityLabel="View Practice History"
+        >
+          <ThemedText variant="label" color={colors.bronze}>
+            Practice History →
+          </ThemedText>
+        </Pressable>
+      </View>
 
       <PowerDropsEntryCard />
 
@@ -62,3 +95,13 @@ export default function PracticesScreen() {
     </ScreenContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  linkRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+    gap: spacing.md,
+    marginBottom: spacing.md,
+  },
+});

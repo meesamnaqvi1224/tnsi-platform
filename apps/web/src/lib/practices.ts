@@ -1,7 +1,9 @@
-import { db, practices, practiceCompletions } from '@tnsi/db';
-import { eq, and, desc, gt, count } from 'drizzle-orm';
+import { db, practices, practiceCompletions, practiceReflections, practiceSaves } from '@tnsi/db';
+import { eq, and, desc, gt, count, countDistinct, inArray } from 'drizzle-orm';
 import { categoryForCapacityScore, pickDeterministicCandidate } from '@tnsi/core';
 import { getLatestCheckIn } from './check-ins';
+import { paginateRows } from './practice-sessions';
+import type { PracticeReflection as PracticeReflectionRow } from '@tnsi/db/schema';
 
 /**
  * Fields the member-facing UI is allowed to see. Deliberately excludes
@@ -116,23 +118,32 @@ export async function getRecommendedPractice(userId: string): Promise<PracticeSu
 }
 
 /**
- * Whether the given user has completed the given practice. The schema has
- * no per-day completion concept for practices (unlike check-ins) — just a
- * single `completed` boolean per user+practice — so this reflects overall
- * completion, not "completed today" specifically.
+ * Whether the given user has EVER completed the given practice, across any
+ * session - not just their most recent one. Since Practice History (see
+ * `practice_completions`'s own schema comment), a practice can have many
+ * rows for the same user; this is intentionally an existence check
+ * ("has a completed=true row ever existed"), not "is the latest row
+ * completed" - those aren't the same question once repeat sessions are
+ * real (a member who finished a practice last week and reopened it today
+ * without finishing again has still, overall, completed it).
  */
 export async function isPracticeCompleted(userId: string, practiceId: string): Promise<boolean> {
   const result = await db
-    .select({ completed: practiceCompletions.completed })
+    .select({ id: practiceCompletions.id })
     .from(practiceCompletions)
     .where(
-      and(eq(practiceCompletions.userId, userId), eq(practiceCompletions.practiceId, practiceId)),
+      and(
+        eq(practiceCompletions.userId, userId),
+        eq(practiceCompletions.practiceId, practiceId),
+        eq(practiceCompletions.completed, true),
+      ),
     )
     .limit(1);
-  return result[0]?.completed ?? false;
+  return result.length > 0;
 }
 
 export interface PracticeCompletionState {
+  id: string;
   progressPct: number;
   positionSeconds: number;
   completed: boolean;
@@ -140,12 +151,14 @@ export interface PracticeCompletionState {
 }
 
 /**
- * The full completion row for one user+practice, or `null` if they've never
- * started it. Unlike `isPracticeCompleted` above (which exists purely for
- * the boolean badge/gate case), the practice player needs `positionSeconds`
- * to resume playback and `playCount` to avoid re-incrementing it on every
- * throttled progress save — neither is derivable from a boolean, so this is
- * a genuinely separate read, not a duplicate of the existing one.
+ * This user's *current* relationship with a practice, for the practice
+ * player/detail screen - not their full history (see getPracticeHistory
+ * for that). "Current" means the most recently touched row: the one
+ * in-progress session if there is one (so playback resumes exactly where
+ * it left off), otherwise their most recent past session (so a finished
+ * practice reopens ready to start fresh, per PracticePlayer/AudioPlayer's
+ * own `completed ? 0 : ...` resume logic). `null` only if they've never
+ * touched this practice at all.
  */
 export async function getPracticeCompletion(
   userId: string,
@@ -153,6 +166,7 @@ export async function getPracticeCompletion(
 ): Promise<PracticeCompletionState | null> {
   const result = await db
     .select({
+      id: practiceCompletions.id,
       progressPct: practiceCompletions.progressPct,
       positionSeconds: practiceCompletions.positionSeconds,
       completed: practiceCompletions.completed,
@@ -162,8 +176,81 @@ export async function getPracticeCompletion(
     .where(
       and(eq(practiceCompletions.userId, userId), eq(practiceCompletions.practiceId, practiceId)),
     )
+    .orderBy(desc(practiceCompletions.lastPlayedAt))
     .limit(1);
   return result[0] ?? null;
+}
+
+export interface PracticeReflectionState {
+  completionId: PracticeReflectionRow['completionId'];
+  response: PracticeReflectionRow['response'];
+  reflection: PracticeReflectionRow['reflection'];
+  updatedAt: PracticeReflectionRow['updatedAt'];
+}
+
+/**
+ * This user's own saved reflection for one specific completed session, or
+ * `null` if they never saved one for it (skipped, or the session isn't
+ * finished yet). Takes `completionId`, not `practiceId` - a reflection now
+ * belongs to a session, not "this practice" in general (see
+ * practice_reflections's own schema comment) - and re-checks `userId`
+ * itself rather than trusting the caller already verified ownership of
+ * `completionId`, so a mistaken call here can never leak another member's
+ * reflection.
+ */
+export async function getPracticeReflection(
+  userId: string,
+  completionId: string,
+): Promise<PracticeReflectionState | null> {
+  const result = await db
+    .select({
+      completionId: practiceReflections.completionId,
+      response: practiceReflections.response,
+      reflection: practiceReflections.reflection,
+      updatedAt: practiceReflections.updatedAt,
+    })
+    .from(practiceReflections)
+    .where(
+      and(
+        eq(practiceReflections.completionId, completionId),
+        eq(practiceReflections.userId, userId),
+      ),
+    )
+    .limit(1);
+  return result[0] ?? null;
+}
+
+/** Whether this user currently has this practice saved. */
+export async function isPracticeSaved(userId: string, practiceId: string): Promise<boolean> {
+  const result = await db
+    .select({ id: practiceSaves.id })
+    .from(practiceSaves)
+    .where(and(eq(practiceSaves.userId, userId), eq(practiceSaves.practiceId, practiceId)))
+    .limit(1);
+  return result.length > 0;
+}
+
+export interface SavedPractice extends PracticeSummary {
+  savedAt: Date;
+}
+
+/**
+ * This user's saved practices, most recently saved first. Filters
+ * `isPublished` the same way every other member-facing practice list in
+ * this file does (getPublishedPractices, getInProgressPractices, ...) -
+ * if a saved practice is later unpublished, its save row is never
+ * deleted (see POST/DELETE .../save's own comments), it simply stops
+ * appearing here, exactly like an unpublished practice already stops
+ * appearing everywhere else. No separate "unavailable" placeholder is
+ * fabricated for it.
+ */
+export async function getSavedPractices(userId: string): Promise<SavedPractice[]> {
+  return db
+    .select({ ...PRACTICE_SUMMARY_COLUMNS, savedAt: practiceSaves.createdAt })
+    .from(practiceSaves)
+    .innerJoin(practices, eq(practiceSaves.practiceId, practices.id))
+    .where(and(eq(practiceSaves.userId, userId), eq(practices.isPublished, true)))
+    .orderBy(desc(practiceSaves.createdAt));
 }
 
 export interface InProgressPractice extends PracticeSummary {
@@ -235,14 +322,92 @@ export async function getRecentCompletions(
     .limit(limit);
 }
 
+export interface PracticeHistoryEntry extends PracticeSummary {
+  completionId: string;
+  completedAt: Date;
+  reflection: {
+    response: PracticeReflectionRow['response'];
+    reflection: PracticeReflectionRow['reflection'];
+  } | null;
+}
+
 /**
- * Total completed-practice count for this user — a plain `COUNT(*)`, not a
- * derived/invented metric, so the dashboard's "X completed" figure stays
- * accurate even when the recent-completions list above is capped by `limit`.
+ * This user's full practice history, newest session first — real Practice
+ * History (see `practice_completions`'s own schema comment): every
+ * completed session is its own row here, including repeat sessions of the
+ * same practice, each independently queryable rather than one overwriting
+ * the last. Pagination mirrors `getCheckInHistory`'s existing
+ * fetch-`limit`-plus-one convention exactly, rather than introducing a
+ * different (e.g. cursor-based) scheme this codebase doesn't otherwise
+ * use.
+ *
+ * Reflections are fetched in one extra query keyed by `completionId` and
+ * merged in-memory (a `Map`, not a second per-row round trip) — avoids
+ * the N+1 an inner loop of individual lookups would cause for a page of,
+ * say, 20 sessions.
+ *
+ * Deliberately does NOT filter `practices.isPublished` (unlike every other
+ * list in this file) — a member's own record of what they actually did
+ * shouldn't disappear just because the practice was later unpublished.
+ * See getJourneyEntries's identical choice for the same reason.
+ */
+export async function getPracticeHistory(
+  userId: string,
+  limit: number,
+  offset: number,
+): Promise<{ history: PracticeHistoryEntry[]; hasMore: boolean }> {
+  const rows = await db
+    .select({
+      ...PRACTICE_SUMMARY_COLUMNS,
+      completionId: practiceCompletions.id,
+      completedAt: practiceCompletions.completedAt,
+    })
+    .from(practiceCompletions)
+    .innerJoin(practices, eq(practiceCompletions.practiceId, practices.id))
+    .where(and(eq(practiceCompletions.userId, userId), eq(practiceCompletions.completed, true)))
+    .orderBy(desc(practiceCompletions.completedAt))
+    .limit(limit + 1)
+    .offset(offset);
+
+  const { page, hasMore } = paginateRows(rows, limit);
+
+  const completionIds = page.map((row) => row.completionId);
+  const reflectionRows =
+    completionIds.length > 0
+      ? await db
+          .select({
+            completionId: practiceReflections.completionId,
+            response: practiceReflections.response,
+            reflection: practiceReflections.reflection,
+          })
+          .from(practiceReflections)
+          .where(inArray(practiceReflections.completionId, completionIds))
+      : [];
+  const reflectionByCompletionId = new Map(reflectionRows.map((r) => [r.completionId, r]));
+
+  return {
+    history: page.map((row) => ({
+      ...row,
+      completedAt: row.completedAt as Date,
+      reflection: reflectionByCompletionId.get(row.completionId) ?? null,
+    })),
+    hasMore,
+  };
+}
+
+/**
+ * Count of *distinct* practices this user has completed at least once —
+ * deliberately `COUNT(DISTINCT practiceId)`, not `COUNT(*)`. Before
+ * Practice History, those were identical (at most one completion row per
+ * practice existed at all); now that repeat sessions are real rows, a
+ * plain `COUNT(*)` would count completed *sessions*, quietly turning this
+ * dashboard stat into something closer to a streak/activity count - which
+ * is explicitly out of scope. This keeps its existing meaning ("how much
+ * of the library have you gotten through") intact.
  */
 export async function getCompletedPracticeCount(userId: string): Promise<number> {
   const [row] = await db
-    .select({ count: count() })
+    .select({ count: countDistinct(practiceCompletions.practiceId) })
     .from(practiceCompletions)
     .innerJoin(practices, eq(practiceCompletions.practiceId, practices.id))
     .where(

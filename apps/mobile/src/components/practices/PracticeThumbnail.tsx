@@ -3,10 +3,12 @@ import {
   Image,
   StyleSheet,
   View,
+  type ImageSourcePropType,
   type ImageStyle,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ThemedText } from '@/components/ThemedText';
 import { capitalize } from '@/lib/format';
 import { colors, radius } from '@/theme';
@@ -21,9 +23,28 @@ interface PracticeThumbnailProps {
 }
 
 /**
- * Real thumbnail image when one exists; otherwise (or if it fails to
- * load) a plain branded surface naming the content type - never a broken-
- * image icon, never invented stock art.
+ * Generic (not practice-specific) stock photo per content type, shown only
+ * when a practice has no real `thumbnailUrl` of its own. Explicitly approved
+ * as a stand-in for visual polish - same reasoning as Home's hero photo in
+ * WelcomeHeader.tsx - swap for real photography per practice as Caroline
+ * supplies it. content-video.jpg is CC BY 2.0 "Woman working on laptop while
+ * sitting on couch" by nenad53 (flickr.com/photos/202780880@N02/54582935863)
+ * and needs attribution wherever image credits are shown; the rest are
+ * Unsplash License (no attribution required).
+ */
+const CONTENT_TYPE_STOCK_IMAGES: Record<PracticeContentType, ImageSourcePropType> = {
+  meditation: require('../../../assets/images/content-meditation.jpg'),
+  movement: require('../../../assets/images/content-movement.jpg'),
+  journal: require('../../../assets/images/content-journal.jpg'),
+  breathwork: require('../../../assets/images/content-breathwork.jpg'),
+  audio: require('../../../assets/images/content-audio.jpg'),
+  video: require('../../../assets/images/content-video.jpg'),
+};
+
+/**
+ * Real per-practice thumbnail when one exists; otherwise (or if it fails to
+ * load) a generic stock photo for the content type, labeled so it's never
+ * mistaken for that specific practice's own photography.
  */
 export function PracticeThumbnail({
   thumbnailUrl,
@@ -47,9 +68,17 @@ export function PracticeThumbnail({
 
   return (
     <View style={[styles.surface, { height }, style]}>
-      <ThemedText variant="label" color={colors.bronzeMuted} style={styles.surfaceLabel}>
-        {capitalize(contentType)}
-      </ThemedText>
+      <Image
+        source={CONTENT_TYPE_STOCK_IMAGES[contentType]}
+        style={styles.stockImage as StyleProp<ImageStyle>}
+        accessibilityIgnoresInvertColors
+        accessible={false}
+      />
+      <LinearGradient colors={['transparent', 'rgba(11,21,38,0.75)']} style={styles.gradient}>
+        <ThemedText variant="label" color={colors.cream} style={styles.surfaceLabel}>
+          {capitalize(contentType)}
+        </ThemedText>
+      </LinearGradient>
     </View>
   );
 }
@@ -64,8 +93,19 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: radius.lg,
     backgroundColor: colors.navy,
-    alignItems: 'center',
-    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  stockImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  gradient: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    padding: 12,
   },
   surfaceLabel: {
     textTransform: 'uppercase',

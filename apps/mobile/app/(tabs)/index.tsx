@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet } from 'react-native';
 import { useUser } from '@clerk/clerk-expo';
+import { useRouter } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { ScreenContainer, ErrorNotice, ThemedText, Card } from '@/components';
 import { WelcomeHeader } from '@/components/home/WelcomeHeader';
@@ -19,7 +20,7 @@ import { LifeBeyondTraumaCard } from '@/components/home/LifeBeyondTraumaCard';
 import { BookConsultationCard } from '@/components/home/BookConsultationCard';
 import { useToday } from '@/hooks/useToday';
 import { colors, spacing } from '@/theme';
-import type { Practice } from '@/api/types';
+import type { CheckIn, Practice } from '@/api/types';
 
 /**
  * Home: a calm daily orientation, not a dashboard. Fetches GET
@@ -64,7 +65,16 @@ function findRecentlyCompleted(practices: Practice[], excludeId: string | undefi
 
 export default function HomeScreen() {
   const { user } = useUser();
-  const { state, reload, setCheckIn } = useToday();
+  const router = useRouter();
+  const { state, reload, setCheckIn, refresh } = useToday();
+
+  function handleCheckInSubmitted(checkIn: CheckIn) {
+    // Instant feedback (CheckInCard's own "recorded" view doesn't wait on
+    // this), then a quiet background refetch so todayPractice reflects the
+    // category this check-in just routed to - see useToday.ts's `refresh`.
+    setCheckIn(checkIn);
+    void refresh();
+  }
 
   const todayPractice = state.status === 'success' ? state.data.todayPractice : null;
   const continueCandidate = useMemo(() => {
@@ -81,6 +91,17 @@ export default function HomeScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <WelcomeHeader firstName={user?.firstName} />
 
+        <Pressable
+          onPress={() => router.push('/practices/journey')}
+          accessibilityRole="link"
+          accessibilityLabel="View My Journey"
+          style={styles.journeyLink}
+        >
+          <ThemedText variant="label" color={colors.bronze}>
+            My Journey →
+          </ThemedText>
+        </Pressable>
+
         {state.status === 'loading' && <HomeSkeleton />}
 
         {state.status === 'error' && <ErrorNotice message={state.message} onRetry={reload} />}
@@ -88,10 +109,13 @@ export default function HomeScreen() {
         {state.status === 'success' && (
           <>
             <Animated.View entering={FadeInDown.duration(450)} style={styles.checkInSection}>
-              <CheckInCard initialCheckIn={state.data.checkIn} onSubmitted={setCheckIn} />
+              <CheckInCard
+                initialCheckIn={state.data.checkIn}
+                onSubmitted={handleCheckInSubmitted}
+              />
             </Animated.View>
 
-            <ForThisMomentCard practice={todayPractice} />
+            <ForThisMomentCard practice={todayPractice} hasCheckedInToday={!!state.data.checkIn} />
 
             {continueCandidate ? <ContinuePractiseCard practice={continueCandidate} /> : null}
           </>
@@ -129,6 +153,10 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  journeyLink: {
+    alignSelf: 'flex-end',
+    marginBottom: spacing.md,
+  },
   checkInSection: {
     marginBottom: spacing.xl,
   },

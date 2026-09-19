@@ -18,7 +18,7 @@ import {
 import { CheckInForm } from '@/components/dashboard/check-in-form';
 import { ProgressBar } from '@/components/dashboard/progress-bar';
 import { WeekAtAGlance } from '@/components/dashboard/week-at-a-glance';
-import { requireAuthOrRedirect } from '@/lib/auth-api';
+import { requireMemberAccessOrRedirect } from '@/lib/auth-api';
 import { getCheckInHistory, getTodayCheckIn } from '@/lib/check-ins';
 import {
   formatContentTypeLabel,
@@ -150,7 +150,7 @@ function accessActivitySentence(completedCount: number, inProgressCount: number)
 }
 
 export default async function DashboardPage() {
-  const user = await requireAuthOrRedirect();
+  const user = await requireMemberAccessOrRedirect();
   const todayCheckIn = await getTodayCheckIn(user.id);
   const todayPractice = await getTodayPractice(user.id);
   const [

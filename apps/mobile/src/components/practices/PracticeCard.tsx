@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { PracticeThumbnail } from './PracticeThumbnail';
+import { SaveToggleButton } from './SaveToggleButton';
 import { capitalize, formatDuration } from '@/lib/format';
 import { colors, spacing } from '@/theme';
 import type { Practice } from '@/api/types';
@@ -22,48 +23,63 @@ export function PracticeCard({ practice }: PracticeCardProps) {
   if (practice.durationSeconds) meta.push(formatDuration(practice.durationSeconds));
 
   return (
-    <Pressable
-      onPress={() => router.push({ pathname: '/practices/[id]', params: { id: practice.id } })}
-      accessibilityRole="button"
-      accessibilityLabel={`${title}, ${meta.join(', ')}`}
-      style={({ pressed }) => pressed && styles.pressed}
-    >
-      <Card style={styles.card}>
-        <PracticeThumbnail
-          thumbnailUrl={practice.thumbnailUrl}
-          contentType={practice.contentType}
-          height={140}
-          style={styles.thumbnail}
-        />
-        <ThemedText variant="heading" style={styles.title}>
-          {title}
-        </ThemedText>
-        {practice.description ? (
-          <ThemedText
-            variant="body"
-            color={colors.charcoal}
-            numberOfLines={2}
-            style={styles.description}
-          >
-            {practice.description}
+    // The save toggle is a sibling of this Pressable, not nested inside it -
+    // React Native's default `accessible` behavior collapses a Pressable's
+    // entire subtree into one accessibility element, which would silently
+    // hide a nested save button from screen readers. Positioned absolutely
+    // over the thumbnail instead, so tapping it never also navigates.
+    <View style={styles.wrapper}>
+      <Pressable
+        onPress={() => router.push({ pathname: '/practices/[id]', params: { id: practice.id } })}
+        accessibilityRole="button"
+        accessibilityLabel={`${title}, ${meta.join(', ')}`}
+        style={({ pressed }) => pressed && styles.pressed}
+      >
+        <Card style={styles.card}>
+          <PracticeThumbnail
+            thumbnailUrl={practice.thumbnailUrl}
+            contentType={practice.contentType}
+            height={140}
+            style={styles.thumbnail}
+          />
+          <ThemedText variant="heading" style={styles.title}>
+            {title}
           </ThemedText>
-        ) : null}
-        <View style={styles.metaRow}>
-          <ThemedText variant="caption" color={colors.charcoal}>
-            {meta.join(' · ')}
-          </ThemedText>
-          {practice.category ? (
-            <ThemedText variant="caption" color={colors.bronze}>
-              {practice.category}
+          {practice.description ? (
+            <ThemedText
+              variant="body"
+              color={colors.charcoal}
+              numberOfLines={2}
+              style={styles.description}
+            >
+              {practice.description}
             </ThemedText>
           ) : null}
-        </View>
-      </Card>
-    </Pressable>
+          <View style={styles.metaRow}>
+            <ThemedText variant="caption" color={colors.charcoal}>
+              {meta.join(' · ')}
+            </ThemedText>
+            {practice.category ? (
+              <ThemedText variant="caption" color={colors.bronze}>
+                {practice.category}
+              </ThemedText>
+            ) : null}
+          </View>
+        </Card>
+      </Pressable>
+      <SaveToggleButton
+        practiceId={practice.id}
+        initialSaved={practice.saved ?? false}
+        style={styles.saveButton}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    position: 'relative',
+  },
   pressed: {
     opacity: 0.85,
   },
@@ -83,5 +99,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  saveButton: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
   },
 });

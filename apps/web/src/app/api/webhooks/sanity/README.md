@@ -83,3 +83,39 @@ SANITY_WEBHOOK_SECRET=… node scripts/sync-practice.mjs <sanityId>
 ```
 
 See `apps/web/scripts/sync-practice.mjs`.
+
+## Manual verification checklist
+
+Nothing in this repo can confirm the webhook is actually registered and
+working — that only exists in the Sanity dashboard and production logs.
+Before relying on it for real content entry, the project owner should walk
+through this once:
+
+1. Open `https://sanity.io/manage` → the TNSI project → **API** → **Webhooks**.
+2. Confirm a webhook exists for practice content (any name is fine — check
+   its configuration, not its label).
+3. Confirm its **Filter** targets `practice` documents (matches the
+   `_type == "practice"` filter in [Configuration](#configuration) above,
+   ideally with the draft exclusion from [Draft exclusion](#draft-exclusion)).
+4. Confirm the **URL** points at the real production endpoint —
+   `https://thenervoussysteminstitute.com/api/webhooks/sanity` (not a
+   preview/staging URL, not left as a placeholder).
+5. Confirm a **Secret** is set on the webhook, and that the same value is
+   set as `SANITY_WEBHOOK_SECRET` in the production environment (Vercel
+   project settings → Environment Variables). You're only confirming both
+   sides have _a_ value and that whoever set them used the same one —
+   never paste the actual secret into a ticket, chat, or this file.
+6. Confirm **Trigger on** includes Create, Update, and Delete (all three —
+   missing Delete means unpublishing in Sanity silently stops reaching
+   Postgres).
+7. When ready to actually test live (not as part of routine review): publish
+   or edit one throwaway test practice in Sanity Studio.
+8. Confirm the corresponding row appears/updates in the Postgres `practices`
+   table (e.g. via Drizzle Studio, `pnpm --filter @tnsi/db db:studio`, or a
+   direct read-only query) — matching title/category/etc.
+9. Confirm the practice shows up correctly in the app (Practice Library,
+   then its detail page) on web and/or mobile.
+10. Unpublish or delete the throwaway test practice in Sanity, and confirm
+    it disappears from the Practice Library again (its Postgres row should
+    remain, with `is_published = false` — see
+    [Behaviour this endpoint implements](#behaviour-this-endpoint-implements)).

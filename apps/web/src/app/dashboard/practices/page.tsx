@@ -16,12 +16,14 @@ import {
   Stack,
   Text,
 } from '@tnsi/ui';
-import { requireAuthOrRedirect } from '@/lib/auth-api';
+import { SaveToggleButton } from '@/components/dashboard/save-toggle-button';
+import { requireMemberAccessOrRedirect } from '@/lib/auth-api';
 import {
   formatContentTypeLabel,
   formatPracticeDuration,
   getPracticeCompletion,
   getPublishedPractices,
+  isPracticeSaved,
   type PracticeCompletionState,
   type PracticeSummary,
 } from '@/lib/practices';
@@ -145,7 +147,7 @@ function matchesQuery(q: string, practice: PracticeSummary): boolean {
 }
 
 export default async function PracticeLibraryPage({ searchParams }: PracticeLibraryPageProps) {
-  const user = await requireAuthOrRedirect();
+  const user = await requireMemberAccessOrRedirect();
   const {
     category: categoryParam,
     contentType: contentTypeParam,
@@ -185,9 +187,16 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
   const completions = await Promise.all(
     allPractices.map((practice) => getPracticeCompletion(user.id, practice.id)),
   );
+  const savedStates = await Promise.all(
+    allPractices.map((practice) => isPracticeSaved(user.id, practice.id)),
+  );
 
   const practiceList = allPractices
-    .map((practice, index) => ({ practice, completion: completions[index] ?? null }))
+    .map((practice, index) => ({
+      practice,
+      completion: completions[index] ?? null,
+      saved: savedStates[index] ?? false,
+    }))
     .filter(({ practice, completion }) => {
       if (activeCategory && practice.category !== activeCategory) return false;
       if (activeContentType && practice.contentType !== activeContentType) return false;
@@ -204,7 +213,23 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
             <div className="mx-auto max-w-5xl">
               <Stack gap="2xl">
                 <header className="border-border flex flex-col gap-(--space-md) border-b pb-(--space-2xl)">
-                  <Eyebrow>Practice Library</Eyebrow>
+                  <Stack direction="row" gap="sm" className="items-center justify-between">
+                    <Eyebrow>Practice Library</Eyebrow>
+                    <Stack direction="row" gap="md" className="items-center">
+                      <NextLink
+                        href="/dashboard/practices/saved"
+                        className="interaction-text-link-underline text-sm"
+                      >
+                        Saved Practices →
+                      </NextLink>
+                      <NextLink
+                        href="/dashboard/practices/history"
+                        className="interaction-text-link-underline text-sm"
+                      >
+                        Practice History →
+                      </NextLink>
+                    </Stack>
+                  </Stack>
                   <Heading as="h1" size="xl">
                     Practice Library
                   </Heading>
@@ -318,7 +343,7 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                   />
                 ) : (
                   <Grid cols="2" gap="lg">
-                    {practiceList.map(({ practice, completion }) => {
+                    {practiceList.map(({ practice, completion, saved }) => {
                       const statusLabel = completion?.completed
                         ? 'Completed'
                         : completion && completion.progressPct > 0
@@ -326,18 +351,22 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                           : null;
 
                       return (
-                        <NextLink
+                        // A plain (non-link) Card, not wrapped in NextLink like
+                        // the library previously was - the title below is its
+                        // own link, and the save button is a real sibling
+                        // button, not nested inside an anchor (invalid HTML,
+                        // and unreliable for screen readers/keyboard focus).
+                        <Card
                           key={practice.id}
-                          href={`/dashboard/practices/${practice.id}`}
-                          className="interaction-focus interaction-colors rounded-lg"
+                          className="hover:border-foreground/40 duration-base ease-standard h-full transition-colors"
                         >
-                          <Card className="hover:border-foreground/40 duration-base ease-standard h-full transition-colors">
-                            <CardHeader>
-                              <Stack
-                                direction="row"
-                                gap="sm"
-                                className="items-center justify-between"
-                              >
+                          <CardHeader>
+                            <Stack
+                              direction="row"
+                              gap="sm"
+                              className="items-center justify-between"
+                            >
+                              <Stack direction="row" gap="sm" className="items-center">
                                 <Badge variant="outline">
                                   {formatContentTypeLabel(practice.contentType)}
                                 </Badge>
@@ -351,39 +380,45 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                                   </Badge>
                                 ) : null}
                               </Stack>
+                              <SaveToggleButton practiceId={practice.id} initialSaved={saved} />
+                            </Stack>
+                            <NextLink
+                              href={`/dashboard/practices/${practice.id}`}
+                              className="interaction-focus interaction-colors mt-(--space-xs) block w-fit rounded-sm"
+                            >
                               <Heading
                                 as="h2"
                                 size="xs"
-                                className="font-heading text-foreground mt-(--space-xs) text-lg font-semibold"
+                                className="font-heading text-foreground text-lg font-semibold"
                               >
                                 {practice.title}
                               </Heading>
-                              <Text tone="muted" size="xs" className="tracking-[0.02em]">
-                                {practiceSecondaryMeta(practice)}
-                              </Text>
-                            </CardHeader>
-                            {practice.description || practice.tags.length > 0 ? (
-                              <CardContent>
-                                <Stack gap="sm">
-                                  {practice.description ? (
-                                    <Text tone="muted" className="text-sm leading-[1.7]">
-                                      {practice.description}
-                                    </Text>
-                                  ) : null}
-                                  {practice.tags.length > 0 ? (
-                                    <Stack direction="row" gap="2xs" wrap="wrap">
-                                      {practice.tags.map((tag) => (
-                                        <Badge key={tag} variant="secondary">
-                                          {tag}
-                                        </Badge>
-                                      ))}
-                                    </Stack>
-                                  ) : null}
-                                </Stack>
-                              </CardContent>
-                            ) : null}
-                          </Card>
-                        </NextLink>
+                            </NextLink>
+                            <Text tone="muted" size="xs" className="tracking-[0.02em]">
+                              {practiceSecondaryMeta(practice)}
+                            </Text>
+                          </CardHeader>
+                          {practice.description || practice.tags.length > 0 ? (
+                            <CardContent>
+                              <Stack gap="sm">
+                                {practice.description ? (
+                                  <Text tone="muted" className="text-sm leading-[1.7]">
+                                    {practice.description}
+                                  </Text>
+                                ) : null}
+                                {practice.tags.length > 0 ? (
+                                  <Stack direction="row" gap="2xs" wrap="wrap">
+                                    {practice.tags.map((tag) => (
+                                      <Badge key={tag} variant="secondary">
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                  </Stack>
+                                ) : null}
+                              </Stack>
+                            </CardContent>
+                          ) : null}
+                        </Card>
                       );
                     })}
                   </Grid>

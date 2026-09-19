@@ -1,5 +1,5 @@
 import { z } from '@tnsi/validation';
-import { practiceContentTypeEnum } from '@tnsi/db/schema';
+import { practiceContentTypeEnum, postPracticeResponseEnum } from '@tnsi/db/schema';
 import { PURCHASABLE_TIERS } from '@tnsi/integrations';
 
 export const practiceContentType = z.enum(practiceContentTypeEnum.enumValues);
@@ -35,6 +35,38 @@ export const practiceIdParam = z.object({
 });
 
 export type PracticeIdParam = z.infer<typeof practiceIdParam>;
+
+/** Query params for GET /api/v1/practices/history — same bounds/convention as checkInsListQuerySchema above. */
+export const practiceHistoryListQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
+export type PracticeHistoryListQuery = z.infer<typeof practiceHistoryListQuerySchema>;
+
+/**
+ * A post-practice reflection: `response`/`reflection` are both optional
+ * and both nullable independently of each other - a member can pick a
+ * response without writing anything, write something without picking a
+ * response, or send neither (an explicit "clear my reflection" - see the
+ * route's own handling). `response` is intentionally the exact enum
+ * values from `postPracticeResponseEnum`, not free text, so an invalid
+ * value is rejected rather than silently stored.
+ *
+ * `completionId` is required (not optional) - a reflection is now about
+ * one specific practice session, not "this practice" in general (see
+ * packages/db/src/schema/practice-reflections.ts's own comment on why).
+ * The route itself still verifies the session belongs to the
+ * authenticated user and the practice in the URL - this schema only
+ * confirms it's a well-formed id.
+ */
+export const practiceReflectionSchema = z.object({
+  completionId: z.string().uuid(),
+  response: z.enum(postPracticeResponseEnum.enumValues).optional(),
+  reflection: z.string().trim().max(2000).optional(),
+});
+
+export type PracticeReflectionInput = z.infer<typeof practiceReflectionSchema>;
 
 export const contactFormSchema = z.object({
   name: z.string().trim().min(1).max(200),

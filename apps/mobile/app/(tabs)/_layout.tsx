@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs, usePathname } from 'expo-router';
 import type { ColorValue } from 'react-native';
+import { HomeHeaderButton } from '@/components';
 import { colors, typography } from '@/theme';
 
 /** The one route that should feel like a dedicated full-screen experience
@@ -59,7 +60,21 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="my-learning"
-        options={{ title: 'My Learning', tabBarIcon: tabIcon('school-outline', 'school') }}
+        options={{
+          title: 'My Learning',
+          tabBarIcon: tabIcon('school-outline', 'school'),
+          // The only tab with no nested Stack of its own (a single flat
+          // screen), so unlike Practices/Resources/Profile it never had a
+          // header at all under the shared `headerShown: false` above -
+          // opted back in here specifically so it can carry the same
+          // Home button the other three tab roots now have.
+          headerShown: true,
+          headerStyle: { backgroundColor: colors.cream },
+          headerTintColor: colors.navy,
+          headerTitleStyle: { fontFamily: typography.heading.fontFamily },
+          headerShadowVisible: false,
+          headerLeft: () => <HomeHeaderButton />,
+        }}
       />
       <Tabs.Screen
         name="resources"

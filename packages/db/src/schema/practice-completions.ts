@@ -6,7 +6,6 @@ import {
   boolean,
   timestamp,
   jsonb,
-  unique,
   index,
   check,
 } from 'drizzle-orm/pg-core';
@@ -48,9 +47,20 @@ export const practiceCompletions = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({
-    uniquePcUserPractice: unique('unique_practice_completions_user_practice').on(
+    // No unique(userId, practiceId) here anymore - removed deliberately so
+    // a member can build up real Practice History (see AUDIT_REPORT.md):
+    // each genuinely completed session is its own row. What the old
+    // constraint guaranteed - "at most one row represents this member's
+    // *current* relationship with this practice" - is now an invariant
+    // the application maintains instead: at most one row per (userId,
+    // practiceId) may have completed=false at a time (see POST
+    // .../complete's own comment for how it enforces that), so
+    // idxPcUserPracticeLastPlayed below can still cheaply find "the
+    // current/most recent row for this practice" without a table scan.
+    idxPcUserPracticeLastPlayed: index('idx_practice_completions_user_practice_last_played').on(
       table.userId,
       table.practiceId,
+      table.lastPlayedAt,
     ),
     idxPcUserCompleted: index('idx_practice_completions_user_completed').on(
       table.userId,

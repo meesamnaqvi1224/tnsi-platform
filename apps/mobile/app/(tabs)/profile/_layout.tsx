@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import { HomeHeaderButton } from '@/components';
 import { colors, typography } from '@/theme';
 
 /** Profile tab's own stack: account at the root, Capacity Assessment and Membership & Access pushed on top. */
@@ -12,7 +13,10 @@ export default function ProfileLayout() {
         headerShadowVisible: false,
       }}
     >
-      <Stack.Screen name="index" options={{ title: 'Profile' }} />
+      <Stack.Screen
+        name="index"
+        options={{ title: 'Profile', headerLeft: () => <HomeHeaderButton /> }}
+      />
       <Stack.Screen name="progress" options={{ title: '' }} />
       <Stack.Screen name="membership" options={{ title: '' }} />
       {/*

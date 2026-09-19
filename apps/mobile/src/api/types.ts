@@ -98,13 +98,34 @@ export interface CheckInsListResponse {
 export type PracticeContentType =
   'audio' | 'video' | 'meditation' | 'breathwork' | 'movement' | 'journal';
 
+/**
+ * This member's *current* relationship with a practice - the most
+ * recently touched session, not their full history (see
+ * PracticeHistoryEntry for that). `id` identifies that specific session -
+ * needed to submit a reflection against it (see PracticeReflectionInput's
+ * `completionId`). Practice History (see packages/db/src/schema/
+ * practice-completions.ts's own comment) means a practice can have many
+ * completion rows for this member now; this is always the current one.
+ */
 export interface PracticeProgress {
+  id: string;
   progressPct: number | null;
   positionSeconds: number | null;
   completed: boolean;
   completedAt: string | null;
   playCount: number;
   lastPlayedAt: string | null;
+}
+
+/** Mirrors packages/db/src/schema/enums.ts's `postPracticeResponseEnum` - a purely self-reported, never-interpreted answer to "how do you feel now?". */
+export type PostPracticeResponse = 'DIFFERENT' | 'SAME' | 'NOT_SURE';
+
+/** This member's own saved post-practice reflection for one specific practice session (`completionId`), if they ever saved one for it - not "this practice" in general (see practice_reflections's own schema comment on why). */
+export interface PracticeReflectionState {
+  completionId: string | null;
+  response: PostPracticeResponse | null;
+  reflection: string | null;
+  updatedAt: string;
 }
 
 /**
@@ -126,6 +147,77 @@ export interface Practice {
   tags: string[];
   difficulty: number;
   progress: PracticeProgress | null;
+  /** Only ever populated by GET /api/v1/practices/[id] (the practice detail screen) - absent/undefined from the /today and list endpoints, which don't attach it. */
+  reflection?: PracticeReflectionState | null;
+  /** Whether the authenticated member currently has this practice saved. Populated by GET /api/v1/practices and GET /api/v1/practices/[id] - absent/undefined from /today, which doesn't attach it (Home doesn't show a save control). */
+  saved?: boolean;
+}
+
+/**
+ * One completed session in this member's Practice History - matches
+ * apps/web/src/lib/practices.ts's `PracticeHistoryEntry` exactly. A
+ * practice's own fields (title/category/etc.) are duplicated onto each
+ * session rather than referenced by id, since GET /api/v1/practices/history
+ * already returns them flattened - no second per-practice fetch needed to
+ * render a history row.
+ */
+export interface PracticeHistoryEntry {
+  id: string;
+  title: string;
+  description: string | null;
+  contentType: PracticeContentType;
+  mediaUrl: string | null;
+  thumbnailUrl: string | null;
+  durationSeconds: number | null;
+  category: string | null;
+  tags: string[];
+  difficulty: number;
+  completionId: string;
+  completedAt: string;
+  reflection: { response: PostPracticeResponse | null; reflection: string | null } | null;
+}
+
+/** Response shape of GET /api/v1/practices/history. */
+export interface PracticeHistoryResponse {
+  history: PracticeHistoryEntry[];
+  pagination: { limit: number; offset: number; hasMore: boolean };
+}
+
+/**
+ * My Journey: this member's own recorded activity, newest first - a
+ * completed practice session or a daily check-in. Mirrors
+ * apps/web/src/lib/journey-presentation.ts's `JourneyEntry` union exactly
+ * (`occurredAt` as an ISO string here, same as every other timestamp in
+ * this file). Presentation-only: nothing here is a score, a trend, or an
+ * interpretation - just what the member actually recorded.
+ */
+export interface JourneyPracticeEntry {
+  kind: 'practice';
+  id: string;
+  occurredAt: string;
+  practiceId: string;
+  title: string;
+  contentType: PracticeContentType;
+  category: string | null;
+  durationSeconds: number | null;
+  reflection: { response: PostPracticeResponse | null; reflection: string | null } | null;
+}
+
+export interface JourneyCheckInEntry {
+  kind: 'check_in';
+  id: string;
+  occurredAt: string;
+  moodScore: number;
+  capacityScore: number;
+  notes: string | null;
+}
+
+export type JourneyEntry = JourneyPracticeEntry | JourneyCheckInEntry;
+
+/** Response shape of GET /api/v1/journey. */
+export interface JourneyResponse {
+  entries: JourneyEntry[];
+  pagination: { limit: number; offset: number; hasMore: boolean };
 }
 
 /** Response shape of GET /api/v1/today, per apps/web/src/app/api/v1/today/route.ts. */
@@ -150,6 +242,37 @@ export interface PracticesListResponse {
   pagination: { limit: number; offset: number };
 }
 
+/**
+ * One entry from GET /api/v1/practices/saved, per
+ * apps/web/src/lib/practices.ts's `getSavedPractices` - a plain practice
+ * summary plus `savedAt`, never `progress`/`reflection` (this list isn't
+ * about completion state, only "is it saved").
+ */
+export interface SavedPractice {
+  id: string;
+  title: string;
+  description: string | null;
+  contentType: PracticeContentType;
+  mediaUrl: string | null;
+  thumbnailUrl: string | null;
+  durationSeconds: number | null;
+  category: string | null;
+  tags: string[];
+  difficulty: number;
+  savedAt: string;
+}
+
+/** Response shape of GET /api/v1/practices/saved. */
+export interface SavedPracticesResponse {
+  practices: SavedPractice[];
+}
+
+/** Response shape of POST/DELETE /api/v1/practices/[id]/save. */
+export interface SavePracticeResult {
+  practiceId: string;
+  saved: boolean;
+}
+
 /** Request body for POST /api/v1/practices/[id]/complete, per apps/web/src/lib/validation.ts's `practiceCompletionSchema`. */
 export interface PracticeCompletionInput {
   progressPct?: number;
@@ -164,6 +287,7 @@ export interface PracticeCompletionInput {
  * unused here since the detail screen already has the full `Practice`.
  */
 export interface PracticeCompletionResult {
+  id: string;
   progressPct: number;
   positionSeconds: number;
   completed: boolean;

@@ -12,6 +12,11 @@ const momentImage = require('../../../assets/images/practice-moment.jpg');
 
 interface ForThisMomentCardProps {
   practice: Practice | null;
+  /** Whether today's check-in has already been recorded - lets the empty
+   * state below tell the two honest reasons apart (no check-in yet, vs.
+   * checked in but nothing tagged for that category yet) instead of one
+   * generic message for both. */
+  hasCheckedInToday: boolean;
 }
 
 /**
@@ -19,11 +24,9 @@ interface ForThisMomentCardProps {
  * a deterministic content-routing pick from the user's latest capacity
  * check-in (see apps/web/src/lib/practices.ts's getRecommendedPractice),
  * not a display-order pick. This component itself has no recommendation
- * logic and no "based on your check-ins" framing - it just renders whatever
- * the backend decided, or the empty state below when that's `null` (no
- * check-in yet, or no practice tagged with the recommended category yet).
- * Shows the practice's own real thumbnail when it has one; otherwise a
- * placeholder mood photo
+ * logic - it just renders whatever the backend decided, or one of the two
+ * empty states below when that's `null`. Shows the practice's own real
+ * thumbnail when it has one; otherwise a placeholder mood photo
  * (not a real photo of this practice - swap for real photography later)
  * rather than the plain branded fallback used elsewhere, since this is
  * Home's single largest visual moment.
@@ -33,7 +36,7 @@ interface ForThisMomentCardProps {
  * Pressable card is an RN anti-pattern that causes unreliable touch
  * handling between the two.
  */
-export function ForThisMomentCard({ practice }: ForThisMomentCardProps) {
+export function ForThisMomentCard({ practice, hasCheckedInToday }: ForThisMomentCardProps) {
   const router = useRouter();
 
   if (!practice) {
@@ -43,7 +46,9 @@ export function ForThisMomentCard({ practice }: ForThisMomentCardProps) {
           For this moment
         </ThemedText>
         <ThemedText variant="body" color={colors.charcoal}>
-          No practice is available today.
+          {hasCheckedInToday
+            ? 'No practice is available today.'
+            : "Complete today's check-in above to see a practice for this moment."}
         </ThemedText>
       </View>
     );
@@ -59,7 +64,7 @@ export function ForThisMomentCard({ practice }: ForThisMomentCardProps) {
         For this moment
       </ThemedText>
       <ThemedText variant="body" color={colors.charcoal} style={styles.sectionSubtitle}>
-        A gentle practice to support you now.
+        Based on how you're arriving today.
       </ThemedText>
 
       <Card style={styles.card}>

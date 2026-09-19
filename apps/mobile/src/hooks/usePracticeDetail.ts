@@ -2,7 +2,26 @@ import { useCallback, useEffect, useState } from 'react';
 import { useApiClient } from './useApiClient';
 import { humanizeApiError } from '@/lib/api-errors';
 import { ApiRequestError } from '@/api/types';
-import type { Practice, PracticeCompletionInput, PracticeCompletionResult } from '@/api/types';
+import type {
+  Practice,
+  PracticeCompletionInput,
+  PracticeCompletionResult,
+  PracticeReflectionState,
+  PostPracticeResponse,
+} from '@/api/types';
+
+/**
+ * `completionId` is required - a reflection is about one specific
+ * session, not "this practice" in general (see practice_reflections's own
+ * schema comment). `response`/`reflection` stay optional and independent,
+ * exactly matching POST .../reflection's own validation - a caller can
+ * send one, the other, both, or (skip) neither.
+ */
+export interface PracticeReflectionInput {
+  completionId: string;
+  response?: PostPracticeResponse;
+  reflection?: string;
+}
 
 export type PracticeDetailState =
   | { status: 'loading' }
@@ -55,6 +74,7 @@ export function usePracticeDetail(id: string) {
               practice: {
                 ...prev.practice,
                 progress: {
+                  id: result.id,
                   progressPct: result.progressPct,
                   positionSeconds: result.positionSeconds,
                   completed: result.completed,
@@ -71,5 +91,25 @@ export function usePracticeDetail(id: string) {
     [api, id],
   );
 
-  return { state, reload: load, submitCompletion };
+  // Same "only this screen ever calls it" reasoning as submitCompletion
+  // above - a genuinely separate write from it, though: this can never
+  // fail to save a reflection in a way that touches `progress` above, and
+  // vice versa (see packages/db/src/schema/practice-reflections.ts).
+  const submitReflection = useCallback(
+    async (input: PracticeReflectionInput) => {
+      const result = await api.post<PracticeReflectionState>(
+        `/api/v1/practices/${id}/reflection`,
+        input,
+      );
+      setState((prev) =>
+        prev.status === 'success'
+          ? { ...prev, practice: { ...prev.practice, reflection: result } }
+          : prev,
+      );
+      return result;
+    },
+    [api, id],
+  );
+
+  return { state, reload: load, submitCompletion, submitReflection };
 }

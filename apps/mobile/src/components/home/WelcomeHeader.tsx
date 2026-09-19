@@ -88,8 +88,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   logo: {
-    width: 22,
-    height: 19,
+    width: 34,
+    height: 29,
   },
   brandName: {
     textTransform: 'uppercase',

@@ -7,17 +7,21 @@
  * rather than this web app itself. Kept, not removed, in case one already
  * depends on it.
  */
-import { getAuthUser } from '@/lib/auth-api';
+import { requireMemberAccess, memberAccessErrorResponse } from '@/lib/auth-api';
 import { db, checkIns, practices, practiceCompletions } from '@tnsi/db';
-import { eq, and, inArray, gte, lte } from 'drizzle-orm';
-import { success, unauthorized } from '@/lib/api-response';
+import { eq, and, inArray, gte, lte, desc } from 'drizzle-orm';
+import { success } from '@/lib/api-response';
 import { getRecommendedPractice } from '@/lib/practices';
 
 export const runtime = 'nodejs';
 
 export async function GET() {
-  const user = await getAuthUser();
-  if (!user) return unauthorized();
+  let user;
+  try {
+    user = await requireMemberAccess();
+  } catch (err) {
+    return memberAccessErrorResponse(err);
+  }
 
   const today = new Date();
   const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -44,7 +48,12 @@ export async function GET() {
     .orderBy(practices.category, practices.difficulty)
     .limit(10);
 
-  // Get user's practice completions for today's practices
+  // Get user's practice completions for today's practices. Practice
+  // History (see practice_completions's own schema comment) means a
+  // practice can now have many rows for this user, not just one - ordered
+  // by lastPlayedAt desc so the loop below keeps only the FIRST (i.e.
+  // most recently touched) row it sees per practiceId, the same
+  // "current session" definition getPracticeCompletion uses.
   const practiceIds = recentPractices.map((p) => p.id);
   const completions =
     practiceIds.length > 0
@@ -57,9 +66,13 @@ export async function GET() {
               inArray(practiceCompletions.practiceId, practiceIds),
             ),
           )
+          .orderBy(desc(practiceCompletions.lastPlayedAt))
       : [];
 
-  const completionsMap = new Map(completions.map((c) => [c.practiceId, c]));
+  const completionsMap = new Map<string, (typeof completions)[number]>();
+  for (const c of completions) {
+    if (!completionsMap.has(c.practiceId)) completionsMap.set(c.practiceId, c);
+  }
 
   const practicesWithProgress = recentPractices.map((practice) => {
     const completion = completionsMap.get(practice.id);
@@ -100,6 +113,7 @@ export async function GET() {
               eq(practiceCompletions.practiceId, recommendedPractice.id),
             ),
           )
+          .orderBy(desc(practiceCompletions.lastPlayedAt))
           .limit(1)
       )[0];
 

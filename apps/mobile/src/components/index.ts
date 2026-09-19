@@ -7,3 +7,4 @@ export { PageHeader } from './PageHeader';
 export { TextField } from './TextField';
 export { PlaceholderScreen } from './PlaceholderScreen';
 export { ErrorNotice } from './ErrorNotice';
+export { HomeHeaderButton } from './HomeHeaderButton';

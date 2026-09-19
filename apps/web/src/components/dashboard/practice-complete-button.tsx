@@ -1,13 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { Alert, Button, Text } from '@tnsi/ui';
+import { Alert, Button } from '@tnsi/ui';
 
 type Status = 'idle' | 'submitting' | 'completed' | 'error';
 
 interface PracticeCompleteButtonProps {
   practiceId: string;
-  initialCompleted: boolean;
+  /** Called once, after a successful save, with the id of the now-completed session - lets a parent (see PracticeExperience) move on to the reflection step, and attach it to the right session, without this component knowing anything about what happens after. */
+  onCompleted?: (completionId: string) => void;
 }
 
 /**
@@ -15,12 +16,14 @@ interface PracticeCompleteButtonProps {
  * endpoint. That route already upserts idempotently (updates the existing
  * completion row rather than rejecting a repeat call), so there's no
  * "already completed" error case to handle here, unlike check-ins.
+ *
+ * Never renders anything for an already-completed practice itself - the
+ * parent (PracticeExperience) owns that decision and simply doesn't mount
+ * this component once `completed` is true, swapping in
+ * PostPracticeReflection instead.
  */
-export function PracticeCompleteButton({
-  practiceId,
-  initialCompleted,
-}: PracticeCompleteButtonProps) {
-  const [status, setStatus] = React.useState<Status>(initialCompleted ? 'completed' : 'idle');
+export function PracticeCompleteButton({ practiceId, onCompleted }: PracticeCompleteButtonProps) {
+  const [status, setStatus] = React.useState<Status>('idle');
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   async function handleClick() {
@@ -35,7 +38,9 @@ export function PracticeCompleteButton({
       });
 
       if (response.ok) {
+        const json = (await response.json().catch(() => null)) as { data?: { id?: string } } | null;
         setStatus('completed');
+        if (json?.data?.id) onCompleted?.(json.data.id);
         return;
       }
 
@@ -45,14 +50,6 @@ export function PracticeCompleteButton({
       setStatus('error');
       setErrorMessage("We couldn't save that. Please try again.");
     }
-  }
-
-  if (status === 'completed') {
-    return (
-      <Text role="status" tone="muted">
-        Completed
-      </Text>
-    );
   }
 
   return (

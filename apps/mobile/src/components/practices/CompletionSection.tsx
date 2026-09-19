@@ -1,17 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { Card } from '@/components/Card';
-import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { spacing } from '@/theme';
-
-/** Calm completion confirmation - shown once, regardless of how completion happened. */
-export function CompletionBanner() {
-  return (
-    <Card style={styles.card}>
-      <ThemedText variant="heading">Practice complete.</ThemedText>
-    </Card>
-  );
-}
 
 interface MarkCompleteButtonProps {
   submitting: boolean;
@@ -37,9 +26,6 @@ export function MarkCompleteButton({ submitting, onPress }: MarkCompleteButtonPr
 }
 
 const styles = StyleSheet.create({
-  card: {
-    marginTop: spacing.lg,
-  },
   button: {
     marginTop: spacing.lg,
   },

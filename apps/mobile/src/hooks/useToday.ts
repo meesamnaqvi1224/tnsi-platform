@@ -40,5 +40,27 @@ export function useToday() {
     );
   }, []);
 
-  return { state, reload: load, setCheckIn };
+  /**
+   * Re-fetches /api/v1/today and merges the fresh response into an
+   * already-`success` state, without flipping `status` back to `loading`
+   * first - a real refetch (like `setCheckIn` above's local patch can't
+   * be), but one that shouldn't skeleton-flash Home over a check-in
+   * submission it already has its own "recorded" transition for. Used
+   * right after a check-in is saved, so `todayPractice` reflects the
+   * capacity category that check-in just routed to (see
+   * getRecommendedPractice) instead of staying whatever was recommended
+   * (often nothing) before today's check-in existed. Fails silently -
+   * worst case Home keeps showing pre-check-in data until the next
+   * explicit `reload`, not worse than not calling this at all.
+   */
+  const refresh = useCallback(async () => {
+    try {
+      const data = await api.get<TodayResponse>('/api/v1/today');
+      setState({ status: 'success', data });
+    } catch {
+      // Silent by design - see comment above.
+    }
+  }, [api]);
+
+  return { state, reload: load, setCheckIn, refresh };
 }

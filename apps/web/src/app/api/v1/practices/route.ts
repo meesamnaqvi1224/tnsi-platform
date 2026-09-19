@@ -6,17 +6,21 @@
  * external/mobile client rather than this web app itself. Kept, not
  * removed, in case one already depends on it.
  */
-import { getAuthUser } from '@/lib/auth-api';
-import { db, practices, practiceCompletions } from '@tnsi/db';
+import { requireMemberAccess, memberAccessErrorResponse } from '@/lib/auth-api';
+import { db, practices, practiceCompletions, practiceSaves } from '@tnsi/db';
 import { eq, and, inArray, desc } from 'drizzle-orm';
 import { practiceContentType } from '@/lib/validation';
-import { success, unauthorized, badRequest } from '@/lib/api-response';
+import { success, badRequest } from '@/lib/api-response';
 
 export const runtime = 'nodejs';
 
 export async function GET(request: Request) {
-  const user = await getAuthUser();
-  if (!user) return unauthorized();
+  let user;
+  try {
+    user = await requireMemberAccess();
+  } catch (err) {
+    return memberAccessErrorResponse(err);
+  }
 
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');
@@ -45,7 +49,12 @@ export async function GET(request: Request) {
     .limit(limit)
     .offset(offset);
 
-  // Get completions for these practices
+  // Get completions for these practices. Practice History (see
+  // practice_completions's own schema comment) means a practice can now
+  // have many rows for this user, not just one - ordered by lastPlayedAt
+  // desc so the loop below keeps only the FIRST (i.e. most recently
+  // touched) row it sees per practiceId, the same "current session"
+  // definition getPracticeCompletion uses.
   const practiceIds = practiceList.map((p) => p.id);
   const completions =
     practiceIds.length > 0
@@ -58,14 +67,32 @@ export async function GET(request: Request) {
               inArray(practiceCompletions.practiceId, practiceIds),
             ),
           )
+          .orderBy(desc(practiceCompletions.lastPlayedAt))
       : [];
 
-  const completionsMap = new Map(completions.map((c) => [c.practiceId, c]));
+  const completionsMap = new Map<string, (typeof completions)[number]>();
+  for (const c of completions) {
+    if (!completionsMap.has(c.practiceId)) completionsMap.set(c.practiceId, c);
+  }
+
+  // One batched query for this page's saved state, mirroring the
+  // completions lookup above - never a per-practice query.
+  const saves =
+    practiceIds.length > 0
+      ? await db
+          .select({ practiceId: practiceSaves.practiceId })
+          .from(practiceSaves)
+          .where(
+            and(eq(practiceSaves.userId, user.id), inArray(practiceSaves.practiceId, practiceIds)),
+          )
+      : [];
+  const savedIds = new Set(saves.map((s) => s.practiceId));
 
   const practicesWithProgress = practiceList.map((practice) => {
     const completion = completionsMap.get(practice.id);
     return {
       ...practice,
+      saved: savedIds.has(practice.id),
       progress: completion
         ? {
             progressPct: completion.progressPct,

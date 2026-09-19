@@ -67,6 +67,7 @@ export function createApiClient(getToken: TokenGetter) {
   return {
     get: <T>(path: string) => request<T>(path, { method: 'GET' }),
     post: <T>(path: string, body?: unknown) => request<T>(path, { method: 'POST', body }),
+    delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
   };
 }
 

@@ -8,6 +8,7 @@ import {
   Award,
   BookOpen,
   Calendar,
+  Compass,
   FileText,
   GraduationCap,
   HelpCircle,
@@ -40,8 +41,8 @@ interface NavItem {
 
 /**
  * The full Academy navigation Caroline's reference screenshots establish —
- * `Practices` and `Billing` are this repo's real, already-working
- * equivalents and link out; every other item is a later roadmap phase
+ * `Practices`, `My Journey`, and `Billing` are this repo's real,
+ * already-working equivalents and link out; every other item is a later roadmap phase
  * (see the phase list in the brief) with no real data source yet, so it's
  * shown — establishing the intended architecture — but not linked, per
  * "do not build fake UI for functionality that does not have a real data
@@ -51,6 +52,7 @@ const navItems: NavItem[] = [
   { label: 'Academy Home', icon: Home, href: '/dashboard' },
   { label: 'My Learning', icon: BookOpen },
   { label: 'Practices', icon: Sparkles, href: '/dashboard/practices' },
+  { label: 'My Journey', icon: Compass, href: '/dashboard/journey' },
   { label: 'Programs', icon: GraduationCap },
   { label: 'Workshops', icon: Presentation },
   { label: 'Resources', icon: FileText },

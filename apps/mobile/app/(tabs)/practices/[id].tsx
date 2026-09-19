@@ -7,7 +7,10 @@ import { PracticeDetailSkeleton } from '@/components/practices/PracticeDetailSke
 import { AudioPlayer } from '@/components/practices/AudioPlayer';
 import { VideoPlayer } from '@/components/practices/VideoPlayer';
 import { ExternalMediaNotice } from '@/components/practices/ExternalMediaNotice';
-import { CompletionBanner, MarkCompleteButton } from '@/components/practices/CompletionSection';
+import { MediaUnavailableNotice } from '@/components/practices/MediaUnavailableNotice';
+import { MarkCompleteButton } from '@/components/practices/CompletionSection';
+import { PostPracticeReflection } from '@/components/practices/PostPracticeReflection';
+import { SaveToggleButton } from '@/components/practices/SaveToggleButton';
 import { usePracticeDetail } from '@/hooks/usePracticeDetail';
 import { resolveMediaKind } from '@/lib/media';
 import { capitalize, formatDuration } from '@/lib/format';
@@ -16,7 +19,7 @@ import { colors, spacing } from '@/theme';
 export default function PracticeDetailScreen() {
   const params = useLocalSearchParams<{ id: string }>();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-  const { state, reload, submitCompletion } = usePracticeDetail(id);
+  const { state, reload, submitCompletion, submitReflection } = usePracticeDetail(id);
   const [submitting, setSubmitting] = useState(false);
   // Bumped to force the audio/video player to fully remount (a fresh
   // native player instance, a fresh load attempt) when the member taps
@@ -115,6 +118,11 @@ export default function PracticeDetailScreen() {
 
   const mediaKind = resolveMediaKind(practice.mediaUrl, practice.contentType);
   const completed = practice.progress?.completed ?? false;
+  // `journal` genuinely has no media by design; the other five content
+  // types are meant to carry a recording - if one doesn't yet (today, only
+  // one Sanity practice actually does), that's a real content gap worth
+  // saying out loud rather than leaving a silent empty space.
+  const expectsMedia = practice.contentType !== 'journal';
 
   return (
     <ScreenContainer scroll>
@@ -127,9 +135,12 @@ export default function PracticeDetailScreen() {
         />
       ) : null}
 
-      <ThemedText variant="display" style={styles.title}>
-        {title}
-      </ThemedText>
+      <View style={styles.titleRow}>
+        <ThemedText variant="display" style={styles.title}>
+          {title}
+        </ThemedText>
+        <SaveToggleButton practiceId={practice.id} initialSaved={practice.saved ?? false} />
+      </View>
       <ThemedText variant="caption" color={colors.charcoal} style={styles.meta}>
         {meta.join(' · ')}
       </ThemedText>
@@ -163,10 +174,15 @@ export default function PracticeDetailScreen() {
       {mediaKind === 'external' && practice.mediaUrl ? (
         <ExternalMediaNotice mediaUrl={practice.mediaUrl} />
       ) : null}
+      {mediaKind === 'none' && expectsMedia ? <MediaUnavailableNotice /> : null}
 
       <View style={styles.completionArea}>
-        {completed ? (
-          <CompletionBanner />
+        {completed && practice.progress?.id ? (
+          <PostPracticeReflection
+            completionId={practice.progress.id}
+            initialReflection={practice.reflection}
+            onSubmit={submitReflection}
+          />
         ) : mediaKind === 'audio' || mediaKind === 'video' ? null : (
           <MarkCompleteButton submitting={submitting} onPress={handleMarkComplete} />
         )}
@@ -179,7 +195,14 @@ const styles = StyleSheet.create({
   hero: {
     marginBottom: spacing.lg,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
   title: {
+    flex: 1,
     marginBottom: spacing.xs,
   },
   meta: {
