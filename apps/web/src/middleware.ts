@@ -35,6 +35,7 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',
   '/api/webhooks/clerk',
   '/api/webhooks/sanity',
+  '/api/webhooks/sanity-somatic',
   '/api/webhooks/stripe',
   '/api/health',
   '/api/newsletter',
@@ -65,6 +66,7 @@ const isPublicRoute = createRouteMatcher([
 const isIgnoredRoute = createRouteMatcher([
   '/api/webhooks/clerk', // Webhook endpoint must be accessible without Clerk middleware
   '/api/webhooks/sanity', // Webhook endpoint must be accessible without Clerk middleware
+  '/api/webhooks/sanity-somatic', // Somatic Series/Card sync webhook - same reasoning, its own Sanity signature is the real auth
   '/api/webhooks/stripe', // Webhook endpoint must be accessible without Clerk middleware
 ]);
 

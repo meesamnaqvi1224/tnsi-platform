@@ -389,3 +389,118 @@ export interface PowerDropUsageResult {
   powerDropSlug: string;
   usedAt: string;
 }
+
+/**
+ * Somatic Cards - a structured content library, genuinely separate from
+ * both `Practice` and `PowerDrop` (no shared field, no shared table on
+ * the server side either - see docs/TNSI_Somatic_Card_Sync_v1.md). Every
+ * type below mirrors apps/web/src/lib/somatic-card-api.ts's `Api*` shapes
+ * exactly, since GET /api/v1/somatic-cards* is the one and only source
+ * for both the web and native UIs.
+ */
+export interface SomaticImage {
+  url: string;
+  alt: string;
+}
+
+/** Mirrors ApiSomaticSeriesListItem. */
+export interface SomaticSeriesListItem {
+  id: string;
+  seriesNumber: number;
+  title: string;
+  slug: string;
+  collection: string;
+  description: string | null;
+  coreQuestion: string | null;
+  visualTreatment: string | null;
+  defaultLayout: string | null;
+  sortOrder: number;
+}
+
+/** Response shape of GET /api/v1/somatic-cards/series. */
+export interface SomaticSeriesListResponse {
+  series: SomaticSeriesListItem[];
+  pagination: { limit: number; offset: number };
+}
+
+/** Mirrors ApiSomaticCardSummary - identity + presentation only, not full structured content (that's SomaticCardDetail, below). */
+export interface SomaticCardSummary {
+  id: string;
+  cardNumber: number;
+  title: string;
+  slug: string;
+  sortOrder: number;
+  visualTreatment: string | null;
+  cardArtwork: SomaticImage | null;
+}
+
+/** Response shape of GET /api/v1/somatic-cards/series/[seriesSlug]. Mirrors ApiSomaticSeriesDetail. */
+export interface SomaticSeriesDetail extends SomaticSeriesListItem {
+  cards: SomaticCardSummary[];
+}
+
+/**
+ * One Practice Step - `order` is explicit and authoritative for display
+ * order (never inferred from array position; see
+ * docs/TNSI_Somatic_Card_Read_API_v1.md §7). `label` is optional.
+ */
+export interface SomaticPracticeStep {
+  order: number;
+  label?: string;
+  instruction: string;
+}
+
+/** One "What to Notice" prompt - a plain observation, never titled. */
+export interface SomaticWhatToNoticeItem {
+  order: number;
+  text: string;
+}
+
+/** One supporting image - `imageAlt` is always present when the API returns the item at all (enforced upstream by the sync layer). */
+export interface SomaticSupportingImage {
+  order: number;
+  imageUrl: string;
+  imageAlt: string;
+  caption?: string;
+}
+
+/** One demonstration-sequence frame - `label`/`instruction` are both optional; a wordless movement frame is a valid, real state. */
+export interface SomaticDemonstrationFrame {
+  order: number;
+  imageUrl: string;
+  imageAlt: string;
+  label?: string;
+  instruction?: string;
+}
+
+/** The Series a Card belongs to, embedded in SomaticCardDetail - not a full SomaticSeriesDetail (no nested Cards array; that would recurse). */
+export interface SomaticCardSeriesRef {
+  id: string;
+  seriesNumber: number;
+  title: string;
+  slug: string;
+  collection: string;
+}
+
+/** Response shape of GET /api/v1/somatic-cards/[cardSlug]. Mirrors ApiSomaticCardDetail. */
+export interface SomaticCardDetail {
+  id: string;
+  cardNumber: number;
+  title: string;
+  slug: string;
+  sortOrder: number;
+  series: SomaticCardSeriesRef;
+  invitation: string | null;
+  purpose: string | null;
+  description: string | null;
+  orientation: string | null;
+  gentleNote: string | null;
+  anchor: string | null;
+  visualTreatment: string | null;
+  cardArtwork: SomaticImage | null;
+  heroImage: SomaticImage | null;
+  practiceSteps: SomaticPracticeStep[];
+  whatToNotice: SomaticWhatToNoticeItem[];
+  supportingImages: SomaticSupportingImage[];
+  demonstrationSequence: SomaticDemonstrationFrame[];
+}

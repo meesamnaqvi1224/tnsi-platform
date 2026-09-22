@@ -43,6 +43,13 @@
       "when": 1788927858729,
       "tag": "0005_chemical_groot",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790053803669,
+      "tag": "0009_add_somatic_series_and_cards",
+      "breakpoints": true
     }
   ]
 }

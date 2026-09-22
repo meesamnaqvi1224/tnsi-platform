@@ -1,0 +1,3594 @@
+{
+  "collection": "core-series",
+  "series": [
+    {
+      "seriesNumber": 1,
+      "title": "Support, Pressure & Proprioception",
+      "coreQuestion": "Where am I in my body, and what is supporting me?"
+    },
+    {
+      "seriesNumber": 2,
+      "title": "Breath & Cardiorespiratory Rhythm",
+      "coreQuestion": "What is my breath doing, and can I notice its rhythm without forcing it?"
+    },
+    {
+      "seriesNumber": 3,
+      "title": "Orientation & Visual-Spatial Attention",
+      "coreQuestion": "Where am I in the space around me?"
+    },
+    {
+      "seriesNumber": 4,
+      "title": "Movement, Balance & Vestibular Organisation",
+      "coreQuestion": "Can I move, change position and still remain oriented?"
+    },
+    {
+      "seriesNumber": 5,
+      "title": "Touch, Temperature & Sensory Discrimination",
+      "coreQuestion": "What am I feeling through the skin, and can I distinguish one sensation from another?"
+    }
+  ],
+  "cards": [
+    {
+      "cardNumber": 1,
+      "seriesNumber": 1,
+      "title": "The Ground + Press Drop",
+      "slug": "the-ground-press-drop",
+      "sortOrder": 1,
+      "artworkSource": "Woman_leaning_against_wall_20260921185046.jpeg",
+      "invitation": "Reconnect with support. Regulate from the ground up.",
+      "purpose": "Grounding & bodily support. Feel where you are. Use what supports you.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand with both feet on the floor. Let your knees be soft and notice the contact beneath your feet."
+        },
+        {
+          "order": 1,
+          "label": "Press",
+          "instruction": "Place your palms on a stable surface, such as a wall or countertop. Press gently — not as hard as you can."
+        },
+        {
+          "order": 2,
+          "label": "Feel",
+          "instruction": "Notice the pressure beneath your palms and through the soles of your feet. Feel the surface meeting you."
+        },
+        {
+          "order": 3,
+          "label": "Receive",
+          "instruction": "Allow some of your body weight to be supported by the floor and the surface. You don't need to hold yourself up through effort alone."
+        },
+        {
+          "order": 4,
+          "label": "Pause",
+          "instruction": "Stay for a few slow breaths. Notice your feet, hands, posture, and the space your body occupies."
+        },
+        {
+          "order": 5,
+          "label": "Release",
+          "instruction": "Gradually soften the pressure through your hands. Keep your feet connected to the floor and notice what changes."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What do you feel where your hands and feet make contact?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense where your body is in space?"
+        },
+        {
+          "order": 2,
+          "text": "Support — What changes when you allow the surface to hold some of your weight?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the pressure or take a break.",
+      "anchor": "I have weight. I can create pressure. I can be supported.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 2,
+      "seriesNumber": 1,
+      "title": "The Heel Press Reset",
+      "slug": "the-heel-press-reset",
+      "sortOrder": 2,
+      "artworkSource": "Bare_feet_standing_on_floor_20260921185046.jpeg",
+      "invitation": "Find support through your feet.",
+      "purpose": "Grounding & bodily support. Feel where you are. Use what supports you.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand with both feet on the floor. Let your awareness settle in your lower body."
+        },
+        {
+          "order": 1,
+          "label": "Focus",
+          "instruction": "Bring your specific awareness to your heels. Notice their position and contact."
+        },
+        {
+          "order": 2,
+          "label": "Gentle Press",
+          "instruction": "Gradually and gently increase pressure of both heels into the floor."
+        },
+        {
+          "order": 3,
+          "label": "Sense",
+          "instruction": "Notice the firm, supportive feeling directly beneath each heel."
+        },
+        {
+          "order": 4,
+          "label": "Breathe",
+          "instruction": "Take two slow breaths, maintaining this gentle heel press."
+        },
+        {
+          "order": 5,
+          "label": "Release",
+          "instruction": "Slowly release the extra pressure, keeping your heels connected to the floor."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What do you feel when your heels make contact?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense the exact location of your heels?"
+        },
+        {
+          "order": 2,
+          "text": "Support — What changes when you let the floor hold your heel weight?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. Use a stable, secure surface to steady yourself if needed. This practice should not cause pain. If you experience pain, dizziness, or sharp discomfort, stop immediately.",
+      "anchor": "I can feel the ground beneath me.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 3,
+      "seriesNumber": 1,
+      "title": "The Four-Point Foot Map",
+      "slug": "the-four-point-foot-map",
+      "sortOrder": 3,
+      "artworkSource": "Bare_feet_standing_on_floor_20260921185047.jpeg",
+      "invitation": "Notice how your feet meet the ground.",
+      "purpose": "Foot awareness & bodily orientation. (Feel where you stand. Understand your foundation.)",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Take a comfortable standing stance, feet hip-width apart. Settle your weight evenly."
+        },
+        {
+          "order": 1,
+          "label": "Heel Point",
+          "instruction": "Find the point under the center of your heel. Feel its dense contact with the ground."
+        },
+        {
+          "order": 2,
+          "label": "Outer Point",
+          "instruction": "Locate the outer edge, near the ball of your pinky toe. Shift weight slightly to sense its edge."
+        },
+        {
+          "order": 3,
+          "label": "Inner Point",
+          "instruction": "Sense the point at the ball of your big toe. Notice its unique shape and pressure."
+        },
+        {
+          "order": 4,
+          "label": "Toe Pads",
+          "instruction": "Feel the soft cushions of all ten toe pads. Wiggle them to engage, then rest."
+        },
+        {
+          "order": 5,
+          "label": "Merge Points",
+          "instruction": "Bring all four points—heel, outer edge, inner edge, and toe pads—into unified, stable contact. Breathe and feel the map."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Distribution — Are all four points equally weighted?"
+        },
+        {
+          "order": 1,
+          "text": "Position — How does clearer foot contact affect your overall alignment?"
+        },
+        {
+          "order": 2,
+          "text": "Support — Do your feet feel like reliable anchors for your body?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. Ensure you are on a stable, level surface. The practice can be adapted to sitting. Adjust your stance if you feel discomfort.",
+      "anchor": "I can feel where I stand.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 4,
+      "seriesNumber": 1,
+      "title": "The Wall Support Press",
+      "slug": "the-wall-support-press",
+      "sortOrder": 4,
+      "artworkSource": "Person_performing_wall_support_p…_20260921185047.jpeg",
+      "invitation": "Meet support with your own pressure.",
+      "purpose": "Support, pressure & physical orientation. Feel where you are. Use what supports you.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand with both feet on floor. Relax knees."
+        },
+        {
+          "order": 1,
+          "label": "Press",
+          "instruction": "Place palms flat on wall at shoulder height. Press firmly."
+        },
+        {
+          "order": 2,
+          "label": "Feel",
+          "instruction": "Notice wall pressure beneath palms & ground support under feet."
+        },
+        {
+          "order": 3,
+          "label": "Receive",
+          "instruction": "Allow the wall to share the task of supporting your structure."
+        },
+        {
+          "order": 4,
+          "label": "Pause",
+          "instruction": "Take slow breaths. Sense your body's shape & position."
+        },
+        {
+          "order": 5,
+          "label": "Release",
+          "instruction": "Gradually decrease pressure in your palms. Stay connected."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What do you feel where your palms make contact?"
+        },
+        {
+          "order": 1,
+          "text": "Location — Can you sense your position relative to the wall?"
+        },
+        {
+          "order": 2,
+          "text": "Meet — Notice how your pressure is met by the wall."
+        }
+      ],
+      "gentleNote": "Move at your own pace. Use a stable wall. Adapt to sitting if needed. Lessen pressure if discomfort occurs.",
+      "anchor": "I can meet support with my own strength.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 5,
+      "seriesNumber": 1,
+      "title": "The Chair Support Drop",
+      "slug": "the-chair-support-drop",
+      "sortOrder": 5,
+      "artworkSource": "Person_seated_in_upholstered_chair_20260921185047.jpeg",
+      "invitation": "Reconnect with support, let your body receive support.",
+      "purpose": "Seated grounding & bodily support. Feel the chair beneath you. Allow yourself to be held.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit back into the chair, feet flat on the floor. Let your hips settle."
+        },
+        {
+          "order": 1,
+          "label": "Press",
+          "instruction": "Place your hands on your lap or the chair arms. Apply gentle pressure."
+        },
+        {
+          "order": 2,
+          "label": "Feel",
+          "instruction": "Notice the texture and support of the chair back and seat against your body."
+        },
+        {
+          "order": 3,
+          "label": "Receive",
+          "instruction": "Allow the chair to fully support your weight. You don't need to hold yourself up."
+        },
+        {
+          "order": 4,
+          "label": "Pause",
+          "instruction": "Stay for a few slow breaths. Notice your points of contact and your breathing."
+        },
+        {
+          "order": 5,
+          "label": "Release",
+          "instruction": "Gradually soften any postural effort. Stay connected to the support and notice what changes."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What do you feel where your back, seat, and feet make contact?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense your body's relation to the chair and the ground?"
+        },
+        {
+          "order": 2,
+          "text": "Support — What changes when you fully trust the chair to hold your weight?"
+        }
+      ],
+      "gentleNote": "This practice can be done in any stable chair. If you experience discomfort, adjust your position or take a break.",
+      "anchor": "I can receive support and remain present.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 6,
+      "seriesNumber": 1,
+      "title": "The Back-Body Anchor",
+      "slug": "the-back-body-anchor",
+      "sortOrder": 6,
+      "artworkSource": "Person_seated_in_refined_chair_20260921185047.jpeg",
+      "invitation": "Feel what is supporting you from behind.",
+      "purpose": "Back-body awareness & physical support. Feel what is behind you. Lean into existing support.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit comfortably in the chair. Let your feet rest flat on the floor."
+        },
+        {
+          "order": 1,
+          "label": "Lean",
+          "instruction": "Gently lean your back into the chair. Notice the contact of your spine."
+        },
+        {
+          "order": 2,
+          "label": "Feel",
+          "instruction": "Notice the pressure points along your back and shoulders. Can you soften into this pressure?"
+        },
+        {
+          "order": 3,
+          "label": "Receive",
+          "instruction": "Allow the chair to carry some of your body weight. Relinquish the effort of holding yourself up."
+        },
+        {
+          "order": 4,
+          "label": "Pause",
+          "instruction": "Stay for a few slow breaths. Check in with your breath and body's position."
+        },
+        {
+          "order": 5,
+          "label": "Release",
+          "instruction": "Gradually soften the tension in your back muscles. Maintain the contact without force."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What do you feel where your back makes contact with the chair?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense the position of your spine and shoulders in relation to the chair?"
+        },
+        {
+          "order": 2,
+          "text": "Support — What changes when you allow the chair to take some of your back-body weight?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. Ensure the chair is stable and secure. This practice can be adapted for standing if needed. If you feel discomfort, reduce the pressure or take a break.",
+      "anchor": "There is support behind me.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": true,
+      "reviewNote": "Artwork badge reads 'CORE SERIES | 02' (should be 01) and title renders as 'The Back-BODY' with the artwork visibly cut off before any 'Anchor' suffix - eyebrow text and Purpose/Anchor content match Series 01's xlsx-listed title 'The Back-Body Anchor' exactly, so series/title are used from the xlsx master list, not the artwork's own badge/title rendering. Flagged for human confirmation."
+    },
+    {
+      "cardNumber": 7,
+      "seriesNumber": 1,
+      "title": "The Weight Shift",
+      "slug": "the-weight-shift",
+      "sortOrder": 7,
+      "artworkSource": "Person_practicing_somatic_weight…_20260921185047.jpeg",
+      "invitation": "Notice how your weight moves through your feet.",
+      "purpose": "Weight awareness & postural organisation. Feel the change. Align your center.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand with natural posture, feet hip-width. Notice the ground beneath you."
+        },
+        {
+          "order": 1,
+          "label": "Shift (A)",
+          "instruction": "Slowly move your body's weight towards your right foot. Observe the sensation on the inner arch."
+        },
+        {
+          "order": 2,
+          "label": "Feel",
+          "instruction": "Notice the entire footprint. Try to keep toes relaxed and not gripping."
+        },
+        {
+          "order": 3,
+          "label": "Shift (B)",
+          "instruction": "Move weight back through center and then smoothly to the left foot."
+        },
+        {
+          "order": 4,
+          "label": "Pause & Breathe",
+          "instruction": "Hold the position, taking a calm breath. How does balance feel in this spot?"
+        },
+        {
+          "order": 5,
+          "label": "Settle",
+          "instruction": "Gradually move weight back to center, allowing your whole body to find a soft, centered state."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — Where is the weight? Inner edge, heel, or ball of your foot?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense the precise moment your weight moves?"
+        },
+        {
+          "order": 2,
+          "text": "Support — How does each foot feel to support you? More or less stable?"
+        }
+      ],
+      "gentleNote": "This is a subtle, internal practice. Move gently and do not force the shift. Maintain upright posture throughout. Pause if you feel unbalanced.",
+      "anchor": "I can shift and find my centre again.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 8,
+      "seriesNumber": 1,
+      "title": "The Midline Press",
+      "slug": "the-midline-press",
+      "sortOrder": 8,
+      "artworkSource": "Person_standing_with_hands_together_20260921185046.jpeg",
+      "invitation": null,
+      "purpose": "Midline awareness & bodily organisation.",
+      "description": null,
+      "orientation": "Meet your centre with steady pressure.",
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Establish a steady, grounded stance. Feel your feet."
+        },
+        {
+          "order": 1,
+          "label": "Press",
+          "instruction": "Bring your palms together, fingers up, at the chest center. Apply steady pressure."
+        },
+        {
+          "order": 2,
+          "label": "Feel",
+          "instruction": "Sense the symmetry, force, and warmth of your meeting palms."
+        },
+        {
+          "order": 3,
+          "label": "Organise",
+          "instruction": "Notice how this central connection organises your core and breath."
+        },
+        {
+          "order": 4,
+          "label": "Maintain",
+          "instruction": "Hold the steady pressure and breathe deeply for several counts."
+        },
+        {
+          "order": 5,
+          "label": "Release",
+          "instruction": "Gently relax palm pressure, while keeping the midline sense present."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What changes in your physical sense of self from the midline press?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you perceive the core midline of your body from head to pelvis?"
+        },
+        {
+          "order": 2,
+          "text": "Support — How does this practice provide internal structure and support?"
+        }
+      ],
+      "gentleNote": "Adapt pressure for comfort. Practice at your own pace. If pain occurs, reduce intensity or stop.",
+      "anchor": "I can meet myself at the centre.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 9,
+      "seriesNumber": 1,
+      "title": "The Seated Grounding Press",
+      "slug": "the-seated-grounding-press",
+      "sortOrder": 9,
+      "artworkSource": "Person_practicing_seated_groundi…_20260921185047.jpeg",
+      "invitation": "Feel your feet while you are supported.",
+      "purpose": "Seated grounding & lower-body pressure awareness. Feel where you are. Use what supports you.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit tall with both feet flat on the floor."
+        },
+        {
+          "order": 1,
+          "label": "Press",
+          "instruction": "Rest your hands comfortably in your lap. Focus your attention on your feet."
+        },
+        {
+          "order": 2,
+          "label": "Feel",
+          "instruction": "Notice the exact sensation of the floor beneath your bare feet."
+        },
+        {
+          "order": 3,
+          "label": "Receive",
+          "instruction": "Allow your weight to settle into the chair, and let the floor completely support your feet."
+        },
+        {
+          "order": 4,
+          "label": "Pause",
+          "instruction": "Stay for a few slow breaths. Notice your feet, your seat in the chair, and the floor."
+        },
+        {
+          "order": 5,
+          "label": "Release",
+          "instruction": "Gradually soften any holding in your body, keeping your feet gently connected."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What do you feel where your feet make contact with the floor?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense the position of your lower legs and feet?"
+        },
+        {
+          "order": 2,
+          "text": "Support — What changes when you allow the chair to hold your upper body and the floor to hold your lower body?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. This practice can be done at a desk or table. Use a stable, secure surface. If you experience pain or dizziness, take a break.",
+      "anchor": "I can press down and still be supported.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 10,
+      "seriesNumber": 1,
+      "title": "The Axial Alignment Reset",
+      "slug": "the-axial-alignment-reset",
+      "sortOrder": 10,
+      "artworkSource": "Person_standing_for_postural_reset_20260921185046.jpeg",
+      "invitation": "Find your length without forcing your posture. Regulate from the axial spine out.",
+      "purpose": "Postural awareness & whole-body organisation. Find your centered length and integrated structure.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand with both feet parallel, hip-width apart. Settle into the floor."
+        },
+        {
+          "order": 1,
+          "label": "Sense",
+          "instruction": "Draw your attention from your feet upwards through your legs and pelvis."
+        },
+        {
+          "order": 2,
+          "label": "Lengthen",
+          "instruction": "Quietly imagine a soft string lifting the crown of your head, easing your spine into length."
+        },
+        {
+          "order": 3,
+          "label": "Release",
+          "instruction": "Scan your body for any rigidity and consciously let it go, especially in the neck and shoulders."
+        },
+        {
+          "order": 4,
+          "label": "Balance",
+          "instruction": "Notice how your center of gravity self-adjusts without forceful holding."
+        },
+        {
+          "order": 5,
+          "label": "Breathe",
+          "instruction": "Integration. Savor several natural breaths in this new feeling of space."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What do you feel where your hands and feet make contact?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense where your body is in space?"
+        },
+        {
+          "order": 2,
+          "text": "Support — What changes when you allow the surface to hold some of your weight?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the pressure or take a break.",
+      "anchor": "I can be upright without holding myself rigid.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 11,
+      "seriesNumber": 2,
+      "title": "The Physiological Sigh",
+      "slug": "the-physiological-sigh",
+      "sortOrder": 11,
+      "artworkSource": "ChatGPT_Image_Sep_21,_2026,_20260921185047.jpeg",
+      "invitation": "Let your breath complete itself.",
+      "purpose": "Breath recovery & respiratory awareness. Explore a natural two-part inhale followed by a longer, easy exhale. The practice brings attention to the changing shape and rhythm of your breath without asking you to breathe as deeply or forcefully as possible.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit or stand comfortably. Let your shoulders and jaw rest naturally and notice your breathing without changing it."
+        },
+        {
+          "order": 1,
+          "label": "First Inhale",
+          "instruction": "Take a comfortable inhale through your nose. Keep the breath easy rather than deliberately making it large."
+        },
+        {
+          "order": 2,
+          "label": "Second Inhale",
+          "instruction": "At the top of the inhale, gently add a small second sip of air if it feels comfortable. Keep this subtle and unforced."
+        },
+        {
+          "order": 3,
+          "label": "Longer Exhale",
+          "instruction": "Allow the breath to leave slowly through your mouth. Let the exhale be easy rather than pushing the air out."
+        },
+        {
+          "order": 4,
+          "label": "Pause",
+          "instruction": "After the exhale, allow your breathing to return naturally. Notice whether your next breath arrives without needing to control it."
+        },
+        {
+          "order": 5,
+          "label": "Repeat or Stop",
+          "instruction": "Repeat for a few comfortable rounds, or simply return to natural breathing. You do not need to complete a set number of repetitions."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Rhythm — What changes between the two-part inhale and the longer exhale?"
+        },
+        {
+          "order": 1,
+          "text": "Effort — Can you keep the breath comfortable rather than making it bigger?"
+        },
+        {
+          "order": 2,
+          "text": "Recovery — What happens when you stop directing the breath and allow it to continue naturally?"
+        }
+      ],
+      "gentleNote": "This practice does not need to involve a large inhale. If you notice air hunger, dizziness, anxiety or discomfort, return to your natural breathing or stop. Breath-focused practices can feel activating for some people.",
+      "anchor": "I can let my breath complete itself.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 12,
+      "seriesNumber": 2,
+      "title": "The Extended Exhale",
+      "slug": "the-extended-exhale",
+      "sortOrder": 12,
+      "artworkSource": "Person_practicing_breath_pacing_20260921185046.jpeg",
+      "invitation": "Give your exhale a little more time.",
+      "purpose": "Breath pacing & recovery. Notice the natural rhythm of your breath. Invite the exhale to complete.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Find Your Seat",
+          "instruction": "Stand with both feet on the floor. Or sit with feet on floor and spine supported."
+        },
+        {
+          "order": 1,
+          "label": "Rest Your Hands",
+          "instruction": "Place one hand on your chest and the other on your lower ribs."
+        },
+        {
+          "order": 2,
+          "label": "Inhale Slowly",
+          "instruction": "Take a slow, gentle breath in through your nose."
+        },
+        {
+          "order": 3,
+          "label": "Begin the Exhale",
+          "instruction": "Allow the air to leave softly, perhaps through slightly pursed lips."
+        },
+        {
+          "order": 4,
+          "label": "Slow It Down",
+          "instruction": "Count as you exhale, making it last 2-3 seconds longer than the inhale."
+        },
+        {
+          "order": 5,
+          "label": "Pause & Notice",
+          "instruction": "Feel the end of the exhale. Notice any sense of relaxation or grounding."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Ribcage Motion — Notice the expansion under your hands."
+        },
+        {
+          "order": 1,
+          "text": "Muscle Tension — Notice any softening in shoulders and neck."
+        },
+        {
+          "order": 2,
+          "text": "State — Notice any feelings of calmness or settling."
+        }
+      ],
+      "gentleNote": "Move at your own pace. If you feel lightheaded, return to a natural rhythm. This practice can be modified for any position. Discontinue if you feel strain.",
+      "anchor": "I can give myself more time to exhale.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 13,
+      "seriesNumber": 2,
+      "title": "The Rib Expansion Reset",
+      "slug": "the-rib-expansion-reset",
+      "sortOrder": 13,
+      "artworkSource": "Person_practicing_rib_expansion_…_20260921185047.jpeg",
+      "invitation": "Notice your breath moving through your ribs.",
+      "purpose": "Rib awareness & respiratory movement. Feel the space your ribs create. Use your hands to sense movement.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Find a comfortable, upright seated position. Let your sit bones anchor and notice your overall posture."
+        },
+        {
+          "order": 1,
+          "label": "Hand Placement",
+          "instruction": "Place your hands gently around your lower side and back ribs. Feel the connection."
+        },
+        {
+          "order": 2,
+          "label": "Focus",
+          "instruction": "Direct your attention to the feeling of air entering your body. Don't change anything yet, just notice."
+        },
+        {
+          "order": 3,
+          "label": "Breathing In",
+          "instruction": "As you inhale, can you feel your ribs expand outward into your hands? Notice the three-dimensional movement (forward, side, back)."
+        },
+        {
+          "order": 4,
+          "label": "Breathing Out",
+          "instruction": "As you exhale, notice the gentle softening and return to center. Feel the ribcage move back."
+        },
+        {
+          "order": 5,
+          "label": "Gentle Release",
+          "instruction": "Gradually reduce the hands-on focus but keep the awareness. Continue to breathe with this expanded sensation."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Ribcage Movement — What direction does your ribcage move as you breathe? Can you sense all sides?"
+        },
+        {
+          "order": 1,
+          "text": "Chest vs. Diaphragm — Can you feel the difference between a high chest breath and a lower rib expansion?"
+        },
+        {
+          "order": 2,
+          "text": "Internal Space — How much space does your breath create? What changes when you breathe fully into your ribs?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. There is no 'right' amount of expansion. This practice can also be done while standing or lying down. If you feel dizzy, reduce the depth of your breath or take a break.",
+      "anchor": "I can notice my breath without forcing it.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 14,
+      "seriesNumber": 2,
+      "title": "The Back-Rib Breath",
+      "slug": "the-back-rib-breath",
+      "sortOrder": 14,
+      "artworkSource": "Person_practicing_back_rib_breath_20260921185047.jpeg",
+      "invitation": "Notice the breath you cannot see.",
+      "purpose": "Posterior rib awareness & breath location. Feel the movement of breath behind you. Use your hands to sense the invisible.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Seat",
+          "instruction": "Sit comfortably and tall on a stool. Keep feet flat on the floor."
+        },
+        {
+          "order": 1,
+          "label": "Place",
+          "instruction": "Place your hands around your back ribs, fingers spread, just below the shoulder blades."
+        },
+        {
+          "order": 2,
+          "label": "Feel (Hands)",
+          "instruction": "Notice the warmth and contact of your hands on your back body."
+        },
+        {
+          "order": 3,
+          "label": "Breath (Gentle)",
+          "instruction": "Inhale gently, noticing where your breath naturally flows, without forcing anything."
+        },
+        {
+          "order": 4,
+          "label": "Invite",
+          "instruction": "With patience, observe if breath can be gently invited to expand into the area under your hands."
+        },
+        {
+          "order": 5,
+          "label": "Observe",
+          "instruction": "Allow several soft breaths. Feel any subtle movement in your back ribs and spine."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Breath Pathway — How does the breath flow? Up-and-down, or back-and-forth?"
+        },
+        {
+          "order": 1,
+          "text": "Back Expansion — Do you feel a sense of widening or pushing back?"
+        },
+        {
+          "order": 2,
+          "text": "Spine Alignment — Does breath affect the subtle alignment of your spine?"
+        }
+      ],
+      "gentleNote": "Go at your own pace. There is no right way. Focus on gentle sensation. Do not force movement. If you experience strain, ease off and rest.",
+      "anchor": "I can notice what is happening behind me.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 15,
+      "seriesNumber": 2,
+      "title": "The Pursed-Lip Exhale",
+      "slug": "the-pursed-lip-exhale",
+      "sortOrder": 15,
+      "artworkSource": "Person_exhaling_with_pursed_lips_20260921185046.jpeg",
+      "invitation": "Let the exhale leave slowly.",
+      "purpose": "Exhale pacing & breath control. Regulate airflow and CO2.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Find a comfortable posture. Sense your breath."
+        },
+        {
+          "order": 1,
+          "label": "Inhale",
+          "instruction": "Take a normal, deep breath through your nose."
+        },
+        {
+          "order": 2,
+          "label": "Purse",
+          "instruction": "Gently purse your lips, as if for a slow whistle."
+        },
+        {
+          "order": 3,
+          "label": "Exhale",
+          "instruction": "Let the air leave slowly and evenly through pursed lips."
+        },
+        {
+          "order": 4,
+          "label": "Notice",
+          "instruction": "Feel the controlled resistance and gentle pressure."
+        },
+        {
+          "order": 5,
+          "label": "Regulate",
+          "instruction": "Extend the duration of your exhale relative to your inhale."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Breath Cadence — Observe the rhythm and duration."
+        },
+        {
+          "order": 1,
+          "text": "Airflow — Feel the slow, even flow."
+        },
+        {
+          "order": 2,
+          "text": "Diaphragm Engagement — Notice the core support."
+        }
+      ],
+      "gentleNote": "Move at your own pace. This practice can be done lying down. If you experience dizziness, pause and breathe normally.",
+      "anchor": "I can let the breath leave slowly.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 16,
+      "seriesNumber": 2,
+      "title": "The Hand-on-Ribs Reset",
+      "slug": "the-hand-on-ribs-reset",
+      "sortOrder": 16,
+      "artworkSource": "Person_holding_hands_on_ribs_20260921185047.jpeg",
+      "invitation": "Feel your breath through your hands.",
+      "purpose": "Respiratory awareness & breath rhythm. Feel where your body expands. Use your hands for feedback.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit comfortably. Find a supported position on a chair or the floor. Let your feet rest."
+        },
+        {
+          "order": 1,
+          "label": "Place",
+          "instruction": "Bring your hands to your ribcage. Rest your palms gently on the lower sides of your ribs."
+        },
+        {
+          "order": 2,
+          "label": "Inhale",
+          "instruction": "Breathe naturally. Feel the ribs expand outward into your hands."
+        },
+        {
+          "order": 3,
+          "label": "Exhale",
+          "instruction": "Let the breath go. Feel the ribs move inward, away from your hands."
+        },
+        {
+          "order": 4,
+          "label": "Rhythm",
+          "instruction": "Track the natural pause. Is it after the inhale, or after the exhale?"
+        },
+        {
+          "order": 5,
+          "label": "Regulate",
+          "instruction": "Notice the pace. Is it faster or slower than you expected?"
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Expansion — Can you feel the breath moving horizontally and vertically?"
+        },
+        {
+          "order": 1,
+          "text": "Texture — What is the surface of your ribcage, the fabric, and your hands like?"
+        },
+        {
+          "order": 2,
+          "text": "Rhythm — Where in the cycle do your hands move the most?"
+        }
+      ],
+      "gentleNote": "The goal is not to change your breath, but to observe it. If you feel dizzy, return to normal breathing and remove your hands.",
+      "anchor": "I can feel my breath without controlling it.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 17,
+      "seriesNumber": 2,
+      "title": "The Breath Pace Reset",
+      "slug": "the-breath-pace-reset",
+      "sortOrder": 17,
+      "artworkSource": "Person_sitting_by_window_20260921185047.jpeg",
+      "invitation": "Find a breathing rhythm you can stay with.",
+      "purpose": "Breath pacing & predictability. Feel the stability of a steady, calm rhythm.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit comfortably. Feel the chair supporting you. Notice your body position."
+        },
+        {
+          "order": 1,
+          "label": "Observe Inhale",
+          "instruction": "Breathe in naturally. Follow the path of the air into your lungs."
+        },
+        {
+          "order": 2,
+          "label": "Observe Exhale",
+          "instruction": "Let the breath go. Notice the sensation of air leaving your body."
+        },
+        {
+          "order": 3,
+          "label": "Notice Rhythm",
+          "instruction": "Count the duration of your natural inhale and exhale for a few cycles."
+        },
+        {
+          "order": 4,
+          "label": "Gentle Counting",
+          "instruction": "Try a simple, comfortable rhythm, e.g., count 4 for inhale, count 4 for exhale."
+        },
+        {
+          "order": 5,
+          "label": "Stabilize",
+          "instruction": "Maintain this predictable count for 5 minutes. Find predictability."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Depth — Where in your body does the breath move? Can you feel it low in your ribs?"
+        },
+        {
+          "order": 1,
+          "text": "Rhythm — Is your counted rhythm steady? Does it feel comfortable and predictable?"
+        },
+        {
+          "order": 2,
+          "text": "Ease — How does your body feel with the paced breathing? Does tension or comfort increase?"
+        }
+      ],
+      "gentleNote": "Go at your own pace. The goal is predictable rhythm, not lung capacity. Use a count that feels truly comfortable. Return to natural breathing if you experience any lightheadedness.",
+      "anchor": "I can find a rhythm I can stay with.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 18,
+      "seriesNumber": 2,
+      "title": "The Exhale-and-Drop",
+      "slug": "the-exhale-and-drop",
+      "sortOrder": 18,
+      "artworkSource": "Person_standing_near_window_20260921185047.jpeg",
+      "invitation": "Let the exhale invite a little less effort.",
+      "purpose": "Exhale awareness & muscular softening. Feel your body let go with each breath.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand naturally, shoulders back, arms loose, near a softly lit window. Notice the ground beneath your feet."
+        },
+        {
+          "order": 1,
+          "label": "Exhale",
+          "instruction": "Take a long, natural, unforced exhale. Feel your body sink slightly into the support of your skeletal structure."
+        },
+        {
+          "order": 2,
+          "label": "Drop",
+          "instruction": "As you exhale, let your shoulders subtly lower and your ribcage compress without forcing."
+        },
+        {
+          "order": 3,
+          "label": "Sense",
+          "instruction": "Notice lingering tension in areas like your jaw, hands, or abdomen, and allow them to soften."
+        },
+        {
+          "order": 4,
+          "label": "Repeat",
+          "instruction": "Do this for several breath cycles, emphasizing the complete exhale."
+        },
+        {
+          "order": 5,
+          "label": "Release",
+          "instruction": "Finally, allow your whole body to hold less effort, standing naturally and softly, not rigidly."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What do you feel where your hands and feet make contact?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense where your body is in space?"
+        },
+        {
+          "order": 2,
+          "text": "Support — What changes when you allow the surface to hold some of your weight?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the pressure or take a break.",
+      "anchor": "I can soften without forcing myself to relax.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 19,
+      "seriesNumber": 2,
+      "title": "The Completion Exhale",
+      "slug": "the-completion-exhale",
+      "sortOrder": 19,
+      "artworkSource": "Person_seated_near_window_20260921185046.jpeg",
+      "invitation": "Let one breath finish before the next begins.",
+      "purpose": "Breath completion & respiratory awareness. Notice the full excursion of your exhale. Discover the silent space between.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Find a comfortable seated position. Place a hand lightly on your ribs."
+        },
+        {
+          "order": 1,
+          "label": "Observe",
+          "instruction": "Allow a slow, natural inhale to come. Feel the ribs expand gently."
+        },
+        {
+          "order": 2,
+          "label": "Exhale",
+          "instruction": "Let the exhale begin smoothly. Focus inward and notice the movement."
+        },
+        {
+          "order": 3,
+          "label": "Complete",
+          "instruction": "Observe the feeling of the exhale coming to a natural end."
+        },
+        {
+          "order": 4,
+          "label": "Pause",
+          "instruction": "Wait for a moment in the space after the exhale. Notice stillness."
+        },
+        {
+          "order": 5,
+          "label": "Receive",
+          "instruction": "Allow the next inhale to arrive on its own impulse. Do not rush."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Ribs — What do you feel under your hand on your ribs?"
+        },
+        {
+          "order": 1,
+          "text": "Time — Can you sense the brief moment after the exhale?"
+        },
+        {
+          "order": 2,
+          "text": "Air Flow — What changes when you allow your breath its full expression?"
+        }
+      ],
+      "gentleNote": "Go at your own pace. This practice can be adapted to lying down. If you feel lightheaded, return to normal breathing.",
+      "anchor": "I can let one breath finish before the next begins.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": true,
+      "reviewNote": "Artwork badge reads 'CORE SERIES | 01' (should be 02) - eyebrow text and content ('Breath & Cardiorespiratory Rhythm', an exhale-focused practice) match Series 02, and the title matches the xlsx Series-02 master list exactly. Series assignment uses content/xlsx match, not the artwork's own badge number. Flagged for human confirmation."
+    },
+    {
+      "cardNumber": 20,
+      "seriesNumber": 2,
+      "title": "The Breath Location Scan",
+      "slug": "the-breath-location-scan",
+      "sortOrder": 20,
+      "artworkSource": "Person_practicing_breath_awarene…_20260921185047.jpeg",
+      "invitation": "Notice where your breath moves today.",
+      "purpose": "Breath location & interoceptive awareness. Notice where the breath is felt. Track its path.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Seated comfortably with your back supported. Close your eyes or soften your gaze."
+        },
+        {
+          "order": 1,
+          "label": "Inhale",
+          "instruction": "Begin a slow, deep inhale. Where do you feel it first?"
+        },
+        {
+          "order": 2,
+          "label": "Trace",
+          "instruction": "Mentally track the air as it moves down the trachea and into the lungs."
+        },
+        {
+          "order": 3,
+          "label": "Expand",
+          "instruction": "Identify which areas expand: chest, abdomen, ribcage, or back."
+        },
+        {
+          "order": 4,
+          "label": "Exhale",
+          "instruction": "Note the feeling of release and contraction as you slowly exhale."
+        },
+        {
+          "order": 5,
+          "label": "Observe",
+          "instruction": "What is the rhythm and depth? Do not change it, just notice."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Chest — Where can you feel your chest move?"
+        },
+        {
+          "order": 1,
+          "text": "Abdomen — Is your belly moving, and how?"
+        },
+        {
+          "order": 2,
+          "text": "Ribcage — Can you feel your ribcage expand laterally?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. Use a comfortable, supportive chair. Maintain soft gaze or keep eyes closed. Adapt to sitting or lying if needed. If you experience any strain, lightheadedness, or discomfort, reduce breath depth or pause the practice.",
+      "anchor": "I can notice what is here without needing to change it.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 21,
+      "seriesNumber": 3,
+      "title": "The Horizon Lock",
+      "slug": "the-horizon-lock",
+      "sortOrder": 21,
+      "artworkSource": "ChatGPT_Image_Sep_21,_2026,_20260921185047_2.jpeg",
+      "invitation": "Find a steady point in the space around you.",
+      "purpose": "Visual orientation & present-time location. Choose a stable point in your environment and allow your eyes to rest there. Use the visual reference to notice where you are and how your body exists within the space around you.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit or stand in a comfortable position. Let your head rest naturally and allow your eyes to move around the room briefly."
+        },
+        {
+          "order": 1,
+          "label": "Choose a Point",
+          "instruction": "Find one stable visual reference in front of you — a doorway, edge of a window, piece of furniture, or another stationary object."
+        },
+        {
+          "order": 2,
+          "label": "Let Your Eyes Rest",
+          "instruction": "Allow your gaze to settle on the chosen point. Keep the gaze comfortable rather than intense or fixed."
+        },
+        {
+          "order": 3,
+          "label": "Notice the Space Around It",
+          "instruction": "While keeping the point available to your vision, notice what exists around it. Let nearby shapes, light, colours and edges remain part of your awareness."
+        },
+        {
+          "order": 4,
+          "label": "Locate Yourself",
+          "instruction": "Notice where your body is in relation to the visual point. Feel your feet, the chair beneath you or the surface supporting you."
+        },
+        {
+          "order": 5,
+          "label": "Look Away",
+          "instruction": "Allow your eyes to move naturally around the room again. Notice whether your sense of the space has changed."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Location — Where are you in relation to what you are looking at?"
+        },
+        {
+          "order": 1,
+          "text": "Stability — What happens when one visual reference remains available?"
+        },
+        {
+          "order": 2,
+          "text": "Space — Can you notice the surrounding environment as well as the point itself?"
+        }
+      ],
+      "gentleNote": "There is no need to stare or keep your eyes completely still. Let your gaze move whenever it wants to. If visual focus creates strain, dizziness, headache or discomfort, soften your gaze or look around the room naturally.",
+      "anchor": "I can find my place in the space around me.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 22,
+      "seriesNumber": 3,
+      "title": "The Orienting Sweep",
+      "slug": "the-orienting-sweep",
+      "sortOrder": 22,
+      "artworkSource": "Person_scanning_room_environment_20260921185047.jpeg",
+      "invitation": "Orientation: let your eyes discover the space around you.",
+      "purpose": "Environmental orientation & attentional flexibility. Feel visually connected and aware. Use sight to regulate your state.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand or sit comfortably, eyes open. Notice the environment."
+        },
+        {
+          "order": 1,
+          "label": "Begin",
+          "instruction": "Choose a starting point and slowly turn your head."
+        },
+        {
+          "order": 2,
+          "label": "Scan",
+          "instruction": "Allow your eyes to travel across a wall, ceiling, or floor."
+        },
+        {
+          "order": 3,
+          "label": "Notice",
+          "instruction": "Without analyzing, just notice objects, colors, and shapes."
+        },
+        {
+          "order": 4,
+          "label": "Expand",
+          "instruction": "Let your focus widen to take in more of the room."
+        },
+        {
+          "order": 5,
+          "label": "Pause",
+          "instruction": "Stop and rest your gaze on one specific item."
+        },
+        {
+          "order": 6,
+          "label": "Release",
+          "instruction": "Gently look away from that item and continue the sweep or stop."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Perception — What visual details are most immediate?"
+        },
+        {
+          "order": 1,
+          "text": "Depth & Space — How far can you look? Can you sense the room's volume?"
+        },
+        {
+          "order": 2,
+          "text": "Comfort — Which object feels most neutral or pleasant to look at?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. This practice can be adapted to any posture. If you feel dizzy, reduce the speed of the sweep or take a break.",
+      "anchor": "I can look around and notice what is here.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 23,
+      "seriesNumber": 3,
+      "title": "The Peripheral Vision Reset",
+      "slug": "the-peripheral-vision-reset",
+      "sortOrder": 23,
+      "artworkSource": "Person_performing_somatic_anatom…_20260921185047.jpeg",
+      "invitation": "Cultivate visual flexibility. Notice what's around you without looking directly.",
+      "purpose": "Softening visual focus & widening attention.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Settle your body into a comfortable, relaxed posture. Soften your shoulders."
+        },
+        {
+          "order": 1,
+          "label": "Soften Gaze",
+          "instruction": "Find a point in front of you but let your vision relax. Do not \"look\" hard."
+        },
+        {
+          "order": 2,
+          "label": "Widen Periphery",
+          "instruction": "Keeping your soft gaze forward, begin to invite visual input from the very edge of your vision."
+        },
+        {
+          "order": 3,
+          "label": "Notice Details",
+          "instruction": "Without moving your eyes, can you perceive the shape or color of an object to your far left?"
+        },
+        {
+          "order": 4,
+          "label": "Feel the Field",
+          "instruction": "Sense the entire visual field as a whole, rather than picking out specific objects."
+        },
+        {
+          "order": 5,
+          "label": "Allow the Space",
+          "instruction": "Remain in this state for a few breaths. Notice the felt sense of expanded space."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Scope — How broad is your perceived visual field?"
+        },
+        {
+          "order": 1,
+          "text": "Tension — Is there less tension in your eyes or facial muscles?"
+        },
+        {
+          "order": 2,
+          "text": "Connection — Do you feel more aware of the overall room and yourself in it?"
+        }
+      ],
+      "gentleNote": "Approach this gently. If your vision feels strained or you get dizzy, simply rest and close your eyes. This is about softening, not forcing.",
+      "anchor": "My attention can widen without losing where I am.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": true,
+      "reviewNote": "Artwork's own eyebrow label reads 'SUPPORT, FOCUS, & AWARENESS' rather than the standard 'ORIENTATION & VISUAL-SPATIAL ATTENTION' used on every other Series 03 card - the subtitle line beneath the title and the badge number ('03') both confirm Series 03, so this is treated as a labeling inconsistency in the artwork, not a series-assignment ambiguity. Flagged for awareness."
+    },
+    {
+      "cardNumber": 24,
+      "seriesNumber": 3,
+      "title": "The Near–Far Focus Shift",
+      "slug": "the-near-far-focus-shift",
+      "sortOrder": 24,
+      "artworkSource": "Person_near_window_focusing_20260921185047.jpeg",
+      "invitation": "Recenter your perception. Adapt your vision from the inside out.",
+      "purpose": "Orientation & attention flexibility. Feel your eyes and vision adapt. Experience environmental connection.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Find a comfortable seated position near a window."
+        },
+        {
+          "order": 1,
+          "label": "Choose Near Object",
+          "instruction": "Identify a close object like a plant leaf or book edge. Let your gaze land on it."
+        },
+        {
+          "order": 2,
+          "label": "Study Details",
+          "instruction": "Notice the texture, color, and sharp lines. See it clearly without tension."
+        },
+        {
+          "order": 3,
+          "label": "Choose Far Object",
+          "instruction": "Select a distant object outside like a tree branch or building detail."
+        },
+        {
+          "order": 4,
+          "label": "Shift Focus",
+          "instruction": "Softly move your gaze to the distant object. Let the near object become soft."
+        },
+        {
+          "order": 5,
+          "label": "Appreciate Depth",
+          "instruction": "Notice the distance. Can you perceive the space between you and it?"
+        },
+        {
+          "order": 6,
+          "label": "Return Near",
+          "instruction": "Bring your attention back to the near object. Allow it to come into sharp focus again."
+        },
+        {
+          "order": 7,
+          "label": "Repeating",
+          "instruction": "Gently cycle your focus 3-5 times, noticing the transitions."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Eye Effort — What sensation do you feel in your eye muscles when shifting?"
+        },
+        {
+          "order": 1,
+          "text": "Depth Perception — Can you sense the spatial relationship between near and far?"
+        },
+        {
+          "order": 2,
+          "text": "Detail Notice — How do textures and colors seem different between points of focus?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. If your eyes feel strained, soften your gaze or close them for a moment. This practice is about ease, not forced effort. Adapt as needed.",
+      "anchor": "My attention can move between here and there.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 25,
+      "seriesNumber": 3,
+      "title": "The Horizontal Eye Sweep",
+      "slug": "the-horizontal-eye-sweep",
+      "sortOrder": 25,
+      "artworkSource": "Person_doing_horizontal_eye_sweep_20260921185047.jpeg",
+      "invitation": "Regulate the nervous system with controlled visual scanning.",
+      "purpose": "Orientation & spatial awareness. Feel where you are visually. Connect to your environment.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Seat & Stabilize",
+          "instruction": "Sit comfortably on a chair. Place both feet flat on the floor. Feel your sit bones and let your posture be relaxed yet upright."
+        },
+        {
+          "order": 1,
+          "label": "Soften Gaze",
+          "instruction": "Briefly close your eyes or soften your gaze straight ahead. Release tension around the eyes."
+        },
+        {
+          "order": 2,
+          "label": "Find Horizon",
+          "instruction": "Imagine a soft, horizontal line at eye level in front of you. This is your scanning plane."
+        },
+        {
+          "order": 3,
+          "label": "Right Sweep",
+          "instruction": "Gently and slowly sweep your eyes to the far right, taking in the scene without moving your head. Pause for one soft breath."
+        },
+        {
+          "order": 4,
+          "label": "Return Center",
+          "instruction": "Slowly return your gaze to the center line. Pause."
+        },
+        {
+          "order": 5,
+          "label": "Left Sweep",
+          "instruction": "Repeat the sweep gently to the far left, taking in the scene without moving your head. Pause for one soft breath."
+        },
+        {
+          "order": 6,
+          "label": "Full Cycle",
+          "instruction": "Perform a complete smooth cycle from the center to the right, then center to the left, and back to center."
+        },
+        {
+          "order": 7,
+          "label": "Re-Orient",
+          "instruction": "Stop. Close your eyes for a moment. Then open them, looking all around the room naturally. Notice any changes."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Visual Field — What do you see at the far edges? How wide is your range?"
+        },
+        {
+          "order": 1,
+          "text": "Motion & Stillness — Are you moving your head? Are your eyes tracking smoothly?"
+        },
+        {
+          "order": 2,
+          "text": "Sensation — Notice any changes in tension in your neck, face, or chest."
+        }
+      ],
+      "gentleNote": "Practice in a room with varied objects for visual richness. If you feel dizzy, slow down or take a break.",
+      "anchor": "I can look from side to side and stay connected to the space around me.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": true,
+      "reviewNote": "The card's own step numbering is inconsistent (shows 01-06 then '07.' with step 8 rendered as a separate side callout rather than in the main list) - all 8 step instructions were transcribed and re-numbered sequentially 0-7 here; a 'Left Sweep' step (labeled step 6 above) is implied by the practice's own symmetry description but its instruction text had to be inferred from the 'Full Cycle' step's own description of a left-then-center movement, since the artwork's step list skips directly from 'Right Sweep'/'Return Center' to 'Full Cycle' without its own explicit 'Left Sweep' line. Flagged for human verification against the original source."
+    },
+    {
+      "cardNumber": 26,
+      "seriesNumber": 3,
+      "title": "The Colour Orientation Reset",
+      "slug": "the-colour-orientation-reset",
+      "sortOrder": 26,
+      "artworkSource": "Person_looking_in_warm_interior_20260921185047.jpeg",
+      "invitation": "Let colour help you notice what is actually around you.",
+      "purpose": "Environmental orientation & attentional flexibility. Feel where you are. See what surrounds you.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand with both feet on the floor. Let your knees be soft and notice the contact beneath your feet."
+        },
+        {
+          "order": 1,
+          "label": "Soften Gaze",
+          "instruction": "Allow your eyes to rest gently, softening your overall gaze. Don't focus on any one thing."
+        },
+        {
+          "order": 2,
+          "label": "Scan The Space",
+          "instruction": "Begin to slowly look around the room, keeping your neck and jaw relaxed."
+        },
+        {
+          "order": 3,
+          "label": "Choose A Colour",
+          "instruction": "Allow your eyes to find and settle on one primary color in your environment (e.g., a blue vase or red book)."
+        },
+        {
+          "order": 4,
+          "label": "Observe The Shade",
+          "instruction": "Notice the specific hue, shade, texture, and how light interacts with that color."
+        },
+        {
+          "order": 5,
+          "label": "Repeat",
+          "instruction": "Gently shift your gaze to a different color and notice its unique features in the same way."
+        },
+        {
+          "order": 6,
+          "label": "Re-Orient / Allow Experience",
+          "instruction": "Remain still for a moment. Notice how your visual perspective feels now."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Visual Depth — Sense the space and perspective between you and the objects."
+        },
+        {
+          "order": 1,
+          "text": "Colour Richness — Notice the vibrancy and subtle nuances of the colours."
+        },
+        {
+          "order": 2,
+          "text": "Attentional Focus — Notice how your attention moves from one colour to another."
+        }
+      ],
+      "gentleNote": "Move at your own pace. If at any point you feel visual strain, close your eyes for a moment. This practice can be done sitting or standing.",
+      "anchor": "I can notice what is around me and remain here.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 27,
+      "seriesNumber": 3,
+      "title": "The Shape Mapping Reset",
+      "slug": "the-shape-mapping-reset",
+      "sortOrder": 27,
+      "artworkSource": "Person_mapping_architectural_space_20260921185047.jpeg",
+      "invitation": "Let your eyes notice the shapes that define your space.",
+      "purpose": "Visual mapping & environmental awareness. Feel where you are in relation to your surroundings. Use your vision as a form of spatial touch.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand or sit in your space. Let your gaze be soft and wide. Notice the overall expanse of the room."
+        },
+        {
+          "order": 1,
+          "label": "Map Boundaries",
+          "instruction": "Visually trace the edges of the room. Notice the lines of the walls, ceiling, and floor."
+        },
+        {
+          "order": 2,
+          "label": "Locate Shapes",
+          "instruction": "Find three specific shapes in the architecture. Notice their dimensions."
+        },
+        {
+          "order": 3,
+          "label": "Add Objects",
+          "instruction": "Locate a piece of furniture or an object. Notice its basic shape and how it sits within the space."
+        },
+        {
+          "order": 4,
+          "label": "Observe Depth",
+          "instruction": "Look between objects. Notice the negative space. Is there a defined path or container?"
+        },
+        {
+          "order": 5,
+          "label": "Follow A Line",
+          "instruction": "Choose a long architectural line. Softly follow it with your eyes from start to finish."
+        },
+        {
+          "order": 6,
+          "label": "Pause",
+          "instruction": "Stay for a few slow breaths. Let your eyes move smoothly. Notice the stability."
+        },
+        {
+          "order": 7,
+          "label": "Release Gaze",
+          "instruction": "Gradually soften your focus. Let your eyes return to a neutral gaze, while maintaining a felt sense of the room's geometry."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Boundaries — Are the edges of your space clear or indistinct?"
+        },
+        {
+          "order": 1,
+          "text": "Shapes — What geometric patterns appear in your view?"
+        },
+        {
+          "order": 2,
+          "text": "Spatial Relationships — Can you sense the distance and depth of objects?"
+        }
+      ],
+      "gentleNote": "Practice on surfaces you trust. This can be adapted to any environment. If you feel visually overwhelmed or motion-sick, pause and refocus on a single stationary object.",
+      "anchor": "I can see the shape of the space I am in.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 28,
+      "seriesNumber": 3,
+      "title": "The Light Anchor",
+      "slug": "the-light-anchor",
+      "sortOrder": 28,
+      "artworkSource": "Person_standing_near_window_20260921185047_2.jpeg",
+      "invitation": "Notice a steady source of light in the space around you.",
+      "purpose": "Visual anchoring & environmental orientation. Use a steady light source to stabilize your gaze and spatial awareness.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Locate",
+          "instruction": "Look around and select one steady, soft light source, like daylight from a window."
+        },
+        {
+          "order": 1,
+          "label": "Settle",
+          "instruction": "Find a comfortable, natural standing position."
+        },
+        {
+          "order": 2,
+          "label": "Soften Gaze",
+          "instruction": "Direct your eyes to the light and soften your eyes."
+        },
+        {
+          "order": 3,
+          "label": "Focus",
+          "instruction": "Gently maintain visual contact with the light."
+        },
+        {
+          "order": 4,
+          "label": "Expand Awareness",
+          "instruction": "Notice your peripheral vision. What can you still see?"
+        },
+        {
+          "order": 5,
+          "label": "Compare",
+          "instruction": "Compare the light to the surrounding space."
+        },
+        {
+          "order": 6,
+          "label": "Pause",
+          "instruction": "Stay with the expanded awareness for several breaths."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Light Quality — The softness, warmth, and steadiness of the light."
+        },
+        {
+          "order": 1,
+          "text": "Field of Vision — The width of your view, both central and peripheral."
+        },
+        {
+          "order": 2,
+          "text": "Spatial Calm — The sense of visual stability in your environment."
+        }
+      ],
+      "gentleNote": "Focus gently, without intense staring. Keep your vision expansive. If you experience visual strain, look away and take a break.",
+      "anchor": "I can find a steady point and still see the whole space.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 29,
+      "seriesNumber": 3,
+      "title": "The Distance Map",
+      "slug": "the-distance-map",
+      "sortOrder": 29,
+      "artworkSource": "Person_mapping_spatial_depth_20260921185047.jpeg",
+      "invitation": "Notice what is near, what is far, and where you are between them.",
+      "purpose": "Spatial depth awareness & environmental mapping. Explore your relationship to space and perspective.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Close Focus",
+          "instruction": "Stand comfortably and orient to your immediate space. Feel the floor beneath your feet."
+        },
+        {
+          "order": 1,
+          "label": "Mid Focus",
+          "instruction": "Notice something within your reach. Its texture, its color. Feel your physical connection to it."
+        },
+        {
+          "order": 2,
+          "label": "Distant Focus",
+          "instruction": "Look through a window to the furthest point in your field. Observe the light, details far away."
+        },
+        {
+          "order": 3,
+          "label": "Re-Center",
+          "instruction": "Bring attention back to your feet. They are your stable center point."
+        },
+        {
+          "order": 4,
+          "label": "Trace The Spaces",
+          "instruction": "Visually trace the space from you to close, to mid, and to far objects."
+        },
+        {
+          "order": 5,
+          "label": "Notice The Middle",
+          "instruction": "Sense where your body is positioned relative to all these points. Feel the 'between-ness'."
+        },
+        {
+          "order": 6,
+          "label": "Pause & Reflect",
+          "instruction": "Hold this layered spatial awareness for a few slow breaths, sensing the breadth of your environment."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — How does your grounding feel as your gaze moves between distances?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense your location relative to the objects around you?"
+        },
+        {
+          "order": 2,
+          "text": "Support — Do you feel more spacious yet connected as you notice your surroundings?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. Visual tracking can be adapted. If spatial perception feels challenging, start with fewer points. If you experience dizziness or eye strain, reduce the focus points or take a break.",
+      "anchor": "I can notice where things are and where I am among them.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 30,
+      "seriesNumber": 3,
+      "title": "The Visual Return",
+      "slug": "the-visual-return",
+      "sortOrder": 30,
+      "artworkSource": "Person_practicing_visual_attenti…_20260921185047.jpeg",
+      "invitation": "Let your attention move away — then come back to the space around you.",
+      "purpose": "Attentional flexibility & environmental return. Feel where you are. Build awareness of visual spatial.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Find a Vantage Point",
+          "instruction": "Stand or sit with a clear view of your surroundings."
+        },
+        {
+          "order": 1,
+          "label": "Look Away",
+          "instruction": "Gaze at a distance, perhaps out a window or at the far wall."
+        },
+        {
+          "order": 2,
+          "label": "Focus",
+          "instruction": "Pick a specific detail at that distance and notice its features."
+        },
+        {
+          "order": 3,
+          "label": "Sense Your Body",
+          "instruction": "While gazing, briefly check-in with your physical grounding."
+        },
+        {
+          "order": 4,
+          "label": "Shift Focus",
+          "instruction": "Slowly bring your gaze back to a nearby object."
+        },
+        {
+          "order": 5,
+          "label": "Detail",
+          "instruction": "Notice a different detail about this close object, like its texture."
+        },
+        {
+          "order": 6,
+          "label": "Notice Spatial Relations",
+          "instruction": "Where are you, relative to these objects?"
+        },
+        {
+          "order": 7,
+          "label": "Repeat",
+          "instruction": "Alternate this process a few times."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Sensation — Notice visual-somatic responses, not just the image."
+        },
+        {
+          "order": 1,
+          "text": "Attention — Can you sense the shift in how your attention is moving?"
+        },
+        {
+          "order": 2,
+          "text": "Clarity — Does the environment seem sharper upon your return?"
+        }
+      ],
+      "gentleNote": "If you experience eye strain or dizziness, soften your gaze or take a break. Move at your own pace.",
+      "anchor": "I can move my attention and find my way back.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": true,
+      "reviewNote": "Artwork's own eyebrow label reads 'SUPPORT, PRESSURE & PROPRIOCEPTION' (Series 01's theme) rather than Series 03's - the badge number ('03') is correct and the title matches the xlsx Series-03 master list exactly, so this is treated as a labeling inconsistency in the artwork, not a series-assignment ambiguity. Flagged for awareness."
+    },
+    {
+      "cardNumber": 31,
+      "seriesNumber": 4,
+      "title": "The Gentle Sway",
+      "slug": "the-gentle-sway",
+      "sortOrder": 31,
+      "artworkSource": "Core_series_04_card_31st.png_20260921185047.jpeg",
+      "invitation": "Let your body move a little without losing your place.",
+      "purpose": "Gentle movement & spatial organisation. Explore a small, comfortable side-to-side movement while staying connected to your feet and the surface beneath you. The goal is to notice movement and return rather than create a large or challenging sway.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand with your feet comfortably apart. Let your knees remain soft and notice the floor beneath both feet."
+        },
+        {
+          "order": 1,
+          "label": "Find Your Centre",
+          "instruction": "Notice where your weight feels most balanced between your feet. There is no need to make your posture perfectly symmetrical."
+        },
+        {
+          "order": 2,
+          "label": "Begin to Sway",
+          "instruction": "Very gently allow your body weight to move a little toward one side. Keep both feet connected to the floor."
+        },
+        {
+          "order": 3,
+          "label": "Move Back Through Centre",
+          "instruction": "Allow your weight to travel back toward the middle. Notice the moment when your weight feels more evenly distributed again."
+        },
+        {
+          "order": 4,
+          "label": "Sway to the Other Side",
+          "instruction": "Move slowly toward the opposite side. Keep the movement small enough that you remain comfortable and oriented."
+        },
+        {
+          "order": 5,
+          "label": "Continue Gently",
+          "instruction": "Repeat the side-to-side movement several times. Let the movement remain easy and unhurried."
+        },
+        {
+          "order": 6,
+          "label": "Return to Stillness",
+          "instruction": "Gradually reduce the movement until you are standing quietly again. Notice your feet and the space around you."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Weight — Where do you feel your weight moving?"
+        },
+        {
+          "order": 1,
+          "text": "Support — Can you remain aware of the floor while you move?"
+        },
+        {
+          "order": 2,
+          "text": "Return — What happens when your body comes back toward centre?"
+        }
+      ],
+      "gentleNote": "Keep the movement smaller than you think you need. Hold a stable surface if balance is uncertain, or practise seated if standing does not feel appropriate. If you experience dizziness, nausea, pain, or significant discomfort, stop and return to a stable position.",
+      "anchor": "I can move and still find my centre.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 32,
+      "seriesNumber": 4,
+      "title": "The Seated Rock",
+      "slug": "the-seated-rock",
+      "sortOrder": 32,
+      "artworkSource": "Person_practicing_seated_rock_mo…_20260921185047.jpeg",
+      "invitation": "Explore small movement while something steady supports you.",
+      "purpose": "Supported movement & positional awareness. Explore small, forward and back movements while your body is supported by a sturdy chair. The goal is to notice the gentle shift and return without straining, using the chair for stability.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit on a sturdy chair with feet flat on the floor. Allow your hands to rest on your lap. Notice your foundation."
+        },
+        {
+          "order": 1,
+          "label": "Find Your Centre",
+          "instruction": "Align your posture so your weight feels even on your sit bones. There is no need for perfect symmetry, just comfort."
+        },
+        {
+          "order": 2,
+          "label": "Begin to Rock Forward",
+          "instruction": "Gently lean your upper body forward, allowing your weight to shift from your sit bones towards your knees. Keep your feet in contact with the floor."
+        },
+        {
+          "order": 3,
+          "label": "Move Back Through Centre",
+          "instruction": "Allow your weight to travel back toward the middle, returning to a balanced upright seated position."
+        },
+        {
+          "order": 4,
+          "label": "Rock Backward",
+          "instruction": "Gently lean your upper body backward slightly, allowing your weight to shift towards the back of your sit bones. Maintain foot contact."
+        },
+        {
+          "order": 5,
+          "label": "Continue Gently",
+          "instruction": "Repeat the slow forward and back rocking motion several times, keeping it small and controlled."
+        },
+        {
+          "order": 6,
+          "label": "Return to Stillness",
+          "instruction": "Gradually reduce the movement until you are sitting quietly again. Notice your contact points with the chair and floor."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Weight — Where do you feel your weight moving on your seat?"
+        },
+        {
+          "order": 1,
+          "text": "Support — Can you remain aware of the chair's support while you move?"
+        },
+        {
+          "order": 2,
+          "text": "Return — What happens when your body comes back toward centre?"
+        }
+      ],
+      "gentleNote": "Keep the movement smaller than you think you need. Do not strain. Focus on subtle sensation. If you experience dizziness, nausea, pain, or significant discomfort, stop and return to a stable, neutral seated position.",
+      "anchor": "I can move and still find my centre.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 33,
+      "seriesNumber": 4,
+      "title": "The Centre-Line Return",
+      "slug": "the-centre-line-return",
+      "sortOrder": 33,
+      "artworkSource": "Person_practicing_postural_orien…_20260921185047.jpeg",
+      "invitation": "Move away from centre — then notice your way back.",
+      "purpose": "Postural orientation & return to centre. Explore gentle movement away from midline, then focus on the sensory awareness of precisely returning to your vertical axis. This develops spatial organisation and stability.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand with feet comfortably apart."
+        },
+        {
+          "order": 1,
+          "label": "Find Centre",
+          "instruction": "Distribute weight evenly."
+        },
+        {
+          "order": 2,
+          "label": "Initiate Shift",
+          "instruction": "Gently shift weight to one side."
+        },
+        {
+          "order": 3,
+          "label": "Notice Change",
+          "instruction": "Observe the feet and base."
+        },
+        {
+          "order": 4,
+          "label": "Return to Centre",
+          "instruction": "Slowly bring weight back."
+        },
+        {
+          "order": 5,
+          "label": "Sense the Return",
+          "instruction": "Feel the midline re-engaging."
+        },
+        {
+          "order": 6,
+          "label": "Repeat & Observe",
+          "instruction": "Alternate sides, notice returns."
+        },
+        {
+          "order": 7,
+          "label": "Final Stillness",
+          "instruction": "Come to a still centre."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Weight — Where do you feel weight shifting back?"
+        },
+        {
+          "order": 1,
+          "text": "Support — Can you feel the support of the floor as you cross centre?"
+        },
+        {
+          "order": 2,
+          "text": "Return — Describe the sensation of finding your exact midline."
+        }
+      ],
+      "gentleNote": "Keep the initial movement very small. Focus on the sensory return. This practice is not about the sway, but about the return to alignment. If balance is a concern, hold a surface. If discomfort arises, please stop and rest.",
+      "anchor": "I can move and still find my centre.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 34,
+      "seriesNumber": 4,
+      "title": "The Slow Turn",
+      "slug": "the-slow-turn",
+      "sortOrder": 34,
+      "artworkSource": "Person_practicing_slow_turn_20260921185047.jpeg",
+      "invitation": "Turn slowly and let your body update with the movement.",
+      "purpose": "Explore a controlled, full-body rotation. Notice how your sense of space and orientation updates with each degree of movement. The goal is a seamless update of your inner map, not a fast spin.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive & Ground",
+          "instruction": "Stand with your feet comfortably apart. Sense the floor beneath you. Soften your knees."
+        },
+        {
+          "order": 1,
+          "label": "Choose a Reference Point",
+          "instruction": "Select a clear visual object or point in front of you as your starting orientation."
+        },
+        {
+          "order": 2,
+          "label": "Begin the Rotation",
+          "instruction": "Start a very slow, controlled turn towards one side (e.g., right), keeping your body integrated."
+        },
+        {
+          "order": 3,
+          "label": "Lead With Your Intention",
+          "instruction": "Direct your attention to the destination. Let the turn originate from your core."
+        },
+        {
+          "order": 4,
+          "label": "Let Your Head Follow",
+          "instruction": "Your head should naturally rotate with your spine, keeping your eyes updated."
+        },
+        {
+          "order": 5,
+          "label": "Continue Gently",
+          "instruction": "Turn as far as is comfortable and controlled. The key is to avoid jerky movements."
+        },
+        {
+          "order": 6,
+          "label": "Update Your Map",
+          "instruction": "As you turn, mentally update the positions of objects around you in your spatial awareness."
+        },
+        {
+          "order": 7,
+          "label": "Return to Stillness",
+          "instruction": "Slow the turn to a stop. Face your original reference point or a new one. Recalibrate your sense of 'front'."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Weight — Where is the pressure in your feet shifting as you rotate?"
+        },
+        {
+          "order": 1,
+          "text": "Support — How does your central balance line feel during rotation?"
+        },
+        {
+          "order": 2,
+          "text": "Return — How does it feel to return your gaze to your starting point?"
+        }
+      ],
+      "gentleNote": "Practice on a stable surface. Use small, partial turns initially to build control. If turning triggers vertigo or significant imbalance, reduce the degree of turn or practice seated, turning your head and torso.",
+      "anchor": "I can rotate my view and still return to my center.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 35,
+      "seriesNumber": 4,
+      "title": "The Weight-Transfer Reset",
+      "slug": "the-weight-transfer-reset",
+      "sortOrder": 35,
+      "artworkSource": "Weight_transfer_reset_practice_20260921185047.jpeg",
+      "invitation": "Feel your weight move from one foot to the other.",
+      "purpose": "Weight transfer & balance awareness. Learn to consciously shift weight from foot to foot while maintaining connection and awareness. The goal is a controlled, mindful transfer rather than a fast or unstable move.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand with your feet comfortably apart. Let your knees remain soft and notice the floor beneath both feet."
+        },
+        {
+          "order": 1,
+          "label": "Find Your Centre",
+          "instruction": "Notice where your weight feels most balanced between your feet. There is no need to make your posture perfectly symmetrical."
+        },
+        {
+          "order": 2,
+          "label": "Initiate Weight Shift",
+          "instruction": "Very gently, allow your weight to begin to move towards one foot. Keep the other foot still connected."
+        },
+        {
+          "order": 3,
+          "label": "Deepen The Shift",
+          "instruction": "Allow more weight to settle on the chosen foot."
+        },
+        {
+          "order": 4,
+          "label": "Notice Pressure",
+          "instruction": "Feel the increased pressure under the supporting foot."
+        },
+        {
+          "order": 5,
+          "label": "Release And Return",
+          "instruction": "Slow down, release the weight and allow it to drift back towards the centre."
+        },
+        {
+          "order": 6,
+          "label": "Shift To Other Side",
+          "instruction": "Repeat the shift to the opposite foot, slowly."
+        },
+        {
+          "order": 7,
+          "label": "Return To Balance",
+          "instruction": "Gradually reduce the shifts, finding a neutral, balanced stance."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Weight — Where do you feel your weight moving?"
+        },
+        {
+          "order": 1,
+          "text": "Support — Can you remain aware of the floor while you move?"
+        },
+        {
+          "order": 2,
+          "text": "Return — What happens when your body comes back toward centre?"
+        }
+      ],
+      "gentleNote": "Keep the movement smaller than you think you need. Hold a stable surface if balance is uncertain, or practise seated if standing does not feel appropriate. If you experience dizziness, nausea, pain, or significant discomfort, stop and return to a stable position.",
+      "anchor": "I can transfer weight and remain perfectly grounded.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 36,
+      "seriesNumber": 4,
+      "title": "The Head-Level Reset",
+      "slug": "the-head-level-reset",
+      "sortOrder": 36,
+      "artworkSource": "Person_performing_head_level_reset_20260921185047.jpeg",
+      "invitation": "Move gently while keeping your head oriented.",
+      "purpose": "Head position & movement organisation. Explore head and eye organization during a gentle body shift. Keep your head level and oriented while the rest of your body moves. The goal is to notice stability in your visual field and return rather than create a large head turn.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand comfortably with feet apart. Let your knees remain soft and notice the floor beneath both feet."
+        },
+        {
+          "order": 1,
+          "label": "Find Your Centre",
+          "instruction": "Feel your weight balanced. Gaze softly ahead at a single point (or the horizon)."
+        },
+        {
+          "order": 2,
+          "label": "Soften Gaze",
+          "instruction": "Maintain a soft gaze at your focal point. Notice the visual field around you."
+        },
+        {
+          "order": 3,
+          "label": "Shift Weight",
+          "instruction": "Very gently allow your body weight to move toward one side. Keep your head level."
+        },
+        {
+          "order": 4,
+          "label": "Maintain Orientation",
+          "instruction": "Challenge yourself to keep your head from tilting or turning as you shift."
+        },
+        {
+          "order": 5,
+          "label": "Move Through Centre",
+          "instruction": "Move back to centre and then to the other foot, keeping your head level."
+        },
+        {
+          "order": 6,
+          "label": "Return to Stillness",
+          "instruction": "Gradually stop the shift. Return to standing with head level and centered. Notice how it feels."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Weight — Where do you feel your weight moving? Is your head still?"
+        },
+        {
+          "order": 1,
+          "text": "Support — Are your feet still well-connected to the floor?"
+        },
+        {
+          "order": 2,
+          "text": "Return — How easily can you find center and head orientation?"
+        }
+      ],
+      "gentleNote": "Keep the movement smaller than you think you need. Hold a stable surface if balance is uncertain, or practise seated if standing does not feel appropriate. If you experience dizziness, nausea, pain, or significant discomfort, stop and return to a stable position.",
+      "anchor": "I can move and still find my centre.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 37,
+      "seriesNumber": 4,
+      "title": "The Step-and-Settle",
+      "slug": "the-step-and-settle",
+      "sortOrder": 37,
+      "artworkSource": "Person_taking_a_slow_step_20260921185047.jpeg",
+      "invitation": "Take one small step — then let your body find the floor again.",
+      "purpose": "Movement transition & spatial confidence. Feel the moment of release between efforts.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand with feet hip-width. Notice your initial stability."
+        },
+        {
+          "order": 1,
+          "label": "Weight Shift",
+          "instruction": "Slowly shift your weight onto one leg. Feel your new base."
+        },
+        {
+          "order": 2,
+          "label": "Lift",
+          "instruction": "Gradually peel the other foot off the floor, lifting the knee slightly."
+        },
+        {
+          "order": 3,
+          "label": "Extend",
+          "instruction": "Reach the lifted leg forward or to the side, maintaining balance."
+        },
+        {
+          "order": 4,
+          "label": "Place",
+          "instruction": "Gently place the foot on the floor. Make contact heel-to-ball."
+        },
+        {
+          "order": 5,
+          "label": "Settle",
+          "instruction": "Full weight transfer. Allow your body weight to fully drop into the new base."
+        },
+        {
+          "order": 6,
+          "label": "Notice",
+          "instruction": "Stay for a full breath. Observe the change in support and stability."
+        },
+        {
+          "order": 7,
+          "label": "Repeat",
+          "instruction": "Lift the previous support foot and bring it to meet the first, or step with the other."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What sensations do you feel as weight transfers?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense your body's geometry in motion?"
+        },
+        {
+          "order": 2,
+          "text": "Support — How does the floor feel 'rising up' to meet you?"
+        }
+      ],
+      "gentleNote": "Move slowly, with curiosity. This can be adapted to sitting by taking a small step from a seated position. If you experience balance issues or dizziness, reduce the size of the step or take a break. Consult a somatic practitioner.",
+      "anchor": "I have rhythm. I can find balance in transition. I can be steady.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 38,
+      "seriesNumber": 4,
+      "title": "The Upright Return",
+      "slug": "the-upright-return",
+      "sortOrder": 38,
+      "artworkSource": "Person_rising_to_upright_posture_20260921185047.jpeg",
+      "invitation": "Notice how your body finds an upright position again.",
+      "purpose": "Postural transition & bodily organisation. Feel the natural ease of rising. Move with intentional stability.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand near a low stool or seated on a low cushion. Settle into your base and notice your breath."
+        },
+        {
+          "order": 1,
+          "label": "Engage",
+          "instruction": "Shift your weight toward your feet. Feel your lower body activate."
+        },
+        {
+          "order": 2,
+          "label": "Activate",
+          "instruction": "Push gently into the floor through your feet."
+        },
+        {
+          "order": 3,
+          "label": "Rise",
+          "instruction": "Continue the movement, rising from the low position."
+        },
+        {
+          "order": 4,
+          "label": "Upright",
+          "instruction": "Achieve a natural, relaxed, tall standing posture."
+        },
+        {
+          "order": 5,
+          "label": "Center",
+          "instruction": "Pause in this upright position. Focus gently on a stable horizon."
+        },
+        {
+          "order": 6,
+          "label": "Integrate",
+          "instruction": "Stay for a few breaths. Release unnecessary tension."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What do you feel where your hands and feet make contact?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense where your body is in space?"
+        },
+        {
+          "order": 2,
+          "text": "Support — What changes when you allow the surface to hold some of your weight?"
+        }
+      ],
+      "gentleNote": "Move with a sense of ease, not speed. If you feel unstable or lightheaded, take a moment and re-establish your base.",
+      "anchor": "I have weight. I can create pressure. I can be supported.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 39,
+      "seriesNumber": 4,
+      "title": "The Supported Balance Pause",
+      "slug": "the-supported-balance-pause",
+      "sortOrder": 39,
+      "artworkSource": "Person_demonstrating_supported_b…_20260921185047.jpeg",
+      "invitation": "Let support be part of how you balance.",
+      "purpose": "Supported balance & stability awareness. Sense how external support can help you feel stable.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand clear. Initial body scan."
+        },
+        {
+          "order": 1,
+          "label": "Contact",
+          "instruction": "Reach out. Touch the countertop."
+        },
+        {
+          "order": 2,
+          "label": "Shift Weight",
+          "instruction": "Lean subtly. Feel weight distribute."
+        },
+        {
+          "order": 3,
+          "label": "Find Balance",
+          "instruction": "Lift a foot. Discover new points of connection."
+        },
+        {
+          "order": 4,
+          "label": "Pause & Observe",
+          "instruction": "Hold the pose. Notice sensations."
+        },
+        {
+          "order": 5,
+          "label": "Engage Core",
+          "instruction": "Connect core muscles. Increase inner support."
+        },
+        {
+          "order": 6,
+          "label": "Release Hand",
+          "instruction": "Temporarily lift your hand. Test your own balance."
+        },
+        {
+          "order": 7,
+          "label": "Return to Stance",
+          "instruction": "Step down. Standard standing pose."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Pressure — What do you feel where your hand and foot make contact?"
+        },
+        {
+          "order": 1,
+          "text": "Position — Can you sense your center of gravity shifting?"
+        },
+        {
+          "order": 2,
+          "text": "Support — How does the countertop support your feeling of stability?"
+        }
+      ],
+      "gentleNote": "Move with intention. Ensure the countertop is sturdy and will not move. If you feel unbalanced or dizzy, stop and rest immediately. Adapt to a seated balance pose if needed.",
+      "anchor": "I can sense support. My body finds balance. I am steady and organized.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 40,
+      "seriesNumber": 4,
+      "title": "The Movement-to-Stillness Reset",
+      "slug": "the-movement-to-stillness-reset",
+      "sortOrder": 40,
+      "artworkSource": "Person_standing_still_and_grounded_20260921185047.jpeg",
+      "invitation": "Move gently — then notice what happens when you stop.",
+      "purpose": "Transition from movement to stillness. Find calmness through controlled release.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Stand with feet hip-width. Soft knees. Take 3 deep breaths."
+        },
+        {
+          "order": 1,
+          "label": "Start",
+          "instruction": "Introduce gentle swaying from side to side. Micro-movements in the feet."
+        },
+        {
+          "order": 2,
+          "label": "Expand",
+          "instruction": "Slowly let the sway grow larger, engaging the hips."
+        },
+        {
+          "order": 3,
+          "label": "Add Arms",
+          "instruction": "Gently float arms up and down, like in water."
+        },
+        {
+          "order": 4,
+          "label": "Flow",
+          "instruction": "Move freely and comfortably for one minute. Find a rhythm."
+        },
+        {
+          "order": 5,
+          "label": "Slow Down",
+          "instruction": "Gradually reduce the size and speed of all movement."
+        },
+        {
+          "order": 6,
+          "label": "Almost Still",
+          "instruction": "Movements become almost imperceptible, internal only."
+        },
+        {
+          "order": 7,
+          "label": "Still",
+          "instruction": "Come to a complete physical stop. Notice the absence of outward motion."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Sensation — What do you feel where your feet make contact? Feel the full sole."
+        },
+        {
+          "order": 1,
+          "text": "Balance — Can you sense your center of gravity? Are you shifting or centered?"
+        },
+        {
+          "order": 2,
+          "text": "Internal Shifts — What is moving internally now that the outside is still? Find micro-pulsations."
+        }
+      ],
+      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the pressure or take a break.",
+      "anchor": "I have movement. I have stillness. I can integrate them. I can find calm.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 41,
+      "seriesNumber": 5,
+      "title": "The Texture Return",
+      "slug": "the-texture-return",
+      "sortOrder": 41,
+      "artworkSource": "Core_series_5,_card_41.png_20260921185047.jpeg",
+      "invitation": "Let your skin notice what it is touching.",
+      "purpose": "Tactile awareness & sensory discrimination. Use a familiar object with a distinct texture to explore how your skin receives information through contact. Rather than trying to create a particular sensation, notice qualities such as smoothness, roughness, softness, firmness, and temperature.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit comfortably and let your hands rest for a moment. Notice the contact between your hands and whatever is supporting them."
+        },
+        {
+          "order": 1,
+          "label": "Choose an Object",
+          "instruction": "Select a safe, familiar object with a noticeable texture — a soft cloth, smooth stone, wooden object, towel, or another everyday item."
+        },
+        {
+          "order": 2,
+          "label": "Make Contact",
+          "instruction": "Place your fingertips or palm gently against the object. Begin with light contact rather than gripping or pressing firmly."
+        },
+        {
+          "order": 3,
+          "label": "Notice the Texture",
+          "instruction": "Notice what the surface feels like. Is it smooth, rough, soft, firm, coarse, ridged, or somewhere between?"
+        },
+        {
+          "order": 4,
+          "label": "Explore Slowly",
+          "instruction": "If comfortable, move your fingertips or palm slowly across the surface. Notice whether the sensation changes as your contact moves."
+        },
+        {
+          "order": 5,
+          "label": "Change the Pressure",
+          "instruction": "Very gently vary the amount of pressure. Notice the difference between light contact and slightly firmer contact."
+        },
+        {
+          "order": 6,
+          "label": "Compare",
+          "instruction": "Pause and compare what you noticed with the object held still versus when your hand was moving across it."
+        },
+        {
+          "order": 7,
+          "label": "Return",
+          "instruction": "Place your hand back on the object without moving. Let the texture become familiar again, then gradually release contact."
+        },
+        {
+          "order": 8,
+          "label": "Notice Your Hand",
+          "instruction": "After letting go, notice your hand for a few moments. What sensations remain — temperature, tingling, pressure, or simply the absence of contact?"
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Texture — What qualities can your skin distinguish?"
+        },
+        {
+          "order": 1,
+          "text": "Pressure — How does the sensation change when contact becomes lighter or firmer?"
+        },
+        {
+          "order": 2,
+          "text": "Change — What do you notice when your hand moves compared with when it stays still?"
+        }
+      ],
+      "gentleNote": "Choose an object that feels safe and comfortable to touch. There is no need to use a strong texture or press firmly. Keep the exploration within a comfortable range and stop if the sensation becomes unpleasant, painful, overwhelming, or irritating. You can practise with clothing or another familiar surface if direct contact with an object does not feel comfortable.",
+      "anchor": "I can notice sensation and choose how I make contact.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 42,
+      "seriesNumber": 5,
+      "title": "The Temperature Shift",
+      "slug": "the-temperature-shift",
+      "sortOrder": 42,
+      "artworkSource": "Person_comparing_everyday_object…_20260921185047.jpeg",
+      "invitation": "Notice how temperature changes through contact.",
+      "purpose": "Thermal awareness & sensory comparison. Learn to differentiate and notice subtle differences in temperature between skin and objects, and how these sensations evolve with contact. Rather than judging as \"hot\" or \"cold,\" explore the gradient and rate of thermal transfer.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit comfortably and let your hands test for a moment. Notice the contact between your hands and whatever is supporting them."
+        },
+        {
+          "order": 1,
+          "label": "Select Objects",
+          "instruction": "Select two safe everyday objects known to hold different temperatures (e.g., a warm ceramic mug and a polished stone). Place them close."
+        },
+        {
+          "order": 2,
+          "label": "Make Neutral Contact",
+          "instruction": "Gently place your palms against both surfaces. Notice the initial temperature difference."
+        },
+        {
+          "order": 3,
+          "label": "Explore One Surface",
+          "instruction": "Focus only on one object (e.g., the warm mug). Notice the quality of the warmth. How deep does it feel?"
+        },
+        {
+          "order": 4,
+          "label": "Explore The Other",
+          "instruction": "Shift focus to the cool stone. Notice the quality of the coolness. Is it sharp or diffuse?"
+        },
+        {
+          "order": 5,
+          "label": "Notice Shifts",
+          "instruction": "Hold both hands still for a few moments. Notice how the sensations of warmth and coolness change. Does one hand warm the object, or the object cool the hand?"
+        },
+        {
+          "order": 6,
+          "label": "Compare & Repeat",
+          "instruction": "Pause and compare the sensations before and after contact. Let the objects return to their neutral states before repeating."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Thermal Gradient — What is the specific 'flavor' of warmth or coolness? How does it differ across the skin?"
+        },
+        {
+          "order": 1,
+          "text": "Rate of Transfer — How quickly does the sensation change? Notice how your body's temperature reacts."
+        },
+        {
+          "order": 2,
+          "text": "Comparison — How does the memory of the cold sensation affect your perception of the warm one?"
+        }
+      ],
+      "gentleNote": "Choose safe objects. Do not use items that are burning hot or freezing cold. Focus on gentle, palpable differences. If discomfort occurs, stop. Keep exploration comfortable.",
+      "anchor": "I can notice temperature sensation and choose how I interact.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 43,
+      "seriesNumber": 5,
+      "title": "The Cool Contact Reset",
+      "slug": "the-cool-contact-reset",
+      "sortOrder": 43,
+      "artworkSource": "Person_touching_cool_object_20260921185047.jpeg",
+      "invitation": "Explore a cool sensation without making it intense.",
+      "purpose": "Tactile awareness & sensory discrimination. Use a familiar object with a distinct texture to explore how your skin receives information through contact. Rather than trying to create a particular sensation, notice qualities such as smoothness, roughness, softness, firmness, and temperature.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit comfortably and let your hands rest for a moment. Notice the ambient temperature on your skin."
+        },
+        {
+          "order": 1,
+          "label": "Choose an Object",
+          "instruction": "Select a safe, cool object with a noticeable difference in temperature — a smooth, cool stone, a damp cool cloth, or a metal spoon."
+        },
+        {
+          "order": 2,
+          "label": "Make Contact",
+          "instruction": "Place your fingertips or palm gently against the cool surface. Begin with light contact."
+        },
+        {
+          "order": 3,
+          "label": "Notice the Temperature",
+          "instruction": "Notice what the surface temperature feels like. Is it distinctly cold, merely cool, or closer to room temperature?"
+        },
+        {
+          "order": 4,
+          "label": "Explore Slowly",
+          "instruction": "If comfortable, move your fingertips or palm slowly across the cool surface. Notice whether the temperature sensation changes as your contact moves."
+        },
+        {
+          "order": 5,
+          "label": "Change the Pressure",
+          "instruction": "Very gently vary the amount of pressure. Notice how increasing pressure affects the perception of coolness."
+        },
+        {
+          "order": 6,
+          "label": "Compare",
+          "instruction": "Pause and compare what you noticed with the object held still versus when your hand was moving across it."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Temperature — What qualities can your skin distinguish?"
+        },
+        {
+          "order": 1,
+          "text": "Pressure — How does the sensation change when contact becomes lighter or firmer?"
+        },
+        {
+          "order": 2,
+          "text": "Change — What do you notice when your hand moves compared with when it stays still?"
+        }
+      ],
+      "gentleNote": "Choose an object that feels safe and comfortable to touch. There is no need to use extreme temperatures. Keep exploration within a comfortable range. You can practise with a damp cloth, a smooth stone, or a metal object if preferred. If direct cold contact feels uncomfortable, use a thin barrier cloth.",
+      "anchor": "I can notice sensation and choose how I make contact.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 44,
+      "seriesNumber": 5,
+      "title": "The Warmth Return",
+      "slug": "the-warmth-return",
+      "sortOrder": 44,
+      "artworkSource": "Warmth_awareness_sensory_return_…_20260921185047.jpeg",
+      "invitation": "Notice warmth, then notice what changes when contact ends.",
+      "purpose": "Warmth awareness & sensory return. Use a safe, pre-warmed object (like a folded, warm cloth) to explore how your skin registers temperature and how that comforting sensation is perceived and how it lingers after the object is removed.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit comfortably and let your hands rest. Notice the contact between your hands and whatever supports them."
+        },
+        {
+          "order": 1,
+          "label": "Choose a Warm Object",
+          "instruction": "Select a safe, pre-warmed object (e.g., a warm, dry washcloth, a safe warm stone, a comfortable pre-heated fabric item)."
+        },
+        {
+          "order": 2,
+          "label": "Initial Contact",
+          "instruction": "Gently place your palm or fingertips against the warm object. Start with light, light contact."
+        },
+        {
+          "order": 3,
+          "label": "Registering Warmth",
+          "instruction": "Focus only on the warmth. Notice how it feels — comfortable, soothing, deep, or stable."
+        },
+        {
+          "order": 4,
+          "label": "Sustained Contact",
+          "instruction": "Keep the contact stable for 1-2 minutes. Feel the warmth deepening into the tissues."
+        },
+        {
+          "order": 5,
+          "label": "Gradual Release",
+          "instruction": "Very slowly and mindfully, begin to lift your hand away from the object, noticing the exact moment direct contact ends."
+        },
+        {
+          "order": 6,
+          "label": "Compare Sensations",
+          "instruction": "Compare what you noticed with the object held still versus when your hand was moving across it."
+        },
+        {
+          "order": 7,
+          "label": "Notice the Aftermath",
+          "instruction": "With your hand held still, notice any lingering sensations — warmth, tingling, or subtle changes in feel."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Sensation — What is the quality of the warmth? (Sustained, comforting, radiant)"
+        },
+        {
+          "order": 1,
+          "text": "Gradient — How does the sensation change as contact persists or eases?"
+        },
+        {
+          "order": 2,
+          "text": "The After-Effect — What sensations remain in your skin after the object is gone?"
+        }
+      ],
+      "gentleNote": "Select an object with a safe, comfortable level of warmth. Do not use items that are hot enough to burn or cause distress. A slightly pre-warmed cloth is ideal. If you have temperature sensitivities, practice with caution.",
+      "anchor": "I can notice and hold the feeling of comfort and warmth, even after the source is gone.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": true,
+      "reviewNote": "The card's own step numbering is duplicated in the artwork ('ARRIVE' appears as both step 3's heading text and again as a separate step 4 heading, and the final two steps are both labeled '07') - all 8 distinct step entries visible on the card were transcribed and re-numbered sequentially 0-7 here, preserving each entry's own instruction text exactly as shown (including the apparent duplication of an 'Arrive'-labeled entry as a separate step). Flagged for human verification against the original source."
+    },
+    {
+      "cardNumber": 45,
+      "seriesNumber": 5,
+      "title": "The Forearm Sweep",
+      "slug": "the-forearm-sweep",
+      "sortOrder": 45,
+      "artworkSource": "Hand_sweeping_across_forearm_20260921185047.jpeg",
+      "invitation": "Let your skin notice the difference between contact and movement.",
+      "purpose": "Tactile movement & sensory mapping. Using deliberate movement to map skin sensitivity and note how tactile input changes with motion.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit comfortably and let your arms rest. Notice the contact between your arm and whatever is supporting it."
+        },
+        {
+          "order": 1,
+          "label": "Prepare the Arm",
+          "instruction": "Extend one forearm comfortably, palms-up."
+        },
+        {
+          "order": 2,
+          "label": "Light Contact",
+          "instruction": "Place your other hand's fingertips (or palm) gently on the wrist of the extended forearm. Begin with very light contact."
+        },
+        {
+          "order": 3,
+          "label": "Move Slowly",
+          "instruction": "Very slowly, sweep your hand up the forearm toward the elbow. Notice the movement itself."
+        },
+        {
+          "order": 4,
+          "label": "Notice Sensation",
+          "instruction": "What does the contact feel like as it moves? Is it constant, changing, smooth, or discontinuous?"
+        },
+        {
+          "order": 5,
+          "label": "Compare Speed",
+          "instruction": "Try a faster sweep, then slow down. Notice the difference in sensation at different speeds."
+        },
+        {
+          "order": 6,
+          "label": "Stillness & Return",
+          "instruction": "Place your hand still on the forearm. Notice the sensation in stillness. Then return your hands to rest."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Texture — How does movement help you define the texture and contours of your forearm?"
+        },
+        {
+          "order": 1,
+          "text": "Pressure — Does changing speed affect how pressure is perceived at different points?"
+        },
+        {
+          "order": 2,
+          "text": "Change — What specific changes in sensation do you feel with motion versus static contact?"
+        }
+      ],
+      "gentleNote": "Choose a time when you are calm and free from distraction. You can practice with clothing or another surface if direct skin contact is uncomfortable.",
+      "anchor": "I can notice sensation and choose how I make contact.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": true,
+      "reviewNote": "The final step's instruction text ('Notice the sensation in stillness. Then return your hands to rest.') is printed twice in sequence within the same step on the artwork - transcribed exactly as shown rather than silently de-duplicated. Flagged for human verification against the original source."
+    },
+    {
+      "cardNumber": 46,
+      "seriesNumber": 5,
+      "title": "The Containment Hold",
+      "slug": "the-containment-hold",
+      "sortOrder": 46,
+      "artworkSource": "Person_resting_hand_on_arm_20260921185047.jpeg",
+      "invitation": "Feel the boundary of your body through chosen contact.",
+      "purpose": "Tactile awareness & self-boundary definition. Use specific self-contact points to explore the edges of your physical form. Create a sense of containment and safe boundary without gripping. Focus on the sensation of being held by yourself.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Sit comfortably and let your hands rest for a moment. Notice the contact between your hands and whatever supports them."
+        },
+        {
+          "order": 1,
+          "label": "Choose a Contact",
+          "instruction": "Select a safe, comfortable area of your own body that feels comfortable for contact — the opposite upper arm, shoulder, or chest."
+        },
+        {
+          "order": 2,
+          "label": "Make Contact",
+          "instruction": "Place one hand (the holding hand) gently but firmly against the chosen area (the held area). Use a supportive, enveloping touch."
+        },
+        {
+          "order": 3,
+          "label": "Feel the Boundary",
+          "instruction": "Notice the sensation. How does your skin receive the pressure from your hand? Can you trace the edge where your hand and body meet?"
+        },
+        {
+          "order": 4,
+          "label": "Notice the Containee",
+          "instruction": "Become aware of the sensation of being held. How does the area under your hand feel contained or defined?"
+        },
+        {
+          "order": 5,
+          "label": "Slowly Release",
+          "instruction": "Maintain the awareness. Very gradually, reduce the pressure until your hand makes only light contact, then slowly lift it away completely."
+        },
+        {
+          "order": 6,
+          "label": "Compare",
+          "instruction": "After letting go, notice how your body and awareness feel now. Does the area feel more defined or settled? Compare it with the other side."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Boundary — How defined or contained does your physical body feel under contact?"
+        },
+        {
+          "order": 1,
+          "text": "Pressure — How does the sense of containment change with contact?"
+        },
+        {
+          "order": 2,
+          "text": "Change — How does the sense of containment change when contact stays still?"
+        }
+      ],
+      "gentleNote": "Choose areas that feel safe and comfortable to hold. Avoid any areas of tension or pain. If self-contact is not comfortable, you can practice with a blanket or pillow for the sensation of containment. Keep the exploration within a pleasant and defining range.",
+      "anchor": "I can create my own sense of safety and defined boundary through my touch.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": true,
+      "reviewNote": "The card's own step numbering repeats ('SLOWLY RELEASE' appears as step 6 and its text is repeated verbatim as a separate step 7, both labeled '07' on the artwork) - all distinct step entries visible were transcribed and re-numbered sequentially 0-6 here (the verbatim-repeated entry was not duplicated in this transcription, since its text was identical to the preceding step, not new content). Flagged for human verification against the original source."
+    },
+    {
+      "cardNumber": 47,
+      "seriesNumber": 5,
+      "title": "The Pressure Choice Practice",
+      "slug": "the-pressure-choice-practice",
+      "sortOrder": 47,
+      "artworkSource": "Pressure_choice_practice_sensory…_20260921185047.jpeg",
+      "invitation": "Explore how much pressure feels right for you. Regulate your sensory experience.",
+      "purpose": "Pressure discrimination & sensory choice. Explore how different pressures feel to discover your ideal sensation and foster choice.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Find a stable, soft-textured cushion. Sit or stand comfortably and let your shoulders soften."
+        },
+        {
+          "order": 1,
+          "label": "Light Contact",
+          "instruction": "Place one palm very gently against the cushion, as light as a feather. Just rest it there."
+        },
+        {
+          "order": 2,
+          "label": "Increase",
+          "instruction": "Slowly and carefully increase the pressure of your palm, noticing the resistance."
+        },
+        {
+          "order": 3,
+          "label": "Sustain",
+          "instruction": "Hold the pressure at a level that feels firm but still comfortable. Notice the sensation."
+        },
+        {
+          "order": 4,
+          "label": "Reduce",
+          "instruction": "Slowly begin to ease off the pressure. Feel the moment the tension recedes."
+        },
+        {
+          "order": 5,
+          "label": "Pause",
+          "instruction": "Pause at a lower, but still present, pressure. Stay for a few breaths."
+        },
+        {
+          "order": 6,
+          "label": "Compare & Choose",
+          "instruction": "Move back and forth between light and firm pressure, noticing which feels more supportive."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Touch Clarity — What do you feel where your hands and feet make contact?"
+        },
+        {
+          "order": 1,
+          "text": "Tactile Range — What can sense where your body is in space with this difference?"
+        },
+        {
+          "order": 2,
+          "text": "Choice and Comfort — What changes when choice and comfort?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the pressure or take a break.",
+      "anchor": "I can notice subtle differences. I have a choice in how I engage with pressure.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 48,
+      "seriesNumber": 5,
+      "title": "The Hand-to-Arm Contact",
+      "slug": "the-hand-to-arm-contact",
+      "sortOrder": 48,
+      "artworkSource": "Hand_touching_forearm_contact_20260921185047.jpeg",
+      "invitation": "Notice one part of your body through the contact of another.",
+      "purpose": "Self-touch & localisation. Feel your own presence. Define boundaries and edges.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Arrive",
+          "instruction": "Find a comfortable seated or standing position. Soften your shoulders."
+        },
+        {
+          "order": 1,
+          "label": "Place",
+          "instruction": "Gently place one palm (the 'touching' hand) on the forearm of your other arm."
+        },
+        {
+          "order": 2,
+          "label": "Contact",
+          "instruction": "Bring your attention to the meeting point of the two surfaces."
+        },
+        {
+          "order": 3,
+          "label": "Sense",
+          "instruction": "Notice the initial sensation. Is the contact warm or cool? Dry or moist?"
+        },
+        {
+          "order": 4,
+          "label": "Discriminate",
+          "instruction": "Compare the sensation on the palm with the sensation on the forearm."
+        },
+        {
+          "order": 5,
+          "label": "Pause",
+          "instruction": "Hold the position. Breathe slowly. Let the sensations deepen."
+        },
+        {
+          "order": 6,
+          "label": "Release",
+          "instruction": "Gradually and slowly lift the touching hand. Notice the trailing sensation."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Temperature — Which part of your contact feels warmer? The hand or the forearm?"
+        },
+        {
+          "order": 1,
+          "text": "Texture & Pressure — Can you sense the different skin textures? Is there a sense of deep pressure?"
+        },
+        {
+          "order": 2,
+          "text": "Boundaries & Limits — Where does your touching hand end and the receiving arm begin?"
+        }
+      ],
+      "gentleNote": "Move at your own pace. Let curiosity guide you, not force. If any sensation is uncomfortable, decrease pressure or take a break.",
+      "anchor": "I have skin. I can feel temperature. I can define my boundaries.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 49,
+      "seriesNumber": 5,
+      "title": "The Thermal Map",
+      "slug": "the-thermal-map",
+      "sortOrder": 49,
+      "artworkSource": "Thermal_map_body_practice_20260921185047.jpeg",
+      "invitation": "Notice where warmth and coolness appear across your body.",
+      "purpose": "Thermal localisation & sensory mapping. Feel temperature shifts and create a full-body map.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Locate",
+          "instruction": "Rest your hands on a neutral surface. Observe the current temperature."
+        },
+        {
+          "order": 1,
+          "label": "Explore",
+          "instruction": "Shift your focus to another area, like your face. Is it warmer or cooler than your hands?"
+        },
+        {
+          "order": 2,
+          "label": "Compare",
+          "instruction": "Contrast two distant areas. Notice the difference between your right palm and your left thigh."
+        },
+        {
+          "order": 3,
+          "label": "Track",
+          "instruction": "Trace the flow of temperature shifts over your skin as they move."
+        },
+        {
+          "order": 4,
+          "label": "Map",
+          "instruction": "Become aware of multiple temperature zones simultaneously, building a complete picture."
+        },
+        {
+          "order": 5,
+          "label": "Ground",
+          "instruction": "Use the clearest feeling of warmth or coolness as a sensory anchor to ground yourself."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Zone Focus — Identify one distinct area of temperature (warm or cool)."
+        },
+        {
+          "order": 1,
+          "text": "Contrast Scan — Shift attention to a differing temperature zone and notice the contrast."
+        },
+        {
+          "order": 2,
+          "text": "Full Body Map — Perceive multiple zones at once and see the full bodily thermal landscape."
+        }
+      ],
+      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the pressure or take a break.",
+      "anchor": "My body is a landscape of feeling. I can track the change.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 50,
+      "seriesNumber": 5,
+      "title": "The Texture Discrimination Map",
+      "slug": "the-texture-discrimination-map",
+      "sortOrder": 50,
+      "artworkSource": "Hand_exploring_texture_map_20260921185047.jpeg",
+      "invitation": "Notice how many different qualities your skin can distinguish.",
+      "purpose": "Tactile comparison & sensory precision. Compare surfaces. Distinguish fine details through touch.",
+      "description": null,
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": "Prepare",
+          "instruction": "Quiet your space. Position hands comfortably."
+        },
+        {
+          "order": 1,
+          "label": "Gather Samples",
+          "instruction": "Select three distinctly different textured objects."
+        },
+        {
+          "order": 2,
+          "label": "Initial Touch",
+          "instruction": "Gently touch one surface with a single fingertip."
+        },
+        {
+          "order": 3,
+          "label": "Compare Surfaces",
+          "instruction": "Alternately touch other samples with the same finger."
+        },
+        {
+          "order": 4,
+          "label": "Explore Detail",
+          "instruction": "Use small, slow circular motions to feel surface features."
+        },
+        {
+          "order": 5,
+          "label": "Focus",
+          "instruction": "Close your eyes to sharpen texture sensations."
+        },
+        {
+          "order": 6,
+          "label": "Notice",
+          "instruction": "Sense roughness, smoothness, coolness, or warmth."
+        },
+        {
+          "order": 7,
+          "label": "Reflect",
+          "instruction": "Note how the sensations feel to your skin."
+        }
+      ],
+      "whatToNotice": [
+        {
+          "order": 0,
+          "text": "Fine Texture — What small details can your skin detect?"
+        },
+        {
+          "order": 1,
+          "text": "Thermal — Do surfaces feel cool, warm, or neutral?"
+        },
+        {
+          "order": 2,
+          "text": "Friction — How easily does your skin glide across the surface?"
+        }
+      ],
+      "gentleNote": "Move with curiosity. Use various skin parts (fingertips, palm). If any sensation feels uncomfortable, discontinue.",
+      "anchor": "I can sense distinction. I can explore surface. I am perceptive.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Meesam Somatic Batch 1-5.zip",
+      "needsReview": false,
+      "reviewNote": null
+    }
+  ],
+  "excludedSource": [
+    {
+      "artworkSource": "Hand_holding_smooth_stone_20260921185047.jpeg",
+      "title": "The Object-To-Palm Reset",
+      "reason": "Card title does not appear anywhere in the Somatic_Anatomy_System_Master.xlsx 'Primary Card List' for Series 05 (or any other series) - the master list names exactly 10 Series-05 cards and this is an 11th, unlisted title. Not assigned a card number and not imported, since no authoritative position exists for it. Flagged for human review - it may be a genuine additional card requiring a manifest/architecture decision outside this importer's scope, a duplicate/renamed version of an existing card, or draft material not yet finalized."
+    }
+  ]
+}

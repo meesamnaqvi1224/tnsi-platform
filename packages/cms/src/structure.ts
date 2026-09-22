@@ -4,7 +4,11 @@ import type { StructureResolver } from 'sanity/structure';
  * Studio desk layout — groups documents so editors see a clean sidebar:
  * Articles, Programs (with Modules/Lessons underneath - the learning
  * content foundation, not yet consumed by any app), Practices,
- * Assessments, PowerDrops, then supporting Authors and Categories.
+ * Assessments, PowerDrops, Somatic Series/Cards (a separate content
+ * system from Practices/PowerDrops - see
+ * docs/TNSI_Somatic_Card_Schema_Design_v1.md - given its own divider
+ * rather than grouped with PowerDrops, to keep that separation visible
+ * in the Studio itself), then supporting Authors and Categories.
  */
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -17,6 +21,9 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem('practice').title('Practices'),
       S.documentTypeListItem('assessment').title('Assessments'),
       S.documentTypeListItem('powerDrop').title('PowerDrops'),
+      S.divider(),
+      S.documentTypeListItem('somaticSeries').title('Somatic Series'),
+      S.documentTypeListItem('somaticCard').title('Somatic Cards'),
       S.divider(),
       S.documentTypeListItem('author').title('Authors'),
       S.documentTypeListItem('category').title('Categories'),

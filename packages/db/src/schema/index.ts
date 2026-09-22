@@ -6,3 +6,5 @@ export * from './practices';
 export * from './practice-completions';
 export * from './assessment-submissions';
 export * from './power-drop-usages';
+export * from './somatic-series';
+export * from './somatic-cards';
