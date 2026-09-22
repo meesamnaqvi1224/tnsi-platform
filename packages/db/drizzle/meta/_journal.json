@@ -64,6 +64,13 @@
       "when": 1789559877551,
       "tag": "0008_gigantic_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790053803669,
+      "tag": "0009_add_somatic_series_and_cards",
+      "breakpoints": true
     }
   ]
 }

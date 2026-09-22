@@ -51,6 +51,9 @@ export default function PracticesLayout() {
         options={{ title: 'PowerDrops', headerLeft: () => <BackToPracticesButton /> }}
       />
       <Stack.Screen name="powerdrops/[slug]" options={{ title: '' }} />
+      <Stack.Screen name="somatic-cards/index" options={{ title: 'Somatic Cards' }} />
+      <Stack.Screen name="somatic-cards/[seriesSlug]" options={{ title: '' }} />
+      <Stack.Screen name="somatic-cards/card/[cardSlug]" options={{ title: '' }} />
       {/* The breathing flow builds its own header/close controls to match
           its immersive, non-standard chrome (see each screen) - the stack
           header stays off for all three. The session screen also disables

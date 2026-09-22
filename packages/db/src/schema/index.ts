@@ -8,3 +8,5 @@ export * from './practice-reflections';
 export * from './practice-saves';
 export * from './assessment-submissions';
 export * from './power-drop-usages';
+export * from './somatic-series';
+export * from './somatic-cards';

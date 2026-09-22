@@ -159,3 +159,13 @@ export type PowerDropsListQuery = z.infer<typeof powerDropsListQuerySchema>;
 export const powerDropSlugParamSchema = z.object({
   slug: z.string().trim().min(1).max(200),
 });
+
+/** Route param for GET /api/v1/somatic-cards/series/[seriesSlug]. */
+export const somaticSeriesSlugParamSchema = z.object({
+  seriesSlug: z.string().trim().min(1).max(200),
+});
+
+/** Route param for GET /api/v1/somatic-cards/[cardSlug]. */
+export const somaticCardSlugParamSchema = z.object({
+  cardSlug: z.string().trim().min(1).max(200),
+});

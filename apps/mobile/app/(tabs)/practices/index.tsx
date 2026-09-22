@@ -6,6 +6,7 @@ import { PracticeCard } from '@/components/practices/PracticeCard';
 import { PracticeFilterBar } from '@/components/practices/PracticeFilterBar';
 import { PracticesSkeleton } from '@/components/practices/PracticesSkeleton';
 import { PowerDropsEntryCard } from '@/components/powerdrops/PowerDropsEntryCard';
+import { SomaticCardsEntryCard } from '@/components/somatic-cards/SomaticCardsEntryCard';
 import { usePractices } from '@/hooks/usePractices';
 import { colors, spacing } from '@/theme';
 import type { PracticeContentType } from '@/api/types';
@@ -68,6 +69,7 @@ export default function PracticesScreen() {
       </View>
 
       <PowerDropsEntryCard />
+      <SomaticCardsEntryCard />
 
       {state.status === 'loading' && <PracticesSkeleton />}
 

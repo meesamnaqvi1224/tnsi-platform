@@ -17,3 +17,28 @@ export {
   type PracticeSyncPlan,
   type PracticeUpsertValues,
 } from './sync-plan';
+
+// Somatic Series/Card - a genuinely separate sync path from Practice's
+// above, per docs/TNSI_Somatic_Card_Sync_v1.md. Nothing here shares a
+// schema, plan type, or execution function with the Practice exports.
+export {
+  sanitySomaticSeriesDocumentSchema,
+  sanitySomaticSeriesWebhookSchema,
+  sanitySomaticCardDocumentSchema,
+  sanitySomaticCardWebhookSchema,
+  sanitySomaticWebhookSchema,
+  type SanitySomaticSeriesDocument,
+  type SanitySomaticSeriesWebhookPayload,
+  type SanitySomaticCardDocument,
+  type SanitySomaticCardWebhookPayload,
+  type SanitySomaticWebhookPayload,
+} from './schema-somatic';
+export {
+  buildSomaticSeriesSyncPlan,
+  prepareSomaticCardSync,
+  normalizeSomaticSanityId,
+  type SomaticSeriesSyncPlan,
+  type SomaticSeriesUpsertValues,
+  type SomaticCardPrepared,
+  type SomaticCardCandidateValues,
+} from './sync-plan-somatic';

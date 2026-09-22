@@ -36,3 +36,8 @@ coverage/
 # Misc
 *.tsbuildinfo
 .cache/
+
+# Local-only scratch space (e.g. source artwork for the Somatic Card
+# importer, packages/cms/scripts/import-somatic-core-series.ts) - never
+# committed; raw content assets belong in Sanity, not git.
+.local/

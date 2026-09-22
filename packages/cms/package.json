@@ -12,7 +12,8 @@
   "scripts": {
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "import:somatic-core-series": "tsx scripts/import-somatic-core-series.ts"
   },
   "dependencies": {
     "@sanity/client": "^7.26.2",
@@ -26,6 +27,7 @@
     "@types/node": "^20",
     "typescript": "^5",
     "eslint": "^9",
+    "tsx": "^4.19.2",
     "vitest": "^3.2.4"
   }
 }

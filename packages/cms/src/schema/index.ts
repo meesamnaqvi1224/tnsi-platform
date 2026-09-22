@@ -10,6 +10,8 @@ import { lesson } from './documents/lesson';
 import { practice } from './documents/practice';
 import { assessment } from './documents/assessment';
 import { powerDrop } from './documents/powerDrop';
+import { somaticSeries } from './documents/somaticSeries';
+import { somaticCard } from './documents/somaticCard';
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   // documents
@@ -20,6 +22,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   practice,
   assessment,
   powerDrop,
+  somaticSeries,
+  somaticCard,
   author,
   category,
   // objects
