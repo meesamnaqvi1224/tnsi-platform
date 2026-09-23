@@ -39,4 +39,3 @@ export const somaticPublicationStatusEnum = pgEnum('somatic_publication_status',
   'published',
   'archived',
 ]);
->>>>>>> a57ab50 (feat(somatic-cards): sync/webhook/API/web/mobile pipeline + bulk import all 50 Core Series cards)
