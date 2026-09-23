@@ -5,9 +5,15 @@ import { db, users, entitlements } from '@tnsi/db';
 import { eq } from 'drizzle-orm';
 import type { User, Entitlement } from '@tnsi/db/schema';
 import { getOrCreateUser } from '@tnsi/auth/sync/user';
-import { assertEntitlement, type EntitlementRequirement } from '@tnsi/auth/authorize/entitlements';
+import {
+  assertEntitlement,
+  assertMemberAccess,
+  type EntitlementRequirement,
+} from '@tnsi/auth/authorize/entitlements';
+import { EntitlementRequiredError } from '@tnsi/auth/errors/auth';
 import { extractBearerToken, verifyToken } from '@tnsi/auth/verify/jwt';
 import { userSyncOps } from './user-sync-ops';
+import { unauthorized, forbidden } from './api-response';
 
 export interface AuthUser extends User {
   entitlements: Entitlement | null;
@@ -142,4 +148,76 @@ export async function requireEntitlement(requirement: EntitlementRequirement): P
   const user = await requireAuth();
   assertEntitlement(user.entitlements, requirement);
   return user;
+}
+
+/**
+ * The single authoritative "does this authenticated user currently have
+ * member access?" check (Today, Practices, Practice Detail, Saved
+ * Practices, Practice History, My Journey, Daily Check-In) — Membership &
+ * Entitlements v1. Every member-facing API route and dashboard page
+ * should call this (or `requireMemberAccessOrRedirect` below for pages)
+ * instead of independently re-implementing a membership check; that's
+ * what keeps this a single decision point rather than scattered
+ * `if (user.entitlements.status === ...)` checks throughout the app.
+ *
+ * Same throw contract as `requireAuth()`: plain `Error('UNAUTHENTICATED')`
+ * when there's no session (→ 401 via `memberAccessErrorResponse` below),
+ * `EntitlementRequiredError` when the session is valid but the entitlement
+ * isn't active/trialing (→ 403). The actual decision is
+ * `assertMemberAccess` (`@tnsi/auth`), pure and unit-tested independently
+ * of any database or Clerk call.
+ *
+ * Today this denies no existing user: every entitlement row defaults to
+ * `status: 'active'` on account creation (`packages/auth/src/sync/user.ts`),
+ * and nothing currently transitions a row away from that — the Stripe
+ * sync that could exists but is unconfigured (no real
+ * `STRIPE_SECRET_KEY`/price ids yet, see `packages/integrations/src/stripe`).
+ * Wiring this in now, ahead of that integration, is exactly the point:
+ * when a future billing integration starts marking real users
+ * inactive/canceled/expired, every route already calling this function
+ * enforces that correctly with no further route-level changes.
+ */
+export async function requireMemberAccess(): Promise<AuthUser> {
+  const user = await requireAuth();
+  assertMemberAccess(user.entitlements);
+  return user;
+}
+
+/**
+ * Page-only variant of `requireMemberAccess()`, mirroring
+ * `requireAuthOrRedirect`'s redirect-instead-of-throw shape. No dedicated
+ * "membership required" page exists yet (nothing today can actually reach
+ * that branch — see `requireMemberAccess`'s own comment), so a denial
+ * redirects to `/dashboard/billing`, the existing account/billing page,
+ * as a reasonable provisional destination; this should be revisited once
+ * that state is actually reachable.
+ */
+export async function requireMemberAccessOrRedirect(): Promise<AuthUser> {
+  try {
+    return await requireMemberAccess();
+  } catch (error) {
+    if (error instanceof Error && error.message === 'UNAUTHENTICATED') {
+      redirect('/sign-in');
+    }
+    if (error instanceof EntitlementRequiredError) {
+      redirect('/dashboard/billing');
+    }
+    throw error;
+  }
+}
+
+/**
+ * Maps a `requireMemberAccess()`/`requireEntitlement()` rejection to the
+ * correct API response — 401 for "not authenticated at all", 403 for
+ * "authenticated but not entitled" — so every member-only route handles
+ * this identically instead of each writing its own `catch { ... }`
+ * translation (and risking collapsing both cases into a blanket 401, the
+ * bug this exists to prevent). Never includes entitlement/billing details
+ * in the response body — `forbidden()`'s default message only.
+ */
+export function memberAccessErrorResponse(error: unknown) {
+  if (error instanceof EntitlementRequiredError) {
+    return forbidden();
+  }
+  return unauthorized();
 }

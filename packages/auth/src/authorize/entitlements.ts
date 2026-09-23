@@ -97,6 +97,52 @@ function hasEligibleStatus(entitlement: EntitlementRecord): boolean {
 }
 
 /**
+ * Does this entitlement grant access to member content (Today, Practices,
+ * Practice Detail, Saved Practices, Practice History, My Journey)?
+ *
+ * Deliberately NOT the same question `authorizeEntitlement`'s `free`
+ * requirement answers above - `free` ignores status entirely by design
+ * ("every authenticated user... satisfies it", see its own comment).
+ * `hasMemberAccess` is a genuine, status-aware ACTIVE/INACTIVE gate: the
+ * seam a future paid-membership requirement plugs into, per the
+ * Membership & Entitlements v1 milestone. It reuses the exact same
+ * active/trialing-eligible rule already established for
+ * programme/certification/feature access above, rather than inventing a
+ * second, different eligibility rule.
+ *
+ * `null` (no entitlement row at all) has no access - fails closed. In
+ * practice this should be rare: a default `free`/`active` row is created
+ * synchronously as part of Clerk's `user.created` sync
+ * (`packages/auth/src/sync/user.ts`), so almost every authenticated user
+ * already has one, and `active` is exactly the state `hasMemberAccess`
+ * allows - which is precisely why wiring this in changes no *current*
+ * user's access: everyone is `active` by default today, and nothing in
+ * this codebase yet transitions a row away from that (Stripe sync exists
+ * but is unconfigured/dormant - see packages/integrations/src/stripe).
+ */
+export function hasMemberAccess(entitlement: EntitlementRecord | null): boolean {
+  if (!entitlement) return false;
+  return hasEligibleStatus(entitlement);
+}
+
+/**
+ * Throwing form of `hasMemberAccess`, mirroring `assertEntitlement`'s
+ * shape below. Throws `EntitlementRequiredError` (403,
+ * `ENTITLEMENT_REQUIRED`) when the user has no active/trialing
+ * entitlement; returns normally when they do.
+ */
+export function assertMemberAccess(entitlement: EntitlementRecord | null): void {
+  if (hasMemberAccess(entitlement)) return;
+
+  throw new EntitlementRequiredError(
+    ['member'],
+    entitlement ? [entitlement.status] : [],
+    'Member access required.',
+    { reason: entitlement ? 'STATUS_NOT_ELIGIBLE' : 'NO_ENTITLEMENT' },
+  );
+}
+
+/**
  * Decide whether `entitlement` satisfies `requirement`. Deterministic, no
  * I/O. Returns a reason on denial rather than throwing — callers decide
  * how to surface that (see `assertEntitlement` below for the throwing form
