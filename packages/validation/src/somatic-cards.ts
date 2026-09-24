@@ -48,7 +48,7 @@ export type SomaticVisualTreatment = z.infer<typeof somaticVisualTreatmentSchema
  */
 export const somaticPracticeStepSchema = z.object({
   order: z.number().int().min(0),
-  label: z.string().trim().min(1).max(200).optional(),
+  label: z.string().trim().min(1).max(200).nullable().optional(),
   instruction: z.string().trim().min(1).max(2000),
 });
 export type SomaticPracticeStep = z.infer<typeof somaticPracticeStepSchema>;
