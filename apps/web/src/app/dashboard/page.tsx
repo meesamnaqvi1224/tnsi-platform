@@ -30,6 +30,7 @@ import {
   getTodayPractice,
 } from '@/lib/practices';
 import { createPageMetadata } from '@/lib/seo';
+import { fetchSomaticSeriesList } from '@/lib/somatic-cards-client';
 import { getLatestArticles } from '@/content/cms/loaders';
 import { articlesContent } from '@/content/articles';
 import type { Entitlement } from '@tnsi/db/schema';
@@ -160,6 +161,7 @@ export default async function DashboardPage() {
     recentCompletions,
     latestArticles,
     checkInHistory,
+    somaticSeriesResult,
   ] = await Promise.all([
     getInProgressPractices(user.id, IN_PROGRESS_LIMIT),
     getInProgressPracticeCount(user.id),
@@ -167,9 +169,15 @@ export default async function DashboardPage() {
     getRecentCompletions(user.id, RECENT_COMPLETIONS_LIMIT),
     getLatestArticles(),
     getCheckInHistory(user.id, RECENT_CHECK_INS_LIMIT, 0),
+    fetchSomaticSeriesList(),
   ]);
   const [continuePractice, ...moreInProgress] = inProgressPractices;
   const latestArticle = latestArticles[0] ?? null;
+  // Dynamic so this tile never needs a manual update as Series 06+ are
+  // added - falls back to no count (not a hardcoded "5") if the API call
+  // fails, rather than showing a stale/wrong number.
+  const somaticSeriesCount =
+    somaticSeriesResult.status === 'ok' ? somaticSeriesResult.data.length : null;
 
   const firstName = user.fullName?.trim().split(/\s+/)[0] || null;
   const tier = user.entitlements?.tier ?? 'free';
@@ -374,6 +382,32 @@ export default async function DashboardPage() {
                               }
                             />
                           )}
+                        </CardContent>
+                      </Card>
+                    </section>
+
+                    <section aria-labelledby="somatic-cards-heading">
+                      <Card>
+                        <CardHeader>
+                          <Eyebrow>Somatic Cards</Eyebrow>
+                          <CardTitle id="somatic-cards-heading" className={cardTitleClassName}>
+                            Explore the Core Series
+                          </CardTitle>
+                          <Text tone="muted" className="text-base leading-[1.85]">
+                            Explore guided somatic experiences through the Core Series
+                            {somaticSeriesCount !== null
+                              ? ` — ${somaticSeriesCount} ${somaticSeriesCount === 1 ? 'series' : 'series'} available`
+                              : ''}
+                            .
+                          </Text>
+                        </CardHeader>
+                        <CardContent>
+                          <NextLink
+                            href="/dashboard/somatic-cards"
+                            className={buttonVariants({ variant: 'primary', size: 'md' })}
+                          >
+                            Explore Cards
+                          </NextLink>
                         </CardContent>
                       </Card>
                     </section>
