@@ -94,6 +94,20 @@ describe('CardReadingView', () => {
     expect(html).toContain('Finished artwork alt');
   });
 
+  it("sizes the artwork container to the image's real aspect ratio, parsed from a real Sanity CDN URL shape (dot before the extension, not a hyphen)", () => {
+    const html = renderToStaticMarkup(
+      <CardReadingView
+        card={cardDetail({
+          cardArtwork: {
+            url: 'https://cdn.sanity.io/images/hookrbdv/production/445588fda9c5df237666e6585a209ed1a28d03d7-1760x1328.png',
+            alt: 'Artwork alt',
+          },
+        })}
+      />,
+    );
+    expect(html).toContain('aspect-ratio:1760 / 1328');
+  });
+
   it('14. does not render optional sections (Invitation/Purpose/etc.) when absent', () => {
     const html = renderToStaticMarkup(<CardReadingView card={cardDetail()} />);
     expect(html).not.toContain('Invitation');
