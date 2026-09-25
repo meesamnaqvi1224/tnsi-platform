@@ -34,8 +34,10 @@ vi.mock('@/lib/practices', () => ({
 }));
 
 const mockFetchSomaticSeriesList = vi.fn();
+const mockFetchSomaticSeriesDetail = vi.fn();
 vi.mock('@/lib/somatic-cards-client', () => ({
   fetchSomaticSeriesList: () => mockFetchSomaticSeriesList(),
+  fetchSomaticSeriesDetail: (slug: string) => mockFetchSomaticSeriesDetail(slug),
 }));
 
 vi.mock('@/content/cms/loaders', () => ({ getLatestArticles: () => Promise.resolve([]) }));
@@ -56,10 +58,11 @@ beforeEach(() => {
   mockFetchSomaticSeriesList.mockResolvedValue({
     status: 'ok',
     data: [
-      { id: 's1', seriesNumber: 1 },
-      { id: 's2', seriesNumber: 2 },
+      { id: 's1', seriesNumber: 1, title: 'Support, Pressure & Proprioception', slug: 's1' },
+      { id: 's2', seriesNumber: 2, title: 'Breath & Cardiorespiratory Rhythm', slug: 's2' },
     ],
   });
+  mockFetchSomaticSeriesDetail.mockResolvedValue({ status: 'ok', data: { cards: [] } });
 });
 
 describe('DashboardPage — Somatic Cards discovery tile', () => {
@@ -78,7 +81,12 @@ describe('DashboardPage — Somatic Cards discovery tile', () => {
   it('shows a dynamic series count from the API, not a hardcoded number', async () => {
     mockFetchSomaticSeriesList.mockResolvedValueOnce({
       status: 'ok',
-      data: Array.from({ length: 9 }, (_, i) => ({ id: `s${i}`, seriesNumber: i + 1 })),
+      data: Array.from({ length: 9 }, (_, i) => ({
+        id: `s${i}`,
+        seriesNumber: i + 1,
+        title: `Series ${i + 1}`,
+        slug: `s${i}`,
+      })),
     });
     const html = renderToStaticMarkup(await DashboardPage());
     expect(html).toContain('9 series available');
