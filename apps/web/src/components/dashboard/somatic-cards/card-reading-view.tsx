@@ -26,6 +26,19 @@ function sortByOrder<T extends { order: number }>(items: T[]): T[] {
 }
 
 /**
+ * Sanity's CDN URLs encode the asset's original pixel dimensions in the
+ * filename itself (`<id>-<width>x<height>-<ext>`) - reading them back out
+ * lets the artwork render at its true aspect ratio instead of being
+ * force-cropped into a fixed box. Returns null for a URL that doesn't
+ * follow the convention (e.g. a non-Sanity source) rather than guessing.
+ */
+function parseSanityImageDimensions(url: string): { width: number; height: number } | null {
+  const match = url.match(/-(\d+)x(\d+)-\w+(?:\?|$)/);
+  if (!match) return null;
+  return { width: Number(match[1]), height: Number(match[2]) };
+}
+
+/**
  * Ordered practice steps - always an `<ol>` (order is meaningful, not
  * decorative), every step rendered regardless of count (never assumes
  * exactly 3), label rendered only when the step actually has one.
@@ -182,6 +195,10 @@ function ContentSection({
  * is real, independently readable text.
  */
 export function CardReadingView({ card }: { card: ApiSomaticCardDetail }) {
+  const artworkDimensions = card.cardArtwork
+    ? parseSanityImageDimensions(card.cardArtwork.url)
+    : null;
+
   return (
     <div className="flex flex-col gap-(--space-2xl)">
       <NextLink
@@ -199,13 +216,20 @@ export function CardReadingView({ card }: { card: ApiSomaticCardDetail }) {
       </header>
 
       {card.cardArtwork ? (
-        <div className="from-secondary/50 relative aspect-[9/16] w-full max-w-sm self-center overflow-hidden rounded-lg bg-gradient-to-b to-transparent shadow-sm">
+        <div
+          className="relative w-full max-w-md self-center"
+          style={
+            artworkDimensions
+              ? { aspectRatio: `${artworkDimensions.width} / ${artworkDimensions.height}` }
+              : undefined
+          }
+        >
           <ResponsiveImage
             src={card.cardArtwork.url}
             alt={card.cardArtwork.alt}
             fill
-            sizes="(min-width: 640px) 384px, 100vw"
-            className="object-cover"
+            sizes="(min-width: 640px) 448px, 100vw"
+            className="object-contain"
             priority
           />
         </div>
