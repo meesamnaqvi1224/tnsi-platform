@@ -1,4 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle, Eyebrow, Stack, Text, cn } from '@tnsi/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Divider,
+  Eyebrow,
+  Stack,
+  Text,
+  cn,
+} from '@tnsi/ui';
 import type { CheckIn } from '@tnsi/db/schema';
 
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -83,8 +93,10 @@ export function WeekAtAGlance({ recentCheckIns }: WeekAtAGlanceProps) {
             <Text tone="muted" size="sm">
               {count} check-in{count === 1 ? '' : 's'} this week.
             </Text>
-            <Text tone="muted" className="text-base leading-[1.85] italic">
-              Consistency isn&rsquo;t about perfection. It&rsquo;s about coming back to yourself.
+            <Divider />
+            <Text className="font-heading text-center text-lg leading-relaxed italic">
+              &ldquo;Consistency isn&rsquo;t about perfection. It&rsquo;s about coming back to
+              yourself.&rdquo;
             </Text>
           </Stack>
         </CardContent>
