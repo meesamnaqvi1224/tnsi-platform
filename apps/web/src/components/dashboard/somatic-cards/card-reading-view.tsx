@@ -1,6 +1,15 @@
 import type * as React from 'react';
 import NextLink from 'next/link';
-import { Badge, Divider, Heading, Text } from '@tnsi/ui';
+import {
+  BookOpen,
+  Compass,
+  Eye,
+  HeartHandshake,
+  ListChecks,
+  Sparkles,
+  type LucideIcon,
+} from 'lucide-react';
+import { Card, CardContent, Divider, Eyebrow, Heading, PageQuote, Text } from '@tnsi/ui';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
 import type { ApiSomaticCardDetail } from '@/lib/somatic-card-api';
 
@@ -27,24 +36,35 @@ function sortByOrder<T extends { order: number }>(items: T[]): T[] {
 export function PracticeStepsList({ steps }: { steps: ApiSomaticCardDetail['practiceSteps'] }) {
   if (steps.length === 0) return null;
   return (
-    <ol className="flex list-decimal flex-col gap-(--space-sm) pl-(--space-lg)">
+    <ol className="flex flex-col gap-(--space-md)">
       {sortByOrder(steps).map((step, i) => (
-        <li key={`${step.order}-${i}`} className="text-foreground text-sm leading-[1.8]">
-          {step.label ? <span className="font-medium">{step.label}: </span> : null}
-          {step.instruction}
+        <li key={`${step.order}-${i}`} className="flex items-start gap-(--space-sm)">
+          <span
+            aria-hidden
+            className="border-border bg-secondary/50 text-foreground mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border text-xs font-medium tabular-nums"
+          >
+            {i + 1}
+          </span>
+          <Text className="text-foreground text-sm leading-[1.8]">
+            {step.label ? <span className="font-medium">{step.label}: </span> : null}
+            {step.instruction}
+          </Text>
         </li>
       ))}
     </ol>
   );
 }
 
-/** Ordered "What to Notice" prompts - plain observations, never titled, order preserved from the API. */
+/** Ordered "What to Notice" prompts - short observations rendered as a scannable row of pills, order preserved from the API. */
 export function WhatToNoticeList({ items }: { items: ApiSomaticCardDetail['whatToNotice'] }) {
   if (items.length === 0) return null;
   return (
-    <ol className="flex list-decimal flex-col gap-(--space-xs) pl-(--space-lg)">
+    <ol className="flex flex-wrap gap-(--space-xs)">
       {sortByOrder(items).map((item, i) => (
-        <li key={`${item.order}-${i}`} className="text-foreground text-sm leading-[1.8]">
+        <li
+          key={`${item.order}-${i}`}
+          className="border-border bg-secondary/40 text-foreground rounded-full border px-3 py-1.5 text-sm"
+        >
           {item.text}
         </li>
       ))}
@@ -122,12 +142,21 @@ export function DemonstrationSequenceGallery({
   );
 }
 
-function ContentSection({ heading, children }: { heading: string; children: React.ReactNode }) {
+function ContentSection({
+  heading,
+  icon: Icon,
+  children,
+}: {
+  heading: string;
+  icon: LucideIcon;
+  children: React.ReactNode;
+}) {
   return (
     <section className="flex flex-col gap-(--space-sm)">
-      <Heading as="h2" size="xs" className="font-heading text-foreground text-base font-semibold">
+      <Eyebrow as="span" className="flex items-center gap-(--space-2xs)">
+        <Icon aria-hidden className="text-muted-foreground size-3.5" />
         {heading}
-      </Heading>
+      </Eyebrow>
       {children}
     </section>
   );
@@ -162,17 +191,15 @@ export function CardReadingView({ card }: { card: ApiSomaticCardDetail }) {
         ← {card.series.title}
       </NextLink>
 
-      <header className="flex flex-col gap-(--space-md)">
-        <Badge variant="outline" className="w-fit">
-          Card {card.cardNumber}
-        </Badge>
-        <Heading as="h1" size="xl">
+      <header className="flex flex-col gap-(--space-xs)">
+        <Eyebrow>Card {card.cardNumber}</Eyebrow>
+        <Heading as="h1" size="xl" className="italic">
           {card.title}
         </Heading>
       </header>
 
       {card.cardArtwork ? (
-        <div className="bg-secondary/40 relative aspect-[9/16] w-full max-w-sm self-center overflow-hidden rounded-lg">
+        <div className="from-secondary/50 relative aspect-[9/16] w-full max-w-sm self-center overflow-hidden rounded-lg bg-gradient-to-b to-transparent shadow-sm">
           <ResponsiveImage
             src={card.cardArtwork.url}
             alt={card.cardArtwork.alt}
@@ -198,71 +225,76 @@ export function CardReadingView({ card }: { card: ApiSomaticCardDetail }) {
 
       <Divider />
 
-      <div className="flex flex-col gap-(--space-xl)">
+      <div className="flex flex-col gap-(--space-2xl)">
         {card.invitation ? (
-          <ContentSection heading="Invitation">
-            <Text className="text-foreground text-base leading-[1.85]">{card.invitation}</Text>
-          </ContentSection>
+          <Text
+            as="p"
+            className="font-heading text-foreground text-center text-xl leading-relaxed italic sm:text-2xl"
+          >
+            {card.invitation}
+          </Text>
         ) : null}
 
-        {card.purpose ? (
-          <ContentSection heading="Purpose">
-            <Text className="text-foreground text-base leading-[1.85]">{card.purpose}</Text>
-          </ContentSection>
-        ) : null}
+        <div className="flex flex-col gap-(--space-xl)">
+          {card.purpose ? (
+            <ContentSection heading="Purpose" icon={Compass}>
+              <Text className="text-foreground text-base leading-[1.85]">{card.purpose}</Text>
+            </ContentSection>
+          ) : null}
 
-        {card.description ? (
-          <ContentSection heading="Description">
-            <Text tone="muted" className="text-base leading-[1.85]">
-              {card.description}
-            </Text>
-          </ContentSection>
-        ) : null}
+          {card.description ? (
+            <ContentSection heading="Description" icon={BookOpen}>
+              <Text tone="muted" className="text-base leading-[1.85]">
+                {card.description}
+              </Text>
+            </ContentSection>
+          ) : null}
 
-        {card.orientation ? (
-          <ContentSection heading="Orientation">
-            <Text tone="muted" className="text-sm leading-[1.7]">
-              {card.orientation}
-            </Text>
-          </ContentSection>
-        ) : null}
+          {card.orientation ? (
+            <ContentSection heading="Orientation" icon={Compass}>
+              <Text tone="muted" className="text-sm leading-[1.7]">
+                {card.orientation}
+              </Text>
+            </ContentSection>
+          ) : null}
 
-        {card.practiceSteps.length > 0 || card.demonstrationSequence.length > 0 ? (
-          <ContentSection heading="Practice">
-            <div className="flex flex-col gap-(--space-lg)">
-              <PracticeStepsList steps={card.practiceSteps} />
-              <DemonstrationSequenceGallery frames={card.demonstrationSequence} />
-            </div>
-          </ContentSection>
-        ) : null}
+          {card.practiceSteps.length > 0 || card.demonstrationSequence.length > 0 ? (
+            <ContentSection heading="Practice" icon={ListChecks}>
+              <div className="flex flex-col gap-(--space-lg)">
+                <PracticeStepsList steps={card.practiceSteps} />
+                <DemonstrationSequenceGallery frames={card.demonstrationSequence} />
+              </div>
+            </ContentSection>
+          ) : null}
 
-        {card.whatToNotice.length > 0 ? (
-          <ContentSection heading="What to Notice">
-            <WhatToNoticeList items={card.whatToNotice} />
-          </ContentSection>
-        ) : null}
+          {card.whatToNotice.length > 0 ? (
+            <ContentSection heading="What to Notice" icon={Eye}>
+              <WhatToNoticeList items={card.whatToNotice} />
+            </ContentSection>
+          ) : null}
 
-        {card.supportingImages.length > 0 ? (
-          <ContentSection heading="Supporting Images">
-            <SupportingImagesGallery images={card.supportingImages} />
-          </ContentSection>
-        ) : null}
+          {card.supportingImages.length > 0 ? (
+            <ContentSection heading="Supporting Images" icon={Sparkles}>
+              <SupportingImagesGallery images={card.supportingImages} />
+            </ContentSection>
+          ) : null}
 
-        {card.gentleNote ? (
-          <ContentSection heading="Gentle Note">
-            <Text className="text-foreground text-base leading-[1.85] italic">
-              {card.gentleNote}
-            </Text>
-          </ContentSection>
-        ) : null}
+          {card.gentleNote ? (
+            <Card className="bg-secondary/30 border-border/60 shadow-none">
+              <CardContent className="flex flex-col gap-(--space-xs) p-(--space-lg)">
+                <Eyebrow as="span" className="flex items-center gap-(--space-2xs)">
+                  <HeartHandshake aria-hidden className="text-muted-foreground size-3.5" />
+                  Gentle Note
+                </Eyebrow>
+                <Text className="text-foreground text-base leading-[1.85] italic">
+                  {card.gentleNote}
+                </Text>
+              </CardContent>
+            </Card>
+          ) : null}
+        </div>
 
-        {card.anchor ? (
-          <ContentSection heading="Anchor">
-            <Text className="text-foreground text-base leading-[1.85] font-medium">
-              {card.anchor}
-            </Text>
-          </ContentSection>
-        ) : null}
+        {card.anchor ? <PageQuote quote={card.anchor} /> : null}
       </div>
     </div>
   );
