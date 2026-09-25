@@ -27,13 +27,15 @@ function sortByOrder<T extends { order: number }>(items: T[]): T[] {
 
 /**
  * Sanity's CDN URLs encode the asset's original pixel dimensions in the
- * filename itself (`<id>-<width>x<height>-<ext>`) - reading them back out
- * lets the artwork render at its true aspect ratio instead of being
- * force-cropped into a fixed box. Returns null for a URL that doesn't
- * follow the convention (e.g. a non-Sanity source) rather than guessing.
+ * filename itself (`<id>-<width>x<height>.<ext>` - a dot before the
+ * extension, not a hyphen; that's only how Sanity's internal asset _id
+ * spells it) - reading them back out lets the artwork render at its true
+ * aspect ratio instead of being force-cropped into a fixed box. Returns
+ * null for a URL that doesn't follow the convention (e.g. a non-Sanity
+ * source) rather than guessing.
  */
 function parseSanityImageDimensions(url: string): { width: number; height: number } | null {
-  const match = url.match(/-(\d+)x(\d+)-\w+(?:\?|$)/);
+  const match = url.match(/-(\d+)x(\d+)\.\w+(?:\?|$)/);
   if (!match) return null;
   return { width: Number(match[1]), height: Number(match[2]) };
 }
