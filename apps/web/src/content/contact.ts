@@ -44,15 +44,15 @@ export const contactContent = {
         email: 'programmes@tnsi.org',
         href: 'mailto:programmes@tnsi.org',
         description:
-          'Enquiries about Life Beyond Trauma, Practitioner Certification and programme fit.',
+          'Enquiries about the Life Beyond Trauma Method, Practitioner Certification and programme fit.',
         responseTime: 'Within two business days',
       },
       {
         id: 'executive',
-        title: 'Executive Advisory',
+        title: 'Private & System-Level Executive Advisory',
         email: 'executive@tnsi.org',
         href: 'mailto:executive@tnsi.org',
-        description: 'Organisational and leadership advisory engagements.',
+        description: 'Individual leadership and organisational advisory engagements.',
         responseTime: 'Within three business days',
       },
       {
@@ -103,7 +103,7 @@ export const contactContent = {
       {
         question: 'Can organisations work with TNSI?',
         answer:
-          'Yes. We work with healthcare systems, universities, leadership organisations and corporate teams through Executive Advisory, speaking engagements and bespoke educational partnerships.',
+          'Yes. We work with healthcare systems, universities, leadership organisations and corporate teams through the System-Level Executive Advisory, speaking engagements and bespoke educational partnerships.',
       },
       {
         question: 'How do I know which programme is right?',

@@ -2,22 +2,25 @@
  * Our Pathways page content (served at the existing /programs route —
  * URL preserved for stability; only the page's visible positioning changes).
  *
- * Source: Caroline Reed's "TNSI Website Feedback" document (2026-08).
- * Copy is used as supplied — do not paraphrase or embellish.
+ * Source: Caroline Reed's "TNSI - Program Summaries.docx" (2026-09), the
+ * current source of truth for programme structure and content, superseding
+ * the earlier "TNSI Website Feedback" pass. Two programmes were renamed to
+ * match that document's actual programme names: "Executive Advisory" ->
+ * "Private Executive Advisory", and "Organisational Advisory" ->
+ * "System-Level Executive Advisory" (kept live per explicit owner
+ * instruction, overriding the source document's own "program design in
+ * process" note on that one programme). Route paths (`id`, `cta.href`) are
+ * unchanged - renaming URLs was out of scope and not worth the migration
+ * risk for a content-only update.
  *
- * "Four vs five pathways" discrepancy: Caroline's supplied introduction says
- * "four evidence-informed pathways" but then names five (Regulation Suite,
- * Life Beyond Trauma, Nervous System Academy, Executive Advisory,
- * Organisational Advisory). Per implementation instructions, the numeral is
+ * "Four vs five pathways" discrepancy: an earlier draft of Caroline's intro
+ * copy said "four evidence-informed pathways" but named five. The numeral is
  * not hardcoded here — it would visibly contradict the five pathway panels
  * rendered below it. Flagged for Caroline's review; not resolved silently.
- * Batch B: still numberless, unchanged, per explicit instruction not to
- * reintroduce "four" or invent "five" without her confirmation.
  *
- * `category` values match Batch B's confirmed architecture tree — For
+ * `category` values match the confirmed architecture tree — For
  * Individuals / For Professionals / For Leaders / For Organisations — each
- * pathway's `cta.href` now points at its own dedicated page (Batch B) rather
- * than /method or a generic /book-a-call placeholder (Batch A interim).
+ * pathway's `cta.href` points at its own dedicated page.
  *
  * `comparison` is retained unchanged (old 3-programme model) purely so
  * `content/cms/loaders.ts` — Sanity-adjacent glue this batch does not touch —
@@ -41,16 +44,22 @@ export const programsOverviewContent = {
       id: 'regulation-suite',
       category: 'For Individuals',
       title: 'The Regulation Suite™',
-      tagline: 'Build capacity. One practice at a time.',
+      tagline: 'Practical nervous-system support, whenever you need it.',
       paragraphs: [
-        "The Regulation Suite™ is the Institute's membership and daily learning environment. Designed for individuals who want to better understand their nervous system and develop greater capacity in everyday life, it provides a growing library of practical tools, guided practices, workshops, and educational resources grounded in Human Expansion Theory™.",
-        "Whether you're learning to regulate more effectively, build resilience, reconnect with yourself, or strengthen your capacity over time, the Regulation Suite offers ongoing support that fits into everyday life.",
+        "The Regulation Suite™ is a digital nervous-system support platform — a subscription app designed to help you understand what's happening in your nervous system and find an appropriate response in the moment, without needing to work through complex theory first.",
+        'State-based navigation (Calm My System, Feel Grounded, Release Pressure, Reconnect With Myself, Build Capacity) moves you quickly towards relevant support, drawing on PowerDrops™, somatic regulation practices, guided exercises, meditation and visualisation, and body-based tools.',
+        'It supports both immediate regulation and longer-term capacity awareness, and is not a replacement for clinical treatment, crisis intervention, or specialist mental health care.',
+        // Pricing per Caroline's source document, stated here as informational
+        // content only — the enrolment status below (and the page's own CTA
+        // section) is unchanged, since no live subscription/entitlement flow
+        // exists yet for this product (see docs/membership-commercial-decisions.md).
+        'The current model is priced at £5.99 per month, with the ability to cancel at any time.',
       ],
       idealFor: [
-        'Individuals beginning their nervous system education',
-        'Ongoing personal development',
-        'Daily regulation and capacity-building',
-        'Maintaining progress after Life Beyond Trauma™',
+        'People experiencing everyday stress, overwhelm or reduced capacity',
+        'Immediate, practical regulation support',
+        'Building longer-term nervous-system awareness',
+        'Maintaining progress after the Life Beyond Trauma Method™',
       ],
       cta: { label: 'Explore the Regulation Suite', href: '/programs/regulation-suite' },
       imageSrc: '/images/programs/nav-regulation-suite.webp',
@@ -63,20 +72,20 @@ export const programsOverviewContent = {
     {
       id: 'life-beyond-trauma',
       category: 'For Individuals',
-      title: 'Life Beyond Trauma™',
-      tagline: 'A structured pathway for lasting human development.',
+      title: 'The Life Beyond Trauma Method™',
+      tagline: 'A structured 12-week trauma-informed programme.',
       paragraphs: [
-        "Life Beyond Trauma™ is the Institute's flagship educational pathway for individuals seeking deeper and more sustained change.",
-        'Grounded in the Capacity Recalibration Model™ and informed by Human Expansion Theory™, it helps participants understand the protective patterns that have shaped their lives while developing the capacity to participate more fully in relationships, work, purpose, and everyday living.',
-        'Rather than focusing solely on symptom management, Life Beyond Trauma™ supports the gradual transition from lives organised around protection to lives characterised by greater flexibility, capacity, and meaningful participation.',
+        'The Life Beyond Trauma Method™ is a structured 12-week trauma-informed therapeutic and educational programme for adults whose experiences of trauma, adversity, chronic stress, or long-standing protective patterns continue to affect their emotional wellbeing, nervous-system regulation, relationships, and everyday functioning.',
+        'It combines psychoeducation, nervous-system education, guided reflection, practical exercises, structured self-paced learning, and weekly facilitated group support. Participants are not required to disclose detailed traumatic experiences — the emphasis is on education, reflection, understanding, and practical application.',
+        'Participants retain lifetime access to the core programme materials. Intended outcomes include a greater understanding of trauma and nervous-system responses, awareness of stress patterns and protective behaviours, and clearer plans for continued development. The programme is therapeutic and educational in nature and does not guarantee a particular clinical outcome.',
       ],
       idealFor: [
-        'Individuals seeking deeper personal development',
-        'People living beyond their available capacity',
-        'Those wanting structured education rather than symptom management',
-        'Individuals committed to long-term growth',
+        'Adults affected by trauma, adversity or chronic stress',
+        'People who remain outwardly functional while under significant internal strain',
+        'Those who want structured education without repeated disclosure',
+        'Individuals committed to long-term, trauma-informed development',
       ],
-      cta: { label: 'Explore Life Beyond Trauma', href: '/programs/life-beyond-trauma' },
+      cta: { label: 'Explore the Life Beyond Trauma Method', href: '/programs/life-beyond-trauma' },
       imageSrc: '/images/programs/nav-life-beyond-trauma.webp',
       imageAlt:
         'A woman in a cream sweater walks alone along a winding path through a sunlit forest.',
@@ -91,11 +100,11 @@ export const programsOverviewContent = {
       id: 'nervous-system-academy',
       category: 'For Professionals',
       title: 'The Nervous System Academy',
-      tagline: 'Professional education for those who support others.',
+      tagline: 'Education, training, certification and practitioner development.',
       paragraphs: [
-        'The Nervous System Academy provides evidence-informed education for therapists, coaches, healthcare professionals, educators, and other practitioners who want to integrate nervous system science into their work.',
-        'Through certification, continuing professional development, supervision, and advanced learning, the Academy equips professionals with practical frameworks that bridge scientific understanding with real-world application.',
-        "The Academy exists not simply to teach techniques, but to cultivate thoughtful practitioners who can confidently apply Human Expansion Theory™ and the Institute's educational frameworks within their own professional settings.",
+        'The Nervous System Academy is the education, training, certification, and practitioner-development arm of The Nervous System Institute — structured around three defined routes: the CPD Pathway, the Life Beyond Trauma Coaching Certificate, and the Practitioner Certification Pathway.',
+        'The CPD Pathway provides specialist continuing education without certification in a specific TNSI methodology. The Life Beyond Trauma Coaching Certificate trains people — who have first completed the 12-week Life Beyond Trauma programme themselves — to support others through it. The Practitioner Certification Pathway is the advanced route for appropriately qualified, licensed or regulated clinicians seeking certification in specialist TNSI methodologies, including the Private Executive Advisory Practitioner Certification.',
+        "The Academy exists not simply to teach techniques, but to cultivate thoughtful practitioners who can confidently and responsibly apply the Institute's methodologies within an appropriate professional scope.",
       ],
       idealFor: [
         'Therapists',
@@ -108,7 +117,7 @@ export const programsOverviewContent = {
       cta: { label: 'Explore the Academy', href: '/programs/academy' },
       relatedCta: {
         label:
-          'Our current certification programme, Practitioner Certification, is available today.',
+          'The Practitioner Certification Pathway is the Academy’s current advanced certification route, available today.',
         href: '/programs/practitioner-certification',
       },
       imageSrc: '/images/programs/nav-academy.webp',
@@ -121,21 +130,20 @@ export const programsOverviewContent = {
     {
       id: 'executive-advisory',
       category: 'For Leaders',
-      title: 'Executive Advisory',
-      tagline: 'Building leadership capacity under sustained pressure.',
+      title: 'Private Executive Advisory',
+      tagline: 'A structured three-month advisory for senior leaders.',
       paragraphs: [
-        'Executive Advisory supports founders, senior leaders, and executives operating in environments of sustained complexity and responsibility.',
-        'Rather than focusing solely on stress management or executive performance, our advisory work helps leaders build the internal capacity required to navigate increasing complexity, make clearer decisions, sustain high performance, and lead from a place of greater physiological flexibility.',
-        'Through confidential one-to-one advisory, leaders develop the conditions that enable long-term effectiveness without becoming increasingly organised around protection.',
+        'The Private Executive Advisory is a structured three-month advisory programme for founders, CEOs, business owners, and senior executives operating within environments of sustained responsibility, complexity, pressure, and demand.',
+        'Underpinned by the Capacity Recalibration Model™, the advisory begins with a comprehensive Executive Capacity Audit and Somatic Load Mapping, synthesised into a personalised Executive Advisory Dossier™, before progressing through five phases: capacity assessment and clarification, stabilisation, load reorganisation, capacity expansion, and consolidation, integration and participation.',
+        'Each client receives six individual advisory sessions and weekly monitoring throughout the programme, concluding with a final Executive Advisory Dossier and a 90-Day Continuation Plan.',
       ],
       idealFor: [
         'Founders',
         'CEOs',
-        'Senior executives',
-        'Leadership teams',
-        'High-responsibility decision-makers',
+        'Business owners',
+        'Senior executives under sustained pressure',
       ],
-      cta: { label: 'Explore Executive Advisory', href: '/programs/executive-advisory' },
+      cta: { label: 'Explore Private Executive Advisory', href: '/programs/executive-advisory' },
       imageSrc: '/images/programs/nav-executive.webp',
       imageAlt:
         'A woman in a tailored blazer stands by a floor-to-ceiling window overlooking a city skyline, beside a stack of books.',
@@ -143,22 +151,25 @@ export const programsOverviewContent = {
     {
       id: 'organisational-advisory',
       category: 'For Organisations',
-      title: 'Organisational Advisory',
-      tagline: 'Creating organisations where people can thrive.',
+      title: 'System-Level Executive Advisory',
+      tagline: 'Understanding organisational load, not just individual stress.',
       paragraphs: [
-        'Organisational Advisory helps organisations apply nervous system science to leadership, culture, and organisational development.',
-        'Working alongside leadership teams, we translate Human Expansion Theory™ into practical strategies that strengthen organisational capacity, improve communication, support healthier cultures, and create environments where people can contribute more effectively over time.',
-        'Our focus extends beyond individual wellbeing to the development of resilient systems that enable sustainable organisational performance.',
+        "The System-Level Executive Advisory extends the Institute's work beyond the individual executive into the wider organisational environment — for leadership teams and organisations wanting to understand how pressure, responsibility, decision-making, workload, communication, and organisational structure are affecting collective capacity and sustainable performance.",
+        'The work identifies where organisational demands are creating unnecessary nervous-system load across teams and leadership structures — patterns of chronic urgency, over-responsibility, ineffective delegation, decision bottlenecks, and poor recovery culture — examining systemic patterns rather than individualising stress.',
+        'Engagements may include structured assessment of leadership demand, workload distribution, decision pathways, and communication patterns, with outcomes including a clearer understanding of organisational load, stronger distribution of responsibility, and more sustainable approaches to leadership and team performance.',
       ],
       idealFor: [
-        'Organisations',
         'Leadership teams',
+        'Organisations addressing systemic pressure',
         'Public sector',
         'Healthcare',
         'Education',
         'Corporate organisations',
       ],
-      cta: { label: 'Explore Organisational Advisory', href: '/programs/organisational-advisory' },
+      cta: {
+        label: 'Explore System-Level Executive Advisory',
+        href: '/programs/organisational-advisory',
+      },
       imageSrc: '/images/programs/nav-organisational-advisory.webp',
       imageAlt:
         'An empty boardroom with a curved wooden table, tan leather chairs and a small plant, seen through glass-walled offices.',

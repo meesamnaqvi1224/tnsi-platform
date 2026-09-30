@@ -18,9 +18,11 @@ export const footerColumns = [
   {
     title: 'Programs',
     links: [
-      { label: 'Life Beyond Trauma', href: '/programs/life-beyond-trauma' },
-      { label: 'Practitioner Certification', href: '/programs/practitioner-certification' },
-      { label: 'Executive Advisory', href: '/programs/executive-advisory' },
+      { label: 'The Regulation Suite™', href: '/programs/regulation-suite' },
+      { label: 'Life Beyond Trauma Method™', href: '/programs/life-beyond-trauma' },
+      { label: 'The Nervous System Academy', href: '/programs/academy' },
+      { label: 'Private Executive Advisory', href: '/programs/executive-advisory' },
+      { label: 'System-Level Executive Advisory', href: '/programs/organisational-advisory' },
     ],
   },
   {

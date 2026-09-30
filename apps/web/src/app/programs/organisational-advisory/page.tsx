@@ -60,7 +60,7 @@ export default function OrganisationalAdvisoryPage() {
           <Section
             spacing="xl"
             className="border-foreground/15 border-t"
-            aria-label="Organisational Advisory"
+            aria-label="System-Level Executive Advisory"
           >
             <Container size="xl">
               <EditorialImage
@@ -82,7 +82,7 @@ export default function OrganisationalAdvisoryPage() {
           <Container size="xl">
             <Stack gap="lg" className="max-w-2xl">
               <h2 id="oa-body-heading" className="sr-only">
-                About Organisational Advisory
+                About the System-Level Executive Advisory
               </h2>
               {pathway.paragraphs.map((paragraph) => (
                 <Text key={paragraph} tone="muted" className="max-w-prose leading-relaxed">
@@ -129,8 +129,8 @@ export default function OrganisationalAdvisoryPage() {
                   Take the next step
                 </Heading>
                 <Text tone="muted" className="max-w-prose leading-relaxed">
-                  Every Organisational Advisory engagement begins with a conversation. Book a
-                  Discovery Call to discuss your organisation&apos;s context and needs.
+                  Every System-Level Executive Advisory engagement begins with a conversation. Book
+                  a Discovery Call to discuss your organisation&apos;s context and needs.
                 </Text>
               </Stack>
 

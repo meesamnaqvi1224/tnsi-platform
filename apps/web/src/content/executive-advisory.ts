@@ -1,37 +1,46 @@
 /**
- * Executive Advisory page content.
+ * Private Executive Advisory page content.
  *
  * Structured for future Sanity CMS integration — each top-level key maps to a
  * document field or portable-text block. Components consume this object directly;
  * when Sanity is wired up, replace the static import with a fetch and keep the
  * same shape.
+ *
+ * Rewritten from Caroline Reed's "TNSI - Program Summaries.docx" (2026-09) -
+ * the previous version of this file described generic executive coaching
+ * (open-ended engagements, no fixed structure) which the source document
+ * directly contradicts: the actual programme is a fixed three-month,
+ * six-session advisory built on the Capacity Recalibration Model. Content
+ * below is drawn from that source rather than invented. The "twenty years"
+ * founder detail is kept - it is an established, site-wide biographical fact
+ * (see faculty.ts, discovery-call.ts), not a claim invented here.
  */
 
 export const executiveAdvisoryContent = {
   slug: 'executive-advisory',
 
   seo: {
-    title: 'Executive Advisory — The Nervous System Institute',
+    title: 'Private Executive Advisory — The Nervous System Institute',
     description:
-      'Private advisory for senior leaders and executive teams. Build organisations that perform sustainably through nervous system-informed leadership.',
+      'A structured three-month advisory for founders, CEOs, business owners and senior executives, built on the Capacity Recalibration Model™.',
   },
 
   hero: {
     chapter: '01',
-    eyebrow: 'Executive Advisory',
-    headline: 'Executive Advisory',
+    eyebrow: 'Private Executive Advisory',
+    headline: 'Private Executive Advisory',
     supportingHeadline: 'Building leadership capacity under sustained pressure.',
     supportingCopy:
-      'Modern organisations don\u2019t just need better strategies. They need leaders capable of making clear decisions, leading through uncertainty and creating environments where people can perform without chronic stress.',
+      'A structured three-month advisory for founders, CEOs, business owners, and senior executives operating within environments of sustained responsibility, complexity, pressure, and demand.',
     imageSrc: '/images/programs/executive/hero-meeting.webp',
     imageAlt:
       'Two women in a focused private strategy conversation at a table in a calm, glass-walled room with natural light.',
     imageCaption:
       'Private advisory engagements for leaders navigating complexity, capacity and culture.',
     metadata: [
-      { label: 'Audience', value: 'Senior Leaders & Executive Teams' },
-      { label: 'Format', value: 'Private Advisory' },
-      { label: 'Delivery', value: 'Virtual & In-Person' },
+      { label: 'Audience', value: 'Founders, CEOs & Senior Executives' },
+      { label: 'Format', value: 'Private 1:1 Advisory' },
+      { label: 'Structure', value: 'Three Months · Six Sessions' },
     ],
     primaryCta: { label: 'Book an Executive Consultation', href: '/book-a-call' },
     secondaryCta: { label: 'Request Advisory Overview', href: '/prospectus/executive-advisory' },
@@ -39,11 +48,11 @@ export const executiveAdvisoryContent = {
 
   challenge: {
     chapter: '02',
-    heading: 'Leadership today demands more than performance.',
+    heading: 'Performance does not establish that it is sustainable.',
     paragraphs: [
-      'Executive burnout is no longer exceptional — it is structural. Leaders carry decision fatigue, emotional contagion and the weight of organisational uncertainty without the frameworks to regulate under sustained pressure.',
-      'The hidden cost of dysregulated leadership extends far beyond the individual. It shapes culture, erodes trust and creates environments where high performance becomes synonymous with chronic stress.',
-      'Nervous system capacity is not a wellness concept. It is a leadership capability — the physiological foundation for clear judgment, calm authority and cultures that sustain performance over time.',
+      'Many high-performing executives continue to lead organisations, make complex decisions, manage teams, and meet significant professional obligations while maintaining that performance through sustained physiological and psychological mobilisation — a pattern the Institute calls Functional Overdrive.',
+      'Because performance continues, the internal strain it costs can stay hidden. Over time, Functional Overdrive can be associated with reduced recovery, cognitive fatigue, irritability, sleep disruption, diminished emotional tolerance, decision fatigue, and difficulty disengaging from work.',
+      'The Private Executive Advisory makes an important distinction between performance and sustainable performance. The fact that an individual can continue to perform does not, in itself, establish that their current way of operating is sustainable.',
     ],
   },
 
@@ -52,82 +61,72 @@ export const executiveAdvisoryContent = {
     heading: 'Who We Work With',
     cards: [
       {
-        title: 'CEOs',
-        description:
-          'Leaders responsible for organisational direction who need a confidential space to examine decision-making, resilience and the physiological dimension of executive authority.',
-      },
-      {
         title: 'Founders',
         description:
-          'Entrepreneurs building high-growth companies who recognise that sustainable scale requires regulated leadership — not heroic endurance.',
+          'Founders operating within sustained responsibility, complexity, pressure, and demand — continuing to function effectively while carrying increasing psychological and physiological strain.',
       },
       {
-        title: 'Executive Teams',
+        title: 'CEOs',
         description:
-          'Senior leadership groups seeking shared language, aligned capacity and healthier dynamics across the C-suite and board level.',
+          'CEOs whose decisions, judgment, and capacity for complexity depend on a level of physiological and cognitive resource that sustained pressure can quietly erode.',
       },
       {
-        title: 'Healthcare Leaders',
+        title: 'Business owners',
         description:
-          'Clinical and administrative leaders navigating high-stakes environments where dysregulated culture directly affects patient outcomes and staff retention.',
+          'Business owners carrying persistent pressure, decision fatigue, and reduced recovery while performance continues to look, from the outside, unaffected.',
       },
       {
-        title: 'Education Leaders',
+        title: 'Senior executives',
         description:
-          'Heads of institutions and senior educators building environments where staff and students can thrive without systemic burnout.',
-      },
-      {
-        title: 'High Growth Companies',
-        description:
-          'Organisations in rapid expansion who need leadership infrastructure that scales culture, not just revenue.',
+          'Senior executives showing patterns of Functional Overdrive — performance maintained despite operating beyond sustainable capacity.',
       },
     ],
   },
 
   areas: {
     chapter: '04',
-    heading: 'Advisory Areas',
+    heading: 'What the Advisory Includes',
     panels: [
       {
-        id: 'leadership-capacity',
-        title: 'Leadership Capacity',
+        id: 'capacity-audit',
+        title: 'Executive Capacity Audit',
         description:
-          'Develop the physiological and cognitive reserves required to lead through complexity without depleting yourself or your organisation.',
+          'A comprehensive audit establishing how you are currently operating — demand, energy expenditure and recovery, decision load, and capacity constraints.',
         href: '/book-a-call',
       },
       {
-        id: 'executive-resilience',
-        title: 'Executive Resilience',
+        id: 'somatic-load-mapping',
+        title: 'Somatic Load Mapping',
         description:
-          'Build sustainable patterns of recovery, regulation and presence that withstand the demands of senior leadership.',
+          'Assessment that extends beyond cognitive or behavioural accounts of stress, examining how sustained executive demand is carried physiologically.',
         href: '/book-a-call',
       },
       {
-        id: 'decision-making',
-        title: 'Decision Making',
+        id: 'advisory-dossier',
+        title: 'Executive Advisory Dossier™',
         description:
-          'Strengthen clarity under pressure — understanding how nervous system state shapes judgment, risk tolerance and strategic choice.',
+          'A personalised dossier synthesising your assessment into a structured analysis of your operating profile — the baseline the advisory works from.',
         href: '/book-a-call',
       },
       {
-        id: 'organisational-culture',
-        title: 'Organisational Culture',
+        id: 'capacity-recalibration-model',
+        title: 'The Capacity Recalibration Model™',
         description:
-          'Examine how leadership physiology shapes team dynamics, psychological safety and the unwritten rules of your organisation.',
+          'Five phases — capacity assessment and clarification, stabilisation, load reorganisation, capacity expansion, and consolidation — structure the advisory from baseline to sustainable practice.',
         href: '/book-a-call',
       },
       {
-        id: 'change-leadership',
-        title: 'Change Leadership',
+        id: 'weekly-monitoring',
+        title: 'Six Sessions & Weekly Monitoring',
         description:
-          'Navigate transformation, restructuring and uncertainty with regulated authority that models stability for the entire organisation.',
+          'Six structured individual advisory sessions, supplemented by weekly monitoring that tracks load, recovery, and capacity in real-world conditions between sessions.',
         href: '/book-a-call',
       },
       {
-        id: 'high-performance',
-        title: 'High Performance Without Burnout',
+        id: 'continuation-plan',
+        title: '90-Day Continuation Plan',
         description:
-          'Redefine what sustainable excellence looks like — performance systems that elevate capacity rather than extract it.',
+          'A final dossier and a 90-day plan for the period after formal completion, reducing the likelihood of an unintentional return to previous patterns.',
         href: '/book-a-call',
       },
     ],
@@ -135,34 +134,34 @@ export const executiveAdvisoryContent = {
 
   journey: {
     chapter: '05',
-    heading: 'Advisory Journey',
+    heading: 'The Five Phases',
     intro:
-      'A structured engagement designed for executive contexts — confidential, bespoke and oriented toward long-term organisational impact.',
+      'A formal enquiry and suitability process, followed by onboarding and the Executive Capacity Audit, leads into the five phases of the Capacity Recalibration Model™.',
     steps: [
       {
-        title: 'Discovery',
+        title: 'Capacity Assessment & Clarification',
         description:
-          'Initial consultation to understand your leadership context, organisational challenges and advisory objectives.',
+          'You develop a detailed understanding of your current operating pattern — the relationship between the demands you carry and the resources available to meet them.',
       },
       {
-        title: 'Leadership Assessment',
+        title: 'Stabilisation',
         description:
-          'A structured evaluation of leadership capacity, team dynamics and the physiological patterns shaping your organisation.',
+          'Support to reduce unnecessary physiological and psychological expenditure and improve regulation and recovery, through personalised strategies matched to your assessment profile.',
       },
       {
-        title: 'Strategic Advisory',
+        title: 'Load Reorganisation',
         description:
-          'Private advisory sessions translating nervous system science into leadership strategy and organisational application.',
+          'The advisory examines the structure around you — how responsibility, workload, decision-making, and boundaries are currently organised — rather than treating pressure as purely internal.',
       },
       {
-        title: 'Implementation',
+        title: 'Capacity Expansion',
         description:
-          'Supported integration of frameworks into daily leadership practice, team rituals and cultural infrastructure.',
+          'Once greater stability is established, you learn to identify personal capacity thresholds and support greater complexity and responsibility without recreating overdrive.',
       },
       {
-        title: 'Long-Term Partnership',
+        title: 'Consolidation, Integration & Participation',
         description:
-          'Ongoing advisory relationship for leaders committed to sustained organisational transformation.',
+          'The work is brought together and translated into your ongoing professional practice, with the emphasis moving from active recalibration to sustainable implementation.',
       },
     ],
   },
@@ -171,23 +170,23 @@ export const executiveAdvisoryContent = {
     chapter: '06',
     heading: 'Outcomes',
     before: {
-      label: 'Before',
+      label: 'Functional Overdrive',
       items: [
-        'Reactive leadership',
+        'Reduced recovery',
+        'Cognitive fatigue',
         'Decision fatigue',
-        'Leadership isolation',
-        'Burnout culture',
-        'Low trust',
+        'Diminished emotional tolerance',
+        'Difficulty disengaging from work',
       ],
     },
     after: {
-      label: 'After',
+      label: 'Intended Outcomes',
       items: [
-        'Calm decision-making',
-        'Greater organisational capacity',
-        'Healthy leadership culture',
-        'Psychological safety',
-        'Long-term sustainable performance',
+        'A clearer understanding of your operating model',
+        'Improved recognition of personal capacity thresholds',
+        'Identification of unnecessary or poorly distributed load',
+        'Clearer boundaries around responsibility and decision-making',
+        'Earlier recognition of Functional Overdrive patterns',
       ],
     },
   },
@@ -196,7 +195,7 @@ export const executiveAdvisoryContent = {
     chapter: '07',
     heading: 'Why Caroline Reed',
     imageSrc: '/images/programs/executive/founder-portrait.webp',
-    imageAlt: 'Portrait of Caroline Reed — executive advisory and leadership education.',
+    imageAlt: 'Portrait of Caroline Reed — Private Executive Advisory and leadership education.',
     paragraphs: [
       'Caroline Reed brings more than twenty years of experience in trauma recovery, leadership education and nervous system science.',
       'Her advisory work combines clinical expertise, evidence-informed methodology and a deep understanding of how physiological state shapes executive judgment, team culture and organisational performance.',
@@ -212,36 +211,36 @@ export const executiveAdvisoryContent = {
       {
         question: 'Is this for individuals or organisations?',
         answer:
-          'Both. Executive Advisory serves individual leaders seeking confidential counsel and organisations investing in leadership team development. Engagements are scoped to your context during the discovery phase.',
+          'The Private Executive Advisory is a confidential, individual advisory for founders, CEOs, business owners, and senior executives. Organisations wanting to address pressure, responsibility, and capacity at a team or system level should explore the System-Level Executive Advisory instead.',
       },
       {
-        question: 'Can leadership teams participate together?',
+        question: 'How long does the advisory last?',
         answer:
-          'Yes. Team-based advisory is a core offering. Executive teams benefit from shared frameworks, aligned language and facilitated sessions that address group dynamics alongside individual leadership capacity.',
+          'The Private Executive Advisory is a structured three-month programme, comprising six individual advisory sessions, weekly monitoring, and a final 90-Day Continuation Plan.',
       },
       {
-        question: 'Are engagements customised?',
+        question: 'Is every engagement built around a fixed structure?',
         answer:
-          'Every engagement is bespoke. There is no fixed curriculum or programme structure. Advisory is shaped around your organisation\u2019s challenges, leadership context and strategic objectives.',
+          'Yes. The advisory follows the five phases of the Capacity Recalibration Model\u2122 \u2014 capacity assessment and clarification, stabilisation, load reorganisation, capacity expansion, and consolidation \u2014 informed throughout by your own Executive Capacity Audit and Somatic Load Mapping.',
+      },
+      {
+        question: 'What happens at the start of the advisory?',
+        answer:
+          'The advisory begins with a formal enquiry and suitability process, followed by structured onboarding and a comprehensive Executive Capacity Audit, which is synthesised into your personalised Executive Advisory Dossier\u2122.',
       },
       {
         question: 'Is international delivery available?',
         answer:
-          'Yes. Advisory is delivered virtually and in-person internationally. Senior leaders across time zones engage through scheduled private sessions with supplementary resources tailored to their organisation.',
-      },
-      {
-        question: 'How long does an advisory engagement last?',
-        answer:
-          'Engagement length varies by scope. Some leaders engage for a focused three-month advisory period; others maintain long-term partnerships spanning years. Duration is agreed during discovery based on your objectives.',
+          'Yes. Advisory is delivered virtually and in-person internationally, with scheduled private sessions supplemented by weekly monitoring throughout the three-month programme.',
       },
     ],
   },
 
   cta: {
     chapter: '09',
-    headline: 'Great organisations begin with regulated leadership.',
+    headline: 'Sustainable performance starts with sustainable capacity.',
     supportingCopy:
-      'The quality of leadership influences every conversation, every decision and every culture. Executive Advisory helps leaders build organisations capable of sustained performance without sacrificing the wellbeing of their people.',
+      'The Private Executive Advisory helps founders, CEOs, business owners, and senior executives move from performance maintained through sustained overextension towards a more sustainable model of executive functioning.',
     primaryCta: { label: 'Book Executive Consultation', href: '/book-a-call' },
     secondaryCta: { label: 'Contact Us', href: '/contact' },
   },

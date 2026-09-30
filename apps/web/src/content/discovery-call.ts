@@ -69,7 +69,7 @@ export const discoveryCallContent = {
       'You\u2019re a high-achieving woman experiencing burnout, overwhelm or anxiety.',
       'You\u2019re interested in the Life Beyond Trauma Method.',
       'You\u2019re considering Practitioner Certification.',
-      'You\u2019re exploring Executive Advisory.',
+      'You\u2019re exploring Private or System-Level Executive Advisory.',
       'You\u2019re looking for an evidence-informed approach.',
     ],
     notAppropriateHeading: 'Not appropriate if',
@@ -133,7 +133,7 @@ export const discoveryCallContent = {
       {
         question: 'Can organisations book consultations?',
         answer:
-          'Yes. Leaders and organisations interested in Executive Advisory or team-based programmes can book a Discovery Call to discuss scope, context and fit. For dedicated organisational enquiries, you may also email executive@tnsi.org.',
+          'Yes. Leaders interested in the Private Executive Advisory and organisations interested in the System-Level Executive Advisory can book a Discovery Call to discuss scope, context and fit. For dedicated organisational enquiries, you may also email executive@tnsi.org.',
       },
     ],
   },

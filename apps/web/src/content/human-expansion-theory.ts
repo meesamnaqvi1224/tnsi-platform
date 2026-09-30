@@ -122,7 +122,7 @@ export const humanExpansionTheoryContent = {
     ],
     pathways: [
       {
-        title: 'Life Beyond Trauma™',
+        title: 'The Life Beyond Trauma Method™',
         description:
           'A structured educational pathway for individuals seeking to increase capacity and participation in everyday life.',
       },
@@ -137,9 +137,14 @@ export const humanExpansionTheoryContent = {
           'Professional education, certification, supervision, and continuing development for practitioners.',
       },
       {
-        title: 'Executive Advisory',
+        title: 'Private Executive Advisory',
         description:
-          'Strategic advisory supporting leaders and organisations in creating environments that enable sustainable human development.',
+          'Strategic advisory supporting individual leaders in creating the conditions for sustainable, high-capacity performance.',
+      },
+      {
+        title: 'System-Level Executive Advisory',
+        description:
+          'Advisory supporting organisations in understanding how pressure, workload, and decision-making affect collective capacity.',
       },
     ],
   },

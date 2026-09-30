@@ -1,38 +1,51 @@
 /**
- * Practitioner Certification page content.
+ * Practitioner Certification Pathway page content.
  *
  * Structured for future Sanity CMS integration — each top-level key maps to a
  * document field or portable-text block. Components consume this object directly;
  * when Sanity is wired up, replace the static import with a fetch and keep the
  * same shape.
+ *
+ * Rewritten from Caroline Reed's "TNSI - Program Summaries.docx" (2026-09).
+ * The previous version invented a programme duration ("12 months"), six
+ * named modules, and an eligibility list that included Coaches and Wellbeing
+ * Practitioners — all unsupported. Per the source document, this pathway is
+ * reserved for appropriately qualified, licensed or regulated clinicians;
+ * coaches without a clinical background belong to the separate Life Beyond
+ * Trauma Coaching Certificate (see the Academy page), not here. Duration,
+ * module count and pricing are not specified in the source, so this page
+ * uses neutral language ("provided as part of the Academy application
+ * process") rather than inventing them. The curriculum section instead
+ * features the Private Executive Advisory Practitioner Certification, the
+ * one advanced pathway the source document does describe in named detail.
  */
 
 export const practitionerCertificationContent = {
   slug: 'practitioner-certification',
 
   seo: {
-    title: 'Practitioner Certification — The Nervous System Institute',
+    title: 'Practitioner Certification Pathway — The Nervous System Institute',
     description:
-      'Professional training for practitioners who want to integrate nervous system-informed approaches into their work. An evidence-informed certification designed for real-world clinical application.',
+      'The Academy’s advanced professional route for appropriately qualified, licensed or regulated clinicians seeking certification in specialist TNSI methodologies.',
   },
 
   hero: {
     chapter: '01',
     eyebrow: 'Professional Certification',
-    headline: 'Practitioner Certification',
+    headline: 'Practitioner Certification Pathway',
     supportingHeadline:
-      'Professional training for practitioners who want to integrate nervous system-informed approaches into their work.',
+      'The advanced professional route for practitioners delivering specialist TNSI methodologies.',
     supportingCopy:
-      'Develop a deeper understanding of trauma, regulation and nervous system science through an evidence-informed educational framework designed for real-world application.',
+      'For practitioners seeking certification to deliver specialist Nervous System Institute methodologies that require clinical judgement, professional formulation, assessment, or work with complex presentations.',
     imageSrc: '/images/programs/practitioner/hero-workshop.webp',
     imageAlt:
       'Practitioners discussing notes together around a table in a bright, plant-filled teaching studio.',
     imageCaption:
-      'Live teaching sessions bring nervous system science into structured, practice-ready frameworks.',
+      'Structured education, supervised practice and formal assessment for licensed clinicians.',
     metadata: [
-      { label: 'Format', value: 'Live + structured study' },
-      { label: 'Duration', value: '12 months' },
-      { label: 'Credential', value: 'TNSI Certification' },
+      { label: 'Format', value: 'Advanced Professional Certification' },
+      { label: 'Entry', value: 'Licensed / Regulated Clinicians' },
+      { label: 'Credential', value: 'TNSI Practitioner Certification' },
     ],
     primaryCta: { label: 'Book a Discovery Call', href: '/book-a-call' },
     secondaryCta: { label: 'Request Prospectus', href: '/prospectus/practitioner-certification' },
@@ -40,41 +53,40 @@ export const practitionerCertificationContent = {
 
   audience: {
     chapter: '02',
-    heading: 'Designed for professionals who support people.',
-    professions: [
-      'Psychologists',
-      'Therapists',
-      'Counsellors',
-      'Coaches',
-      'Healthcare Professionals',
-      'Wellbeing Practitioners',
-    ],
+    heading: 'Reserved for appropriately qualified clinicians.',
+    professions: ['Psychotherapists', 'Psychologists', 'Counsellors', 'Healthcare Professionals'],
     closingCopy:
-      'Whether you work in private practice, healthcare, education or organisational wellbeing, this certification provides a practical framework that complements your existing expertise.',
+      'Entry requires appropriate qualification and the relevant licence, registration, regulation, or recognised professional standing for your discipline and jurisdiction, subject to the specific entry criteria for each certification programme. Coaches and other non-clinical practitioners wanting to support people through the Life Beyond Trauma Method™ should explore the Life Beyond Trauma Coaching Certificate instead.',
   },
 
   purpose: {
     chapter: '03',
-    heading: 'Why This Certification Exists',
+    heading: 'Why This Pathway Exists',
     paragraphs: [
-      'Many professionals understand trauma intellectually but lack a practical framework for translating nervous system science into everyday client work.',
-      'This certification bridges the gap between research and application.',
-      'Rather than replacing your current practice, it strengthens it.',
+      'The Practitioner Certification Pathway extends significantly beyond attendance at training. It establishes that a practitioner has not simply learned a methodology, but can use it responsibly and competently within an appropriate professional scope.',
+      'Candidates complete structured theoretical education, formal assessment, practical application, supervised practice, and competency review, with attention to professional governance, client suitability, risk and safety, scope of practice, referral, documentation, and ethical decision-making.',
+      'The requirement for a clinical professional background reflects the level of judgement and responsibility involved in delivering advanced Institute methodologies.',
     ],
   },
 
   curriculum: {
     chapter: '04',
-    heading: "What You'll Learn",
+    heading: 'Private Executive Advisory Practitioner Certification',
     intro:
-      'A structured learning journey through six integrated modules — designed to move from foundational science to confident clinical application.',
+      'One of the Pathway’s advanced certification routes is the Private Executive Advisory Practitioner Certification — based on a 16-module professional curriculum built around the Capacity Recalibration Model™ and the complete Private Executive Advisory client journey. Practitioners learn the methodology as an integrated professional system. The curriculum’s stages include:',
     modules: [
-      { number: 1, title: 'Foundations of Nervous System Science' },
-      { number: 2, title: 'Trauma Physiology' },
-      { number: 3, title: 'Polyvagal Theory' },
-      { number: 4, title: 'Regulation Strategies' },
-      { number: 5, title: 'Clinical Application' },
-      { number: 6, title: 'Case Integration' },
+      { number: 1, title: 'Enquiry & Suitability' },
+      { number: 2, title: 'Assessment' },
+      { number: 3, title: 'Executive Capacity Audit' },
+      { number: 4, title: 'Somatic Load Mapping' },
+      { number: 5, title: 'Formulation' },
+      { number: 6, title: 'Advisory Delivery' },
+      { number: 7, title: 'Stabilisation' },
+      { number: 8, title: 'Load Reorganisation' },
+      { number: 9, title: 'Capacity Expansion' },
+      { number: 10, title: 'Monitoring' },
+      { number: 11, title: 'Final Review' },
+      { number: 12, title: 'Continuation Planning' },
     ],
   },
 
@@ -83,24 +95,24 @@ export const practitionerCertificationContent = {
     heading: 'Learning Experience',
     features: [
       {
-        title: 'Live Teaching Sessions',
+        title: 'Structured Educational Material',
         description:
-          'Structured seminars led by Caroline Reed, translating neuroscience into frameworks you can apply in session the following week.',
+          'Curriculum grounded in peer-reviewed research and more than twenty years of clinical observation — not therapeutic trend or anecdote.',
       },
       {
-        title: 'Evidence-Based Learning',
+        title: 'Case-Based Learning & Simulations',
         description:
-          'Curriculum grounded in peer-reviewed research and fifteen years of clinical observation — not therapeutic trend or anecdote.',
+          'Case-based learning and simulations that let practitioners examine real-world application before working with clients directly.',
       },
       {
-        title: 'Clinical Case Discussions',
+        title: 'Supervised Practice',
         description:
-          'Supervised case integration sessions where practitioners examine real-world application with peers and faculty.',
+          'Trainees move from theoretical learning into practical application under appropriate supervision, developing confidence and receiving structured feedback.',
       },
       {
-        title: 'Practical Application',
+        title: 'Formal Assessment & Competency Review',
         description:
-          'Structured assignments and implementation exercises designed to embed nervous system language into your existing practice.',
+          'Assessment includes knowledge checks, case-based work, and formal competency assessment — course attendance alone is not regarded as sufficient evidence of readiness to practise.',
       },
     ],
   },
@@ -111,19 +123,19 @@ export const practitionerCertificationContent = {
     before: {
       label: 'Before Certification',
       items: [
-        'Understanding theory',
-        'Limited clinical framework',
-        'Inconsistent nervous system language',
-        'Working in isolation',
+        'Methodology understood, not yet formally assessed',
+        'No supervised practice record',
+        'No recognised scope of practice',
+        'Working without Institute governance or supervision',
       ],
     },
     after: {
       label: 'After Certification',
       items: [
-        'Evidence-informed framework',
-        'Confident client application',
-        'Shared clinical language',
-        'Professional community',
+        'Formally assessed competency to deliver the methodology',
+        'Supervised Practice Portfolio and ongoing supervision',
+        'Listing on the TNSI Practitioner Registry',
+        'Annual reapproval and continuing professional development',
       ],
     },
   },
@@ -146,29 +158,29 @@ export const practitionerCertificationContent = {
     heading: 'Frequently Asked Questions',
     items: [
       {
-        question: 'Do I need previous trauma training?',
+        question: 'Who is eligible for this pathway?',
         answer:
-          'No prior training in trauma or nervous system science is required. The certification is designed to build from foundational principles. You should, however, hold an existing professional qualification and active practice in a relevant field — psychology, therapy, counselling, coaching, healthcare or wellbeing.',
+          'Entry requires you to be an appropriately qualified clinician, holding the relevant licence, registration, regulation, or recognised professional standing for your discipline and jurisdiction — for example in psychotherapy, psychology, counselling, or healthcare, subject to the specific entry criteria for each certification programme.',
       },
       {
-        question: 'Is the certification live or self-paced?',
+        question: 'What does the programme involve?',
         answer:
-          'The programme combines live teaching sessions with structured self-paced study. Live seminars provide the primary instructional framework; supplementary materials, readings and implementation exercises are completed between sessions at your own pace.',
+          'Structured theoretical education, formal assessment, practical application, and supervised practice, with attention to professional governance, client suitability, risk and safety, scope of practice, referral, documentation, and ethical decision-making. Programme details are provided as part of the Academy application process.',
       },
       {
         question: 'How long does it take?',
         answer:
-          'The certification is structured as a twelve-month programme. This duration allows sufficient time for deep integration of the material into your existing professional practice, including supervised case discussions and practical application assignments.',
+          'Duration varies by certification programme. Programme details, including duration and structure, are provided as part of the Academy application process.',
       },
       {
         question: 'Will I receive certification?',
         answer:
-          'Graduates who complete all modules, attend required live sessions and pass the case integration assessment receive TNSI Practitioner Certification — a credential that signals evidence-informed nervous system education to clients, employers and professional networks.',
+          'Candidates who complete the required theoretical education, formal assessment, and supervised practice receive TNSI Practitioner Certification and may be listed on the TNSI Practitioner Registry, subject to ongoing supervision and annual reapproval requirements.',
       },
       {
-        question: 'Can I study internationally?',
+        question: 'What is the TNSI Practitioner Registry?',
         answer:
-          'Yes. The programme is designed for international practitioners. Live teaching sessions are delivered online with scheduled times published in advance across time zones. All supplementary materials and resources are accessible globally.',
+          'A formal record of individuals recognised by the Institute as having completed an approved professional pathway — giving clients, organisations, and professionals a way to identify practitioners whose training status has been formally recognised by The Nervous System Institute.',
       },
     ],
   },

@@ -1,27 +1,27 @@
 /**
- * Executive Advisory — Programme Overview page content.
+ * Private Executive Advisory — Programme Overview page content.
  *
  * Serves as the current destination for the "Download Advisory Overview" CTA
- * on the Executive Advisory programme page. There is no PDF document yet, so
- * this page is an editorial overview built from the same source content —
- * not a fake download. Facts are pulled from `content/executive-advisory.ts`;
- * only framing copy (hero, CTA) is new.
+ * on the Private Executive Advisory programme page. There is no PDF document
+ * yet, so this page is an editorial overview built from the same source
+ * content — not a fake download. Facts are pulled from
+ * `content/executive-advisory.ts`; only framing copy (hero, CTA) is new.
  */
 
 export const prospectusExecutiveAdvisoryContent = {
   slug: 'prospectus-executive-advisory',
 
   seo: {
-    title: 'Executive Advisory — Programme Overview — The Nervous System Institute',
+    title: 'Private Executive Advisory — Programme Overview — The Nervous System Institute',
     description:
-      'A programme overview of Executive Advisory — context, advisory areas and who the Institute works with — for leaders and organisations considering advisory.',
+      'A programme overview of the Private Executive Advisory — context, advisory areas and who the Institute works with — for leaders considering the advisory.',
   },
 
   hero: {
-    eyebrow: 'Executive Advisory',
+    eyebrow: 'Private Executive Advisory',
     headline: 'Programme Overview',
     supportingCopy:
-      'A downloadable overview document isn’t available yet — this page is the current overview of Executive Advisory: its context, advisory areas and who the Institute works with.',
+      'A downloadable overview document isn’t available yet — this page is the current overview of the Private Executive Advisory: its context, advisory areas and who the Institute works with.',
   },
 
   cta: {

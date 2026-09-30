@@ -12,7 +12,7 @@ const { seo, hero, cta } = prospectusExecutiveAdvisoryContent;
 const { challenge, audience, areas } = executiveAdvisoryContent;
 
 export const metadata: Metadata = createPageMetadata({
-  title: 'Executive Advisory — Programme Overview',
+  title: 'Private Executive Advisory — Programme Overview',
   description: seo.description,
   path: '/prospectus/executive-advisory',
 });
@@ -20,14 +20,14 @@ export const metadata: Metadata = createPageMetadata({
 export default function ProspectusExecutiveAdvisoryPage() {
   const jsonLd = [
     createWebPageJsonLd({
-      title: 'Executive Advisory — Programme Overview',
+      title: 'Private Executive Advisory — Programme Overview',
       description: seo.description,
       path: '/prospectus/executive-advisory',
     }),
     createBreadcrumbJsonLd([
       { name: 'Home', path: '/' },
       { name: 'Programs', path: '/programs' },
-      { name: 'Executive Advisory', path: '/programs/executive-advisory' },
+      { name: 'Private Executive Advisory', path: '/programs/executive-advisory' },
       { name: 'Programme Overview', path: '/prospectus/executive-advisory' },
     ]),
   ];

@@ -60,7 +60,7 @@ export default function LifeBeyondTraumaPage() {
           <Section
             spacing="xl"
             className="border-foreground/15 border-t"
-            aria-label="Life Beyond Trauma"
+            aria-label="The Life Beyond Trauma Method"
           >
             <Container size="xl">
               <EditorialImage
@@ -82,7 +82,7 @@ export default function LifeBeyondTraumaPage() {
           <Container size="xl">
             <Stack gap="lg" className="max-w-2xl">
               <h2 id="lbt-body-heading" className="sr-only">
-                About Life Beyond Trauma
+                About the Life Beyond Trauma Method
               </h2>
               {pathway.paragraphs.map((paragraph) => (
                 <Text key={paragraph} tone="muted" className="max-w-prose leading-relaxed">
@@ -129,8 +129,8 @@ export default function LifeBeyondTraumaPage() {
                   Take the next step
                 </Heading>
                 <Text tone="muted" className="max-w-prose leading-relaxed">
-                  A Discovery Call is the simplest way to explore whether Life Beyond Trauma™ is the
-                  right pathway for you.
+                  A Discovery Call is the simplest way to explore whether the Life Beyond Trauma
+                  Method™ is the right pathway for you.
                 </Text>
               </Stack>
 

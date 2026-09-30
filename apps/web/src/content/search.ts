@@ -84,12 +84,37 @@ export const searchContent = {
     },
     {
       id: 'program-executive',
-      title: 'Executive Advisory',
+      title: 'Private Executive Advisory',
       excerpt:
-        'Confidential advisory for leaders addressing the physiology of capacity and culture.',
+        'A structured three-month advisory for founders, CEOs and senior executives, built on the Capacity Recalibration Model.',
       href: '/programs/executive-advisory',
       group: 'programs' as const,
-      keywords: ['executive', 'advisory', 'leadership', 'organisation'],
+      keywords: ['executive', 'advisory', 'leadership', 'private'],
+    },
+    {
+      id: 'program-system-level',
+      title: 'System-Level Executive Advisory',
+      excerpt:
+        'Understanding how pressure, workload and decision-making affect organisational capacity.',
+      href: '/programs/organisational-advisory',
+      group: 'programs' as const,
+      keywords: ['system-level', 'organisational', 'advisory', 'leadership', 'teams'],
+    },
+    {
+      id: 'program-academy',
+      title: 'The Nervous System Academy',
+      excerpt: 'Education, training, certification and practitioner development.',
+      href: '/programs/academy',
+      group: 'programs' as const,
+      keywords: ['academy', 'cpd', 'coaching certificate', 'certification'],
+    },
+    {
+      id: 'program-regulation-suite',
+      title: 'The Regulation Suite',
+      excerpt: 'A digital nervous-system support platform for everyday stress and overwhelm.',
+      href: '/programs/regulation-suite',
+      group: 'programs' as const,
+      keywords: ['regulation suite', 'app', 'powerdrops', 'membership'],
     },
     {
       id: 'program-method',

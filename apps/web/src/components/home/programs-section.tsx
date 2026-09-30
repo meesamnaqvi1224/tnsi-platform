@@ -7,7 +7,7 @@ import { ResponsiveImage } from '@/components/utility/responsive-image';
 
 const programs = [
   {
-    title: 'Life Beyond Trauma',
+    title: 'The Life Beyond Trauma Method™',
     description:
       'A foundational pathway for individuals ready to rebuild their relationship with their nervous system and reclaim sustainable capacity.',
     href: '/programs/life-beyond-trauma',
@@ -17,15 +17,15 @@ const programs = [
   {
     title: 'Practitioner Certification',
     description:
-      'Advanced certification for therapists, coaches and healthcare professionals integrating nervous system science into their practice.',
+      'The Academy’s advanced route for appropriately qualified, licensed or regulated clinicians integrating nervous system science into their practice.',
     href: '/programs/practitioner-certification',
     imageSrc: '/images/home/program-practitioner.webp',
     imageAlt: 'Women learning together around an oak table in a bright, plant-filled studio.',
   },
   {
-    title: 'Executive Advisory',
+    title: 'Private Executive Advisory',
     description:
-      'Private advisory for senior leaders and executives navigating high-performance environments without physiological cost.',
+      'A structured three-month advisory for founders, CEOs, business owners and senior executives navigating sustained pressure and responsibility.',
     href: '/programs/executive-advisory',
     imageSrc: '/images/home/program-executive.webp',
     imageAlt:

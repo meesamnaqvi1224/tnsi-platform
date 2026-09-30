@@ -25,13 +25,13 @@ export function LifeBeyondTraumaCard() {
     <Pressable
       onPress={() => Linking.openURL(`${env.apiBaseUrl}/programs/life-beyond-trauma`)}
       accessibilityRole="button"
-      accessibilityLabel="Life Beyond Trauma - opens the Institute's website"
+      accessibilityLabel="Life Beyond Trauma Method - opens the Institute's website"
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
     >
       <Image source={thumbnail} style={styles.thumbnail} />
       <View style={styles.textColumn}>
         <ThemedText variant="body" color={colors.charcoal}>
-          Life Beyond Trauma™ — the Institute's flagship pathway.
+          The Life Beyond Trauma Method™ — the Institute's flagship pathway.
         </ThemedText>
       </View>
       <ThemedText variant="label" color={colors.bronze}>

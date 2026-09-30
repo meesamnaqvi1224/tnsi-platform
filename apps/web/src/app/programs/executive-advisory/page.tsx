@@ -18,7 +18,7 @@ const { seo, footerQuote } = executiveAdvisoryContent;
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
 export const metadata = createPageMetadata({
-  title: 'Executive Advisory',
+  title: 'Private Executive Advisory',
   description: seo.description,
   path: '/programs/executive-advisory',
 });
@@ -26,14 +26,14 @@ export const metadata = createPageMetadata({
 export default function ExecutiveAdvisoryPage() {
   const jsonLd = [
     createWebPageJsonLd({
-      title: 'Executive Advisory',
+      title: 'Private Executive Advisory',
       description: seo.description,
       path: '/programs/executive-advisory',
     }),
     createBreadcrumbJsonLd([
       { name: 'Home', path: '/' },
       { name: 'Programs', path: '/programs' },
-      { name: 'Executive Advisory', path: '/programs/executive-advisory' },
+      { name: 'Private Executive Advisory', path: '/programs/executive-advisory' },
     ]),
   ];
 

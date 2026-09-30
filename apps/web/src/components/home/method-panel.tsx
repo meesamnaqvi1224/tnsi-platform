@@ -25,9 +25,9 @@ export function MethodPanel() {
               capacity to grow, adapt, and participate throughout life.
             </Text>
             <Text tone="muted">
-              Life Beyond Trauma™ is the Institute&apos;s flagship educational pathway built on this
-              foundation — one of several pathways that each apply the theory within a different
-              context.
+              The Life Beyond Trauma Method™ is the Institute&apos;s flagship educational pathway
+              built on this foundation — one of several pathways that each apply the theory within a
+              different context.
             </Text>
             <Stack direction="row" gap="md" wrap="wrap">
               <Link
@@ -52,7 +52,7 @@ export function MethodPanel() {
                 tone="inherit"
                 className="font-medium"
               >
-                Explore Life Beyond Trauma
+                Explore the Life Beyond Trauma Method
               </Link>
             </Stack>
           </Stack>
