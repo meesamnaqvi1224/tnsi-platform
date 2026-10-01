@@ -19,7 +19,7 @@ export function EaAudience() {
       aria-label={audience.heading}
     >
       <Container size="xl">
-        <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-[3fr_2fr] lg:gap-(--space-5xl)">
+        <div className="grid grid-cols-1 items-start gap-(--space-3xl) lg:grid-cols-[3fr_2fr] lg:gap-(--space-5xl)">
           <div>
             <FadeIn>
               <Heading as="h2" size="xl" className="mb-(--space-2xl)">
@@ -59,8 +59,8 @@ export function EaAudience() {
             <EditorialImage
               src="/images/programs/nav-executive.webp"
               alt="An executive pauses in thought beside a window, a stack of books on the sill."
-              aspect="portrait"
-              className="h-full rounded-lg"
+              aspect="landscape"
+              className="rounded-lg"
               sizes="33vw"
             />
           </FadeIn>

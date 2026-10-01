@@ -48,7 +48,11 @@ export function EaAreas() {
     >
       <Container size="xl">
         <FadeIn>
-          <Heading as="h2" size="xl" className="mb-(--space-4xl) max-w-2xl">
+          <Heading
+            as="h2"
+            size="xl"
+            className="mb-(--space-4xl) max-w-2xl text-4xl sm:text-5xl lg:text-6xl"
+          >
             {areas.heading}
           </Heading>
         </FadeIn>
