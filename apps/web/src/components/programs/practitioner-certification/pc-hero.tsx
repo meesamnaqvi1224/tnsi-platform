@@ -1,5 +1,6 @@
 import NextLink from 'next/link';
 import { buttonVariants, Container, Stack, Text } from '@tnsi/ui';
+import { FadeIn } from '@/components/utility/fade-in';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { practitionerCertificationContent } from '@/content/practitioner-certification';
 
@@ -13,54 +14,64 @@ export function PcHero() {
     >
       <div className="flex flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-4xl) sm:px-(--space-3xl) lg:px-(--space-3xl)">
         <Stack gap="xl" className="max-w-xl">
-          <div className="flex flex-col gap-(--space-sm)">
-            <div className="border-foreground/15 border-t" aria-hidden />
-            <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
-              {hero.eyebrow}
-            </p>
-          </div>
+          <FadeIn>
+            <div className="flex flex-col gap-(--space-sm)">
+              <div className="border-foreground/15 border-t" aria-hidden />
+              <p className="text-muted-foreground font-mono text-xs tracking-[0.25em] uppercase">
+                {hero.eyebrow}
+              </p>
+            </div>
+          </FadeIn>
 
-          <h1
-            id="pc-hero-heading"
-            className="font-heading text-foreground text-4xl leading-[1.02] font-semibold tracking-tight sm:text-5xl lg:text-[4.5rem] xl:text-[5.5rem]"
-          >
-            {hero.headline}
-          </h1>
-
-          <Stack gap="lg">
-            <p className="text-foreground max-w-2xl text-lg leading-snug font-medium sm:text-xl lg:text-2xl">
-              {hero.supportingHeadline}
-            </p>
-            <Text tone="muted" className="max-w-prose leading-relaxed">
-              {hero.supportingCopy}
-            </Text>
-          </Stack>
-
-          <dl className="border-foreground/15 grid grid-cols-1 gap-(--space-md) border-y py-(--space-lg) sm:grid-cols-3">
-            {hero.metadata.map(({ label, value }) => (
-              <div key={label} className="flex flex-col gap-(--space-2xs)">
-                <dt className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">
-                  {label}
-                </dt>
-                <dd className="text-foreground text-sm font-medium">{value}</dd>
-              </div>
-            ))}
-          </dl>
-
-          <Stack direction="row" gap="sm" wrap="wrap">
-            <NextLink
-              href={hero.primaryCta.href}
-              className={buttonVariants({ variant: 'primary', size: 'lg' })}
+          <FadeIn delayMs={80}>
+            <h1
+              id="pc-hero-heading"
+              className="font-heading text-foreground text-[2.75rem] leading-[1.02] font-semibold tracking-tight sm:text-6xl lg:text-[4.75rem] xl:text-[5.75rem]"
             >
-              {hero.primaryCta.label}
-            </NextLink>
-            <NextLink
-              href={hero.secondaryCta.href}
-              className={buttonVariants({ variant: 'outline', size: 'lg' })}
-            >
-              {hero.secondaryCta.label}
-            </NextLink>
-          </Stack>
+              {hero.headline}
+            </h1>
+          </FadeIn>
+
+          <FadeIn delayMs={160}>
+            <Stack gap="lg">
+              <p className="text-foreground max-w-2xl text-lg leading-snug font-medium sm:text-xl lg:text-2xl">
+                {hero.supportingHeadline}
+              </p>
+              <Text tone="muted" className="max-w-prose leading-relaxed">
+                {hero.supportingCopy}
+              </Text>
+            </Stack>
+          </FadeIn>
+
+          <FadeIn delayMs={220}>
+            <dl className="border-foreground/15 grid grid-cols-1 gap-(--space-md) border-y py-(--space-lg) sm:grid-cols-3">
+              {hero.metadata.map(({ label, value }) => (
+                <div key={label} className="flex flex-col gap-(--space-2xs)">
+                  <dt className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">
+                    {label}
+                  </dt>
+                  <dd className="text-foreground text-sm font-medium">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </FadeIn>
+
+          <FadeIn delayMs={260}>
+            <Stack direction="row" gap="sm" wrap="wrap">
+              <NextLink
+                href={hero.primaryCta.href}
+                className={buttonVariants({ variant: 'primary', size: 'lg' })}
+              >
+                {hero.primaryCta.label}
+              </NextLink>
+              <NextLink
+                href={hero.secondaryCta.href}
+                className={buttonVariants({ variant: 'outline', size: 'lg' })}
+              >
+                {hero.secondaryCta.label}
+              </NextLink>
+            </Stack>
+          </FadeIn>
         </Stack>
       </div>
 

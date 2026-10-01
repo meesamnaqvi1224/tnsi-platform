@@ -30,24 +30,23 @@ export function InstitutionalCredibility() {
             as="h2"
             id="credibility-heading"
             size="lg"
-            className="mx-auto mt-(--space-xs) max-w-2xl text-center text-3xl sm:text-4xl"
+            className="mx-auto mt-(--space-sm) max-w-3xl text-center text-4xl sm:text-5xl lg:text-[3.25rem]"
           >
             Fifteen years of clinical observation. One coherent framework.
           </Heading>
         </FadeIn>
 
-        <FadeIn className="mt-(--space-2xl)">
-          {/* Same card treatment as `TrustBar` above — bordered, filled boxes, not the
-              hairline-rule grammar `InstitutionalEvidence` in @tnsi/ui uses elsewhere
-              (e.g. /method); that shared component tops out at 3 columns, so this stays
-              hand-rolled at 4. */}
-          <div className="grid grid-cols-1 gap-(--space-md) sm:grid-cols-2 lg:grid-cols-4">
-            {evidence.map((item) => (
-              <div
-                key={item.label}
-                className="border-border bg-card flex flex-col gap-(--space-xs) rounded-sm border px-(--space-lg) py-(--space-lg)"
-              >
-                <span className="text-muted-foreground text-xs tracking-widest uppercase">
+        <FadeIn delayMs={100} className="mt-(--space-3xl)">
+          <div
+            className="border-border grid grid-cols-1 gap-(--space-xl) border-t pt-(--space-xl) sm:grid-cols-2 lg:grid-cols-4"
+            role="list"
+          >
+            {evidence.map((item, index) => (
+              <div key={item.label} role="listitem" className="flex flex-col gap-(--space-sm)">
+                <span className="text-muted-foreground/50 font-mono text-xs tabular-nums">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span className="text-foreground text-sm font-semibold tracking-wide uppercase">
                   {item.label}
                 </span>
                 <p className="text-muted-foreground text-sm leading-relaxed">{item.statement}</p>

@@ -14,17 +14,22 @@ export function MethodPanel() {
           per docs/02-brand-strategy.md — not a hardcoded navy. 40% of the panel on desktop. */}
       <div className="dark bg-background text-foreground flex items-center px-(--space-lg) py-(--space-4xl) sm:px-(--space-2xl) lg:col-span-2 lg:px-(--space-3xl) lg:py-(--space-5xl)">
         <FadeIn>
-          <Stack gap="md" className="max-w-md">
+          <Stack gap="lg" className="max-w-md">
             <Eyebrow className="text-muted-foreground">Our Approach</Eyebrow>
-            <Heading as="h2" id="method-heading" size="xl" className="text-3xl sm:text-4xl">
+            <Heading
+              as="h2"
+              id="method-heading"
+              size="xl"
+              className="text-3xl sm:text-4xl lg:text-[2.75rem]"
+            >
               Human Expansion Theory™
             </Heading>
-            <Text tone="muted">
+            <Text tone="muted" size="lg" className="leading-relaxed">
               The Human Expansion Theory™ is the conceptual foundation of The Nervous System
               Institute. It explores how the conditions surrounding an individual influence their
               capacity to grow, adapt, and participate throughout life.
             </Text>
-            <Text tone="muted">
+            <Text tone="muted" size="lg" className="leading-relaxed">
               The Life Beyond Trauma Method™ is the Institute&apos;s flagship educational pathway
               built on this foundation — one of several pathways that each apply the theory within a
               different context.

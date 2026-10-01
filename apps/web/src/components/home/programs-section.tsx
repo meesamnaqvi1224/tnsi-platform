@@ -48,13 +48,10 @@ function ProgramCard({ title, description, href, imageSrc, imageAlt }: (typeof p
         </figure>
       </NextLink>
       <Stack gap="xs" className="mt-(--space-lg)">
-        <Text
-          weight="semibold"
-          className="interaction-transform duration-slow ease-standard group-hover:-translate-y-1"
-        >
+        <p className="font-heading text-foreground interaction-transform duration-slow ease-standard text-xl leading-snug font-semibold tracking-tight group-hover:-translate-y-1">
           {title}
-        </Text>
-        <Text size="sm" tone="muted">
+        </p>
+        <Text size="sm" tone="muted" className="leading-relaxed">
           {description}
         </Text>
         <Link
@@ -89,7 +86,12 @@ export function ProgramsSection() {
           >
             <Stack gap="sm" className="max-w-2xl">
               <Eyebrow>Programs</Eyebrow>
-              <Heading as="h2" id="programs-heading" size="xl" className="text-3xl sm:text-4xl">
+              <Heading
+                as="h2"
+                id="programs-heading"
+                size="xl"
+                className="text-3xl sm:text-4xl lg:text-5xl"
+              >
                 Structured for transformation at every stage.
               </Heading>
             </Stack>

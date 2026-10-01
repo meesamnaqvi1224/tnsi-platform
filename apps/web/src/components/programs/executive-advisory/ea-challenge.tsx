@@ -1,32 +1,39 @@
-import { ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
+import { Container, Section, Stack, Text } from '@tnsi/ui';
+import { FadeIn } from '@/components/utility/fade-in';
 import { executiveAdvisoryContent } from '@/content/executive-advisory';
 
 const { challenge } = executiveAdvisoryContent;
 
+/**
+ * The page's single philosophical statement — interrupts the normal
+ * heading+paragraph rhythm on purpose. Left: the statement. Right: the
+ * supporting paragraphs, arriving just after. Section id doubles as the
+ * first anchor-nav target ("The Approach").
+ */
 export function EaChallenge() {
   return (
-    <Section spacing="xl" className="border-border border-t" aria-label={challenge.heading}>
+    <Section
+      id="ea-approach"
+      className="border-border scroll-mt-36 border-t py-(--space-4xl) sm:py-(--space-5xl)"
+      aria-label={challenge.heading}
+    >
       <Container size="xl">
-        <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-[1fr_1.1fr] lg:gap-(--space-5xl)">
-          <ChapterMarker
-            index={challenge.chapter}
-            as="h2"
-            size="2xl"
-            title={challenge.heading}
-            className="lg:sticky lg:top-(--space-3xl) lg:self-start"
-          />
+        <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-[3fr_2fr] lg:gap-(--space-5xl)">
+          <FadeIn>
+            <h2 className="font-heading text-foreground max-w-xl text-4xl leading-[1.08] font-semibold tracking-tight text-balance sm:text-5xl lg:text-[3.75rem] xl:text-[4.25rem]">
+              {challenge.heading}
+            </h2>
+          </FadeIn>
 
-          <Stack gap="xl" className="lg:pt-(--space-md)">
-            {challenge.paragraphs.map((paragraph, index) => (
-              <Text
-                key={paragraph}
-                tone={index === challenge.paragraphs.length - 1 ? 'default' : 'muted'}
-                className={`leading-relaxed ${index === challenge.paragraphs.length - 1 ? 'text-foreground text-lg font-medium' : 'text-base'}`}
-              >
-                {paragraph}
-              </Text>
-            ))}
-          </Stack>
+          <FadeIn delayMs={200}>
+            <Stack gap="lg" className="lg:pt-(--space-sm)">
+              {challenge.paragraphs.map((paragraph) => (
+                <Text key={paragraph} tone="muted" className="leading-relaxed">
+                  {paragraph}
+                </Text>
+              ))}
+            </Stack>
+          </FadeIn>
         </div>
       </Container>
     </Section>

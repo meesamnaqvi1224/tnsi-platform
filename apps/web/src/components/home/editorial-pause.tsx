@@ -11,24 +11,28 @@ import { ResponsiveImage } from '@/components/utility/responsive-image';
  */
 export function EditorialPause() {
   return (
-    <FadeIn as="section" aria-label="Editorial statement" className="relative overflow-hidden">
-      <ResponsiveImage
-        src="/images/resources/hero.webp"
-        alt=""
-        fill
-        className="object-cover"
-        sizes="100vw"
-      />
+    <section aria-label="Editorial statement" className="relative overflow-hidden">
+      <div className="animate-hero-ken-burns absolute inset-0">
+        <ResponsiveImage
+          src="/images/resources/hero.webp"
+          alt=""
+          fill
+          className="object-cover"
+          sizes="100vw"
+        />
+      </div>
       <div className="absolute inset-0 bg-black/55" aria-hidden />
 
-      <div className="dark text-foreground relative flex min-h-[70vh] items-center justify-center px-(--space-xl) py-(--space-4xl) sm:px-(--space-3xl)">
+      <div className="dark text-foreground relative flex min-h-[85vh] items-center justify-center px-(--space-xl) py-(--space-5xl) sm:px-(--space-3xl)">
         <Container size="xl">
-          <p className="font-heading mx-auto max-w-3xl text-center text-4xl leading-[1.1] font-semibold tracking-tight text-balance lg:text-5xl xl:text-[3.5rem]">
-            The goal isn&apos;t to eliminate stress. It&apos;s to expand your capacity to meet life
-            differently.
-          </p>
+          <FadeIn>
+            <p className="font-heading mx-auto max-w-4xl text-center text-5xl leading-[1.08] font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
+              The goal isn&apos;t to eliminate stress. It&apos;s to expand your capacity to meet
+              life differently.
+            </p>
+          </FadeIn>
         </Container>
       </div>
-    </FadeIn>
+    </section>
   );
 }

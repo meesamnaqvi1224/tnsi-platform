@@ -35,7 +35,12 @@ export function FrameworkSection() {
         <FadeIn>
           <Stack gap="sm" className="max-w-2xl">
             <Eyebrow>The Framework</Eyebrow>
-            <Heading as="h2" id="framework-heading" size="xl" className="text-3xl sm:text-4xl">
+            <Heading
+              as="h2"
+              id="framework-heading"
+              size="xl"
+              className="text-3xl sm:text-4xl lg:text-5xl"
+            >
               We help you move from survival to capacity.
             </Heading>
           </Stack>
@@ -44,15 +49,21 @@ export function FrameworkSection() {
         <Grid cols="4" gap="xl" className="mt-(--space-3xl) sm:mt-(--space-4xl)">
           {steps.map((step, index) => (
             <FadeIn key={step.number} delayMs={index * 80}>
-              <Stack gap="md" className="border-border border-t pt-(--space-lg)">
+              <Stack
+                gap="md"
+                className="group border-border hover:border-foreground/40 duration-base ease-standard border-t pt-(--space-lg) transition-colors"
+              >
                 <Text
                   as="span"
-                  className="text-muted-foreground/50 font-mono text-4xl leading-none font-medium sm:text-5xl"
+                  className="text-muted-foreground/50 group-hover:text-muted-foreground duration-base ease-standard font-mono text-4xl leading-none font-medium transition-colors sm:text-5xl"
                 >
                   {step.number}
                 </Text>
                 <Divider className="w-8" />
-                <Stack gap="xs">
+                <Stack
+                  gap="xs"
+                  className="duration-base ease-standard transition-transform group-hover:translate-x-1"
+                >
                   <Heading as="h3" size="xs">
                     {step.title}
                   </Heading>

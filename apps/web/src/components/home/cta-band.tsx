@@ -12,10 +12,15 @@ export function CtaBand() {
       <Container size="md">
         <FadeIn>
           <Stack gap="lg" align="center" className="text-center">
-            <Heading as="h2" id="cta-heading" size="2xl" className="text-4xl sm:text-5xl">
+            <Heading
+              as="h2"
+              id="cta-heading"
+              size="2xl"
+              className="text-4xl sm:text-5xl lg:text-6xl"
+            >
               Find Your Pathway
             </Heading>
-            <Text tone="muted" size="lg" className="max-w-xl">
+            <Text tone="muted" size="lg" className="max-w-xl leading-relaxed">
               Every journey through The Nervous System Institute is different. Whether you&apos;re
               seeking personal development, advancing your professional practice, or exploring how
               Human Expansion Theory™ can inform your organization, we&apos;ll help you find the

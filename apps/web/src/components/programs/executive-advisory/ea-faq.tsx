@@ -1,36 +1,34 @@
-import { ChevronDown } from 'lucide-react';
-import { ChapterMarker, Container, Section } from '@tnsi/ui';
+import { Container, Heading, Section } from '@tnsi/ui';
+import { FadeIn } from '@/components/utility/fade-in';
 import { executiveAdvisoryContent } from '@/content/executive-advisory';
+import { EaFaqItem } from './ea-faq-item';
 
 const { faq } = executiveAdvisoryContent;
 
 export function EaFaq() {
   return (
     <Section
+      id="ea-faq"
       spacing="xl"
-      className="border-border bg-secondary/40 border-t"
+      className="border-border bg-secondary/40 scroll-mt-36 border-t"
       aria-label={faq.heading}
     >
       <Container size="xl">
         <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-[1fr_1.5fr]">
-          <ChapterMarker index={faq.chapter} as="h2" title={faq.heading} />
+          <FadeIn>
+            <Heading as="h2" size="xl">
+              {faq.heading}
+            </Heading>
+          </FadeIn>
 
-          <div>
-            {faq.items.map(({ question, answer }) => (
-              <details key={question} className="group border-border border-t">
-                <summary className="interaction-accordion-summary">
-                  <span className="font-heading text-foreground text-base font-semibold tracking-tight">
-                    {question}
-                  </span>
-                  <ChevronDown aria-hidden className="interaction-accordion-icon" />
-                </summary>
-                <div className="pb-(--space-xl)">
-                  <p className="text-muted-foreground text-sm leading-relaxed">{answer}</p>
-                </div>
-              </details>
-            ))}
-            <div className="border-border border-t" aria-hidden />
-          </div>
+          <FadeIn delayMs={100}>
+            <div>
+              {faq.items.map(({ question, answer }) => (
+                <EaFaqItem key={question} question={question} answer={answer} />
+              ))}
+              <div className="border-foreground/15 border-t" aria-hidden />
+            </div>
+          </FadeIn>
         </div>
       </Container>
     </Section>

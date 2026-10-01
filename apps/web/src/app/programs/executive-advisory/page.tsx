@@ -2,6 +2,7 @@ import { Container, PageQuote, Section } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
+import { EaAnchorNav } from '@/components/programs/executive-advisory/ea-anchor-nav';
 import { EaAreas } from '@/components/programs/executive-advisory/ea-areas';
 import { EaAudience } from '@/components/programs/executive-advisory/ea-audience';
 import { EaChallenge } from '@/components/programs/executive-advisory/ea-challenge';
@@ -43,6 +44,7 @@ export default function ExecutiveAdvisoryPage() {
       <SiteHeader />
       <main id="main-content">
         <EaHero />
+        <EaAnchorNav />
         <EaChallenge />
         <EaAudience />
         <EaAreas />

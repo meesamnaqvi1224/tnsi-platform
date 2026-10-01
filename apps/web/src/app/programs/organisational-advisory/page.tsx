@@ -5,6 +5,7 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { EditorialImage } from '@/components/utility/editorial-image';
+import { FadeIn } from '@/components/utility/fade-in';
 import { getPathway } from '@/content/programs';
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
@@ -37,112 +38,142 @@ export default function OrganisationalAdvisoryPage() {
       <JsonLd data={jsonLd} />
       <SiteHeader />
       <main id="main-content">
-        <Section spacing="xl" aria-labelledby="oa-hero-heading">
+        {/* Hero — heading and image treated as one composition, tight gap between them */}
+        <Section
+          className="pt-(--space-3xl) pb-(--space-lg) sm:pt-(--space-4xl) sm:pb-(--space-xl)"
+          aria-labelledby="oa-hero-heading"
+        >
           <Container size="xl">
-            <Stack gap="lg" className="max-w-2xl">
-              <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
-                {pathway.category}
-              </p>
-              <h1
-                id="oa-hero-heading"
-                className="font-heading text-foreground text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl"
-              >
-                {pathway.title}
-              </h1>
-              <Text size="lg" tone="muted" className="max-w-prose leading-relaxed">
-                {pathway.tagline}
-              </Text>
+            <Stack gap="lg" className="max-w-3xl">
+              <FadeIn>
+                <p className="text-muted-foreground font-mono text-xs tracking-[0.25em] uppercase">
+                  {pathway.category}
+                </p>
+              </FadeIn>
+              <FadeIn delayMs={80}>
+                <h1
+                  id="oa-hero-heading"
+                  className="font-heading text-foreground text-[2.75rem] leading-[1.05] font-semibold tracking-tight sm:text-6xl lg:text-7xl"
+                >
+                  {pathway.title}
+                </h1>
+              </FadeIn>
+              <FadeIn delayMs={160}>
+                <Text size="lg" tone="muted" className="max-w-xl leading-relaxed">
+                  {pathway.tagline}
+                </Text>
+              </FadeIn>
             </Stack>
           </Container>
         </Section>
 
         {'heroImageSrc' in pathway ? (
-          <Section
-            spacing="xl"
-            className="border-foreground/15 border-t"
-            aria-label="System-Level Executive Advisory"
-          >
+          <Section className="pb-(--space-3xl) sm:pb-(--space-4xl)" aria-label={pathway.title}>
             <Container size="xl">
-              <EditorialImage
-                src={pathway.heroImageSrc}
-                alt={pathway.heroImageAlt}
-                aspect="landscape"
-                className="rounded-lg"
-                sizes="(max-width: 1024px) 100vw, 1152px"
-              />
+              <FadeIn delayMs={200}>
+                <EditorialImage
+                  src={pathway.heroImageSrc}
+                  alt={pathway.heroImageAlt}
+                  aspect="landscape"
+                  className="rounded-lg"
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 1280px"
+                />
+              </FadeIn>
             </Container>
           </Section>
         ) : null}
 
+        {/* Body copy — the category label stands as a quiet running marker beside the paragraphs */}
         <Section
-          spacing="xl"
-          className="border-foreground/15 border-t"
+          className="border-foreground/15 border-t py-(--space-2xl) sm:py-(--space-3xl)"
           aria-labelledby="oa-body-heading"
         >
           <Container size="xl">
-            <Stack gap="lg" className="max-w-2xl">
-              <h2 id="oa-body-heading" className="sr-only">
-                About the System-Level Executive Advisory
-              </h2>
-              {pathway.paragraphs.map((paragraph) => (
-                <Text key={paragraph} tone="muted" className="max-w-prose leading-relaxed">
-                  {paragraph}
-                </Text>
-              ))}
-            </Stack>
+            <h2 id="oa-body-heading" className="sr-only">
+              About the System-Level Executive Advisory
+            </h2>
+            <div className="grid grid-cols-1 gap-(--space-xl) lg:grid-cols-[1fr_2.5fr] lg:gap-(--space-3xl)">
+              <FadeIn>
+                <p className="text-muted-foreground font-mono text-xs tracking-[0.25em] uppercase">
+                  {pathway.category}
+                </p>
+              </FadeIn>
+              <FadeIn delayMs={100}>
+                <Stack gap="lg" className="max-w-[65ch]">
+                  {pathway.paragraphs.map((paragraph) => (
+                    <Text key={paragraph} size="lg" tone="muted" className="leading-[1.7]">
+                      {paragraph}
+                    </Text>
+                  ))}
+                </Stack>
+              </FadeIn>
+            </div>
           </Container>
         </Section>
 
+        {/* Ideal for — a quiet typographic list rather than pills, content unchanged */}
         <Section
-          spacing="xl"
-          className="border-foreground/15 border-t"
+          className="border-foreground/15 border-t py-(--space-2xl) sm:py-(--space-3xl)"
           aria-labelledby="oa-ideal-heading"
         >
           <Container size="xl">
-            <Stack gap="2xl">
-              <Heading as="h2" id="oa-ideal-heading" size="xl">
-                Ideal for
-              </Heading>
-              <ul className="flex flex-wrap gap-(--space-sm)" aria-label="Ideal for">
-                {pathway.idealFor.map((item) => (
-                  <li
-                    key={item}
-                    className="border-foreground/15 text-foreground rounded-full border px-(--space-md) py-(--space-xs) text-sm"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </Stack>
+            <div className="grid grid-cols-1 gap-(--space-xl) lg:grid-cols-[1fr_2.5fr] lg:gap-(--space-3xl)">
+              <FadeIn>
+                <Heading as="h2" id="oa-ideal-heading" size="xl">
+                  Ideal for
+                </Heading>
+              </FadeIn>
+              <FadeIn delayMs={100}>
+                <ul
+                  className="grid grid-cols-1 gap-x-(--space-2xl) gap-y-0 sm:grid-cols-2"
+                  aria-label="Ideal for"
+                >
+                  {pathway.idealFor.map((item) => (
+                    <li
+                      key={item}
+                      className="border-foreground/15 text-foreground border-t py-(--space-md) text-base leading-relaxed"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </FadeIn>
+            </div>
           </Container>
         </Section>
 
+        {/* Final CTA — the strongest closing moment on the page */}
         <Section
-          spacing="xl"
-          className="border-foreground/15 border-t"
+          className="border-foreground/15 border-t py-(--space-3xl) sm:py-(--space-4xl)"
           aria-labelledby="oa-cta-heading"
         >
           <Container size="xl">
-            <Stack gap="xl" className="max-w-2xl">
-              <Stack gap="md">
-                <Heading as="h2" id="oa-cta-heading" size="xl">
-                  Take the next step
-                </Heading>
-                <Text tone="muted" className="max-w-prose leading-relaxed">
-                  Every System-Level Executive Advisory engagement begins with a conversation. Book
-                  a Discovery Call to discuss your organisation&apos;s context and needs.
-                </Text>
-              </Stack>
+            <FadeIn>
+              <Stack gap="xl" className="max-w-2xl">
+                <Stack gap="md">
+                  <h2
+                    id="oa-cta-heading"
+                    className="font-heading text-foreground text-3xl leading-[1.1] font-semibold tracking-tight sm:text-4xl lg:text-[2.75rem]"
+                  >
+                    Take the next step
+                  </h2>
+                  <Text size="lg" tone="muted" className="max-w-prose leading-relaxed">
+                    Every System-Level Executive Advisory engagement begins with a conversation.
+                    Book a Discovery Call to discuss your organisation&apos;s context and needs.
+                  </Text>
+                </Stack>
 
-              <div>
-                <NextLink
-                  href="/book-a-call"
-                  className={buttonVariants({ variant: 'primary', size: 'lg' })}
-                >
-                  Book a Discovery Call
-                </NextLink>
-              </div>
-            </Stack>
+                <div className="pt-(--space-sm)">
+                  <NextLink
+                    href="/book-a-call"
+                    className={buttonVariants({ variant: 'primary', size: 'lg' })}
+                  >
+                    Book a Discovery Call
+                  </NextLink>
+                </div>
+              </Stack>
+            </FadeIn>
           </Container>
         </Section>
       </main>

@@ -1,4 +1,5 @@
 import { ChapterMarker, Container, Section, Stack } from '@tnsi/ui';
+import { FadeIn } from '@/components/utility/fade-in';
 import { practitionerCertificationContent } from '@/content/practitioner-certification';
 
 const { outcomes } = practitionerCertificationContent;
@@ -36,20 +37,24 @@ export function PcOutcomes() {
     <Section spacing="xl" className="border-foreground/15 border-t" aria-label={outcomes.heading}>
       <Container size="xl">
         <Stack gap="2xl">
-          <ChapterMarker index={outcomes.chapter} as="h2" title={outcomes.heading} />
+          <FadeIn>
+            <ChapterMarker index={outcomes.chapter} as="h2" size="2xl" title={outcomes.heading} />
+          </FadeIn>
 
-          <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-2 lg:gap-(--space-4xl)">
-            <OutcomeColumn
-              label={outcomes.before.label}
-              items={outcomes.before.items}
-              variant="before"
-            />
-            <OutcomeColumn
-              label={outcomes.after.label}
-              items={outcomes.after.items}
-              variant="after"
-            />
-          </div>
+          <FadeIn delayMs={100}>
+            <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-2 lg:gap-(--space-4xl)">
+              <OutcomeColumn
+                label={outcomes.before.label}
+                items={outcomes.before.items}
+                variant="before"
+              />
+              <OutcomeColumn
+                label={outcomes.after.label}
+                items={outcomes.after.items}
+                variant="after"
+              />
+            </div>
+          </FadeIn>
         </Stack>
       </Container>
     </Section>

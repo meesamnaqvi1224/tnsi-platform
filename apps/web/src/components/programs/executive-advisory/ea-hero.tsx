@@ -5,11 +5,20 @@ import { executiveAdvisoryContent } from '@/content/executive-advisory';
 
 const { hero } = executiveAdvisoryContent;
 
+/**
+ * One immersive composition rather than image-then-text-block: the
+ * photograph fills the viewport and the headline sits directly over it,
+ * bottom-anchored like a magazine cover. A quiet bottom-to-transparent
+ * scrim (the same neutral-black treatment already used for `MethodQuote`
+ * and `EditorialPause`, not a new colour) keeps the type legible without
+ * dimming the photograph as a whole. The slow one-time scale-in on the
+ * image is pure CSS (`hero-ken-burns` in globals.css) — no JS, and already
+ * covered by the site-wide `prefers-reduced-motion` neutralisation.
+ */
 export function EaHero() {
   return (
-    <section aria-labelledby="ea-hero-heading" className="border-border border-b">
-      {/* Full-width editorial photography */}
-      <div className="bg-foreground relative min-h-[72vh] w-full overflow-hidden">
+    <section aria-labelledby="ea-hero-heading" className="relative min-h-[92vh] overflow-hidden">
+      <div className="animate-hero-ken-burns absolute inset-0">
         <ResponsiveImage
           src={hero.imageSrc}
           alt={hero.imageAlt}
@@ -19,33 +28,36 @@ export function EaHero() {
           sizes="100vw"
         />
       </div>
+      <div
+        className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
+        aria-hidden
+      />
 
-      {/* Editorial content block — stacked below image, not side-by-side */}
-      <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">
-        <Stack gap="2xl" className="max-w-4xl">
-          <div className="flex flex-col gap-(--space-sm)">
-            <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
-              {hero.eyebrow}
-            </p>
-          </div>
+      <Container
+        size="xl"
+        className="dark text-foreground relative flex min-h-[92vh] flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-3xl) sm:px-(--space-2xl) sm:pb-(--space-4xl)"
+      >
+        <Stack gap="xl" className="max-w-4xl">
+          <p className="font-mono text-xs tracking-[0.25em] text-white/70 uppercase">
+            {hero.eyebrow}
+          </p>
 
           <h1
             id="ea-hero-heading"
-            className="font-heading text-foreground text-4xl leading-[1.02] font-semibold tracking-tight sm:text-5xl lg:text-[4.5rem] xl:text-[5.5rem]"
+            className="font-heading text-[2.75rem] leading-[1] font-semibold tracking-tight text-white sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem]"
           >
             {hero.headline}
           </h1>
 
-          <Stack gap="lg">
-            <p className="text-foreground max-w-2xl text-lg leading-snug font-medium sm:text-xl lg:text-2xl">
-              {hero.supportingHeadline}
-            </p>
-            <Text tone="muted" className="max-w-prose leading-relaxed">
-              {hero.supportingCopy}
-            </Text>
-          </Stack>
+          <p className="max-w-xl text-lg leading-snug font-medium text-white/90 sm:text-xl">
+            {hero.supportingHeadline}
+          </p>
 
-          <Stack direction="row" gap="sm" wrap="wrap">
+          <Text className="max-w-xl text-base leading-relaxed text-white/70">
+            {hero.supportingCopy}
+          </Text>
+
+          <Stack direction="row" gap="sm" wrap="wrap" className="pt-(--space-sm)">
             <NextLink
               href={hero.primaryCta.href}
               className={buttonVariants({ variant: 'primary', size: 'lg' })}
@@ -59,24 +71,19 @@ export function EaHero() {
               {hero.secondaryCta.label}
             </NextLink>
           </Stack>
-        </Stack>
-      </Container>
 
-      {/* Premium metadata strip — inverted for executive distinction */}
-      <div className="bg-foreground text-background border-border border-t">
-        <Container size="xl" className="px-(--space-xl) py-(--space-xl) sm:px-(--space-2xl)">
-          <dl className="grid grid-cols-1 gap-(--space-xl) sm:grid-cols-3">
+          <dl className="flex flex-wrap gap-x-(--space-2xl) gap-y-(--space-sm) pt-(--space-lg)">
             {hero.metadata.map(({ label, value }) => (
-              <div key={label} className="flex flex-col gap-(--space-sm)">
-                <dt className="text-background/50 font-mono text-[0.625rem] tracking-[0.2em] uppercase">
+              <div key={label} className="flex flex-col gap-(--space-3xs)">
+                <dt className="font-mono text-[0.625rem] tracking-[0.2em] text-white/50 uppercase">
                   {label}
                 </dt>
-                <dd className="font-heading text-lg font-medium tracking-tight">{value}</dd>
+                <dd className="text-sm font-medium text-white/85">{value}</dd>
               </div>
             ))}
           </dl>
-        </Container>
-      </div>
+        </Stack>
+      </Container>
     </section>
   );
 }

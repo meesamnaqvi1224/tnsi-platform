@@ -1,44 +1,57 @@
 import NextLink from 'next/link';
-import { buttonVariants, ChapterMarker, Stack, Text } from '@tnsi/ui';
+import { buttonVariants, cn, Section, Text } from '@tnsi/ui';
 import { EditorialImage } from '@/components/utility/editorial-image';
+import { FadeIn } from '@/components/utility/fade-in';
 import { executiveAdvisoryContent } from '@/content/executive-advisory';
 
-const { founder } = executiveAdvisoryContent;
+const { founder, footerQuote } = executiveAdvisoryContent;
 
+/**
+ * The large pull-quote here is `footerQuote` — already-approved copy that
+ * otherwise only appeared once, quietly, at the very bottom of the page via
+ * `PageQuote`. Reusing it prominently here (rather than inventing a new
+ * "philosophical statement") connects Caroline directly to the advisory's
+ * philosophy without adding a single new claim. `PageQuote` still closes
+ * the page afterwards — a quiet bookend, not a duplicate.
+ */
 export function EaFounder() {
   return (
-    <section
-      aria-label={founder.heading}
-      className="border-border grid grid-cols-1 border-t lg:grid-cols-2"
-    >
-      <div className="flex items-center px-(--space-lg) py-(--space-3xl) sm:px-(--space-2xl) lg:order-1 lg:px-(--space-3xl)">
-        <Stack gap="xl" className="max-w-lg">
-          <ChapterMarker index={founder.chapter} as="h2" title={founder.heading} />
+    <Section className="border-border border-t">
+      <div className="grid grid-cols-1 lg:grid-cols-2">
+        <FadeIn as="div">
+          <EditorialImage
+            src={founder.imageSrc}
+            alt={founder.imageAlt}
+            aspect="portrait"
+            className="h-full min-h-[24rem] rounded-none lg:min-h-full"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+          />
+        </FadeIn>
 
-          <Stack gap="md">
-            {founder.paragraphs.map((paragraph) => (
-              <Text key={paragraph} tone="muted" className="leading-relaxed">
-                {paragraph}
-              </Text>
-            ))}
-          </Stack>
-
-          <NextLink
-            href={founder.cta.href}
-            className={buttonVariants({ variant: 'outline', size: 'lg' })}
-          >
-            {founder.cta.label}
-          </NextLink>
-        </Stack>
+        <div className="flex items-center px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:px-(--space-3xl)">
+          <FadeIn delayMs={100} className="max-w-lg">
+            <p className="text-muted-foreground mb-(--space-lg) font-mono text-xs tracking-[0.2em] uppercase">
+              {founder.heading}
+            </p>
+            <p className="font-heading text-foreground mb-(--space-xl) text-3xl leading-[1.2] font-semibold tracking-tight text-balance sm:text-4xl lg:text-[2.75rem]">
+              &ldquo;{footerQuote.quote}&rdquo;
+            </p>
+            <div className="flex flex-col gap-(--space-md)">
+              {founder.paragraphs.map((paragraph) => (
+                <Text key={paragraph} tone="muted" className="leading-relaxed">
+                  {paragraph}
+                </Text>
+              ))}
+            </div>
+            <NextLink
+              href={founder.cta.href}
+              className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'mt-(--space-xl)')}
+            >
+              {founder.cta.label}
+            </NextLink>
+          </FadeIn>
+        </div>
       </div>
-
-      <EditorialImage
-        src={founder.imageSrc}
-        alt={founder.imageAlt}
-        aspect="portrait"
-        className="lg:order-2 lg:aspect-auto lg:min-h-full lg:rounded-none"
-        sizes="(max-width: 1024px) 100vw, 50vw"
-      />
-    </section>
+    </Section>
   );
 }

@@ -24,12 +24,12 @@ export function TransformationSection() {
           deliberate variation on Editorial Pause's overlay, not a repeat of it. */}
       <div className="absolute inset-0 bg-[var(--deep-slate)]/60" aria-hidden />
 
-      <div className="dark text-foreground relative py-(--space-4xl)">
+      <div className="dark text-foreground relative flex min-h-[90vh] items-center py-(--space-4xl)">
         <Container size="md" className="text-center">
           <FadeIn>
             <h2
               id="transformation-heading"
-              className="text-muted-foreground mb-(--space-2xl) text-xs font-medium tracking-[0.15em] uppercase"
+              className="text-muted-foreground mb-(--space-3xl) text-xs font-medium tracking-[0.15em] uppercase"
             >
               What Changes
             </h2>
@@ -38,7 +38,7 @@ export function TransformationSection() {
           <div className="flex flex-col items-center">
             {outcomes.map((outcome, index) => (
               <FadeIn key={outcome} delayMs={index * 90} className="flex flex-col items-center">
-                <p className="font-heading text-foreground text-2xl font-medium tracking-tight sm:text-3xl">
+                <p className="font-heading text-foreground text-3xl font-medium tracking-tight sm:text-4xl lg:text-[2.75rem]">
                   {outcome}
                 </p>
                 {index < outcomes.length - 1 && (

@@ -137,4 +137,21 @@
   .skip-link {
     @apply focus-visible:ring-ring bg-background text-foreground sr-only rounded-sm px-4 py-2 text-sm font-medium focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[calc(var(--z-sticky)+1)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
   }
+
+  /* A single, one-time, very slow settle - not a looping "Ken Burns" pan,
+     just enough movement that a full-bleed hero photograph doesn't feel
+     static. Respects prefers-reduced-motion via the global neutralisation
+     above (animation-duration: 0.01ms). */
+  .animate-hero-ken-burns {
+    animation: hero-ken-burns 12s ease-out forwards;
+  }
+}
+
+@keyframes hero-ken-burns {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
 }
