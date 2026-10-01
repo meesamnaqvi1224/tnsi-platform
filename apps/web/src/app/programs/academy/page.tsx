@@ -5,6 +5,7 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { EditorialImage } from '@/components/utility/editorial-image';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { getPathway } from '@/content/programs';
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
@@ -26,6 +27,8 @@ const academyRoutes = [
     id: 'cpd-pathway',
     title: 'The CPD Pathway',
     status: 'Continuing Education',
+    imageSrc: '/images/programs/nav-academy.webp',
+    imageAlt: 'A quiet home-office desk beside tall windows overlooking bare winter trees.',
     paragraphs: [
       'Specialist education for professionals who want to deepen their understanding of nervous-system-informed practice without undertaking certification in a specific TNSI methodology.',
       'Relevant to therapists, counsellors, psychologists, coaches, healthcare professionals, educators, leaders, and other professionals whose work involves stress, trauma, nervous-system regulation, human behaviour, wellbeing, or capacity.',
@@ -36,6 +39,8 @@ const academyRoutes = [
     id: 'lbt-coaching-certificate',
     title: 'The Life Beyond Trauma Coaching Certificate',
     status: 'Vocational Pathway',
+    imageSrc: '/images/programs/featured-life-beyond-trauma.webp',
+    imageAlt: 'A woman in a trench coat walks alone along a golden autumn forest path.',
     paragraphs: [
       'A vocational pathway for people who want to support others within the established Life Beyond Trauma Method™. Applicants do not need to be qualified therapists or clinicians — but must first have completed the full 12-week Life Beyond Trauma programme themselves.',
       'Training covers trauma understanding, nervous-system education, protective patterns, self-care, communication, relationships, perfectionism, support, boundaries, and future-focused change, and includes clear expectations around scope, safeguarding, boundaries, escalation, and referral. Assessment is part of the certificate.',
@@ -46,6 +51,8 @@ const academyRoutes = [
     id: 'practitioner-certification-pathway',
     title: 'The Practitioner Certification Pathway',
     status: 'Available today',
+    imageSrc: '/images/programs/featured-practitioner.webp',
+    imageAlt: 'Five practitioners in cream knitwear in quiet conversation beside tall windows.',
     paragraphs: [
       'The Academy’s advanced professional route — for practitioners seeking certification to deliver specialist TNSI methodologies that require clinical judgement, professional formulation, assessment, or work with complex presentations.',
       'Entry requires applicants to be appropriately qualified clinicians, holding the relevant licence, registration, regulation, or recognised professional standing for their discipline and jurisdiction. Candidates complete structured theoretical education, formal assessment, practical application, supervised practice, and competency review.',
@@ -122,16 +129,26 @@ export default function AcademyPage() {
           aria-labelledby="academy-body-heading"
         >
           <Container size="xl">
-            <Stack gap="lg" className="max-w-2xl">
-              <h2 id="academy-body-heading" className="sr-only">
-                About the Nervous System Academy
-              </h2>
-              {pathway.paragraphs.map((paragraph) => (
-                <Text key={paragraph} tone="muted" className="max-w-prose leading-relaxed">
-                  {paragraph}
-                </Text>
-              ))}
-            </Stack>
+            <div className="grid grid-cols-1 gap-(--space-2xl) lg:grid-cols-[3fr_2fr] lg:gap-(--space-4xl)">
+              <Stack gap="lg" className="max-w-prose">
+                <h2 id="academy-body-heading" className="sr-only">
+                  About the Nervous System Academy
+                </h2>
+                {pathway.paragraphs.map((paragraph) => (
+                  <Text key={paragraph} tone="muted" className="leading-relaxed">
+                    {paragraph}
+                  </Text>
+                ))}
+              </Stack>
+
+              <EditorialImage
+                src="/images/programs/nav-practitioner.webp"
+                alt="Several practitioners seated around a long table, taking notes together during a seminar."
+                aspect="portrait"
+                className="rounded-lg"
+                sizes="(max-width: 1024px) 100vw, 40vw"
+              />
+            </div>
           </Container>
         </Section>
 
@@ -152,13 +169,22 @@ export default function AcademyPage() {
                     key={route.id}
                     className="border-foreground/15 grid grid-cols-1 gap-(--space-lg) border-t py-(--space-2xl) lg:grid-cols-[1fr_2fr] lg:gap-(--space-2xl)"
                   >
-                    <Stack gap="xs">
-                      <h3 className="font-heading text-foreground text-xl font-semibold tracking-tight sm:text-2xl">
-                        {route.title}
-                      </h3>
-                      <p className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.2em] uppercase">
-                        {route.status}
-                      </p>
+                    <Stack gap="lg">
+                      <EditorialImage
+                        src={route.imageSrc}
+                        alt={route.imageAlt}
+                        aspect="portrait"
+                        className="rounded-lg"
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                      />
+                      <Stack gap="xs">
+                        <h3 className="font-heading text-foreground text-xl font-semibold tracking-tight sm:text-2xl">
+                          {route.title}
+                        </h3>
+                        <p className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.2em] uppercase">
+                          {route.status}
+                        </p>
+                      </Stack>
                     </Stack>
 
                     <Stack gap="md">
@@ -204,10 +230,19 @@ export default function AcademyPage() {
 
         <Section
           spacing="xl"
-          className="border-foreground/15 border-t"
+          className="border-foreground/15 relative flex min-h-[28rem] items-center overflow-hidden border-t"
           aria-labelledby="academy-cert-heading"
         >
-          <Container size="xl">
+          <ResponsiveImage
+            src="/images/programs/featured-executive.webp"
+            alt=""
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-black/60" aria-hidden />
+
+          <Container size="xl" className="dark text-foreground relative">
             <Stack gap="lg" className="max-w-2xl">
               <Heading as="h2" id="academy-cert-heading" size="xl">
                 Advanced certification: Private Executive Advisory
@@ -249,7 +284,7 @@ export default function AcademyPage() {
               <div>
                 <NextLink
                   href="/book-a-call"
-                  className={buttonVariants({ variant: 'outline', size: 'lg' })}
+                  className={buttonVariants({ variant: 'primary', size: 'lg' })}
                 >
                   Book a Discovery Call
                 </NextLink>
