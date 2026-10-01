@@ -17,28 +17,28 @@ const { founder, footerQuote } = executiveAdvisoryContent;
 export function EaFounder() {
   return (
     <Section className="border-border border-t">
-      <div className="grid grid-cols-1 lg:grid-cols-2">
+      <div className="grid grid-cols-1 lg:grid-cols-[44fr_56fr]">
         <FadeIn as="div">
           <EditorialImage
             src={founder.imageSrc}
             alt={founder.imageAlt}
             aspect="portrait"
-            className="h-full min-h-[24rem] rounded-none lg:min-h-full"
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="min-h-[24rem] rounded-none lg:h-full lg:max-h-[42rem]"
+            sizes="(max-width: 1024px) 100vw, 44vw"
           />
         </FadeIn>
 
-        <div className="flex items-center px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:px-(--space-3xl)">
-          <FadeIn delayMs={100} className="max-w-lg">
+        <div className="flex items-center px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:px-(--space-4xl)">
+          <FadeIn delayMs={100} className="max-w-xl">
             <p className="text-muted-foreground mb-(--space-lg) font-mono text-xs tracking-[0.2em] uppercase">
               {founder.heading}
             </p>
-            <p className="font-heading text-foreground mb-(--space-xl) text-3xl leading-[1.2] font-semibold tracking-tight text-balance sm:text-4xl lg:text-[2.75rem]">
+            <p className="font-heading text-foreground mb-(--space-xl) text-4xl leading-[1.2] font-semibold tracking-tight text-balance sm:text-5xl lg:text-[3.25rem]">
               &ldquo;{footerQuote.quote}&rdquo;
             </p>
-            <div className="flex flex-col gap-(--space-md)">
+            <div className="flex flex-col gap-(--space-lg)">
               {founder.paragraphs.map((paragraph) => (
-                <Text key={paragraph} tone="muted" className="leading-relaxed">
+                <Text key={paragraph} tone="muted" size="lg" className="leading-relaxed">
                   {paragraph}
                 </Text>
               ))}

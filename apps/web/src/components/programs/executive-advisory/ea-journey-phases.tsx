@@ -102,22 +102,36 @@ export function EaJourneyPhases({ steps }: { steps: readonly Step[] }) {
               <div className="bg-background/15 h-px flex-1" aria-hidden />
             </div>
 
-            <p
-              className={cn(
-                'font-heading duration-slow ease-standard text-2xl font-semibold tracking-tight transition-opacity sm:text-3xl lg:text-4xl xl:text-[2.75rem]',
-                index === activeIndex ? 'lg:opacity-100' : 'lg:opacity-30',
-              )}
-            >
-              {step.title}
-            </p>
-            <Text
-              className={cn(
-                'text-background/60 duration-slow ease-standard max-w-lg leading-relaxed transition-opacity lg:text-lg',
-                index === activeIndex ? 'lg:opacity-100' : 'lg:opacity-0',
-              )}
-            >
-              {step.description}
-            </Text>
+            <div className="lg:grid lg:grid-cols-[minmax(0,10rem)_1fr] lg:items-center lg:gap-(--space-3xl)">
+              <span
+                aria-hidden
+                className={cn(
+                  'duration-slow ease-standard hidden font-mono text-8xl leading-none font-semibold transition-opacity lg:block',
+                  index === activeIndex ? 'text-background/15' : 'text-background/5',
+                )}
+              >
+                {String(index + 1).padStart(2, '0')}
+              </span>
+
+              <div>
+                <p
+                  className={cn(
+                    'font-heading duration-slow ease-standard text-2xl font-semibold tracking-tight transition-opacity sm:text-3xl lg:text-4xl xl:text-[2.75rem]',
+                    index === activeIndex ? 'lg:opacity-100' : 'lg:opacity-30',
+                  )}
+                >
+                  {step.title}
+                </p>
+                <Text
+                  className={cn(
+                    'text-background/60 duration-slow ease-standard mt-(--space-sm) max-w-lg leading-relaxed transition-opacity lg:text-lg',
+                    index === activeIndex ? 'lg:opacity-100' : 'lg:opacity-0',
+                  )}
+                >
+                  {step.description}
+                </Text>
+              </div>
+            </div>
           </li>
         ))}
       </ol>
