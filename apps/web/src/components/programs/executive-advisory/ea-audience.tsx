@@ -55,12 +55,12 @@ export function EaAudience() {
             </div>
           </div>
 
-          <FadeIn delayMs={160} className="hidden lg:block">
+          <FadeIn delayMs={160} className="hidden min-w-0 lg:block">
             <EditorialImage
               src="/images/programs/nav-executive.webp"
               alt="An executive pauses in thought beside a window, a stack of books on the sill."
               aspect="landscape"
-              className="rounded-lg"
+              className="min-h-[36rem] rounded-lg"
               sizes="33vw"
             />
           </FadeIn>
