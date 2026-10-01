@@ -46,8 +46,8 @@ export const programsOverviewContent = {
       title: 'The Regulation Suite™',
       tagline: 'Practical nervous-system support, whenever you need it.',
       paragraphs: [
-        "The Regulation Suite™ is a digital nervous-system support platform — a subscription app designed to help you understand what's happening in your nervous system and find an appropriate response in the moment, without needing to work through complex theory first.",
-        'State-based navigation (Calm My System, Feel Grounded, Release Pressure, Reconnect With Myself, Build Capacity) moves you quickly towards relevant support, drawing on PowerDrops™, somatic regulation practices, guided exercises, meditation and visualisation, and body-based tools.',
+        "The Regulation Suite™ is a digital nervous-system support platform — delivered through a subscription app and digital membership — designed to help you understand what's happening in your nervous system and find an appropriate response in the moment, without needing to work through complex theory first.",
+        'State-based navigation (Calm My System, Feel Grounded, Release Pressure, Reconnect With Myself, Build Capacity) moves you quickly towards relevant support — from PowerDrops™, brief interventions designed for immediate use in moments of pressure or overwhelm, to longer-form somatic regulation practices, guided exercises, meditation and visualisation, and body-based tools.',
         'It supports both immediate regulation and longer-term capacity awareness, and is not a replacement for clinical treatment, crisis intervention, or specialist mental health care.',
         // Pricing per Caroline's source document, stated here as informational
         // content only — the enrolment status below (and the page's own CTA
@@ -59,7 +59,7 @@ export const programsOverviewContent = {
         'People experiencing everyday stress, overwhelm or reduced capacity',
         'Immediate, practical regulation support',
         'Building longer-term nervous-system awareness',
-        'Maintaining progress after the Life Beyond Trauma Method™',
+        'An accessible entry point before deciding on a more structured programme such as The Life Beyond Trauma Method™',
       ],
       cta: { label: 'Explore the Regulation Suite', href: '/programs/regulation-suite' },
       imageSrc: '/images/programs/nav-regulation-suite.webp',
