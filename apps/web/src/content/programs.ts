@@ -65,9 +65,8 @@ export const programsOverviewContent = {
       imageSrc: '/images/programs/nav-regulation-suite.webp',
       imageAlt:
         'An open blank notebook and pencil beside a small succulent plant on a wooden table.',
-      heroImageSrc: '/images/programs/regulation-suite/hero.webp',
-      heroImageAlt:
-        'An open blank notebook and pencil beside a small succulent plant on a wooden table, seen from above.',
+      heroImageSrc: '/images/programs/regulation-suite/hero-journal.webp',
+      heroImageAlt: 'A woman in a cream cardigan pauses thoughtfully by a window, journal in hand.',
     },
     {
       id: 'life-beyond-trauma',

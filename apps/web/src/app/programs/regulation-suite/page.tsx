@@ -39,46 +39,55 @@ export default function RegulationSuitePage() {
       <JsonLd data={jsonLd} />
       <SiteHeader />
       <main id="main-content">
-        {/* Hero — true split composition: text left, image bleeding to the edge right */}
+        {/* Hero — one immersive full-bleed composition, matching the Private
+            Executive Advisory treatment: image fills the viewport, text sits
+            directly over it with a bottom-to-transparent scrim. */}
         <section
           aria-labelledby="rs-hero-heading"
-          className="border-foreground/15 grid min-h-[80vh] grid-cols-1 border-b lg:grid-cols-[45fr_55fr]"
+          className="relative min-h-[92vh] overflow-hidden"
         >
-          <div className="flex flex-col justify-center px-(--space-xl) py-(--space-4xl) sm:px-(--space-3xl) lg:px-(--space-3xl)">
-            <Stack gap="lg" className="max-w-md">
-              <FadeIn>
-                <p className="text-muted-foreground font-mono text-xs tracking-[0.25em] uppercase">
-                  {pathway.category}
-                </p>
-              </FadeIn>
-              <FadeIn delayMs={80}>
-                <h1
-                  id="rs-hero-heading"
-                  className="font-heading text-foreground text-[2.75rem] leading-[1.02] font-semibold tracking-tight sm:text-6xl lg:text-[4.5rem] xl:text-[5rem]"
-                >
-                  {pathway.title}
-                </h1>
-              </FadeIn>
-              <FadeIn delayMs={160}>
-                <Text size="lg" tone="muted" className="leading-relaxed">
-                  {pathway.tagline}
-                </Text>
-              </FadeIn>
-            </Stack>
-          </div>
-
           {'heroImageSrc' in pathway ? (
-            <figure className="bg-secondary relative min-h-[50vh] overflow-hidden lg:min-h-0">
+            <div className="animate-hero-ken-burns absolute inset-0">
               <ResponsiveImage
                 src={pathway.heroImageSrc}
                 alt={pathway.heroImageAlt}
                 fill
                 priority
                 className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 55vw"
+                sizes="100vw"
               />
-            </figure>
+            </div>
           ) : null}
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
+            aria-hidden
+          />
+
+          <Container
+            size="xl"
+            className="dark text-foreground relative flex min-h-[92vh] flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-3xl) sm:px-(--space-2xl) sm:pb-(--space-4xl)"
+          >
+            <Stack gap="lg" className="max-w-2xl">
+              <FadeIn>
+                <p className="font-mono text-xs tracking-[0.25em] text-white/70 uppercase">
+                  {pathway.category}
+                </p>
+              </FadeIn>
+              <FadeIn delayMs={80}>
+                <h1
+                  id="rs-hero-heading"
+                  className="font-heading text-[2.75rem] leading-[1] font-semibold tracking-tight text-white sm:text-6xl lg:text-[4.5rem] xl:text-[5rem]"
+                >
+                  {pathway.title}
+                </h1>
+              </FadeIn>
+              <FadeIn delayMs={160}>
+                <Text className="max-w-xl text-lg leading-relaxed text-white/90">
+                  {pathway.tagline}
+                </Text>
+              </FadeIn>
+            </Stack>
+          </Container>
         </section>
 
         {/* Body copy — a thin rule anchors the running category marker beside the paragraphs */}
