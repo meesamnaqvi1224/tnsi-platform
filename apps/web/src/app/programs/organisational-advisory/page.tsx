@@ -1,6 +1,16 @@
+import type * as React from 'react';
 import type { Metadata } from 'next';
 import NextLink from 'next/link';
-import { buttonVariants, Container, Heading, Section, Stack, Text } from '@tnsi/ui';
+import {
+  Building2,
+  GraduationCap,
+  HeartPulse,
+  Landmark,
+  Network,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
+import { buttonVariants, Container, Section, Stack, Text } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
@@ -12,6 +22,16 @@ import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from 
 const pathway = getPathway('organisational-advisory');
 const PAGE_TITLE = pathway.title;
 const PAGE_DESCRIPTION = pathway.tagline;
+
+/** Purely visual pairing of each existing audience label with a line icon. */
+const idealForIcons: Record<string, LucideIcon> = {
+  'Leadership teams': Users,
+  'Organisations addressing systemic pressure': Network,
+  'Public sector': Landmark,
+  Healthcare: HeartPulse,
+  Education: GraduationCap,
+  'Corporate organisations': Building2,
+};
 
 export const metadata: Metadata = createPageMetadata({
   title: PAGE_TITLE,
@@ -119,34 +139,62 @@ export default function OrganisationalAdvisoryPage() {
           </Container>
         </Section>
 
-        {/* Ideal for — a quiet typographic list rather than pills, content unchanged */}
+        {/* Ideal for — a dark slate band so the audience reads as a highlight,
+            with one line icon per audience. The gold is derived from the
+            brand's bronze accent token, warmed with the sand tone for contrast
+            on slate, rather than introducing a new colour. */}
         <Section
-          className="border-foreground/15 border-t py-(--space-2xl) sm:py-(--space-3xl)"
+          className="dark bg-background text-foreground border-foreground/15 border-t py-(--space-3xl) sm:py-(--space-4xl)"
+          style={
+            {
+              '--oa-gold': 'color-mix(in oklch, var(--accent-bronze) 50%, var(--warm-sand))',
+            } as React.CSSProperties
+          }
           aria-labelledby="oa-ideal-heading"
         >
           <Container size="xl">
-            <div className="grid grid-cols-1 gap-(--space-xl) lg:grid-cols-[1fr_2.5fr] lg:gap-(--space-3xl)">
-              <FadeIn>
-                <Heading as="h2" id="oa-ideal-heading" size="xl">
-                  Ideal for
-                </Heading>
-              </FadeIn>
-              <FadeIn delayMs={100}>
-                <ul
-                  className="grid grid-cols-1 gap-x-(--space-2xl) gap-y-0 sm:grid-cols-2"
-                  aria-label="Ideal for"
-                >
-                  {pathway.idealFor.map((item) => (
-                    <li
-                      key={item}
-                      className="border-foreground/15 text-foreground border-t py-(--space-md) text-base leading-relaxed"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </FadeIn>
-            </div>
+            <FadeIn>
+              <div className="mb-(--space-2xl) flex items-end gap-(--space-xl)">
+                <div>
+                  <div className="mb-(--space-md) h-px w-7 bg-(--oa-gold)" aria-hidden />
+                  <h2
+                    id="oa-ideal-heading"
+                    className="font-heading text-foreground text-4xl leading-none font-semibold tracking-tight sm:text-5xl lg:text-[3.25rem]"
+                  >
+                    Ideal for
+                  </h2>
+                </div>
+                <div className="bg-foreground/20 mb-2 hidden h-px flex-1 sm:block" aria-hidden />
+              </div>
+            </FadeIn>
+
+            <ul
+              className="grid grid-cols-1 gap-(--space-md) sm:grid-cols-2 lg:grid-cols-3"
+              aria-label="Ideal for"
+            >
+              {pathway.idealFor.map((item, index) => {
+                const Icon = idealForIcons[item];
+                return (
+                  <li key={item}>
+                    <FadeIn delayMs={index * 80} className="h-full">
+                      <div className="group border-foreground/15 bg-foreground/5 hover:border-foreground/30 duration-base ease-standard flex h-full min-h-40 flex-col justify-between gap-(--space-xl) rounded-sm border p-(--space-lg) transition-[border-color,transform] hover:-translate-y-1">
+                        {Icon ? (
+                          <span
+                            aria-hidden
+                            className="duration-base ease-standard flex size-11 items-center justify-center rounded-sm border border-(--oa-gold)/60 text-(--oa-gold) transition-colors group-hover:border-(--oa-gold)"
+                          >
+                            <Icon className="size-6" strokeWidth={1.25} />
+                          </span>
+                        ) : null}
+                        <p className="font-heading text-foreground text-xl leading-snug font-medium tracking-tight sm:text-[1.375rem]">
+                          {item}
+                        </p>
+                      </div>
+                    </FadeIn>
+                  </li>
+                );
+              })}
+            </ul>
           </Container>
         </Section>
 
