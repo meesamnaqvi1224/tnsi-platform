@@ -6,6 +6,7 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { IdealForBand } from '@/components/programs/ideal-for-band';
+import { EditorialImage } from '@/components/utility/editorial-image';
 import { FadeIn } from '@/components/utility/fade-in';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { getPathway } from '@/content/programs';
@@ -107,16 +108,30 @@ export default function LifeBeyondTraumaPage() {
           aria-labelledby="lbt-body-heading"
         >
           <Container size="xl">
-            <Stack gap="lg" className="max-w-2xl">
-              <h2 id="lbt-body-heading" className="sr-only">
-                About the Life Beyond Trauma Method
-              </h2>
-              {pathway.paragraphs.map((paragraph) => (
-                <Text key={paragraph} tone="muted" className="max-w-prose leading-relaxed">
-                  {paragraph}
-                </Text>
-              ))}
-            </Stack>
+            <div className="grid grid-cols-1 items-start gap-(--space-2xl) lg:grid-cols-[3fr_2fr] lg:gap-(--space-4xl)">
+              <FadeIn>
+                <Stack gap="lg" className="max-w-[65ch]">
+                  <h2 id="lbt-body-heading" className="sr-only">
+                    About the Life Beyond Trauma Method
+                  </h2>
+                  {pathway.paragraphs.map((paragraph) => (
+                    <Text key={paragraph} size="lg" tone="muted" className="leading-[1.7]">
+                      {paragraph}
+                    </Text>
+                  ))}
+                </Stack>
+              </FadeIn>
+
+              <FadeIn delayMs={120}>
+                <EditorialImage
+                  src="/images/programs/nav-life-beyond-trauma.webp"
+                  alt="A woman in a cream sweater walks alone along a winding forest path."
+                  aspect="portrait"
+                  className="rounded-lg"
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                />
+              </FadeIn>
+            </div>
           </Container>
         </Section>
 
