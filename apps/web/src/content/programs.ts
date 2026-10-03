@@ -172,9 +172,9 @@ export const programsOverviewContent = {
       imageSrc: '/images/programs/nav-organisational-advisory.webp',
       imageAlt:
         'An empty boardroom with a curved wooden table, tan leather chairs and a small plant, seen through glass-walled offices.',
-      heroImageSrc: '/images/programs/organisational-advisory/hero.webp',
+      heroImageSrc: '/images/programs/organisational-advisory/hero-studio.webp',
       heroImageAlt:
-        'A boardroom with a curved wooden table, tan leather chairs and a small plant, glass-walled offices visible beyond.',
+        'A bright, quiet meeting room with a long wooden table, cream chairs and tall arched windows.',
     },
   ] as const,
 
