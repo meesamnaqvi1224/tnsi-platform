@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import NextLink from 'next/link';
-import { buttonVariants, Container, Heading, Section, Stack, Text } from '@tnsi/ui';
+import { BatteryLow, DoorOpen, Sprout, Zap, type LucideIcon } from 'lucide-react';
+import { buttonVariants, Container, Section, Stack, Text } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
+import { IdealForBand } from '@/components/programs/ideal-for-band';
 import { EditorialImage } from '@/components/utility/editorial-image';
 import { FadeIn } from '@/components/utility/fade-in';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
@@ -13,6 +15,15 @@ import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from 
 const pathway = getPathway('regulation-suite');
 const PAGE_TITLE = pathway.title;
 const PAGE_DESCRIPTION = pathway.tagline;
+
+/** Purely visual pairing of each existing audience label with a line icon. */
+const idealForIcons: Record<string, LucideIcon> = {
+  'People experiencing everyday stress, overwhelm or reduced capacity': BatteryLow,
+  'Immediate, practical regulation support': Zap,
+  'Building longer-term nervous-system awareness': Sprout,
+  'An accessible entry point before deciding on a more structured programme such as The Life Beyond Trauma Method™':
+    DoorOpen,
+};
 
 export const metadata: Metadata = createPageMetadata({
   title: PAGE_TITLE,
@@ -121,36 +132,12 @@ export default function RegulationSuitePage() {
           </Container>
         </Section>
 
-        {/* Ideal for — a quiet typographic list rather than pills, content unchanged */}
-        <Section
-          className="border-foreground/15 border-t py-(--space-2xl) sm:py-(--space-3xl)"
-          aria-labelledby="rs-ideal-heading"
-        >
-          <Container size="xl">
-            <div className="grid grid-cols-1 gap-(--space-xl) lg:grid-cols-[1fr_2.5fr] lg:gap-(--space-3xl)">
-              <FadeIn>
-                <Heading as="h2" id="rs-ideal-heading" size="xl">
-                  Ideal for
-                </Heading>
-              </FadeIn>
-              <FadeIn delayMs={100}>
-                <ul
-                  className="grid grid-cols-1 gap-x-(--space-2xl) gap-y-0 sm:grid-cols-2"
-                  aria-label="Ideal for"
-                >
-                  {pathway.idealFor.map((item) => (
-                    <li
-                      key={item}
-                      className="border-foreground/15 text-foreground border-t py-(--space-md) text-base leading-relaxed"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </FadeIn>
-            </div>
-          </Container>
-        </Section>
+        <IdealForBand
+          headingId="rs-ideal-heading"
+          items={pathway.idealFor}
+          icons={idealForIcons}
+          columns={2}
+        />
 
         {/* Final CTA — wide editorial closing panel; the existing nav/card photo
             of the same notebook scene gives the panel a visual counterpart

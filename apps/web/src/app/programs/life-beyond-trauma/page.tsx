@@ -1,16 +1,27 @@
 import type { Metadata } from 'next';
 import NextLink from 'next/link';
+import { BookOpen, Gauge, LifeBuoy, Route, type LucideIcon } from 'lucide-react';
 import { buttonVariants, cn, Container, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
-import { EditorialImage } from '@/components/utility/editorial-image';
+import { IdealForBand } from '@/components/programs/ideal-for-band';
+import { FadeIn } from '@/components/utility/fade-in';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { getPathway } from '@/content/programs';
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
 const pathway = getPathway('life-beyond-trauma');
 const PAGE_TITLE = pathway.title;
 const PAGE_DESCRIPTION = pathway.tagline;
+
+/** Purely visual pairing of each existing audience label with a line icon. */
+const idealForIcons: Record<string, LucideIcon> = {
+  'Adults affected by trauma, adversity or chronic stress': LifeBuoy,
+  'People who remain outwardly functional while under significant internal strain': Gauge,
+  'Those who want structured education without repeated disclosure': BookOpen,
+  'Individuals committed to long-term, trauma-informed development': Route,
+};
 
 export const metadata: Metadata = createPageMetadata({
   title: PAGE_TITLE,
@@ -37,42 +48,58 @@ export default function LifeBeyondTraumaPage() {
       <JsonLd data={jsonLd} />
       <SiteHeader />
       <main id="main-content">
-        <Section spacing="xl" aria-labelledby="lbt-hero-heading">
-          <Container size="xl">
-            <Stack gap="lg" className="max-w-2xl">
-              <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
-                {pathway.category}
-              </p>
-              <h1
-                id="lbt-hero-heading"
-                className="font-heading text-foreground text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl"
-              >
-                {pathway.title}
-              </h1>
-              <Text size="lg" tone="muted" className="max-w-prose leading-relaxed">
-                {pathway.tagline}
-              </Text>
-            </Stack>
-          </Container>
-        </Section>
-
-        {'heroImageSrc' in pathway ? (
-          <Section
-            spacing="xl"
-            className="border-foreground/15 border-t"
-            aria-label="The Life Beyond Trauma Method"
-          >
-            <Container size="xl">
-              <EditorialImage
+        {/* Hero — one immersive full-bleed composition, matching the other
+            pathway pages: image fills the viewport, text sits directly over
+            it with a bottom-to-transparent scrim. */}
+        <section
+          aria-labelledby="lbt-hero-heading"
+          className="relative min-h-[92vh] overflow-hidden"
+        >
+          {'heroImageSrc' in pathway ? (
+            <div className="animate-hero-ken-burns absolute inset-0">
+              <ResponsiveImage
                 src={pathway.heroImageSrc}
                 alt={pathway.heroImageAlt}
-                aspect="landscape"
-                className="rounded-lg"
-                sizes="(max-width: 1024px) 100vw, 1152px"
+                fill
+                priority
+                className="object-cover"
+                sizes="100vw"
               />
-            </Container>
-          </Section>
-        ) : null}
+            </div>
+          ) : null}
+          {/* The sunbeam photograph is mid-bright through its centre, so the scrim
+              holds a little more strength than on the darker heroes. */}
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10"
+            aria-hidden
+          />
+
+          <Container
+            size="xl"
+            className="dark text-foreground relative flex min-h-[92vh] flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-3xl) sm:px-(--space-2xl) sm:pb-(--space-4xl)"
+          >
+            <Stack gap="lg" className="max-w-2xl">
+              <FadeIn>
+                <p className="font-mono text-xs tracking-[0.25em] text-white/70 uppercase">
+                  {pathway.category}
+                </p>
+              </FadeIn>
+              <FadeIn delayMs={80}>
+                <h1
+                  id="lbt-hero-heading"
+                  className="font-heading text-[2.75rem] leading-[1] font-semibold tracking-tight text-white sm:text-6xl lg:text-[4.5rem] xl:text-[5rem]"
+                >
+                  {pathway.title}
+                </h1>
+              </FadeIn>
+              <FadeIn delayMs={160}>
+                <Text className="max-w-xl text-lg leading-relaxed text-white/90">
+                  {pathway.tagline}
+                </Text>
+              </FadeIn>
+            </Stack>
+          </Container>
+        </section>
 
         <Section
           spacing="xl"
@@ -93,29 +120,12 @@ export default function LifeBeyondTraumaPage() {
           </Container>
         </Section>
 
-        <Section
-          spacing="xl"
-          className="border-foreground/15 border-t"
-          aria-labelledby="lbt-ideal-heading"
-        >
-          <Container size="xl">
-            <Stack gap="2xl">
-              <Heading as="h2" id="lbt-ideal-heading" size="xl">
-                Ideal for
-              </Heading>
-              <ul className="flex flex-wrap gap-(--space-sm)" aria-label="Ideal for">
-                {pathway.idealFor.map((item) => (
-                  <li
-                    key={item}
-                    className="border-foreground/15 text-foreground rounded-full border px-(--space-md) py-(--space-xs) text-sm"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </Stack>
-          </Container>
-        </Section>
+        <IdealForBand
+          headingId="lbt-ideal-heading"
+          items={pathway.idealFor}
+          icons={idealForIcons}
+          columns={2}
+        />
 
         <Section
           spacing="xl"
