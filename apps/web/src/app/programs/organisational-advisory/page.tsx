@@ -1,4 +1,3 @@
-import type * as React from 'react';
 import type { Metadata } from 'next';
 import NextLink from 'next/link';
 import {
@@ -14,6 +13,7 @@ import { buttonVariants, Container, Section, Stack, Text } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
+import { IdealForBand } from '@/components/programs/ideal-for-band';
 import { FadeIn } from '@/components/utility/fade-in';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { getPathway } from '@/content/programs';
@@ -139,64 +139,12 @@ export default function OrganisationalAdvisoryPage() {
           </Container>
         </Section>
 
-        {/* Ideal for — a dark slate band so the audience reads as a highlight,
-            with one line icon per audience. The gold is derived from the
-            brand's bronze accent token, warmed with the sand tone for contrast
-            on slate, rather than introducing a new colour. */}
-        <Section
-          className="dark bg-background text-foreground border-foreground/15 border-t py-(--space-3xl) sm:py-(--space-4xl)"
-          style={
-            {
-              '--oa-gold': 'color-mix(in oklch, var(--accent-bronze) 50%, var(--warm-sand))',
-            } as React.CSSProperties
-          }
-          aria-labelledby="oa-ideal-heading"
-        >
-          <Container size="xl">
-            <FadeIn>
-              <div className="mb-(--space-2xl) flex items-end gap-(--space-xl)">
-                <div>
-                  <div className="mb-(--space-md) h-px w-7 bg-(--oa-gold)" aria-hidden />
-                  <h2
-                    id="oa-ideal-heading"
-                    className="font-heading text-foreground text-4xl leading-none font-semibold tracking-tight sm:text-5xl lg:text-[3.25rem]"
-                  >
-                    Ideal for
-                  </h2>
-                </div>
-                <div className="bg-foreground/20 mb-2 hidden h-px flex-1 sm:block" aria-hidden />
-              </div>
-            </FadeIn>
-
-            <ul
-              className="grid grid-cols-1 gap-(--space-md) sm:grid-cols-2 lg:grid-cols-3"
-              aria-label="Ideal for"
-            >
-              {pathway.idealFor.map((item, index) => {
-                const Icon = idealForIcons[item];
-                return (
-                  <li key={item}>
-                    <FadeIn delayMs={index * 80} className="h-full">
-                      <div className="group border-foreground/15 bg-foreground/5 hover:border-foreground/30 duration-base ease-standard flex h-full min-h-40 flex-col justify-between gap-(--space-xl) rounded-sm border p-(--space-lg) transition-[border-color,transform] hover:-translate-y-1">
-                        {Icon ? (
-                          <span
-                            aria-hidden
-                            className="duration-base ease-standard flex size-11 items-center justify-center rounded-sm border border-(--oa-gold)/60 text-(--oa-gold) transition-colors group-hover:border-(--oa-gold)"
-                          >
-                            <Icon className="size-6" strokeWidth={1.25} />
-                          </span>
-                        ) : null}
-                        <p className="font-heading text-foreground text-xl leading-snug font-medium tracking-tight sm:text-[1.375rem]">
-                          {item}
-                        </p>
-                      </div>
-                    </FadeIn>
-                  </li>
-                );
-              })}
-            </ul>
-          </Container>
-        </Section>
+        <IdealForBand
+          headingId="oa-ideal-heading"
+          items={pathway.idealFor}
+          icons={idealForIcons}
+          columns={3}
+        />
 
         {/* Final CTA — the strongest closing moment on the page */}
         <Section

@@ -1,9 +1,19 @@
 import type { Metadata } from 'next';
 import NextLink from 'next/link';
+import {
+  Brain,
+  Compass,
+  GraduationCap,
+  HandHeart,
+  MessagesSquare,
+  Stethoscope,
+  type LucideIcon,
+} from 'lucide-react';
 import { buttonVariants, Container, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
+import { IdealForBand } from '@/components/programs/ideal-for-band';
 import { EditorialImage } from '@/components/utility/editorial-image';
 import { FadeIn } from '@/components/utility/fade-in';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
@@ -13,6 +23,16 @@ import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from 
 const pathway = getPathway('nervous-system-academy');
 const PAGE_TITLE = pathway.title;
 const PAGE_DESCRIPTION = pathway.tagline;
+
+/** Purely visual pairing of each existing audience label with a line icon. */
+const idealForIcons: Record<string, LucideIcon> = {
+  Therapists: MessagesSquare,
+  Psychologists: Brain,
+  Coaches: Compass,
+  'Healthcare professionals': Stethoscope,
+  Educators: GraduationCap,
+  'Helping professionals': HandHeart,
+};
 
 /**
  * The Academy's three defined routes, per Caroline Reed's
@@ -220,29 +240,12 @@ export default function AcademyPage() {
           </Container>
         </Section>
 
-        <Section
-          spacing="xl"
-          className="border-foreground/15 border-t"
-          aria-labelledby="academy-ideal-heading"
-        >
-          <Container size="xl">
-            <Stack gap="2xl">
-              <Heading as="h2" id="academy-ideal-heading" size="xl">
-                Ideal for
-              </Heading>
-              <ul className="flex flex-wrap gap-(--space-sm)" aria-label="Ideal for">
-                {pathway.idealFor.map((item) => (
-                  <li
-                    key={item}
-                    className="border-foreground/15 text-foreground rounded-full border px-(--space-md) py-(--space-xs) text-sm"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </Stack>
-          </Container>
-        </Section>
+        <IdealForBand
+          headingId="academy-ideal-heading"
+          items={pathway.idealFor}
+          icons={idealForIcons}
+          columns={3}
+        />
 
         <Section
           spacing="xl"

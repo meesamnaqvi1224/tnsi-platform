@@ -169,9 +169,9 @@ export const programsOverviewContent = {
         label: 'Explore System-Level Executive Advisory',
         href: '/programs/organisational-advisory',
       },
-      imageSrc: '/images/programs/nav-organisational-advisory.webp',
+      imageSrc: '/images/programs/organisational-advisory/thumb-studio.webp',
       imageAlt:
-        'An empty boardroom with a curved wooden table, tan leather chairs and a small plant, seen through glass-walled offices.',
+        'A bright, quiet meeting room with a long wooden table, cream chairs and tall arched windows.',
       heroImageSrc: '/images/programs/organisational-advisory/hero-studio.webp',
       heroImageAlt:
         'A bright, quiet meeting room with a long wooden table, cream chairs and tall arched windows.',
