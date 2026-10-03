@@ -54,6 +54,14 @@ export const entitlements = pgTable(
 
     canceledAt: timestamp('canceled_at', { withTimezone: true }),
 
+    // Set when the first still-unresolved recurring payment failure happens
+    // (from the Stripe webhook's own event time) and cleared when the
+    // subscription recovers. It anchors the approved 7-day payment-failure
+    // grace period (`PAYMENT_GRACE_PERIOD_DAYS` in @tnsi/auth) — Stripe's
+    // `past_due` status alone says a payment failed, not when. Never
+    // overwritten by later retries, so the grace clock can't restart.
+    paymentFailedAt: timestamp('payment_failed_at', { withTimezone: true }),
+
     metadata: jsonb('metadata').$type<Record<string, unknown>>().notNull().default({}),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

@@ -47,6 +47,13 @@ export const practices = pgTable(
 
     isPublished: boolean('is_published').notNull().default(true),
 
+    // Editorial access flag, mirrored from the Sanity `practice` document's
+    // `freeAccess` field. Only consulted once Regulation Suite™ membership
+    // is open (see `isMembershipOpen` in the web app): then free members
+    // get the practices flagged here and paid members get the full library.
+    // Defaults to false — nothing is "free" until editorial designates it.
+    isFree: boolean('is_free').notNull().default(false),
+
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

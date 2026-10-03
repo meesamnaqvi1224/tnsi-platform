@@ -14,14 +14,27 @@ interface PowerDropCardProps {
 export function PowerDropCard({ powerDrop }: PowerDropCardProps) {
   const router = useRouter();
   const title = powerDrop.title.trim();
+  // Decided by the server (see PowerDropSummary.locked): in the paid library
+  // and not open to this member. Its card artwork is withheld, so there is
+  // nothing to open - tapping explains membership instead.
+  const locked = powerDrop.locked === true;
 
   return (
     <Pressable
       onPress={() =>
-        router.push({ pathname: '/practices/powerdrops/[slug]', params: { slug: powerDrop.slug } })
+        locked
+          ? router.push('/profile/membership')
+          : router.push({
+              pathname: '/practices/powerdrops/[slug]',
+              params: { slug: powerDrop.slug },
+            })
       }
       accessibilityRole="button"
-      accessibilityLabel={`${title}, ${powerDrop.focus}`}
+      accessibilityLabel={
+        locked
+          ? `${title}, ${powerDrop.focus}, members only. Opens membership details`
+          : `${title}, ${powerDrop.focus}`
+      }
       style={({ pressed }) => pressed && styles.pressed}
     >
       <Card style={styles.card}>
@@ -44,7 +57,7 @@ export function PowerDropCard({ powerDrop }: PowerDropCardProps) {
         </ThemedText>
         <View style={styles.metaRow}>
           <ThemedText variant="caption" color={colors.bronze}>
-            {powerDrop.focus}
+            {locked ? `${powerDrop.focus} · Members` : powerDrop.focus}
           </ThemedText>
           {powerDrop.category ? (
             <ThemedText variant="caption" color={colors.charcoal}>

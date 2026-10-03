@@ -14,6 +14,8 @@ const priceIds: Record<PurchasableTier, string | undefined> = {
   lifetime: 'price_lifetime',
 };
 
+const EVENT_TIME = new Date('2026-01-10T12:00:00Z');
+
 function checkoutInput(
   overrides: Partial<CheckoutSessionCompletedInput> = {},
 ): CheckoutSessionCompletedInput {
@@ -39,6 +41,7 @@ function subscriptionInput(
     currentPeriodEnd: new Date('2026-02-01T00:00:00Z'),
     cancelAtPeriodEnd: false,
     canceledAt: null,
+    eventTime: EVENT_TIME,
     ...overrides,
   };
 }
@@ -117,6 +120,7 @@ describe('planForSubscriptionEvent', () => {
         currentPeriodEnd: new Date('2026-02-01T00:00:00Z'),
         cancelAtPeriodEnd: false,
         canceledAt: null,
+        paymentFailure: { action: 'clear' },
       },
     });
   });
@@ -166,19 +170,88 @@ describe('planForSubscriptionEvent', () => {
 
 describe('planForInvoicePaymentFailed', () => {
   it('marks the customer past-due when the failed invoice belongs to a subscription', () => {
-    const plan = planForInvoicePaymentFailed({ customerId: 'cus_123', subscriptionId: 'sub_123' });
-    expect(plan).toEqual({ action: 'mark-past-due', stripeCustomerId: 'cus_123' });
+    const plan = planForInvoicePaymentFailed({
+      customerId: 'cus_123',
+      subscriptionId: 'sub_123',
+      eventTime: EVENT_TIME,
+    });
+    expect(plan).toEqual({
+      action: 'mark-past-due',
+      stripeCustomerId: 'cus_123',
+      failedAt: EVENT_TIME,
+    });
   });
 
   it('skips an invoice with no customer id', () => {
     expect(
-      planForInvoicePaymentFailed({ customerId: null, subscriptionId: 'sub_123' }).action,
+      planForInvoicePaymentFailed({
+        customerId: null,
+        subscriptionId: 'sub_123',
+        eventTime: EVENT_TIME,
+      }).action,
     ).toBe('skip');
   });
 
   it('skips a failed invoice not associated with any subscription', () => {
     expect(
-      planForInvoicePaymentFailed({ customerId: 'cus_123', subscriptionId: null }).action,
+      planForInvoicePaymentFailed({
+        customerId: 'cus_123',
+        subscriptionId: null,
+        eventTime: EVENT_TIME,
+      }).action,
     ).toBe('skip');
+  });
+});
+
+describe('payment-failure grace anchor (7-day grace period)', () => {
+  function paymentFailureFor(status: string) {
+    const plan = planForSubscriptionEvent(subscriptionInput({ status }), priceIds);
+    if (plan.action !== 'sync-subscription') throw new Error('expected sync-subscription');
+    return plan.values.paymentFailure;
+  }
+
+  it("starts the grace anchor, at Stripe's own event time, when a subscription goes past_due", () => {
+    expect(paymentFailureFor('past_due')).toEqual({ action: 'start', at: EVENT_TIME });
+  });
+
+  it('treats unpaid like past_due (still a payment problem, not yet a cancellation)', () => {
+    expect(paymentFailureFor('unpaid')).toEqual({ action: 'start', at: EVENT_TIME });
+  });
+
+  it('clears the anchor once the subscription is healthy again', () => {
+    expect(paymentFailureFor('active')).toEqual({ action: 'clear' });
+    expect(paymentFailureFor('trialing')).toEqual({ action: 'clear' });
+  });
+
+  it('leaves the anchor alone for terminal states', () => {
+    expect(paymentFailureFor('canceled')).toEqual({ action: 'keep' });
+    expect(paymentFailureFor('incomplete_expired')).toEqual({ action: 'keep' });
+  });
+
+  it('a trialing subscription syncs as trialing — the trial is Stripe-native, not a custom timer', () => {
+    const plan = planForSubscriptionEvent(subscriptionInput({ status: 'trialing' }), priceIds);
+    expect(plan.action).toBe('sync-subscription');
+    if (plan.action === 'sync-subscription') {
+      expect(plan.values.status).toBe('trialing');
+      expect(plan.values.tier).toBe('monthly');
+    }
+  });
+
+  it('cancel-at-period-end keeps the subscription active and records the flag — access is not cut early', () => {
+    const plan = planForSubscriptionEvent(
+      subscriptionInput({ status: 'active', cancelAtPeriodEnd: true }),
+      priceIds,
+    );
+    expect(plan.action).toBe('sync-subscription');
+    if (plan.action === 'sync-subscription') {
+      expect(plan.values.status).toBe('active');
+      expect(plan.values.cancelAtPeriodEnd).toBe(true);
+    }
+  });
+
+  it('recognises the annual price as the annual tier', () => {
+    const plan = planForSubscriptionEvent(subscriptionInput({ priceId: 'price_annual' }), priceIds);
+    expect(plan.action).toBe('sync-subscription');
+    if (plan.action === 'sync-subscription') expect(plan.values.tier).toBe('annual');
   });
 });

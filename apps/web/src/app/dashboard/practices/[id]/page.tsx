@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation';
 import NextLink from 'next/link';
 import { Badge, Container, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
+import { LockedPracticeNotice } from '@/components/dashboard/locked-practice-notice';
 import { PracticeExperience } from '@/components/dashboard/practice-experience';
 import { SaveToggleButton } from '@/components/dashboard/save-toggle-button';
 import { requireMemberAccessOrRedirect } from '@/lib/auth-api';
+import { contentAccessFor } from '@/lib/membership';
 import {
   formatContentTypeLabel,
   formatPracticeDuration,
@@ -52,18 +54,23 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
   const practice = await getPublishedPracticeById(idResult.data.id);
   if (!practice) notFound();
 
+  // Free vs paid is decided here, server-side. A locked practice never has
+  // its media resolved or passed to the (client) player at all.
+  const locked = !contentAccessFor(user.entitlements).canOpen(practice);
+
   const completion = await getPracticeCompletion(user.id, practice.id);
   const reflection = completion ? await getPracticeReflection(user.id, completion.id) : null;
   const saved = await isPracticeSaved(user.id, practice.id);
   const completed = completion?.completed ?? false;
   const duration = formatPracticeDuration(practice.durationSeconds);
-  const driveEmbedUrl = practice.mediaUrl ? toGoogleDriveEmbedUrl(practice.mediaUrl) : null;
+  const driveEmbedUrl =
+    !locked && practice.mediaUrl ? toGoogleDriveEmbedUrl(practice.mediaUrl) : null;
   const mediaKind: 'audio' | 'video' | null = AUDIO_CONTENT_TYPES.has(practice.contentType)
     ? 'audio'
     : VIDEO_CONTENT_TYPES.has(practice.contentType)
       ? 'video'
       : null;
-  const hasPlayableMedia = !!driveEmbedUrl || !!(practice.mediaUrl && mediaKind);
+  const hasPlayableMedia = !locked && (!!driveEmbedUrl || !!(practice.mediaUrl && mediaKind));
 
   const metaParts = [formatContentTypeLabel(practice.contentType)];
   if (duration) metaParts.push(duration);
@@ -90,7 +97,9 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
                     <Heading as="h1" size="xl">
                       {practice.title}
                     </Heading>
-                    <SaveToggleButton practiceId={practice.id} initialSaved={saved} />
+                    {locked ? null : (
+                      <SaveToggleButton practiceId={practice.id} initialSaved={saved} />
+                    )}
                   </Stack>
                   {practice.description ? (
                     <Text tone="muted" className="text-base leading-[1.85] lg:text-lg">
@@ -108,7 +117,9 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
                   ) : null}
                 </header>
 
-                {!hasPlayableMedia && practice.contentType !== 'journal' ? (
+                {locked ? <LockedPracticeNotice /> : null}
+
+                {!locked && !hasPlayableMedia && practice.contentType !== 'journal' ? (
                   // `journal` genuinely has no media by design; every other
                   // content type is meant to carry a recording - if one
                   // doesn't have `mediaUrl` set yet, that's a real content
@@ -123,20 +134,22 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
                   </div>
                 ) : null}
 
-                <PracticeExperience
-                  practiceId={practice.id}
-                  driveEmbedUrl={driveEmbedUrl}
-                  driveEmbedTitle={practice.title}
-                  mediaUrl={practice.mediaUrl}
-                  mediaKind={mediaKind}
-                  thumbnailUrl={practice.thumbnailUrl}
-                  initialPlayCount={completion?.playCount ?? 0}
-                  initialPositionSeconds={completion?.positionSeconds ?? 0}
-                  initialCompleted={completed}
-                  initialCompletionId={completion?.id ?? null}
-                  initialProgressPct={completion?.progressPct ?? 0}
-                  initialReflection={reflection}
-                />
+                {locked ? null : (
+                  <PracticeExperience
+                    practiceId={practice.id}
+                    driveEmbedUrl={driveEmbedUrl}
+                    driveEmbedTitle={practice.title}
+                    mediaUrl={practice.mediaUrl}
+                    mediaKind={mediaKind}
+                    thumbnailUrl={practice.thumbnailUrl}
+                    initialPlayCount={completion?.playCount ?? 0}
+                    initialPositionSeconds={completion?.positionSeconds ?? 0}
+                    initialCompleted={completed}
+                    initialCompletionId={completion?.id ?? null}
+                    initialProgressPct={completion?.progressPct ?? 0}
+                    initialReflection={reflection}
+                  />
+                )}
               </Stack>
             </div>
           </Container>

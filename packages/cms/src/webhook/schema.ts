@@ -36,6 +36,7 @@ export const sanityPracticeDocumentSchema = z.object({
   category: z.string().nullable().optional(),
   tags: z.array(z.string()).nullable().optional(),
   difficulty: z.number().nullable().optional(),
+  freeAccess: z.boolean().nullable().optional(),
   status: z.enum(['published', 'draft']).nullable().optional(),
 });
 

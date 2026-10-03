@@ -1,34 +1,33 @@
 import { db, entitlements } from '@tnsi/db';
 import { eq } from 'drizzle-orm';
 import type { EntitlementStatus, EntitlementTier } from '@tnsi/integrations';
+import { resolveMembership, type ResolvedMembership } from '@tnsi/auth/authorize/entitlements';
 
 export interface BillingState {
   tier: EntitlementTier;
   status: EntitlementStatus;
-  /** Whether this status currently grants paid access — the same rule `authorizeEntitlement` (@tnsi/auth) applies; duplicated as a read-only display fact here, not a second authorization path. */
-  isEligible: boolean;
+  /**
+   * Where the member stands in the commercial model (free / trialing /
+   * active / grace / inactive), resolved by the same pure function
+   * (`resolveMembership`, @tnsi/auth) every access check uses — so what the
+   * billing page says and what the server enforces cannot disagree.
+   */
+  membership: ResolvedMembership;
   hasStripeCustomer: boolean;
+  /** Whether this account has ever had a Stripe subscription — a first-time subscriber is the only one offered the 30-day trial. */
+  hasHadSubscription: boolean;
   currentPeriodEnd: Date | null;
   cancelAtPeriodEnd: boolean;
   canceledAt: Date | null;
 }
 
 /**
- * The same statuses `authorizeEntitlement` (packages/auth/src/authorize/entitlements.ts)
- * treats as eligible. Duplicated as a plain constant rather than importing
- * that function, since this module only needs the *display* fact "is this
- * currently active," not to make an access decision — the real
- * authorization check for gating content stays exactly where it already
- * is. Keep these two lists in sync if that ever changes.
- */
-const ELIGIBLE_STATUSES: ReadonlySet<EntitlementStatus> = new Set(['active', 'trialing']);
-
-/**
  * Reads the authenticated member's own billing state directly from
  * Postgres, for display only — this never itself decides what content a
- * user can access (that stays `authorizeEntitlement`'s job). Every user
- * has an `entitlements` row from the moment their account is created (see
- * `DEFAULT_ENTITLEMENTS`), so this always returns a value, never `null`.
+ * user can access (that stays `@tnsi/auth`'s job, via `resolveMembership` /
+ * `canAccessContent`). Every user has an `entitlements` row from the moment
+ * their account is created (see `DEFAULT_ENTITLEMENTS`), so this always
+ * returns a value, never `null`.
  */
 export async function getBillingState(userId: string): Promise<BillingState> {
   const [row] = await db
@@ -36,9 +35,11 @@ export async function getBillingState(userId: string): Promise<BillingState> {
       tier: entitlements.tier,
       status: entitlements.status,
       stripeCustomerId: entitlements.stripeCustomerId,
+      stripeSubscriptionId: entitlements.stripeSubscriptionId,
       currentPeriodEnd: entitlements.currentPeriodEnd,
       cancelAtPeriodEnd: entitlements.cancelAtPeriodEnd,
       canceledAt: entitlements.canceledAt,
+      paymentFailedAt: entitlements.paymentFailedAt,
     })
     .from(entitlements)
     .where(eq(entitlements.userId, userId))
@@ -50,8 +51,21 @@ export async function getBillingState(userId: string): Promise<BillingState> {
   return {
     tier,
     status,
-    isEligible: ELIGIBLE_STATUSES.has(status),
+    membership: resolveMembership(
+      row
+        ? {
+            tier,
+            status,
+            programs: [],
+            certifications: [],
+            features: [],
+            paymentFailedAt: row.paymentFailedAt,
+            cancelAtPeriodEnd: row.cancelAtPeriodEnd,
+          }
+        : null,
+    ),
     hasStripeCustomer: Boolean(row?.stripeCustomerId),
+    hasHadSubscription: Boolean(row?.stripeSubscriptionId),
     currentPeriodEnd: row?.currentPeriodEnd ?? null,
     cancelAtPeriodEnd: row?.cancelAtPeriodEnd ?? false,
     canceledAt: row?.canceledAt ?? null,

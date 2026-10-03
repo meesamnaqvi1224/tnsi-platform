@@ -22,6 +22,20 @@ import {
  * this event id before" bookkeeping.
  */
 
+/**
+ * What a subscription update does to the payment-failure grace anchor
+ * (`entitlements.payment_failed_at`, which drives the approved 7-day grace
+ * period — see `PAYMENT_GRACE_PERIOD_DAYS` in @tnsi/auth):
+ *
+ * - `start` — the subscription is `past_due`: record `at` as the failure
+ *   time, but only if none is recorded yet (the executor keeps an existing
+ *   value, so repeated failed retries never restart the clock).
+ * - `clear` — the subscription is healthy again (`active`/`trialing`).
+ * - `keep` — any other state; leave the column alone.
+ */
+export type PaymentFailureUpdate =
+  { action: 'start'; at: Date } | { action: 'clear' } | { action: 'keep' };
+
 export interface SubscriptionSyncValues {
   tier: PurchasableTier;
   status: EntitlementStatus;
@@ -30,6 +44,7 @@ export interface SubscriptionSyncValues {
   currentPeriodEnd: Date | null;
   cancelAtPeriodEnd: boolean;
   canceledAt: Date | null;
+  paymentFailure: PaymentFailureUpdate;
 }
 
 export type EntitlementSyncPlan =
@@ -39,8 +54,8 @@ export type EntitlementSyncPlan =
   | { action: 'grant-lifetime'; userId: string; stripeCustomerId: string }
   /** Authoritative subscription state from `customer.subscription.created` / `.updated` / `.deleted` — all three carry a full subscription object, so one plan builder handles all three. */
   | { action: 'sync-subscription'; stripeCustomerId: string; values: SubscriptionSyncValues }
-  /** A renewal payment failed — defensive, minimal update (status only); `customer.subscription.updated` normally also fires with the same status change. */
-  | { action: 'mark-past-due'; stripeCustomerId: string }
+  /** A renewal payment failed — defensive, minimal update (status + grace anchor); `customer.subscription.updated` normally also fires with the same status change. `failedAt` is Stripe's own event time, so replaying the event reproduces the same value. */
+  | { action: 'mark-past-due'; stripeCustomerId: string; failedAt: Date }
   /** Nothing safe to do with this event — never guessed at, always explained. */
   | { action: 'skip'; reason: string };
 
@@ -98,6 +113,14 @@ export interface SubscriptionEventInput {
   currentPeriodEnd: Date | null;
   cancelAtPeriodEnd: boolean;
   canceledAt: Date | null;
+  /** Stripe's own timestamp for this event (`event.created`) — the grace anchor if this is the first sign of a payment problem. Never `new Date()`, so replays are deterministic. */
+  eventTime: Date;
+}
+
+function paymentFailureUpdateFor(status: EntitlementStatus, eventTime: Date): PaymentFailureUpdate {
+  if (status === 'past_due') return { action: 'start', at: eventTime };
+  if (status === 'active' || status === 'trialing') return { action: 'clear' };
+  return { action: 'keep' };
 }
 
 /**
@@ -122,17 +145,20 @@ export function planForSubscriptionEvent(
     };
   }
 
+  const status = mapStripeSubscriptionStatus(input.status);
+
   return {
     action: 'sync-subscription',
     stripeCustomerId: input.customerId,
     values: {
       tier,
-      status: mapStripeSubscriptionStatus(input.status),
+      status,
       stripeSubscriptionId: input.subscriptionId,
       currentPeriodStart: input.currentPeriodStart,
       currentPeriodEnd: input.currentPeriodEnd,
       cancelAtPeriodEnd: input.cancelAtPeriodEnd,
       canceledAt: input.canceledAt,
+      paymentFailure: paymentFailureUpdateFor(status, input.eventTime),
     },
   };
 }
@@ -140,6 +166,8 @@ export function planForSubscriptionEvent(
 export interface InvoicePaymentFailedInput {
   customerId: string | null;
   subscriptionId: string | null;
+  /** Stripe's own timestamp for this event (`event.created`). */
+  eventTime: Date;
 }
 
 export function planForInvoicePaymentFailed(input: InvoicePaymentFailedInput): EntitlementSyncPlan {
@@ -149,5 +177,9 @@ export function planForInvoicePaymentFailed(input: InvoicePaymentFailedInput): E
   if (!input.subscriptionId) {
     return { action: 'skip', reason: 'invoice is not associated with a subscription' };
   }
-  return { action: 'mark-past-due', stripeCustomerId: input.customerId };
+  return {
+    action: 'mark-past-due',
+    stripeCustomerId: input.customerId,
+    failedAt: input.eventTime,
+  };
 }

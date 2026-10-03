@@ -92,6 +92,14 @@ export const practice = defineType({
       validation: (r) => r.min(1).max(3),
     }),
     defineField({
+      name: 'freeAccess',
+      title: 'Free for all members',
+      type: 'boolean',
+      initialValue: false,
+      description:
+        'Regulation Suite membership: switch on to make this Practice part of the free introductory selection that every member can open. Leave off and it is part of the paid library. Has no effect until Regulation Suite membership is open. The approved model offers exactly three free PowerDrops; free Practices are a selected set.',
+    }),
+    defineField({
       name: 'status',
       type: 'string',
       options: {

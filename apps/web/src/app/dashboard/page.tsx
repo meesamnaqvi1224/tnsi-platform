@@ -32,6 +32,7 @@ import { ProgressBar } from '@/components/dashboard/progress-bar';
 import { WeekAtAGlance } from '@/components/dashboard/week-at-a-glance';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { requireMemberAccessOrRedirect } from '@/lib/auth-api';
+import { contentAccessFor } from '@/lib/membership';
 import { getCheckInHistory, getTodayCheckIn } from '@/lib/check-ins';
 import {
   formatContentTypeLabel,
@@ -205,7 +206,11 @@ function computeCheckInStreak(checkIns: Pick<CheckIn, 'completedDate'>[]): numbe
 export default async function DashboardPage() {
   const user = await requireMemberAccessOrRedirect();
   const todayCheckIn = await getTodayCheckIn(user.id);
-  const todayPractice = await getTodayPractice(user.id);
+  // Don't feature a paid practice as "today's" for a member who can't open it.
+  const contentAccess = contentAccessFor(user.entitlements);
+  const todayPractice = await getTodayPractice(user.id, {
+    freeOnly: contentAccess.gatingActive && !contentAccess.membership.hasPaidAccess,
+  });
   const [
     inProgressPractices,
     inProgressCount,

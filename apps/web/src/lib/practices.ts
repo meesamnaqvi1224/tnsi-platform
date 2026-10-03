@@ -24,6 +24,7 @@ const PRACTICE_SUMMARY_COLUMNS = {
   category: practices.category,
   tags: practices.tags,
   difficulty: practices.difficulty,
+  isFree: practices.isFree,
 } as const;
 
 export type PracticeSummary = {
@@ -37,6 +38,8 @@ export type PracticeSummary = {
   category: string | null;
   tags: string[];
   difficulty: number;
+  /** Part of the free introductory selection (editorial `freeAccess`). Only meaningful once membership is open. */
+  isFree: boolean;
 };
 
 /**
@@ -73,11 +76,16 @@ export async function getPublishedPracticeById(id: string): Promise<PracticeSumm
  */
 export async function getTodayPractice(
   userId: string,
+  options: { freeOnly?: boolean } = {},
 ): Promise<{ practice: PracticeSummary; completed: boolean } | null> {
   const [practice] = await db
     .select(PRACTICE_SUMMARY_COLUMNS)
     .from(practices)
-    .where(eq(practices.isPublished, true))
+    .where(
+      options.freeOnly
+        ? and(eq(practices.isPublished, true), eq(practices.isFree, true))
+        : eq(practices.isPublished, true),
+    )
     .orderBy(practices.category, practices.difficulty, practices.title)
     .limit(1);
 
@@ -94,6 +102,10 @@ export async function getTodayPractice(
  * `getTodayPractice` above. Mechanical only: no LLM, no clinical inference,
  * just a fixed capacity-state -> category table.
  *
+ * `freeOnly` restricts candidates to the free introductory selection — set
+ * by callers when the member can't open paid practices, so the daily
+ * suggestion is never something they'd immediately hit a lock on.
+ *
  * Returns `null` (never a silent `practices[0]`-style fallback) when:
  * - the user has no check-in yet (no capacity signal to route on), or
  * - no published practice is tagged with the mapped category yet.
@@ -103,7 +115,10 @@ export async function getTodayPractice(
  * wanting a guaranteed non-null result must pass an explicitly-designated
  * fallback practice id once one exists; none is hardcoded here.
  */
-export async function getRecommendedPractice(userId: string): Promise<PracticeSummary | null> {
+export async function getRecommendedPractice(
+  userId: string,
+  options: { freeOnly?: boolean } = {},
+): Promise<PracticeSummary | null> {
   const latestCheckIn = await getLatestCheckIn(userId);
   if (!latestCheckIn) return null;
 
@@ -112,7 +127,13 @@ export async function getRecommendedPractice(userId: string): Promise<PracticeSu
   const candidates = await db
     .select(PRACTICE_SUMMARY_COLUMNS)
     .from(practices)
-    .where(and(eq(practices.isPublished, true), eq(practices.category, category)));
+    .where(
+      and(
+        eq(practices.isPublished, true),
+        eq(practices.category, category),
+        ...(options.freeOnly ? [eq(practices.isFree, true)] : []),
+      ),
+    );
 
   return pickDeterministicCandidate(candidates);
 }

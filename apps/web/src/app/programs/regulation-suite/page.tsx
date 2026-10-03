@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import NextLink from 'next/link';
 import { BatteryLow, DoorOpen, Sprout, Zap, type LucideIcon } from 'lucide-react';
 import { buttonVariants, Container, Section, Stack, Text } from '@tnsi/ui';
+import { MEMBERSHIP_PLANS, MEMBERSHIP_TRIAL_DAYS } from '@tnsi/integrations';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
@@ -10,6 +11,7 @@ import { EditorialImage } from '@/components/utility/editorial-image';
 import { FadeIn } from '@/components/utility/fade-in';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { getPathway } from '@/content/programs';
+import { isMembershipOpen } from '@/lib/membership';
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
 const pathway = getPathway('regulation-suite');
@@ -31,7 +33,19 @@ export const metadata: Metadata = createPageMetadata({
   path: '/programs/regulation-suite',
 });
 
+/**
+ * Where "Start free trial" sends a visitor: account creation first, then
+ * straight to the plan choice on the billing page (which hands off to
+ * Stripe Checkout). A signed-in member simply lands on billing. Auth pages
+ * themselves are untouched — this only passes Clerk's standard redirect.
+ */
+const TRIAL_START_HREF = '/sign-up?redirect_url=%2Fdashboard%2Fbilling';
+
 export default function RegulationSuitePage() {
+  // Evaluated when the page is built: membership opens with a deliberate
+  // launch (env switch + complete Stripe configuration) and a redeploy. Until
+  // then the page keeps its closed "not yet open for enrolment" behaviour.
+  const membershipOpen = isMembershipOpen();
   const jsonLd = [
     createWebPageJsonLd({
       title: PAGE_TITLE,
@@ -155,22 +169,33 @@ export default function RegulationSuitePage() {
                       id="rs-cta-heading"
                       className="font-heading text-foreground text-4xl leading-[1.1] font-semibold tracking-tight sm:text-5xl lg:text-6xl"
                     >
-                      Not yet open for enrolment
+                      {membershipOpen
+                        ? `Start your ${MEMBERSHIP_TRIAL_DAYS}-day free trial`
+                        : 'Not yet open for enrolment'}
                     </h2>
                     <Text size="lg" tone="muted" className="max-w-prose leading-relaxed">
-                      The Regulation Suite™ is not yet available for enrolment. In the meantime,
-                      book a Discovery Call to discuss your nervous system education options with
-                      the Institute.
+                      {membershipOpen
+                        ? `Try the full Regulation Suite™ free for ${MEMBERSHIP_TRIAL_DAYS} days. After the trial, membership is ${MEMBERSHIP_PLANS.monthly.price} per ${MEMBERSHIP_PLANS.monthly.interval} or ${MEMBERSHIP_PLANS.annual.price} per ${MEMBERSHIP_PLANS.annual.interval}, and you can cancel at any time. No discovery call is needed.`
+                        : 'The Regulation Suite™ is not yet available for enrolment. In the meantime, book a Discovery Call to discuss your nervous system education options with the Institute.'}
                     </Text>
                   </Stack>
 
                   <div className="pt-(--space-sm)">
-                    <NextLink
-                      href="/book-a-call"
-                      className={buttonVariants({ variant: 'primary', size: 'lg' })}
-                    >
-                      Book a Discovery Call
-                    </NextLink>
+                    {membershipOpen ? (
+                      <NextLink
+                        href={TRIAL_START_HREF}
+                        className={buttonVariants({ variant: 'primary', size: 'lg' })}
+                      >
+                        Start {MEMBERSHIP_TRIAL_DAYS}-day free trial
+                      </NextLink>
+                    ) : (
+                      <NextLink
+                        href="/book-a-call"
+                        className={buttonVariants({ variant: 'primary', size: 'lg' })}
+                      >
+                        Book a Discovery Call
+                      </NextLink>
+                    )}
                   </div>
                 </Stack>
               </FadeIn>

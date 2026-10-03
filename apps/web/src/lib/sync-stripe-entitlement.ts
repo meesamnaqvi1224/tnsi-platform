@@ -1,5 +1,5 @@
 import { db, entitlements, users } from '@tnsi/db';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import {
   getStripeClient,
   getStripeConfig,
@@ -7,6 +7,7 @@ import {
   planForInvoicePaymentFailed,
   planForSubscriptionEvent,
   type EntitlementSyncPlan,
+  type PaymentFailureUpdate,
 } from '@tnsi/integrations';
 import type Stripe from 'stripe';
 
@@ -63,6 +64,7 @@ export async function syncStripeEvent(event: Stripe.Event): Promise<SyncStripeEn
           currentPeriodEnd: toDate(subscription.current_period_end),
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
           canceledAt: toDate(subscription.canceled_at),
+          eventTime: new Date(event.created * 1000),
         },
         priceIds,
       );
@@ -77,12 +79,34 @@ export async function syncStripeEvent(event: Stripe.Event): Promise<SyncStripeEn
           typeof invoice.subscription === 'string'
             ? invoice.subscription
             : (invoice.subscription?.id ?? null),
+        eventTime: new Date(event.created * 1000),
       });
       return applyPlan(plan);
     }
 
     default:
       return { action: 'skip', detail: `unhandled event type: ${event.type}` };
+  }
+}
+
+/**
+ * The grace anchor write for a subscription update. `start` records the
+ * failure time only if none is recorded yet — `COALESCE` keeps the FIRST
+ * failure, so Stripe's repeated retries can never restart the 7-day grace
+ * clock. `clear` resets it once the subscription is healthy again; `keep`
+ * leaves it untouched. Stored as an ISO string cast to timestamptz so the
+ * value is identical whichever driver serialises it.
+ */
+function paymentFailedAtUpdate(update: PaymentFailureUpdate) {
+  switch (update.action) {
+    case 'start':
+      return {
+        paymentFailedAt: sql`COALESCE(${entitlements.paymentFailedAt}, ${update.at.toISOString()}::timestamptz)`,
+      };
+    case 'clear':
+      return { paymentFailedAt: null };
+    case 'keep':
+      return {};
   }
 }
 
@@ -148,6 +172,7 @@ async function applyPlan(plan: EntitlementSyncPlan): Promise<SyncStripeEntitleme
           currentPeriodEnd: null,
           cancelAtPeriodEnd: false,
           canceledAt: null,
+          paymentFailedAt: null,
           updatedAt: new Date(),
         })
         .where(eq(entitlements.userId, plan.userId));
@@ -165,6 +190,7 @@ async function applyPlan(plan: EntitlementSyncPlan): Promise<SyncStripeEntitleme
           currentPeriodEnd: plan.values.currentPeriodEnd,
           cancelAtPeriodEnd: plan.values.cancelAtPeriodEnd,
           canceledAt: plan.values.canceledAt,
+          ...paymentFailedAtUpdate(plan.values.paymentFailure),
           updatedAt: new Date(),
         })
         .where(eq(entitlements.stripeCustomerId, plan.stripeCustomerId))
@@ -185,7 +211,11 @@ async function applyPlan(plan: EntitlementSyncPlan): Promise<SyncStripeEntitleme
     case 'mark-past-due': {
       const result = await db
         .update(entitlements)
-        .set({ status: 'past_due', updatedAt: new Date() })
+        .set({
+          status: 'past_due',
+          ...paymentFailedAtUpdate({ action: 'start', at: plan.failedAt }),
+          updatedAt: new Date(),
+        })
         .where(eq(entitlements.stripeCustomerId, plan.stripeCustomerId))
         .returning({ userId: entitlements.userId });
 

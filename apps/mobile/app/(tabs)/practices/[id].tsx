@@ -9,6 +9,7 @@ import { VideoPlayer } from '@/components/practices/VideoPlayer';
 import { ExternalMediaNotice } from '@/components/practices/ExternalMediaNotice';
 import { MediaUnavailableNotice } from '@/components/practices/MediaUnavailableNotice';
 import { MarkCompleteButton } from '@/components/practices/CompletionSection';
+import { MembershipLockedNotice } from '@/components/membership/MembershipLockedNotice';
 import { PostPracticeReflection } from '@/components/practices/PostPracticeReflection';
 import { SaveToggleButton } from '@/components/practices/SaveToggleButton';
 import { usePracticeDetail } from '@/hooks/usePracticeDetail';
@@ -116,6 +117,8 @@ export default function PracticeDetailScreen() {
   if (practice.durationSeconds) meta.push(formatDuration(practice.durationSeconds));
   if (practice.category) meta.push(practice.category);
 
+  // Decided by the server; when locked it has also withheld `mediaUrl`.
+  const locked = practice.locked === true;
   const mediaKind = resolveMediaKind(practice.mediaUrl, practice.contentType);
   const completed = practice.progress?.completed ?? false;
   // `journal` genuinely has no media by design; the other five content
@@ -139,7 +142,9 @@ export default function PracticeDetailScreen() {
         <ThemedText variant="display" style={styles.title}>
           {title}
         </ThemedText>
-        <SaveToggleButton practiceId={practice.id} initialSaved={practice.saved ?? false} />
+        {locked ? null : (
+          <SaveToggleButton practiceId={practice.id} initialSaved={practice.saved ?? false} />
+        )}
       </View>
       <ThemedText variant="caption" color={colors.charcoal} style={styles.meta}>
         {meta.join(' · ')}
@@ -151,7 +156,9 @@ export default function PracticeDetailScreen() {
         </ThemedText>
       ) : null}
 
-      {mediaKind === 'audio' && practice.mediaUrl ? (
+      {locked ? <MembershipLockedNotice /> : null}
+
+      {!locked && mediaKind === 'audio' && practice.mediaUrl ? (
         <AudioPlayer
           key={mediaAttempt}
           uri={practice.mediaUrl}
@@ -161,7 +168,7 @@ export default function PracticeDetailScreen() {
           onRetry={handleMediaRetry}
         />
       ) : null}
-      {mediaKind === 'video' && practice.mediaUrl ? (
+      {!locked && mediaKind === 'video' && practice.mediaUrl ? (
         <VideoPlayer
           key={mediaAttempt}
           uri={practice.mediaUrl}
@@ -171,13 +178,13 @@ export default function PracticeDetailScreen() {
           onRetry={handleMediaRetry}
         />
       ) : null}
-      {mediaKind === 'external' && practice.mediaUrl ? (
+      {!locked && mediaKind === 'external' && practice.mediaUrl ? (
         <ExternalMediaNotice mediaUrl={practice.mediaUrl} />
       ) : null}
-      {mediaKind === 'none' && expectsMedia ? <MediaUnavailableNotice /> : null}
+      {!locked && mediaKind === 'none' && expectsMedia ? <MediaUnavailableNotice /> : null}
 
       <View style={styles.completionArea}>
-        {completed && practice.progress?.id ? (
+        {locked ? null : completed && practice.progress?.id ? (
           <PostPracticeReflection
             completionId={practice.progress.id}
             initialReflection={practice.reflection}

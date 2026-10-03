@@ -4,18 +4,18 @@
  * (a library to learn and practise over time; see
  * packages/cms/src/schema/documents/powerDrop.ts).
  *
- * Requires an authenticated session (same `getAuthUser()` gate as
- * `/api/v1/practices`), not a specific membership entitlement. A real
- * entitlement gate exists (`requireEntitlement()`,
- * `packages/auth/src/authorize/entitlements.ts`) but no PowerDrops
- * programme/certification/feature identifier is established anywhere in
- * the product yet — inventing one here would be a guess this phase is
- * explicitly not allowed to make (see the Phase 11.3 implementation
- * report's "Access Control" section). Authenticated-only is the safe,
- * reversible default until that identifier is decided.
+ * Requires an authenticated session. Free vs paid is decided per
+ * PowerDrop from its editorial `freeAccess` flag (Sanity), per the approved
+ * Regulation Suite™ model: exactly three PowerDrops are designated free,
+ * everything else is the paid library. No programme/certification/feature
+ * identifier is involved — `contentAccessFor` (`@/lib/membership`) is the
+ * single decision.
  *
- * Membership entitlement gating is deferred until a canonical PowerDrops
- * entitlement/product identifier exists.
+ * Every PowerDrop is still LISTED (so the library shows what membership
+ * includes), but one the member can't open comes back `locked: true` with
+ * its card artwork withheld by the server; opening it is refused by the
+ * detail and usage routes. While membership is not open (today), nothing is
+ * locked.
  */
 import { sanityFetch } from '@tnsi/cms/server';
 import { POWER_DROPS_LIST_API_QUERY } from '@tnsi/cms';
@@ -23,6 +23,7 @@ import { mapPowerDropListItem, type RawPowerDropListItem } from '@/lib/power-dro
 import { powerDropsListQuerySchema } from '@/lib/validation';
 import { getAuthUser } from '@/lib/auth-api';
 import { success, unauthorized, badRequest } from '@/lib/api-response';
+import { contentAccessFor } from '@/lib/membership';
 
 export const runtime = 'nodejs';
 
@@ -58,11 +59,14 @@ export async function GET(request: Request) {
     featuredOnly: featured === 'true',
   });
 
+  const access = contentAccessFor(user.entitlements);
   const items = result?.items ?? [];
   const total = result?.total ?? 0;
 
   return success({
-    powerDrops: items.map(mapPowerDropListItem),
+    powerDrops: items.map((item) =>
+      mapPowerDropListItem(item, !access.canOpen({ isFree: item.isFree ?? false })),
+    ),
     pagination: {
       limit,
       offset,

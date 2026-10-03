@@ -1,6 +1,7 @@
 import 'server-only';
 import { getStripeClient } from './client';
 import { getStripeConfig } from './config';
+import { MEMBERSHIP_TRIAL_DAYS } from './plans';
 import { checkoutModeForTier, resolvePriceId, type PurchasableTier } from './tier-mapping';
 
 /** Thrown when the requested tier has no Stripe Price configured yet — never a fabricated fallback price. */
@@ -13,6 +14,13 @@ export interface CreateCheckoutSessionInput {
   userEmail: string;
   /** Reuse the caller's existing Stripe customer, if they have one, instead of letting Stripe create a second one for the same person. */
   existingStripeCustomerId: string | null;
+  /**
+   * Start the subscription with Stripe's native 30-day free trial. Decided
+   * server-side by the caller (trial is for a member's first subscription
+   * only) — never taken from client input. Ignored for one-time purchases,
+   * which cannot have a trial.
+   */
+  offerTrial: boolean;
   successUrl: string;
   cancelUrl: string;
 }
@@ -49,7 +57,17 @@ export async function createCheckoutSession(
     // user by subscription metadata if ever needed; the webhook's primary
     // lookup path is by Stripe customer id, established at link time.
     ...(mode === 'subscription'
-      ? { subscription_data: { metadata: { userId: input.userId } } }
+      ? {
+          subscription_data: {
+            metadata: { userId: input.userId },
+            // Stripe's own trial mechanism — no custom timer. The first
+            // charge happens when it ends, on the selected plan.
+            ...(input.offerTrial ? { trial_period_days: MEMBERSHIP_TRIAL_DAYS } : {}),
+          },
+          // A trial converts to a paid plan automatically, so the payment
+          // method must be on file before it starts.
+          ...(input.offerTrial ? { payment_method_collection: 'always' as const } : {}),
+        }
       : {}),
     ...(input.existingStripeCustomerId
       ? { customer: input.existingStripeCustomerId }

@@ -19,6 +19,7 @@ function publishedEvent(
       category: 'regulation',
       tags: ['morning', 'breath'],
       difficulty: 1,
+      freeAccess: false,
       status: 'published',
       ...overrides,
     },
@@ -39,6 +40,22 @@ describe('normalizeSanityId', () => {
   });
 });
 
+describe('buildPracticeSyncPlan — free access flag', () => {
+  it('carries an editorially flagged free practice through as isFree: true', () => {
+    const plan = buildPracticeSyncPlan(publishedEvent({ freeAccess: true }));
+    if (plan.action !== 'upsert') throw new Error('expected upsert');
+    expect(plan.values.isFree).toBe(true);
+  });
+
+  it('defaults to paid (isFree: false) when the field is absent or null — nothing is free until editorial says so', () => {
+    for (const freeAccess of [undefined, null, false]) {
+      const plan = buildPracticeSyncPlan(publishedEvent({ freeAccess }));
+      if (plan.action !== 'upsert') throw new Error('expected upsert');
+      expect(plan.values.isFree).toBe(false);
+    }
+  });
+});
+
 describe('buildPracticeSyncPlan', () => {
   it('maps a published document to an upsert plan', () => {
     const plan = buildPracticeSyncPlan(publishedEvent());
@@ -56,6 +73,7 @@ describe('buildPracticeSyncPlan', () => {
       category: 'regulation',
       tags: ['morning', 'breath'],
       difficulty: 1,
+      isFree: false,
       isPublished: true,
     });
   });

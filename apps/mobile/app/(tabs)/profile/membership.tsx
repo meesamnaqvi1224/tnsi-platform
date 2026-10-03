@@ -5,7 +5,12 @@ import { useEntitlements } from '@/hooks/useEntitlements';
 import { formatArticleDate } from '@/lib/format';
 import { env } from '@/lib/env';
 import { colors, spacing } from '@/theme';
-import type { Entitlements, EntitlementStatus, EntitlementTier } from '@/api/types';
+import type {
+  Entitlements,
+  EntitlementStatus,
+  EntitlementTier,
+  MembershipState,
+} from '@/api/types';
 
 const TIER_LABEL: Record<EntitlementTier, string> = {
   free: 'Free Member',
@@ -27,6 +32,27 @@ const STATUS_LABEL: Record<EntitlementStatus, string> = {
   canceled: 'Canceled',
   expired: 'Expired',
 };
+
+/**
+ * Preferred over `STATUS_LABEL` whenever the server sends its resolved
+ * `membership` — this is the server's own answer to "where does this member
+ * stand?", so what the app says always matches what the server enforces
+ * (e.g. a payment-failed member inside the 7-day grace period is still
+ * entitled, which the raw `past_due` status alone doesn't say).
+ */
+const MEMBERSHIP_STATE_LABEL: Record<MembershipState, string> = {
+  free: 'Free account',
+  trialing: 'Free trial',
+  active: 'Active',
+  grace: 'Payment needs attention',
+  inactive: 'Membership ended',
+};
+
+function statusLabelFor(entitlements: Entitlements): string {
+  return entitlements.membership
+    ? MEMBERSHIP_STATE_LABEL[entitlements.membership.state]
+    : STATUS_LABEL[entitlements.status];
+}
 
 /**
  * The real, already-existing web billing page - not invented. Same
@@ -74,11 +100,11 @@ function MembershipContent({
       <Card style={styles.card}>
         <View
           accessible
-          accessibilityLabel={`Membership: ${TIER_LABEL[entitlements.tier]}. Status: ${STATUS_LABEL[entitlements.status]}`}
+          accessibilityLabel={`Membership: ${TIER_LABEL[entitlements.tier]}. Status: ${statusLabelFor(entitlements)}`}
         >
           <ThemedText variant="heading">{TIER_LABEL[entitlements.tier]}</ThemedText>
           <ThemedText variant="body" color={colors.charcoal} style={styles.statusLine}>
-            Status: {STATUS_LABEL[entitlements.status]}
+            Status: {statusLabelFor(entitlements)}
           </ThemedText>
         </View>
 
@@ -146,30 +172,68 @@ function MembershipContent({
   );
 }
 
+function DetailLine({ children }: { children: string }) {
+  return (
+    <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
+      {children}
+    </ThemedText>
+  );
+}
+
 function AccessDetail({ entitlements }: { entitlements: Entitlements }) {
+  const { membership } = entitlements;
+
+  if (membership) {
+    switch (membership.state) {
+      case 'free':
+        return (
+          <DetailLine>
+            {membership.contentLocking
+              ? 'You have free access to selected practices and PowerDrops™. A membership unlocks the full Regulation Suite™ library.'
+              : 'You currently have free access to TNSI.'}
+          </DetailLine>
+        );
+      case 'trialing':
+        return (
+          <DetailLine>
+            {entitlements.currentPeriodEnd
+              ? `Your free trial runs until ${formatArticleDate(entitlements.currentPeriodEnd)}, after which your plan begins.`
+              : 'Your free trial is active.'}
+          </DetailLine>
+        );
+      case 'grace':
+        return (
+          <DetailLine>
+            {membership.graceEndsAt
+              ? `We couldn't take your latest payment. Your access continues until ${formatArticleDate(membership.graceEndsAt)}. Update your payment method on the website to keep your membership.`
+              : "We couldn't take your latest payment. Update your payment method on the website to keep your membership."}
+          </DetailLine>
+        );
+      case 'inactive':
+        return (
+          <DetailLine>
+            Your membership has ended. You can restart it from the TNSI website.
+          </DetailLine>
+        );
+      case 'active':
+        break;
+    }
+  }
+
   if (entitlements.tier === 'free') {
-    return (
-      <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
-        You currently have free access to TNSI.
-      </ThemedText>
-    );
+    return <DetailLine>You currently have free access to TNSI.</DetailLine>;
   }
 
   if (entitlements.cancelAtPeriodEnd && entitlements.currentPeriodEnd) {
     return (
-      <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
-        Your access continues until {formatArticleDate(entitlements.currentPeriodEnd)}, after which
-        your membership will not renew.
-      </ThemedText>
+      <DetailLine>
+        {`Your access continues until ${formatArticleDate(entitlements.currentPeriodEnd)}, after which your membership will not renew.`}
+      </DetailLine>
     );
   }
 
   if (entitlements.status === 'active' && entitlements.currentPeriodEnd) {
-    return (
-      <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
-        Renews {formatArticleDate(entitlements.currentPeriodEnd)}.
-      </ThemedText>
-    );
+    return <DetailLine>{`Renews ${formatArticleDate(entitlements.currentPeriodEnd)}.`}</DetailLine>;
   }
 
   return null;

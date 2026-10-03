@@ -37,10 +37,17 @@ route expects:
     "category": category,
     "tags": tags,
     "difficulty": difficulty,
+    "freeAccess": freeAccess,
     "status": status
   }
 }
 ```
+
+`freeAccess` (added for Regulation Suite membership) mirrors the practice's
+"Free for all members" switch into `practices.is_free`. This projection
+change must be saved in the Sanity dashboard **before** membership is opened;
+an older projection without it simply leaves every practice paid (`false`),
+never free.
 
 ## Draft exclusion
 

@@ -1,16 +1,23 @@
 /**
  * Single published PowerDrop by slug for the native mobile detail screen.
- * Same authenticated-only model as `GET /api/v1/powerdrops` — see that
- * route's header comment for why this isn't gated by a specific
- * membership entitlement. Membership entitlement gating is deferred until
- * a canonical PowerDrops entitlement/product identifier exists.
+ * Same free-vs-paid model as `GET /api/v1/powerdrops` — see that route's
+ * header comment. A PowerDrop the member can't open is refused here with
+ * 403 `MEMBERSHIP_REQUIRED`; its instructions and card artwork are never
+ * sent.
  */
 import { sanityFetch } from '@tnsi/cms/server';
 import { POWER_DROP_API_BY_SLUG_QUERY } from '@tnsi/cms';
 import { mapPowerDropDetail, type RawPowerDropDetail } from '@/lib/power-drop-api';
 import { powerDropSlugParamSchema } from '@/lib/validation';
 import { getAuthUser } from '@/lib/auth-api';
-import { success, unauthorized, badRequest, notFound } from '@/lib/api-response';
+import {
+  success,
+  unauthorized,
+  badRequest,
+  notFound,
+  membershipRequired,
+} from '@/lib/api-response';
+import { contentAccessFor } from '@/lib/membership';
 
 export const runtime = 'nodejs';
 
@@ -38,6 +45,11 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
   if (!powerDrop) {
     return notFound('PowerDrop not found');
+  }
+
+  const access = contentAccessFor(user.entitlements);
+  if (!access.canOpen({ isFree: powerDrop.isFree ?? false })) {
+    return membershipRequired();
   }
 
   return success(mapPowerDropDetail(powerDrop));

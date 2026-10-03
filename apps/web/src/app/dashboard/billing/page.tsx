@@ -12,9 +12,11 @@ import {
   Stack,
   Text,
 } from '@tnsi/ui';
+import { MEMBERSHIP_PLANS, MEMBERSHIP_TRIAL_DAYS } from '@tnsi/integrations';
 import { ManageBillingButton, SubscribeButton } from '@/components/dashboard/billing-actions';
 import { requireAuthOrRedirect } from '@/lib/auth-api';
 import { getBillingState } from '@/lib/billing';
+import { isMembershipOpen } from '@/lib/membership';
 import { createPageMetadata } from '@/lib/seo';
 
 export const metadata = createPageMetadata({
@@ -31,13 +33,17 @@ const TIER_LABELS = {
   lifetime: 'Lifetime Member',
 } as const;
 
-const STATUS_LABELS = {
+const STATE_LABELS = {
+  free: 'Free account',
+  trialing: 'Free trial',
   active: 'Active',
-  trialing: 'Trial',
-  past_due: 'Payment overdue',
-  canceled: 'Canceled',
-  expired: 'Expired',
+  grace: 'Payment needs attention',
+  inactive: 'Membership ended',
 } as const;
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
 
 interface BillingPageProps {
   searchParams: Promise<{ success?: string; canceled?: string }>;
@@ -47,8 +53,17 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
   const user = await requireAuthOrRedirect();
   const billing = await getBillingState(user.id);
   const { success, canceled } = await searchParams;
+  const membershipOpen = isMembershipOpen();
+  const { membership } = billing;
 
   const cardTitleClassName = 'font-heading text-2xl font-semibold tracking-tight text-foreground';
+
+  // The 30-day trial is only offered to an account that has never had a
+  // subscription — the same rule the checkout route enforces server-side.
+  const trialEligible = !billing.hasHadSubscription;
+  const canSubscribe = membershipOpen && !membership.hasPaidAccess;
+  const monthly = MEMBERSHIP_PLANS.monthly;
+  const annual = MEMBERSHIP_PLANS.annual;
 
   return (
     <>
@@ -63,15 +78,34 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                     Billing
                   </Heading>
                   <Text tone="muted" className="text-base leading-[1.85] lg:text-lg">
-                    Your membership tier and access status.
+                    Your membership and access status.
                   </Text>
                 </header>
 
                 {success ? (
-                  <Alert variant="success">Your subscription is now active. Thank you.</Alert>
+                  membership.hasPaidAccess ? (
+                    <Alert variant="success">
+                      {membership.state === 'trialing'
+                        ? 'Your free trial has started. Thank you.'
+                        : 'Your membership is now active. Thank you.'}
+                    </Alert>
+                  ) : (
+                    <Alert variant="info">
+                      Thank you — we are confirming your membership with Stripe. This can take a
+                      moment; refresh this page shortly.
+                    </Alert>
+                  )
                 ) : null}
                 {canceled ? (
                   <Alert>Checkout was canceled — you have not been charged.</Alert>
+                ) : null}
+
+                {membership.state === 'grace' && membership.graceEndsAt ? (
+                  <Alert variant="warning">
+                    We could not take your latest payment. Your access continues until{' '}
+                    {formatDate(membership.graceEndsAt)}. Update your payment method in the billing
+                    portal to keep your membership.
+                  </Alert>
                 ) : null}
 
                 <Card>
@@ -83,28 +117,43 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                   <CardContent>
                     <Stack gap="md">
                       <Text tone="muted">
-                        Status: {STATUS_LABELS[billing.status]}
-                        {billing.cancelAtPeriodEnd && billing.currentPeriodEnd
-                          ? ` — access continues until ${billing.currentPeriodEnd.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}, then won't renew`
-                          : billing.currentPeriodEnd
-                            ? ` — renews ${billing.currentPeriodEnd.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
-                            : ''}
+                        Status: {STATE_LABELS[membership.state]}
+                        {membership.state === 'trialing' && billing.currentPeriodEnd
+                          ? ` — your ${MEMBERSHIP_TRIAL_DAYS}-day free trial ends ${formatDate(billing.currentPeriodEnd)}, then your plan begins`
+                          : membership.cancelsAtPeriodEnd && billing.currentPeriodEnd
+                            ? ` — access continues until ${formatDate(billing.currentPeriodEnd)}, then won't renew`
+                            : membership.state === 'active' && billing.currentPeriodEnd
+                              ? ` — renews ${formatDate(billing.currentPeriodEnd)}`
+                              : ''}
                       </Text>
 
-                      {billing.hasStripeCustomer ? (
-                        <ManageBillingButton />
-                      ) : (
+                      {billing.hasStripeCustomer ? <ManageBillingButton /> : null}
+
+                      {canSubscribe ? (
                         <Stack gap="sm">
                           <Text tone="muted" size="sm">
-                            Choose a membership to unlock full access.
+                            {trialEligible
+                              ? `Start your ${MEMBERSHIP_TRIAL_DAYS}-day free trial of the Regulation Suite™ for full access. Choose a plan — your first payment is taken when the trial ends.`
+                              : 'Choose a plan to restore full Regulation Suite™ access.'}
                           </Text>
                           <Stack direction="row" gap="sm" wrap="wrap">
-                            <SubscribeButton tier="monthly" label="Subscribe monthly" />
-                            <SubscribeButton tier="annual" label="Subscribe annually" />
-                            <SubscribeButton tier="lifetime" label="Get lifetime access" />
+                            <SubscribeButton
+                              tier="monthly"
+                              label={`${trialEligible ? 'Start free trial' : 'Subscribe'} — ${monthly.price}/${monthly.interval}`}
+                            />
+                            <SubscribeButton
+                              tier="annual"
+                              label={`${trialEligible ? 'Start free trial' : 'Subscribe'} — ${annual.price}/${annual.interval}`}
+                            />
                           </Stack>
                         </Stack>
-                      )}
+                      ) : null}
+
+                      {!membershipOpen && !membership.hasPaidAccess ? (
+                        <Text tone="muted" size="sm">
+                          Regulation Suite™ membership is not open for enrolment yet.
+                        </Text>
+                      ) : null}
                     </Stack>
                   </CardContent>
                 </Card>
@@ -113,7 +162,8 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
                 <Text tone="muted" size="sm">
                   Billing is handled securely by Stripe. Manage your payment method, view invoices,
-                  or cancel anytime from the billing portal above.
+                  or cancel anytime from the billing portal above — if you cancel, your access
+                  continues until the end of the period you have paid for.
                 </Text>
               </Stack>
             </div>

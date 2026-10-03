@@ -31,7 +31,14 @@ import { db } from '@tnsi/db';
 import { practices, practiceCompletions } from '@tnsi/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import { practiceIdParam, practiceCompletionSchema } from '@/lib/validation';
-import { success, notFound, badRequest, internalError } from '@/lib/api-response';
+import {
+  success,
+  notFound,
+  badRequest,
+  internalError,
+  membershipRequired,
+} from '@/lib/api-response';
+import { contentAccessFor } from '@/lib/membership';
 import { shouldReuseCompletionRow } from '@/lib/practice-sessions';
 
 export const runtime = 'nodejs';
@@ -66,6 +73,11 @@ export async function POST(request: Request, { params }: RouteParams) {
 
   if (!practice[0]) {
     return notFound('Practice not found');
+  }
+
+  // Progress can only be recorded against a practice the member can open.
+  if (!contentAccessFor(user.entitlements).canOpen(practice[0])) {
+    return membershipRequired();
   }
 
   let body;

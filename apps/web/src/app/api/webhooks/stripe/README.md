@@ -22,6 +22,19 @@ endpoint expects.
   staging deployment needs its own test-mode endpoint pointed at its own
   URL.
 
+## Stripe dashboard settings this behaviour depends on
+
+These cannot be set from the repository:
+
+- **Customer portal → Cancellations**: "Cancel at end of billing period"
+  (not "immediately"), so a cancelling member keeps access to the end of the
+  period they paid for.
+- **Billing → Subscriptions and emails → retry/dunning rules**: the retry
+  schedule should run for at least the 7-day grace period; the platform
+  enforces the 7 days itself, independent of when Stripe finally gives up.
+- **No refund automation**: the commercial model is no refunds — nothing in
+  this platform issues refunds; do not add refund flows to the customer portal.
+
 No payload/projection configuration is needed beyond selecting those five
 events — this endpoint reads directly from Stripe's own event object shape
 via the `stripe` SDK's types, not a custom projection.
@@ -54,9 +67,26 @@ user it belongs to.
   `stripe_customer_id`. A `.deleted` event is handled by the same mapping —
   Stripe reports its `status` as `canceled`.
 - **`invoice.payment_failed`**: defensively marks the associated customer's
-  entitlement `past_due`. Usually redundant with a concurrent
-  `customer.subscription.updated`, but handled explicitly since a failed
-  payment is one of this endpoint's required scenarios.
+  entitlement `past_due` and records the failure time. Usually redundant with
+  a concurrent `customer.subscription.updated`, but handled explicitly since a
+  failed payment is one of this endpoint's required scenarios.
+- **Payment-failure grace period (7 days)**: the first time a subscription
+  goes `past_due` (via either event above), `entitlements.payment_failed_at`
+  is set to Stripe's own event time — and kept, never moved, by later retry
+  failures (`COALESCE`), so the clock cannot restart. Membership access
+  continues while `now < payment_failed_at + 7 days`
+  (`PAYMENT_GRACE_PERIOD_DAYS` in `@tnsi/auth`); after that the existing
+  inactive rule applies. When Stripe reports the subscription `active` or
+  `trialing` again, `payment_failed_at` is cleared. The decision is computed
+  on read, so nothing needs to "expire" the grace period.
+- **Trial**: a subscription started with a 30-day trial arrives as status
+  `trialing` (mapped 1:1, paid access). When the trial ends Stripe moves it
+  to `active` (or `past_due` if the first payment fails) via
+  `customer.subscription.updated` — no extra event is needed.
+- **Cancellation**: cancelling in the billing portal sets
+  `cancel_at_period_end`; the subscription stays `active` (access continues)
+  until the paid period ends, when Stripe sends `customer.subscription.deleted`
+  (status `canceled`).
 - Every write is a plain `UPDATE ... WHERE`, never an insert — the
   `entitlements` row already exists for every user (created with the
   `free` tier on `user.created`, see

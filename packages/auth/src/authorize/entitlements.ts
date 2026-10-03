@@ -28,6 +28,29 @@ export interface EntitlementRecord {
   programs: string[];
   certifications: string[];
   features: string[];
+  /**
+   * When the first still-unresolved recurring payment failure happened
+   * (`entitlements.payment_failed_at`). Only meaningful while `status` is
+   * `past_due`: it anchors the grace period below. Optional so callers that
+   * don't care about grace (and every pre-existing test fixture) are
+   * unaffected — a `past_due` record without it is simply not in grace.
+   */
+  paymentFailedAt?: Date | null;
+}
+
+/**
+ * Approved Regulation Suite™ commercial rule (Membership & Commercial
+ * Model v1): after a failed recurring payment, membership access continues
+ * for 7 days. Counted from the FIRST failure, not each retry — a repeated
+ * failed retry must never restart the clock.
+ */
+export const PAYMENT_GRACE_PERIOD_DAYS = 7;
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/** The instant a payment-failure grace period ends (access is NOT granted at this exact instant). */
+export function graceEndsAt(paymentFailedAt: Date): Date {
+  return new Date(paymentFailedAt.getTime() + PAYMENT_GRACE_PERIOD_DAYS * MS_PER_DAY);
 }
 
 /**
@@ -71,29 +94,30 @@ function deny(reason: AuthorizationDenialReason): AuthorizationResult {
 
 /**
  * Entitlement statuses that grant access to protected (programme,
- * certification, feature) content, per the approved C6.2 product rule:
+ * certification, feature) content, per the approved C6.2 product rule,
+ * extended by the approved Regulation Suite™ payment-failure rule:
  *
- * - `active`, `trialing` — eligible (explicitly required by the rule).
- * - `expired` — not eligible (explicitly required by the rule).
- * - `past_due` — treated as NOT eligible. This is a deliberate fail-closed
- *   default, not a confirmed business rule: no product decision exists for
- *   whether a payment-retry window should retain access. Flagged as an
- *   open ambiguity in the C6.2 report rather than inventing grace-period
- *   behavior here.
- * - `canceled` — treated as NOT eligible. The schema carries
- *   `currentPeriodEnd`/`cancelAtPeriodEnd`, which in typical billing
- *   systems can mean a canceled subscription is still within a paid
- *   period — but nothing in this repository establishes when `status`
- *   actually transitions to `canceled` (immediately on cancellation vs.
- *   only once the paid period ends), because no Stripe webhook logic
- *   exists yet (C10 is deferred). Treating `canceled` as ineligible is the
- *   safe default until that lifecycle is actually defined; do not add
- *   period-end grace logic speculatively.
+ * - `active`, `trialing` — eligible.
+ * - `expired` — not eligible.
+ * - `past_due` — eligible ONLY during the 7-day grace period that starts at
+ *   the first failed payment (`paymentFailedAt`). A `past_due` record with
+ *   no recorded failure time is not in grace — fail closed rather than
+ *   assuming one. Once the grace period has elapsed the record is treated
+ *   exactly like any other ineligible status: the existing entitlement
+ *   architecture applies unchanged.
+ * - `canceled` — not eligible. A member who cancels keeps `active` status
+ *   (Stripe cancel-at-period-end semantics, see `cancelAtPeriodEnd`) until
+ *   the paid period actually ends; Stripe only reports `canceled` after
+ *   that, so no period-end logic is needed here.
  */
-const ELIGIBLE_STATUSES: ReadonlySet<EntitlementStatus> = new Set(['active', 'trialing']);
+function isInPaymentGrace(entitlement: EntitlementRecord, now: Date): boolean {
+  if (entitlement.status !== 'past_due' || !entitlement.paymentFailedAt) return false;
+  return now.getTime() < graceEndsAt(entitlement.paymentFailedAt).getTime();
+}
 
-function hasEligibleStatus(entitlement: EntitlementRecord): boolean {
-  return ELIGIBLE_STATUSES.has(entitlement.status);
+function hasEligibleStatus(entitlement: EntitlementRecord, now: Date): boolean {
+  if (entitlement.status === 'active' || entitlement.status === 'trialing') return true;
+  return isInPaymentGrace(entitlement, now);
 }
 
 /**
@@ -120,9 +144,12 @@ function hasEligibleStatus(entitlement: EntitlementRecord): boolean {
  * this codebase yet transitions a row away from that (Stripe sync exists
  * but is unconfigured/dormant - see packages/integrations/src/stripe).
  */
-export function hasMemberAccess(entitlement: EntitlementRecord | null): boolean {
+export function hasMemberAccess(
+  entitlement: EntitlementRecord | null,
+  now: Date = new Date(),
+): boolean {
   if (!entitlement) return false;
-  return hasEligibleStatus(entitlement);
+  return hasEligibleStatus(entitlement, now);
 }
 
 /**
@@ -131,8 +158,11 @@ export function hasMemberAccess(entitlement: EntitlementRecord | null): boolean 
  * `ENTITLEMENT_REQUIRED`) when the user has no active/trialing
  * entitlement; returns normally when they do.
  */
-export function assertMemberAccess(entitlement: EntitlementRecord | null): void {
-  if (hasMemberAccess(entitlement)) return;
+export function assertMemberAccess(
+  entitlement: EntitlementRecord | null,
+  now: Date = new Date(),
+): void {
+  if (hasMemberAccess(entitlement, now)) return;
 
   throw new EntitlementRequiredError(
     ['member'],
@@ -158,6 +188,7 @@ export function assertMemberAccess(entitlement: EntitlementRecord | null): void 
 export function authorizeEntitlement(
   entitlement: EntitlementRecord | null,
   requirement: EntitlementRequirement,
+  now: Date = new Date(),
 ): AuthorizationResult {
   if (requirement.type === 'free') {
     return ALLOW;
@@ -167,7 +198,7 @@ export function authorizeEntitlement(
     return deny('NO_ENTITLEMENT');
   }
 
-  if (!hasEligibleStatus(entitlement)) {
+  if (!hasEligibleStatus(entitlement, now)) {
     return deny('STATUS_NOT_ELIGIBLE');
   }
 
@@ -201,8 +232,9 @@ export function authorizeEntitlement(
 export function assertEntitlement(
   entitlement: EntitlementRecord | null,
   requirement: EntitlementRequirement,
+  now: Date = new Date(),
 ): void {
-  const result = authorizeEntitlement(entitlement, requirement);
+  const result = authorizeEntitlement(entitlement, requirement, now);
   if (result.allowed) return;
 
   throw new EntitlementRequiredError(
@@ -211,4 +243,116 @@ export function assertEntitlement(
     'This content requires additional access.',
     { reason: result.reason },
   );
+}
+
+// ---------------------------------------------------------------------------
+// Regulation Suite™ membership (Free + Paid) — Membership & Commercial Model v1
+// ---------------------------------------------------------------------------
+
+export type EntitlementTier = 'free' | 'monthly' | 'annual' | 'lifetime';
+
+/** An entitlement record that also carries the billing tier — everything `resolveMembership` needs. */
+export interface MembershipRecord extends EntitlementRecord {
+  tier: EntitlementTier;
+}
+
+/**
+ * Where a member stands, in the commercial model's own vocabulary:
+ *
+ * - `free` — a free account (no paid plan).
+ * - `trialing` — inside the 30-day Stripe trial (paid access).
+ * - `active` — paying member (paid access). `cancelsAtPeriodEnd` is set when
+ *   they have cancelled: access still runs to the end of the paid period.
+ * - `grace` — a recurring payment failed; inside the 7-day grace period
+ *   (paid access continues).
+ * - `inactive` — had a paid plan but is no longer eligible: cancelled and
+ *   period ended, expired, or payment unresolved past the grace period.
+ *   Falls under the existing entitlement architecture's ineligible rule
+ *   (no member access).
+ */
+export type MembershipState = 'free' | 'trialing' | 'active' | 'grace' | 'inactive';
+
+export interface ResolvedMembership {
+  state: MembershipState;
+  /** Full Regulation Suite™ library (all Practices and PowerDrops™). */
+  hasPaidAccess: boolean;
+  /** Grace period end, only while `state` is `grace`. */
+  graceEndsAt: Date | null;
+  /** True for a paying/trialing member who has cancelled and will not renew. */
+  cancelsAtPeriodEnd: boolean;
+}
+
+/**
+ * The single deterministic answer to "what membership does this user have
+ * right now?" — a pure function of the entitlement record and `now`, so the
+ * website, API routes and mobile app (via `/api/v1/me/entitlements`) can
+ * never disagree about it. Never trusts client state.
+ *
+ * `null` (no entitlement row) resolves to `inactive`: no account state at
+ * all fails closed, same as `hasMemberAccess(null)`.
+ */
+export function resolveMembership(
+  record: (MembershipRecord & { cancelAtPeriodEnd?: boolean }) | null,
+  now: Date = new Date(),
+): ResolvedMembership {
+  const inactive: ResolvedMembership = {
+    state: 'inactive',
+    hasPaidAccess: false,
+    graceEndsAt: null,
+    cancelsAtPeriodEnd: false,
+  };
+
+  if (!record || !hasMemberAccess(record, now)) return inactive;
+
+  if (record.tier === 'free') {
+    return { state: 'free', hasPaidAccess: false, graceEndsAt: null, cancelsAtPeriodEnd: false };
+  }
+
+  if (record.status === 'past_due') {
+    // hasMemberAccess already proved we're inside grace, so paymentFailedAt is set.
+    return {
+      state: 'grace',
+      hasPaidAccess: true,
+      graceEndsAt: record.paymentFailedAt ? graceEndsAt(record.paymentFailedAt) : null,
+      cancelsAtPeriodEnd: false,
+    };
+  }
+
+  return {
+    state: record.status === 'trialing' ? 'trialing' : 'active',
+    hasPaidAccess: true,
+    graceEndsAt: null,
+    cancelsAtPeriodEnd: record.cancelAtPeriodEnd === true,
+  };
+}
+
+/** Does this user currently hold a paid Regulation Suite™ membership (trialing, active, or in payment grace)? */
+export function hasPaidAccess(
+  record: (MembershipRecord & { cancelAtPeriodEnd?: boolean }) | null,
+  now: Date = new Date(),
+): boolean {
+  return resolveMembership(record, now).hasPaidAccess;
+}
+
+/**
+ * Can this user open a specific piece of Regulation Suite™ content
+ * (a Practice or a PowerDrop™)?
+ *
+ * - No member access at all → never.
+ * - `gatingActive` false → yes. Membership is not commercially open yet
+ *   (see `isMembershipOpen` in the web app): nothing is locked, which is
+ *   today's behaviour. Content must never be locked before the paid
+ *   product can actually be bought.
+ * - `gatingActive` true → free-designated content for everyone with member
+ *   access; everything else only with paid access.
+ */
+export function canAccessContent(
+  record: (MembershipRecord & { cancelAtPeriodEnd?: boolean }) | null,
+  content: { isFree: boolean },
+  gatingActive: boolean,
+  now: Date = new Date(),
+): boolean {
+  if (!hasMemberAccess(record, now)) return false;
+  if (!gatingActive) return true;
+  return content.isFree || hasPaidAccess(record, now);
 }

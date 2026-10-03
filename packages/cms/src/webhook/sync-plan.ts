@@ -18,6 +18,7 @@ export interface PracticeUpsertValues {
   category: string | null;
   tags: string[];
   difficulty: number;
+  isFree: boolean;
   sanityData: Record<string, unknown>;
   isPublished: true;
 }
@@ -67,6 +68,7 @@ export function buildPracticeSyncPlan(event: SanityPracticeWebhookPayload): Prac
       category: doc.category ?? null,
       tags: doc.tags ?? [],
       difficulty: doc.difficulty ?? 1,
+      isFree: doc.freeAccess ?? false,
       sanityData: doc,
       isPublished: true,
     },

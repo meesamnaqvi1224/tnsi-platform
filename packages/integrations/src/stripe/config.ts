@@ -47,3 +47,19 @@ export function getStripeConfig(): StripeConfig {
     priceIds: readPriceIds(),
   };
 }
+
+/**
+ * True only when everything a Regulation Suite™ self-serve checkout needs
+ * is configured: the Stripe secret key, the webhook signing secret (without
+ * which a successful payment could never grant access), and BOTH approved
+ * subscription Prices (monthly + annual). The lifetime Price is deliberately
+ * not required — it is not part of the approved model.
+ *
+ * Used to keep membership closed (no checkout buttons, no content locking)
+ * until billing is genuinely ready, rather than exposing a checkout that
+ * would fail. Reads the environment only; never throws.
+ */
+export function isMembershipCheckoutConfigured(): boolean {
+  const { secretKey, webhookSecret, priceIds } = getStripeConfig();
+  return Boolean(secretKey && webhookSecret && priceIds.monthly && priceIds.annual);
+}

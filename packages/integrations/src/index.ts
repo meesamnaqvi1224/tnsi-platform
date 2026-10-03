@@ -8,7 +8,13 @@ export {
   type FlowiUpsertContactResult,
 } from './flowi';
 
-export { getStripeConfig, StripeConfigError, type StripeConfig } from './stripe/config';
+export {
+  getStripeConfig,
+  isMembershipCheckoutConfigured,
+  StripeConfigError,
+  type StripeConfig,
+} from './stripe/config';
+export { MEMBERSHIP_TRIAL_DAYS, MEMBERSHIP_PLANS, type MembershipPlanTier } from './stripe/plans';
 export { getStripeClient, isStripeConfigured } from './stripe/client';
 export { verifyStripeWebhookEvent, StripeWebhookVerificationError } from './stripe/verify';
 export {
@@ -17,6 +23,7 @@ export {
   planForInvoicePaymentFailed,
   type EntitlementSyncPlan,
   type SubscriptionSyncValues,
+  type PaymentFailureUpdate,
   type CheckoutSessionCompletedInput,
   type SubscriptionEventInput,
   type InvoicePaymentFailedInput,

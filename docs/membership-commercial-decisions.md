@@ -10,6 +10,70 @@ below and engineering is asked to implement them.
 
 ---
 
+## 0. Approved model (v1) and implementation status
+
+**Update, October 2026.** The owner has approved the Regulation Suite™
+commercial model ("TNSI Regulation Suite™ Membership & Commercial Model —
+Version 1"). The decision tables later in this document are the original
+questions and are kept for history; where they conflict, this section wins.
+
+| Decision            | Approved                                                   |
+| ------------------- | ---------------------------------------------------------- |
+| Model               | Free + paid membership, self-serve (no discovery call)     |
+| Monthly / annual    | £5.99 per month / £59 per year                             |
+| Trial               | 30 days, Stripe-native, first subscription only            |
+| Payment failure     | 7-day grace period (counted from the first failed payment) |
+| Cancellation        | Access continues to the end of the paid billing period     |
+| Refunds             | None — nothing in the platform issues or promises refunds  |
+| Free account        | Check-In, selected Practices/resources, 3 PowerDrops™      |
+| Paid                | Full Practice and PowerDrops™ library                      |
+| Lifetime tier       | Not part of the approved model (price intentionally unset) |
+| Life Beyond Trauma™ | Separate programme and commercial journey                  |
+
+**Built, but switched off.** The application supports all of the above. It
+stays dormant — website closed, no checkout, no content locked — until
+`REGULATION_SUITE_MEMBERSHIP_OPEN=true` _and_ Stripe is fully configured
+(see `.env.example`). Nothing is live.
+
+### Launch checklist (in this order)
+
+1. **Apply database migration `0010`** (adds `entitlements.payment_failed_at`
+   and `practices.is_free`; additive, no data changes) **before deploying this
+   code** — the new queries select those columns.
+2. **Stripe dashboard:** create the two recurring GBP Prices (£5.99/month,
+   £59/year, no trial on the Price itself); set `STRIPE_SECRET_KEY`,
+   `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_ANNUAL`;
+   register the webhook; set the customer portal to cancel _at end of billing
+   period_; align the retry schedule with the 7-day grace period. See
+   `apps/web/src/app/api/webhooks/stripe/README.md`.
+3. **Sanity:** add `freeAccess` to the practice webhook projection
+   (`apps/web/src/app/api/webhooks/sanity/README.md`), then switch on
+   "Free for all members" for **exactly three PowerDrops™** and the selected
+   free Practices. Until this is done, opening membership would make every
+   PowerDrop and Practice paid.
+4. **Test mode first:** run the full flow (trial → payment → grace →
+   cancel) against Stripe test mode with the switch on in a preview
+   environment.
+5. **Launch:** set `REGULATION_SUITE_MEMBERSHIP_OPEN=true` in production and
+   redeploy (the Regulation Suite page reads it at build time).
+
+### Open questions for the owner
+
+- A member whose paid access has ended (cancelled and period over, expired,
+  or unpaid past the grace period) currently loses the whole member area —
+  the platform's existing rule for an inactive entitlement — rather than
+  falling back to the free tier. Confirm that is intended.
+- The model lists "Practice history and progress" under paid but does not say
+  free members lose it; it is currently recorded for any practice a member can
+  open.
+- "Selected educational resources" has no member-gated content type behind it
+  (articles are public); nothing is gated for it.
+- Is a payment method required to start the trial? Currently yes (the trial
+  converts automatically).
+- Refund wording for the website terms needs approved copy.
+
+---
+
 ## 1. Executive Summary
 
 The technical groundwork for paid membership is already built and sitting
