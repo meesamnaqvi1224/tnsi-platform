@@ -1,19 +1,20 @@
-import { Container, PageQuote, Section } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { MethodFinalCta } from '@/components/method/method-final-cta';
 import { MethodFoundation } from '@/components/method/method-foundation';
+import { ChapterProgress } from '@/components/method/chapter-progress';
 import { MethodHero } from '@/components/method/method-hero';
 import { MethodJourney } from '@/components/method/method-journey';
 import { MethodPractice } from '@/components/method/method-practice';
 import { MethodProtectionParticipation } from '@/components/method/method-protection-participation';
+import { MethodPullQuote } from '@/components/method/method-pull-quote';
 import { MethodQuote } from '@/components/method/method-quote';
 import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
 
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
-const { seo, quote } = humanExpansionTheoryContent;
+const { seo } = humanExpansionTheoryContent;
 const PAGE_TITLE = 'Human Expansion Theory™';
 const PAGE_DESCRIPTION = seo.description;
 
@@ -36,6 +37,7 @@ export default function MethodPage() {
     <>
       <JsonLd data={jsonLd} />
       <SiteHeader />
+      <ChapterProgress />
       <main id="main-content">
         <MethodHero />
 
@@ -50,11 +52,7 @@ export default function MethodPage() {
 
         <MethodPractice />
 
-        <Section spacing="md" className="border-border border-t">
-          <Container size="xl">
-            <PageQuote quote={quote.quote} author={quote.author} />
-          </Container>
-        </Section>
+        <MethodPullQuote />
 
         <MethodFinalCta />
       </main>

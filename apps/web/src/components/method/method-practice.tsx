@@ -1,65 +1,75 @@
-import { ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
+import { Container, Section, Stack, Text } from '@tnsi/ui';
+import { MethodChapterHeading } from '@/components/method/method-chapter-heading';
+import { FadeIn } from '@/components/utility/fade-in';
 import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
 
 const { theoryToPractice, evolving } = humanExpansionTheoryContent;
 
+const bodyText = 'text-foreground/75 text-[1.0625rem] leading-[1.75] sm:text-lg';
+
 export function MethodPractice() {
   return (
     <>
+      {/* From Theory to Practice — the framework on the left stays in view
+          while the pathways it informs arrive one after another on the right. */}
       <Section
-        spacing="xl"
-        className="border-border border-t"
+        data-chapter
+        className="border-border border-t py-(--space-4xl) sm:py-(--space-5xl)"
         aria-label={theoryToPractice.heading}
       >
         <Container size="xl">
-          <Stack gap="2xl">
-            <Stack gap="lg" className="max-w-2xl">
-              <ChapterMarker
-                index={theoryToPractice.chapter}
-                as="h2"
-                title={theoryToPractice.heading}
-              />
-              {theoryToPractice.paragraphs.map((paragraph) => (
-                <Text key={paragraph} tone="muted" className="leading-relaxed">
-                  {paragraph}
-                </Text>
-              ))}
-            </Stack>
-
-            <div className="grid grid-cols-1 gap-(--space-lg) sm:grid-cols-2">
-              {theoryToPractice.pathways.map((pathway) => (
-                <div
-                  key={pathway.title}
-                  className="border-foreground/15 flex flex-col gap-(--space-sm) border-t pt-(--space-lg)"
-                >
-                  <p className="font-heading text-foreground text-lg font-semibold tracking-tight">
-                    {pathway.title}
-                  </p>
-                  <Text size="sm" tone="muted" className="leading-relaxed">
-                    {pathway.description}
+          <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-[5fr_7fr] lg:gap-(--space-4xl)">
+            <FadeIn className="lg:sticky lg:top-32 lg:self-start">
+              <MethodChapterHeading title={theoryToPractice.heading} />
+              <Stack gap="lg" className="mt-(--space-lg) max-w-[44ch]">
+                {theoryToPractice.paragraphs.map((paragraph) => (
+                  <Text key={paragraph} className={bodyText}>
+                    {paragraph}
                   </Text>
-                </div>
+                ))}
+              </Stack>
+            </FadeIn>
+
+            <ul className="list-none">
+              {theoryToPractice.pathways.map((pathway, index) => (
+                <li key={pathway.title}>
+                  <FadeIn
+                    delayMs={index === 0 ? 0 : 100}
+                    className="border-foreground/20 flex flex-col gap-(--space-sm) border-t py-(--space-xl) first:pt-(--space-xl)"
+                  >
+                    <p className="font-heading text-foreground text-[clamp(1.5rem,2.4vw,2rem)] leading-[1.15] font-semibold tracking-tight">
+                      {pathway.title}
+                    </p>
+                    <Text className={`${bodyText} max-w-[52ch]`}>{pathway.description}</Text>
+                  </FadeIn>
+                </li>
               ))}
-            </div>
-          </Stack>
+            </ul>
+          </div>
         </Container>
       </Section>
 
+      {/* An Evolving Body of Work — a large heading with plenty of air, the
+          supporting copy following it. */}
       <Section
-        spacing="xl"
-        className="border-border bg-secondary border-t"
+        data-chapter
+        className="border-border bg-secondary border-t py-(--space-4xl) sm:py-(--space-5xl)"
         aria-label={evolving.heading}
       >
         <Container size="xl">
-          <div className="grid grid-cols-1 gap-(--space-3xl) lg:grid-cols-2 lg:gap-(--space-4xl)">
-            <ChapterMarker index={evolving.chapter} as="h2" title={evolving.heading} />
-            <Stack gap="lg" className="lg:pt-(--space-2xl)">
-              {evolving.paragraphs.map((paragraph) => (
-                <Text key={paragraph} tone="muted" className="text-base leading-relaxed">
-                  {paragraph}
-                </Text>
-              ))}
-            </Stack>
+          <div className="grid grid-cols-1 gap-(--space-2xl) lg:grid-cols-[6fr_6fr] lg:gap-(--space-4xl)">
+            <FadeIn>
+              <MethodChapterHeading title={evolving.heading} size="major" />
+            </FadeIn>
+            <FadeIn delayMs={250}>
+              <Stack gap="lg" className="max-w-[56ch] lg:pt-(--space-xl)">
+                {evolving.paragraphs.map((paragraph) => (
+                  <Text key={paragraph} className={bodyText}>
+                    {paragraph}
+                  </Text>
+                ))}
+              </Stack>
+            </FadeIn>
           </div>
         </Container>
       </Section>

@@ -1,51 +1,63 @@
-import { ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
+import { Container, Section, Text } from '@tnsi/ui';
+import { MethodChapterHeading } from '@/components/method/method-chapter-heading';
+import { DrawLine } from '@/components/utility/draw-line';
+import { FadeIn } from '@/components/utility/fade-in';
 import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
 
 const { protectionParticipation } = humanExpansionTheoryContent;
 
+const termTitle =
+  'font-heading text-foreground text-[clamp(2.5rem,5vw,4rem)] leading-[1.05] font-semibold tracking-tight';
+const termBody = 'text-foreground/75 text-[1.0625rem] leading-[1.75] sm:text-lg';
+
+/**
+ * Protection and Participation — the two orientations given equal, large
+ * typographic presence and joined by a single hairline that draws across
+ * both. They arrive in order: Protection, Participation, then the closing
+ * statement.
+ */
 export function MethodProtectionParticipation() {
   return (
     <Section
-      spacing="xl"
-      className="border-border bg-secondary border-t"
+      data-chapter
+      className="border-border bg-secondary border-t py-(--space-4xl) sm:py-(--space-5xl)"
       aria-label={protectionParticipation.heading}
     >
       <Container size="xl">
-        <Stack gap="2xl">
-          <Stack gap="lg" className="max-w-2xl">
-            <ChapterMarker
-              index={protectionParticipation.chapter}
-              as="h2"
-              title={protectionParticipation.heading}
-            />
-            <Text tone="muted" className="leading-relaxed">
+        <div className="grid grid-cols-1 gap-(--space-xl) lg:grid-cols-2 lg:gap-(--space-4xl)">
+          <FadeIn>
+            <MethodChapterHeading title={protectionParticipation.heading} />
+          </FadeIn>
+          <FadeIn delayMs={200}>
+            <Text className="text-foreground/75 max-w-[44ch] text-[1.0625rem] leading-[1.75] sm:text-lg lg:pt-(--space-lg)">
               {protectionParticipation.intro}
             </Text>
-          </Stack>
+          </FadeIn>
+        </div>
 
-          <div className="grid grid-cols-1 gap-(--space-2xl) lg:grid-cols-2 lg:gap-(--space-4xl)">
-            <div className="border-foreground/15 border-t pt-(--space-lg)">
-              <p className="font-heading text-foreground mb-(--space-sm) text-xl font-semibold tracking-tight">
-                {protectionParticipation.protection.title}
-              </p>
-              <Text tone="muted" className="leading-relaxed">
+        <div className="pt-(--space-3xl) lg:pt-(--space-4xl)">
+          <DrawLine />
+          <div className="grid grid-cols-1 gap-(--space-2xl) pt-(--space-xl) lg:grid-cols-2 lg:gap-(--space-4xl)">
+            <FadeIn>
+              <p className={termTitle}>{protectionParticipation.protection.title}</p>
+              <Text className={`${termBody} mt-(--space-md) max-w-[40ch]`}>
                 {protectionParticipation.protection.description}
               </Text>
-            </div>
-            <div className="border-foreground/15 border-t pt-(--space-lg)">
-              <p className="font-heading text-foreground mb-(--space-sm) text-xl font-semibold tracking-tight">
-                {protectionParticipation.participation.title}
-              </p>
-              <Text tone="muted" className="leading-relaxed">
+            </FadeIn>
+            <FadeIn delayMs={250}>
+              <p className={termTitle}>{protectionParticipation.participation.title}</p>
+              <Text className={`${termBody} mt-(--space-md) max-w-[40ch]`}>
                 {protectionParticipation.participation.description}
               </Text>
-            </div>
+            </FadeIn>
           </div>
+        </div>
 
-          <Text className="text-foreground max-w-2xl text-lg leading-relaxed font-medium">
+        <FadeIn delayMs={450} className="pt-(--space-3xl) lg:pt-(--space-4xl)">
+          <Text className="text-foreground font-heading max-w-[34ch] text-[clamp(1.5rem,2.6vw,2.25rem)] leading-[1.25] font-medium tracking-tight text-balance">
             {protectionParticipation.closing}
           </Text>
-        </Stack>
+        </FadeIn>
       </Container>
     </Section>
   );
