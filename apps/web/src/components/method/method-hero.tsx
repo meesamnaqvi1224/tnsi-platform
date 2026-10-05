@@ -1,49 +1,63 @@
 import NextLink from 'next/link';
-import { buttonVariants, Container, Eyebrow, Stack, Text } from '@tnsi/ui';
+import { buttonVariants, Container, Stack, Text } from '@tnsi/ui';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { ScrollLinked } from '@/components/utility/scroll-linked';
-import { methodImages } from '@/content/images';
 import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
 
 const { hero } = humanExpansionTheoryContent;
 
 /**
- * Hero — the existing eyebrow, title, tagline and CTA on the left, the
- * existing Caroline portrait as a full-height photograph on the right (it
- * bleeds to the viewport edge on desktop instead of sitting in a small
- * card). The only motion is a barely-perceptible scroll response: the
- * portrait eases from 1.00 to 1.03 and the text drifts up ~28px as the page
- * scrolls away from the hero (see `ScrollLinked`).
+ * Hero — one full-bleed photograph (the two women in conversation) with the
+ * existing eyebrow, title, tagline and CTA set over it, bottom-left, like
+ * the other pathway heroes. Flat dark scrim sized so the tagline stays ≥ 4.5:1
+ * over the brightest part of the photograph. The only motion is a
+ * barely-perceptible scroll response: the image eases from 1.00 to 1.03 and
+ * the text drifts up ~28px as the page scrolls away (see `ScrollLinked`).
+ * Text is in the `dark` token scope, not a hardcoded white.
  */
 export function MethodHero() {
   return (
     <section aria-labelledby="method-hero-heading" data-chapter data-tone="dark">
-      <ScrollLinked className="relative lg:min-h-[min(46rem,calc(100svh-5rem))]">
+      <ScrollLinked className="relative overflow-hidden">
+        <div
+          className="absolute inset-0 will-change-transform"
+          style={{ transform: 'scale(calc(1 + var(--p) * 0.03))' }}
+        >
+          <ResponsiveImage
+            src="/images/discovery/hero-landscape.webp"
+            alt="Two women in conversation across a wooden table in a warm, softly lit room."
+            fill
+            priority
+            className="object-cover object-[30%_50%] lg:object-center"
+            sizes="100vw"
+          />
+        </div>
+        <div className="absolute inset-0 bg-black/[0.82]" aria-hidden />
+
         <Container
           size="xl"
-          className="relative z-10 flex items-center py-(--space-4xl) lg:min-h-[inherit] lg:py-(--space-5xl)"
+          className="dark text-foreground relative flex min-h-[calc(100svh-5rem)] flex-col justify-end pt-(--space-5xl) pb-(--space-3xl) sm:pb-(--space-4xl)"
         >
           <div
-            className="will-change-transform lg:w-[52%]"
+            className="will-change-transform"
             style={{
               transform: 'translateY(calc(var(--p) * -28px))',
               opacity: 'calc(1 - var(--p) * 0.3)',
             }}
           >
-            <Stack gap="lg">
-              <Eyebrow>{hero.eyebrow}</Eyebrow>
+            <Stack gap="lg" className="max-w-3xl">
+              <p className="font-mono text-xs tracking-[0.25em] text-white uppercase">
+                {hero.eyebrow}
+              </p>
 
               <h1
                 id="method-hero-heading"
-                className="font-heading text-foreground text-[clamp(3.25rem,6.4vw,5.5rem)] leading-[1.02] font-semibold tracking-tight text-balance"
+                className="font-heading text-[clamp(3.25rem,6.6vw,5.75rem)] leading-[1.02] font-semibold tracking-tight text-balance text-white"
               >
                 {hero.headline}
               </h1>
 
-              <Text
-                size="lg"
-                className="text-foreground/75 max-w-md text-lg leading-[1.7] lg:text-xl"
-              >
+              <Text size="lg" className="max-w-xl text-lg leading-[1.7] text-white lg:text-xl">
                 {hero.tagline}
               </Text>
 
@@ -58,22 +72,6 @@ export function MethodHero() {
             </Stack>
           </div>
         </Container>
-
-        <div className="relative aspect-[4/5] w-full overflow-hidden lg:absolute lg:inset-y-0 lg:right-0 lg:aspect-auto lg:w-[44%]">
-          <div
-            className="absolute inset-0 will-change-transform"
-            style={{ transform: 'scale(calc(1 + var(--p) * 0.03))' }}
-          >
-            <ResponsiveImage
-              src={methodImages.heroPortrait}
-              alt="Caroline Reed, Founder and Director of The Nervous System Institute, in a professional portrait with warm natural light."
-              fill
-              priority
-              className="object-cover object-[50%_22%]"
-              sizes="(max-width: 1024px) 100vw, 44vw"
-            />
-          </div>
-        </div>
       </ScrollLinked>
     </section>
   );
