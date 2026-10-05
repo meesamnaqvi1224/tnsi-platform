@@ -1,10 +1,12 @@
 import { Container, Section, Stack, Text } from '@tnsi/ui';
 import { MethodChapterHeading } from '@/components/method/method-chapter-heading';
+import { MethodImageSection } from '@/components/method/method-image-section';
 import { FadeIn } from '@/components/utility/fade-in';
 import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
 
 const { theoryToPractice, evolving } = humanExpansionTheoryContent;
 
+const onImageBodyText = 'text-foreground text-[1.0625rem] leading-[1.75] sm:text-lg';
 const bodyText = 'text-foreground/75 text-[1.0625rem] leading-[1.75] sm:text-lg';
 
 export function MethodPractice() {
@@ -49,11 +51,11 @@ export function MethodPractice() {
         </Container>
       </Section>
 
-      {/* An Evolving Body of Work — a large heading with plenty of air, the
-          supporting copy following it. */}
-      <Section
-        data-chapter
-        className="border-border bg-secondary border-t py-(--space-4xl) sm:py-(--space-5xl)"
+      {/* An Evolving Body of Work — a large heading over the library
+          photograph with plenty of air, the supporting copy following it. */}
+      <MethodImageSection
+        src="/images/resources/hero.webp"
+        scrim="bg-black/[0.82]"
         aria-label={evolving.heading}
       >
         <Container size="xl">
@@ -64,7 +66,7 @@ export function MethodPractice() {
             <FadeIn delayMs={250}>
               <Stack gap="lg" className="max-w-[56ch] lg:pt-(--space-xl)">
                 {evolving.paragraphs.map((paragraph) => (
-                  <Text key={paragraph} className={bodyText}>
+                  <Text key={paragraph} className={onImageBodyText}>
                     {paragraph}
                   </Text>
                 ))}
@@ -72,7 +74,7 @@ export function MethodPractice() {
             </FadeIn>
           </div>
         </Container>
-      </Section>
+      </MethodImageSection>
     </>
   );
 }

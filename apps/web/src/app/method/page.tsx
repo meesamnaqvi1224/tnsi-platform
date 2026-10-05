@@ -9,7 +9,7 @@ import { MethodJourney } from '@/components/method/method-journey';
 import { MethodPractice } from '@/components/method/method-practice';
 import { MethodProtectionParticipation } from '@/components/method/method-protection-participation';
 import { MethodPullQuote } from '@/components/method/method-pull-quote';
-import { MethodQuote } from '@/components/method/method-quote';
+import { MethodStatement } from '@/components/method/method-statement';
 import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
 
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
@@ -41,8 +41,8 @@ export default function MethodPage() {
       <main id="main-content">
         <MethodHero />
 
-        {/* One sentence. One viewport. The thesis of everything that follows. */}
-        <MethodQuote />
+        {/* One sentence. One pause. The thesis of everything that follows. */}
+        <MethodStatement />
 
         <MethodFoundation />
 

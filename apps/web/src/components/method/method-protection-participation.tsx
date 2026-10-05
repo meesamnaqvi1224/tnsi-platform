@@ -1,5 +1,6 @@
-import { Container, Section, Text } from '@tnsi/ui';
+import { Container, Text } from '@tnsi/ui';
 import { MethodChapterHeading } from '@/components/method/method-chapter-heading';
+import { MethodImageSection } from '@/components/method/method-image-section';
 import { DrawLine } from '@/components/utility/draw-line';
 import { FadeIn } from '@/components/utility/fade-in';
 import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
@@ -8,7 +9,7 @@ const { protectionParticipation } = humanExpansionTheoryContent;
 
 const termTitle =
   'font-heading text-foreground text-[clamp(2.5rem,5vw,4rem)] leading-[1.05] font-semibold tracking-tight';
-const termBody = 'text-foreground/75 text-[1.0625rem] leading-[1.75] sm:text-lg';
+const termBody = 'text-foreground text-[1.0625rem] leading-[1.75] sm:text-lg';
 
 /**
  * Protection and Participation — the two orientations given equal, large
@@ -18,9 +19,9 @@ const termBody = 'text-foreground/75 text-[1.0625rem] leading-[1.75] sm:text-lg'
  */
 export function MethodProtectionParticipation() {
   return (
-    <Section
-      data-chapter
-      className="border-border bg-secondary border-t py-(--space-4xl) sm:py-(--space-5xl)"
+    <MethodImageSection
+      src="/images/programs/overview-hero.webp"
+      scrim="bg-black/[0.78]"
       aria-label={protectionParticipation.heading}
     >
       <Container size="xl">
@@ -29,7 +30,7 @@ export function MethodProtectionParticipation() {
             <MethodChapterHeading title={protectionParticipation.heading} />
           </FadeIn>
           <FadeIn delayMs={200}>
-            <Text className="text-foreground/75 max-w-[44ch] text-[1.0625rem] leading-[1.75] sm:text-lg lg:pt-(--space-lg)">
+            <Text className="text-foreground max-w-[44ch] text-[1.0625rem] leading-[1.75] sm:text-lg lg:pt-(--space-lg)">
               {protectionParticipation.intro}
             </Text>
           </FadeIn>
@@ -59,6 +60,6 @@ export function MethodProtectionParticipation() {
           </Text>
         </FadeIn>
       </Container>
-    </Section>
+    </MethodImageSection>
   );
 }

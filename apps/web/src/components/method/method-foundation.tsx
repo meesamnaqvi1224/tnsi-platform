@@ -1,10 +1,12 @@
 import { Container, Section, Stack, Text } from '@tnsi/ui';
 import { MethodChapterHeading } from '@/components/method/method-chapter-heading';
+import { MethodImageSection } from '@/components/method/method-image-section';
 import { FadeIn } from '@/components/utility/fade-in';
 import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
 
 const { whyNewFramework, centralProposition } = humanExpansionTheoryContent;
 
+const onImageBodyText = 'text-foreground text-[1.0625rem] leading-[1.75] sm:text-lg';
 const bodyText = 'text-foreground/75 text-[1.0625rem] leading-[1.75] sm:text-lg';
 
 export function MethodFoundation() {
@@ -35,11 +37,12 @@ export function MethodFoundation() {
         </Container>
       </Section>
 
-      {/* The Central Proposition — an intellectual pause: heading, then the
-          proposition itself at display scale, then the supporting copy. */}
-      <Section
-        data-chapter
-        className="border-border bg-secondary border-t py-(--space-4xl) sm:py-(--space-5xl)"
+      {/* The Central Proposition — an intellectual pause over the forest
+          photograph: heading, then the proposition itself at display scale,
+          then the supporting copy. */}
+      <MethodImageSection
+        src="/images/programs/life-beyond-trauma/hero.webp"
+        scrim="bg-black/[0.76]"
         aria-label={centralProposition.heading}
       >
         <Container size="xl">
@@ -56,7 +59,7 @@ export function MethodFoundation() {
               <FadeIn delayMs={350}>
                 <Stack gap="lg" className="max-w-[62ch]">
                   {centralProposition.paragraphs.map((paragraph) => (
-                    <Text key={paragraph} className={bodyText}>
+                    <Text key={paragraph} className={onImageBodyText}>
                       {paragraph}
                     </Text>
                   ))}
@@ -65,7 +68,7 @@ export function MethodFoundation() {
             </Stack>
           </div>
         </Container>
-      </Section>
+      </MethodImageSection>
     </>
   );
 }
