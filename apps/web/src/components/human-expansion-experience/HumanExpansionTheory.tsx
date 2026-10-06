@@ -6,10 +6,9 @@ import { PALETTE } from './experience-config';
 import './human-expansion.css';
 
 /**
- * Where the still render of the figure lives. It sits under `/models` with the
- * 3D model it comes from, and is AVIF on purpose: the middleware matcher skips
- * common image extensions (`.webp`, `.png`, `.jpg`…), which would leave the
- * still publicly downloadable while the model is gated. A test guards this.
+ * Where the still render of the figure lives: next to the 3D model it comes
+ * from, under `/models`, which the middleware keeps publicly readable because
+ * this page loads both.
  */
 export const FIGURE_STILL = {
   src: '/models/human-expansion/figure-still.avif',
@@ -78,7 +77,7 @@ export function HumanExpansionTheory() {
           <div className="he-canvas" data-he-canvas aria-hidden />
           <div className="he-layer" data-he-layer>
             <div className="he-figure-col">
-              {/* A plain <img>: the still lives under /models (gated with the model), which the image optimiser cannot fetch. */}
+              {/* A plain <img>: a fixed, already-compressed (AVIF) render, so the image optimiser would add nothing. */}
               <img
                 className="he-figure"
                 src={FIGURE_STILL.src}

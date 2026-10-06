@@ -108,17 +108,16 @@ describe('server-rendered Human Expansion Theory content', () => {
   });
 });
 
-describe('model files stay behind the review gate', () => {
-  it('serves the still from an extension the middleware matcher does not skip', () => {
-    const middleware = fs.readFileSync(path.join(__dirname, '../../middleware.ts'), 'utf8');
-    const skip = middleware.match(/\(\?!_next\|\[\^\?\]\*\\\\\.\(\?:([^)]*)\)/)?.[1];
-    expect(skip, 'could not read the matcher').toBeTruthy();
-    const ext = FIGURE_STILL.src.split('.').pop()!;
-    expect(
-      skip!.split('|').map((e) => e.replace(/\(\?!on\)|\?/g, '')),
-      ext,
-    ).not.toContain(ext);
+describe('model files', () => {
+  const middleware = fs.readFileSync(path.join(__dirname, '../../middleware.ts'), 'utf8');
+
+  it('are publicly readable, because this page loads them', () => {
     expect(FIGURE_STILL.src.startsWith('/models/')).toBe(true);
+    expect(middleware).toContain("'/models(.*)'");
+  });
+
+  it('are not behind a review switch any more', () => {
+    expect(middleware).not.toMatch(/ENABLE_(LAB_ROUTES|HUMAN_EXPANSION_3D)/);
   });
 });
 

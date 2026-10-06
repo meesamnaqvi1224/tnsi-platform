@@ -21,9 +21,7 @@
         "SANITY_WEBHOOK_SECRET",
         "NEXT_PUBLIC_SITE_URL",
         "FLOWI_API_KEY",
-        "FLOWI_LOCATION_ID",
-        "ENABLE_HUMAN_EXPANSION_3D",
-        "ENABLE_LAB_ROUTES"
+        "FLOWI_LOCATION_ID"
       ]
     },
     "dev": {

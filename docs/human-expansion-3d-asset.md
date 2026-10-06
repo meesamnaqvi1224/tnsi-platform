@@ -35,7 +35,7 @@ no materials, no UVs). 51,954 triangles, ~165 KB (Meshopt-compressed).
    smoothing; height normalised; textures/UVs dropped; Meshopt-compressed with
    `@gltf-transform/cli`.
 
-## Licence — OPEN ITEM (must close before production launch)
+## Licence — OPEN ITEM (must be confirmed before the production release goes live)
 
 Magnific states that paid plans include a commercial licence for AI-generated
 content (see its usage-rights and AI-content-and-copyright pages), but also
@@ -45,8 +45,9 @@ rights. Meshy 7.1 is a third-party engine running inside Magnific.
 
 **Before any production launch we need written confirmation that the
 Magnific / underlying-engine licence covers commercial website use of this
-specific output.** Until that is on file, keep the prototype route hidden and
-un-indexed, and do not merge it into the live `/method` page.
+specific output.** The code is release-ready, but `/models` is now public and
+`/method` is the Human Expansion page, so do not deploy it to Production until
+that confirmation is on file.
 
 No attribution is known to be required; if the confirmation says otherwise,
 record it here and in the site credits.
@@ -78,25 +79,24 @@ renamed; `editorial-content.test.tsx` asserts every word renders unaltered.
 
 Not rendered by the scene, as on the live page: `hero.paragraphs`.
 
-### Review build (2026-10-06): `/method` prepared, not public
+### Production release (2026-10-06)
 
-`/method` now has two versions behind one switch, `ENABLE_HUMAN_EXPANSION_3D`
-(`apps/web/src/lib/human-expansion-3d.ts`; read at build time because the page
-is static):
+The Human Expansion experience **is** `/method`
+(`components/human-expansion-experience/HumanExpansionPage.tsx`: opening
+statement, theory, polyvagal figure, quote, closing call to action, footer).
+The review mechanism used while it was approved is removed: there is no
+`ENABLE_HUMAN_EXPANSION_3D` or `ENABLE_LAB_ROUTES`, no `/lab/human-expansion`
+route, and the old chapter-by-chapter implementation (`ChapterProgress`,
+`MethodHero`, `MethodFoundation`, `MethodJourney`, `MethodProtectionParticipation`,
+`MethodPractice`, `MethodImageSection`, `DevelopmentalConditions`) is deleted.
+`/models(.*)` is permanently public in the middleware, because the page loads
+the 3D figure (`figure.glb`) and the still render (`figure-still.avif`) from it.
+Metadata, canonical, Open Graph, Twitter and JSON-LD are unchanged.
 
-- **Off (default; always in production until launch):** the existing page,
-  unchanged. Metadata, canonical, Open Graph and JSON-LD are identical in both
-  versions (checked).
-- **On (local `.env.local` only):** the new composition
-  (`components/human-expansion-experience/HumanExpansionPage.tsx`): opening
-  statement, theory, polyvagal figure, quote, closing call to action, footer.
-
-`ENABLE_LAB_ROUTES` still opens the temporary `/lab/human-expansion`
-comparison route. `/models(.*)` (the model and the still render of it) is open
-only when either flag is on; neither is set in Vercel production or preview.
-The still is AVIF on purpose: the middleware matcher skips `.webp`/`.png`/
-`.jpg`, which would have left it downloadable while the model is gated (a test
-guards this).
+The site URL used for canonical links comes from `NEXT_PUBLIC_SITE_URL`
+(set for Production, so Production canonicals are unchanged). On a Vercel
+Preview, where it is not set, `resolveSiteUrl` in `apps/web/src/env.ts` falls
+back to the deployment's own URL instead of `localhost`.
 
 **One markup, two compositions.** `HumanExpansionTheory` (server component)
 renders all the content once, in the initial HTML, plus the connector paths,
@@ -118,13 +118,13 @@ change in the static composition.
 
 **Edge fade (2026-10-06):** the bands either side of the scene carry a continuation of the scene's own edge glow (colour and spread measured from the rendered scene, added as light), so the scene dissolves into the page rather than stopping. Seam step (mean, 0-255) at the exit went from 18.6 to 2.1 and at the entry from 3.2 to 1.7, at 1440/1280/1024/430/390 px. See `.he-band-in` / `.he-band-out` in `human-expansion.css`.
 
-### Still to settle before this goes public
+### Before this goes live
 
-1. **Licence confirmation** for the Magnific/Meshy output (launch blocker; the
-   model and still must stay behind the gate until then).
-2. When launching: make `/models(.*)` permanently public (or move the files),
-   drop the two review flags and the `/lab` route, and set the switch's default.
-3. The old `components/method/*` chapter components become unused once the
-   switch is removed (separate clean-up), including `ChapterProgress`.
+1. **Licence confirmation** for the Magnific/Meshy output (see above).
+2. Remove the Preview-only `ENABLE_HUMAN_EXPANSION_3D` variable from Vercel
+   (it no longer does anything) and turn Preview authentication back to the
+   team's preferred setting if it was enabled only for the review.
+3. Orphaned after the clean-up, safe to remove separately:
+   `components/utility/draw-line` and `components/utility/scroll-linked`.
 4. Very old browsers without AVIF show the figure's alt text instead of the
    still in the static composition; all text is unaffected.
