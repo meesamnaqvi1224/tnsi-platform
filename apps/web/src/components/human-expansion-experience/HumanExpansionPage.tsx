@@ -18,7 +18,7 @@ const { polyvagalFigure } = humanExpansionTheoryContent;
  * Protection and Participation, From Theory to Practice, An Evolving Body of
  * Work — server-rendered, progressively enhanced into the scrolling 3D scene);
  * then the polyvagal figure, the quotation, the closing call to action and the
- * footer. Used by `/method` (when enabled) and the temporary lab comparison route.
+ * footer. This is the `/method` page.
  *
  * `--he-header` is the site header's height, so the sticky stage sits beneath it.
  */
