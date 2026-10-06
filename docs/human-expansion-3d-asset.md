@@ -35,22 +35,79 @@ no materials, no UVs). 51,954 triangles, ~165 KB (Meshopt-compressed).
    smoothing; height normalised; textures/UVs dropped; Meshopt-compressed with
    `@gltf-transform/cli`.
 
-## Licence — OPEN ITEM (must be confirmed before the production release goes live)
+## Licence status (as of 6 October 2026)
 
-Magnific states that paid plans include a commercial licence for AI-generated
-content (see its usage-rights and AI-content-and-copyright pages), but also
-that copyright in AI-generated output is legally unsettled and not guaranteed
-in every jurisdiction, and that the user is responsible for third-party
-rights. Meshy 7.1 is a third-party engine running inside Magnific.
+**Licensing verification: PASS, subject to reference-input confirmation.**
+The reference-input confirmation (below) is **open**; it is the only licensing
+item left before the production release.
 
-**Before any production launch we need written confirmation that the
-Magnific / underlying-engine licence covers commercial website use of this
-specific output.** The code is release-ready, but `/models` is now public and
-`/method` is the Human Expansion page, so do not deploy it to Production until
-that confirmation is on file.
+### What the published terms say
 
-No attribution is known to be required; if the confirmation says otherwise,
-record it here and in the site credits.
+**Meshy.** Meshy's current Terms of Service, updated September 19, 2026, state
+that paid-plan customers own their Customer Output, to the extent possible under
+applicable law. Meshy's current documentation also confirms commercial use of
+paid-plan generated assets, subject to rights in the input materials. This is
+not an unconditional statement that Meshy guarantees copyright ownership in every
+jurisdiction. Meshy's terms also require the customer to have the necessary
+rights, licences and permissions for the input material they submit.
+
+**Magnific.** Magnific's current documentation confirms that paid plans include a
+commercial license for AI-generated content. Magnific also notes that copyright
+ownership of AI-generated content remains subject to applicable law and does not
+guarantee copyright ownership in every jurisdiction.
+
+**Magnific confirmation.** No separate written confirmation from Magnific is
+being awaited. The published paid-plan commercial-use documentation is the basis
+for the commercial-use determination. Magnific has not given us a bespoke
+licence or individual approval, and none is implied.
+
+The figure was generated with Meshy 7.1 (image-to-3D) on a paid plan, run through
+Magnific, the generation platform the account uses to reach Meshy. No
+attribution is known to be required; if that changes, record it here and in the
+site credits.
+
+### Generation chain (unchanged)
+
+1. Owner-approved Human Expansion Theory™ mockup, uploaded to Magnific as the
+   reference (creation `xSGgTGijfW`);
+2. a reference image generated through Magnific from that mockup (sculpted clay
+   statue, closed eyes; creation `huU5CR8vqL`);
+3. Meshy 7.1 generated the final figure from that reference (creation
+   `1l2Js8mr4r`), which was then cleaned up locally.
+
+The earlier blank-faced figure (built from a different reference) is no longer
+shipped.
+
+### Open item: reference-input confirmation (not yet recorded as passed)
+
+Because Meshy's output terms are subject to rights in the input, the following
+remains to be confirmed internally, and each box is to be ticked, dated and
+initialled only when evidence exists:
+
+- [ ] Confirm who created the original mockup.
+- [ ] Confirm we hold the necessary rights and permission to use the mockup as an
+      AI reference input.
+- [ ] Confirm the mockup and the generated reference image do not reproduce
+      third-party protected work without authorisation.
+- [ ] Confirm the imagery does not contain an unauthorised real person's
+      likeness.
+
+No project evidence establishing any of these is recorded in this repository, so
+none is marked as passed.
+
+### Terms archive
+
+Online terms can change. Dated copies (screenshots or PDFs) of the Meshy and
+Magnific terms and documentation reviewed on 6 October 2026 should be retained
+with the project records. No archived copy is currently recorded in this
+repository; none has been created or implied by this note. Re-read the terms if
+the figure is regenerated or the plan changes.
+
+### State when this note was written (6 October 2026)
+
+No model was regenerated and no generation credits were spent for this
+verification. The mobile work is untouched. The production-release commit
+`5703cc0` had not been pushed or deployed.
 
 ## Content map and integration plan (prototype → `/method`)
 
@@ -120,7 +177,7 @@ change in the static composition.
 
 ### Before this goes live
 
-1. **Licence confirmation** for the Magnific/Meshy output (see above).
+1. **Reference-input confirmation** (see "Licence status" above): the only licensing item left. The commercial-use determination rests on the published paid-plan terms; the mockup and reference image still need the rights confirmation recorded.
 2. Remove the Preview-only `ENABLE_HUMAN_EXPANSION_3D` variable from Vercel
    (it no longer does anything) and turn Preview authentication back to the
    team's preferred setting if it was enabled only for the review.
