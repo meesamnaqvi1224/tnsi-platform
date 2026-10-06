@@ -57,6 +57,18 @@ const isPublicRoute = createRouteMatcher([
   '/sitemap.xml',
   '/favicon.ico',
   '/studio(.*)', // Sanity Studio has its own auth
+  // Prototype-only routes (e.g. the 3D experience) stay behind sign-in like
+  // any other non-public route, unless explicitly opened with
+  // ENABLE_LAB_ROUTES=true — set locally for review, never in production.
+  ...(process.env.ENABLE_LAB_ROUTES === 'true' ? ['/lab(.*)'] : []),
+  // '/models' (the 3D figure and its still render, whose licence for
+  // commercial use is not yet confirmed) is gated the same way, so the files
+  // are not publicly downloadable from production. It is opened by either
+  // review flag: the lab route, or the new experience on '/method'
+  // (ENABLE_HUMAN_EXPANSION_3D=true). Neither is set in production.
+  ...(process.env.ENABLE_LAB_ROUTES === 'true' || process.env.ENABLE_HUMAN_EXPANSION_3D === 'true'
+    ? ['/models(.*)']
+    : []),
 ]);
 
 /**

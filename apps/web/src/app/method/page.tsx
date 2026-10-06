@@ -10,7 +10,9 @@ import { MethodPractice } from '@/components/method/method-practice';
 import { MethodProtectionParticipation } from '@/components/method/method-protection-participation';
 import { MethodPullQuote } from '@/components/method/method-pull-quote';
 import { MethodStatement } from '@/components/method/method-statement';
+import { HumanExpansionPage } from '@/components/human-expansion-experience/HumanExpansionPage';
 import { humanExpansionTheoryContent } from '@/content/human-expansion-theory';
+import { isHumanExpansion3dEnabled } from '@/lib/human-expansion-3d';
 
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
@@ -32,6 +34,17 @@ export default function MethodPage() {
       { name: PAGE_TITLE, path: '/method' },
     ]),
   ];
+
+  // The 3D experience is behind a review switch (see lib/human-expansion-3d.ts):
+  // metadata, JSON-LD and the page's identity are the same either way.
+  if (isHumanExpansion3dEnabled()) {
+    return (
+      <>
+        <JsonLd data={jsonLd} />
+        <HumanExpansionPage />
+      </>
+    );
+  }
 
   return (
     <>

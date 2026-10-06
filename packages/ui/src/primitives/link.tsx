@@ -18,7 +18,14 @@ const linkVariants = cva(
   },
 );
 
-type AnchorComponent = React.ElementType<React.AnchorHTMLAttributes<HTMLAnchorElement>>;
+/**
+ * Equivalent to `React.ElementType<AnchorHTMLAttributes>` for the only cases
+ * that matter here (a plain `<a>` or a router link component), but without
+ * expanding to every intrinsic JSX element. That expansion becomes
+ * pathologically large (TS2590) once a package such as React Three Fiber adds
+ * hundreds of its own elements to the global JSX namespace.
+ */
+type AnchorComponent = 'a' | React.ComponentType<React.AnchorHTMLAttributes<HTMLAnchorElement>>;
 
 export interface LinkProps
   extends React.AnchorHTMLAttributes<HTMLAnchorElement>, VariantProps<typeof linkVariants> {
