@@ -37,9 +37,10 @@ no materials, no UVs). 51,954 triangles, ~165 KB (Meshopt-compressed).
 
 ## Licence status (as of 6 October 2026)
 
-**Licensing verification: PASS, subject to reference-input confirmation.**
-The reference-input confirmation (below) is **open**; it is the only licensing
-item left before the production release.
+**Licensing verification: PASS — reference-input rights confirmed.**
+The commercial-use basis (published paid-plan terms, below) and the
+reference-input rights check (below) are both complete. No licensing item is
+open.
 
 ### What the published terms say
 
@@ -78,22 +79,24 @@ site credits.
 The earlier blank-faced figure (built from a different reference) is no longer
 shipped.
 
-### Open item: reference-input confirmation (not yet recorded as passed)
+### Reference-input rights: confirmed (6 October 2026)
 
-Because Meshy's output terms are subject to rights in the input, the following
-remains to be confirmed internally, and each box is to be ticked, dated and
-initialled only when evidence exists:
+Meshy's output terms are subject to rights in the input, so the input to the
+generation chain above was checked. The project owner has confirmed each point
+for the mockup and for the reference image derived from it:
 
-- [ ] Confirm who created the original mockup.
-- [ ] Confirm we hold the necessary rights and permission to use the mockup as an
-      AI reference input.
-- [ ] Confirm the mockup and the generated reference image do not reproduce
-      third-party protected work without authorisation.
-- [ ] Confirm the imagery does not contain an unauthorised real person's
-      likeness.
+- [x] **PASS** — The original mockup was created by the project owner.
+- [x] **PASS** — The project owner therefore has the right to use that mockup as
+      the AI reference input.
+- [x] **PASS** — The mockup and the generated reference contain no unauthorised
+      third-party protected artwork or material.
+- [x] **PASS** — The mockup and the generated reference contain no unauthorised
+      real person's likeness.
 
-No project evidence establishing any of these is recorded in this repository, so
-none is marked as passed.
+Basis: the project owner's confirmation, recorded on 6 October 2026. The mockup
+itself is the owner's own work; no separate supporting file is stored in this
+repository. If the figure is ever regenerated from a different reference, repeat
+this check for the new input.
 
 ### Terms archive
 
@@ -107,7 +110,8 @@ the figure is regenerated or the plan changes.
 
 No model was regenerated and no generation credits were spent for this
 verification. The mobile work is untouched. The production-release commit
-`5703cc0` had not been pushed or deployed.
+`5703cc0` was unchanged, and neither it nor the earlier licence-note commit
+`46efba8` had been pushed or deployed.
 
 ## Content map and integration plan (prototype → `/method`)
 
@@ -177,7 +181,9 @@ change in the static composition.
 
 ### Before this goes live
 
-1. **Reference-input confirmation** (see "Licence status" above): the only licensing item left. The commercial-use determination rests on the published paid-plan terms; the mockup and reference image still need the rights confirmation recorded.
+1. Licensing is complete (see "Licence status" above). Retain dated copies of the
+   reviewed Meshy and Magnific terms with the project records (see "Terms
+   archive").
 2. Remove the Preview-only `ENABLE_HUMAN_EXPANSION_3D` variable from Vercel
    (it no longer does anything) and turn Preview authentication back to the
    team's preferred setting if it was enabled only for the review.
