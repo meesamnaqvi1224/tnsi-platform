@@ -1,0 +1,335 @@
+/*
+ * Human Expansion Theory™ — the two compositions of one piece of markup
+ * (see HumanExpansionTheory.tsx). `data-he="linear"` is the default and needs no
+ * script; `data-he="scene"` is the enhanced, scrolling 3D layout, set before
+ * first paint when the browser can support it.
+ *
+ * Kept as plain CSS (rather than utility classes) because the state lives on
+ * the root and reaches many elements, and the layout is a grid in one mode and
+ * an overlay in the other. The breakpoint and canvas ratio mirror
+ * NARROW_BREAKPOINT / NARROW_CANVAS_RATIO in editorial-config.ts (a test keeps
+ * them in step).
+ */
+
+.he-root {
+  --he-text: #f6ecd8;
+  --he-muted: rgba(246, 236, 216, 0.72);
+  --he-scroll: 600vh;
+  position: relative;
+  background: var(--he-bg);
+  color: var(--he-text);
+}
+
+/* ---------- shared: the chapter indicator ---------- */
+
+.he-chapters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 1.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--he-muted);
+}
+
+.he-chapters li {
+  display: inline-flex;
+  gap: 0.55em;
+  opacity: 0.42;
+}
+
+.he-chapters li[data-on] {
+  opacity: 1;
+  color: var(--he-text);
+}
+
+.he-chapter-n {
+  color: var(--he-line);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .he-chapters li {
+    transition: opacity 0.5s ease;
+  }
+}
+
+/* ---------- linear (default): the still figure with the text around it ---------- */
+
+.he-canvas,
+.he-connectors {
+  display: none;
+}
+
+.he-layer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.75rem;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+}
+
+.he-figure-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.he-figure {
+  display: block;
+  width: min(100%, 20rem);
+  height: auto;
+  /* The still's edges are lit by the scene's glow; fade them into the page's ground. */
+  -webkit-mask-image: radial-gradient(ellipse 47% 51% at 50% 50%, #000 34%, transparent 100%);
+  mask-image: radial-gradient(ellipse 47% 51% at 50% 50%, #000 34%, transparent 100%);
+}
+
+@media (min-width: 768px) {
+  .he-layer {
+    max-width: none;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 26rem) minmax(0, 1fr);
+    column-gap: clamp(2rem, 4vw, 4rem);
+    row-gap: clamp(3.5rem, 9vh, 6rem);
+    padding: clamp(3rem, 8vh, 6rem) clamp(1.5rem, 5.5vw, 6rem);
+  }
+
+  .he-figure-col {
+    grid-column: 2;
+    grid-row: 1 / span var(--he-rows);
+    align-self: start;
+    position: sticky;
+    top: calc(var(--he-header, 0px) + 1.5rem);
+  }
+
+  .he-figure {
+    width: auto;
+    max-width: 100%;
+    max-height: calc(100svh - var(--he-header, 0px) - 6rem);
+  }
+
+  .he-block {
+    grid-row: var(--he-row);
+    max-width: 26rem;
+  }
+
+  .he-block[data-side='left'] {
+    grid-column: 1;
+    justify-self: end;
+  }
+
+  .he-block[data-side='right'] {
+    grid-column: 3;
+    justify-self: start;
+  }
+}
+
+/* ---------- scene: a sticky stage, the live figure, text revealed by scroll ---------- */
+
+.he-root[data-he='scene'] .he-outer {
+  height: var(--he-scroll);
+  /* Shares the stage's dark ground: on iOS Safari the visible height changes as
+     the toolbar collapses, and any gap must not show the page behind. */
+  background: var(--he-bg);
+}
+
+.he-root[data-he='scene'] .he-stage {
+  position: sticky;
+  top: var(--he-header, 0px);
+  height: calc(100svh - var(--he-header, 0px));
+  overflow: hidden;
+  background: var(--he-bg);
+}
+
+.he-root[data-he='scene'] .he-canvas {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+.he-root[data-he='scene'] .he-connectors {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.he-root[data-he='scene'] .he-layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+.he-root[data-he='scene'] .he-figure-col {
+  display: contents;
+}
+
+.he-root[data-he='scene'] .he-figure {
+  display: none;
+}
+
+.he-root[data-he='scene'] .he-block {
+  position: absolute;
+  max-width: none;
+  opacity: var(--vis, 0);
+}
+
+/* Until the layer starts, the title is already in place. */
+.he-root[data-he='scene'] .he-block[data-block='intro'] {
+  --vis: 1;
+}
+
+.he-root[data-he='scene'] .he-chapters {
+  position: absolute;
+  opacity: var(--he-chapters, 0);
+}
+
+@media (min-width: 768px) {
+  .he-root[data-he='scene'] .he-block {
+    width: min(22rem, 25vw);
+    top: calc(var(--he-y) * 100%);
+    transform: translateY(-50%);
+  }
+
+  .he-root[data-he='scene'] .he-block[data-side='left'] {
+    left: clamp(24px, 5.5vw, 96px);
+  }
+
+  .he-root[data-he='scene'] .he-block[data-side='right'] {
+    right: clamp(24px, 5.5vw, 96px);
+  }
+
+  .he-root[data-he='scene'] .he-chapters {
+    left: 50%;
+    bottom: 1.1rem;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    flex-wrap: nowrap;
+  }
+}
+
+@media (max-width: 767px) {
+  .he-root[data-he='scene'] {
+    --he-scroll: 850vh;
+  }
+
+  .he-root[data-he='scene'] .he-canvas {
+    height: calc(var(--he-ratio) * 100%);
+    /* The scene's light fades out toward the text beneath it, not onto a hard edge. */
+    -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+  }
+
+  .he-root[data-he='scene'] .he-block {
+    left: 24px;
+    right: 24px;
+    top: calc(var(--he-ratio) * 100% + 3%);
+  }
+
+  /* The pathway list is one list; on a phone its two parts take turns in the same cells. */
+  .he-root[data-he='scene'] .he-pathways {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.7rem;
+  }
+
+  .he-root[data-he='scene'] .he-pathways > li {
+    grid-column: 1;
+    grid-row: var(--he-nr);
+    opacity: var(--part, 1);
+  }
+
+  .he-root[data-he='scene'] .he-chapters {
+    left: 24px;
+    right: 24px;
+    top: calc(var(--he-ratio) * 100% - 0.4rem);
+    justify-content: flex-start;
+    gap: 0.2rem 1rem;
+  }
+
+  /* On a phone only the current condition's name is spelled out. */
+  .he-root[data-he='scene'] .he-chapter-name {
+    display: none;
+  }
+
+  .he-root[data-he='scene'] .he-chapters li[data-on] .he-chapter-name {
+    display: inline;
+  }
+}
+
+/* ---------- the bands either side of the scene ---------- */
+
+/*
+ * The page's light ground deepens into the scene's dark one before it, and
+ * lightens again after it. The scene is not flat dark: light gathers at its
+ * floor (and faintly at its crown), so a plain dark band left a visible edge
+ * where the scene stopped. Each band therefore carries a continuation of the
+ * scene's own glow at the edge it shares with the stage — the same colour and
+ * spread (measured from the rendered scene), a gaussian that fades away
+ * within a short distance. It is added as light (`screen`), so it dies away
+ * naturally as the ground brightens instead of staining it. The dark ground is
+ * PALETTE.background (experience-config.ts); a test keeps the two in step.
+ */
+.he-band-in {
+  height: 28svh;
+  background-blend-mode: screen, normal;
+  background-image:
+    radial-gradient(
+      ellipse 15svh 9svh at 50% 100%,
+      rgba(20, 14, 5, 1) 0%,
+      rgba(20, 14, 5, 0.835) 20%,
+      rgba(20, 14, 5, 0.487) 40%,
+      rgba(20, 14, 5, 0.198) 60%,
+      rgba(20, 14, 5, 0.056) 80%,
+      rgba(20, 14, 5, 0) 100%
+    ),
+    linear-gradient(to bottom, var(--background), #13100d);
+}
+
+.he-band-out {
+  height: 40svh;
+  background-image: linear-gradient(to bottom, #13100d, var(--background));
+}
+
+@media (min-width: 768px) {
+  .he-band-in {
+    background-image:
+      radial-gradient(
+        ellipse 42svh 16svh at 50% 100%,
+        rgba(20, 14, 5, 1) 0%,
+        rgba(20, 14, 5, 0.835) 20%,
+        rgba(20, 14, 5, 0.487) 40%,
+        rgba(20, 14, 5, 0.198) 60%,
+        rgba(20, 14, 5, 0.056) 80%,
+        rgba(20, 14, 5, 0) 100%
+      ),
+      linear-gradient(to bottom, var(--background), #13100d);
+  }
+
+  /* The scene's floor glow: about rgb(77, 60, 37) at the centre of its bottom edge. */
+  .he-band-out {
+    background-blend-mode: screen, normal;
+    background-image:
+      radial-gradient(
+        ellipse 100svh 22svh at 50% 0%,
+        rgba(64, 45, 19, 1) 0%,
+        rgba(64, 45, 19, 0.835) 20%,
+        rgba(64, 45, 19, 0.487) 40%,
+        rgba(64, 45, 19, 0.198) 60%,
+        rgba(64, 45, 19, 0.056) 80%,
+        rgba(64, 45, 19, 0) 100%
+      ),
+      linear-gradient(to bottom, #13100d, var(--background));
+  }
+}
