@@ -11,6 +11,9 @@ export default defineConfig({
   esbuild: {
     jsx: 'automatic',
   },
+  // Components import their own stylesheets (e.g. human-expansion.css); tests
+  // never need them processed, so skip loading the Next/Tailwind PostCSS config.
+  css: { postcss: { plugins: [] } },
   test: {
     environment: 'node',
     // `validation.ts` imports `@tnsi/integrations`, which transitively

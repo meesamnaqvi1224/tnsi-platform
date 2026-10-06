@@ -57,6 +57,9 @@ const isPublicRoute = createRouteMatcher([
   '/sitemap.xml',
   '/favicon.ico',
   '/studio(.*)', // Sanity Studio has its own auth
+  // The Human Expansion Theory™ page (/method) loads its 3D figure and the
+  // still render of it from here, so they must be publicly readable.
+  '/models(.*)',
 ]);
 
 /**
