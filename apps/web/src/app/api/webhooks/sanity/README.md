@@ -32,6 +32,7 @@ route expects:
     "description": description,
     "contentType": contentType,
     "mediaUrl": mediaUrl,
+    "interactiveKey": interactiveKey,
     "thumbnailUrl": thumbnailUrl,
     "durationSeconds": durationSeconds,
     "category": category,
@@ -41,6 +42,11 @@ route expects:
   }
 }
 ```
+
+`interactiveKey` was added for interactive practices (The Return Path,
+2026-10-12). A webhook registered before then must have its projection
+updated in the Sanity dashboard, or interactive practices sync with a null
+key and the member page shows "not available yet".
 
 ## Draft exclusion
 

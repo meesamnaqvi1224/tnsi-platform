@@ -141,6 +141,40 @@ live in production.
   (`NEXT_PUBLIC_SANITY_*`, `SANITY_API_READ_TOKEN`) live in Vercel and a
   gitignored `.env.local`; the deployed origin is a Sanity CORS origin.
 
+### 2026-10-12 — The Return Path: first interactive practice
+
+The Return Path is a short labyrinth breathing practice: the person traces a
+labyrinth with a finger, pausing at markers for guided breaths. It ships as
+one client component used in two places: a free public page (lead magnet)
+and a member practice in the dashboard. Build brief: "The Return Path —
+Build Brief for Claude Code" (Claude Docs). Decisions approved 2026-10-12:
+
+- **New practice content type `interactive`.** Added to the Postgres
+  `practice_content_type` enum (migration), the Sanity `contentType` list
+  and the webhook validation list. Recommendation routing is by `category`,
+  not content type, so `packages/core` needs no change. An interactive
+  practice has no `mediaUrl`, `durationSeconds` = 240, and a new
+  `interactiveKey` field (`"the-return-path"`, Sanity + Postgres column)
+  that selects which component the member practice page renders.
+- **Level access is hardcoded for v1.** Level 1 is free; Levels 2–3 are
+  members only. No Sanity setting for free levels.
+- **No changes to membership access code.** The public page is a separate
+  route that renders Level 1 only (Levels 2–3 shown locked). The member
+  practice uses the existing all-or-nothing practice access and shows all
+  three levels. Completions use the existing `practice_completions` flow.
+- **Copy lives in one Sanity document,** "The Return Path — content"
+  (`returnPathContent`, a singleton with grouped fields). The component
+  falls back to the approved draft copy in code if Sanity is unreachable,
+  matching the site's existing `sanityFetch` fallback pattern.
+- **Public page is in scope but unlaunched.** `/the-return-path` deploys
+  unlinked, `noindex`, and out of the sitemap until Caroline approves the
+  name, copy, consent wording and route.
+- **Email capture** goes server-side to Flowi through the existing
+  `upsertFlowiContact`, tagged "The Return Path". **Analytics** events go
+  to GA4 via `gtag` (the site's existing tool); GA4's own page view covers
+  `page_view`.
+- **Expo app is out of scope for v1** (phase 2).
+
 ## Open decisions
 
 None recorded yet beyond the log above.

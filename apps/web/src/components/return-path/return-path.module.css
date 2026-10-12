@@ -1,0 +1,179 @@
+/*
+ * The Return Path's practice colours, mapped onto the site's own tokens
+ * (packages/ui/src/styles/tokens.css): forest for the inward trace, head
+ * and orb; bronze for the return trace. The labyrinth is the only bold
+ * element - no shadows, gradients or celebration (build brief, Visual
+ * design).
+ */
+.root {
+  --rp-trace: var(--accent-forest);
+  --rp-return: var(--accent-bronze);
+  --rp-channel: color-mix(in oklch, var(--stone-grey) 26%, var(--background));
+  --rp-trace-soft: color-mix(in oklch, var(--rp-trace) 14%, transparent);
+  --rp-glow: color-mix(in oklch, var(--rp-trace) 33%, transparent);
+  --rp-overlay: color-mix(in oklch, var(--background) 92%, transparent);
+}
+
+:global(.dark) .root {
+  --rp-trace: oklch(0.74 0.07 165);
+  --rp-return: oklch(0.77 0.09 70);
+  --rp-channel: color-mix(in oklch, var(--neutral-400) 20%, var(--background));
+}
+
+.channel {
+  fill: none;
+  stroke: var(--rp-channel);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trace,
+.returnTrace {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trace {
+  stroke: var(--rp-trace);
+}
+
+.returnTrace {
+  stroke: var(--rp-return);
+}
+
+.centre {
+  fill: var(--rp-trace-soft);
+  stroke: var(--rp-trace);
+  stroke-width: 1.5;
+}
+
+.marker {
+  fill: var(--background);
+  stroke: var(--rp-trace);
+  stroke-width: 2;
+  transition: opacity var(--transition-duration-slow) var(--ease-standard);
+}
+
+.markerOut {
+  stroke: var(--rp-return);
+}
+
+.markerDone {
+  fill: var(--rp-trace);
+  opacity: 0.45;
+}
+
+.markerOut.markerDone {
+  fill: var(--rp-return);
+}
+
+.head {
+  fill: var(--rp-trace);
+}
+
+.headReturning {
+  fill: var(--rp-return);
+}
+
+.halo {
+  fill: var(--rp-glow);
+}
+
+/* The most important mobile requirement: tracing never scrolls or zooms. */
+.stage {
+  display: block;
+  overflow: visible; /* the entrance glow sits on the bottom edge */
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.overlay {
+  background: var(--rp-overlay);
+  transition: opacity 600ms var(--ease-standard);
+}
+
+.orb {
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--rp-trace) 78%, var(--background));
+  transition-property: transform, opacity;
+  transition-timing-function: ease-in-out;
+}
+
+.progressFill {
+  background: var(--rp-trace);
+  transition: width 300ms linear;
+}
+
+.progressTrack {
+  background: var(--rp-channel);
+}
+
+.tag {
+  background: var(--rp-trace-soft);
+  color: var(--rp-trace);
+}
+
+.switch {
+  appearance: none;
+  flex: none;
+  position: relative;
+  width: 44px;
+  height: 26px;
+  margin-top: 2px;
+  border-radius: 9999px;
+  background: var(--rp-channel);
+  cursor: pointer;
+  transition: background var(--transition-duration-base) var(--ease-standard);
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: var(--card);
+  transition: transform var(--transition-duration-base) var(--ease-standard);
+}
+
+.switch:checked {
+  background: var(--rp-trace);
+}
+
+.switch:checked::after {
+  transform: translateX(18px);
+}
+
+.switch:focus-visible {
+  outline: 2px solid var(--rp-trace);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .halo {
+    animation: pulse 2.4s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.5;
+  }
+}

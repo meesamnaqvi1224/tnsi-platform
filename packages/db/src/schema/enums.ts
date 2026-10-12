@@ -22,6 +22,7 @@ export const practiceContentTypeEnum = pgEnum('practice_content_type', [
   'breathwork',
   'movement',
   'journal',
+  'interactive',
 ]);
 
 /**

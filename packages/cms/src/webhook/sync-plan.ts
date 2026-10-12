@@ -13,6 +13,7 @@ export interface PracticeUpsertValues {
   description: string | null;
   contentType: PracticeContentType;
   mediaUrl: string | null;
+  interactiveKey: string | null;
   thumbnailUrl: string | null;
   durationSeconds: number | null;
   category: string | null;
@@ -62,6 +63,7 @@ export function buildPracticeSyncPlan(event: SanityPracticeWebhookPayload): Prac
       description: doc.description ?? null,
       contentType: doc.contentType,
       mediaUrl: doc.mediaUrl ?? null,
+      interactiveKey: doc.interactiveKey ?? null,
       thumbnailUrl: doc.thumbnailUrl ?? null,
       durationSeconds: doc.durationSeconds ?? null,
       category: doc.category ?? null,

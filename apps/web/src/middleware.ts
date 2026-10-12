@@ -31,6 +31,9 @@ const isPublicRoute = createRouteMatcher([
   '/accessibility(.*)',
   '/search(.*)',
   '/assessment(.*)',
+  // The Return Path's free public page and its email capture (Flowi).
+  '/the-return-path(.*)',
+  '/api/the-return-path/subscribe',
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/webhooks/clerk',

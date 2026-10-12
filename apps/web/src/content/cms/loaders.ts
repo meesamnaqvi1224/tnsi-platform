@@ -1,7 +1,17 @@
 import { sanityFetch } from '@tnsi/cms/server';
-import { ARTICLES_QUERY, ASSESSMENT_BY_SLUG_QUERY, PROGRAMS_QUERY } from '@tnsi/cms';
+import {
+  ARTICLES_QUERY,
+  ASSESSMENT_BY_SLUG_QUERY,
+  PROGRAMS_QUERY,
+  RETURN_PATH_CONTENT_QUERY,
+} from '@tnsi/cms';
 import { articlesContent, type ArticleItem } from '@/content/articles';
 import { programsOverviewContent } from '@/content/programs';
+import {
+  resolveReturnPathContent,
+  type ReturnPathContent,
+  type ReturnPathContentInput,
+} from '@/components/return-path/content';
 
 /** Raw shapes returned by the GROQ projections. */
 interface SanityImage {
@@ -151,4 +161,14 @@ export interface Assessment {
  */
 export async function getAssessmentBySlug(slug: string): Promise<Assessment | null> {
   return sanityFetch<Assessment>(ASSESSMENT_BY_SLUG_QUERY, { slug });
+}
+
+/**
+ * The Return Path's copy and timings from its Sanity singleton, merged
+ * field by field over the approved draft copy - never null, so the
+ * practice renders even when Sanity is unconfigured or unreachable.
+ */
+export async function getReturnPathContent(): Promise<ReturnPathContent> {
+  const data = await sanityFetch<ReturnPathContentInput>(RETURN_PATH_CONTENT_QUERY);
+  return resolveReturnPathContent(data);
 }

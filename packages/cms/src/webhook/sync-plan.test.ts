@@ -60,6 +60,30 @@ describe('buildPracticeSyncPlan', () => {
     });
   });
 
+  it('defaults interactiveKey to null for a media practice', () => {
+    const plan = buildPracticeSyncPlan(publishedEvent());
+    if (plan.action !== 'upsert') throw new Error('expected upsert');
+    expect(plan.values.interactiveKey).toBeNull();
+  });
+
+  it('carries interactiveKey through for an interactive practice', () => {
+    const plan = buildPracticeSyncPlan(
+      publishedEvent({
+        contentType: 'interactive',
+        interactiveKey: 'the-return-path',
+        mediaUrl: null,
+        durationSeconds: 240,
+      }),
+    );
+    if (plan.action !== 'upsert') throw new Error('expected upsert');
+    expect(plan.values).toMatchObject({
+      contentType: 'interactive',
+      interactiveKey: 'the-return-path',
+      mediaUrl: null,
+      durationSeconds: 240,
+    });
+  });
+
   it('normalizes a drafts.-prefixed id in the plan', () => {
     const event = publishedEvent();
     const plan = buildPracticeSyncPlan({ ...event, _id: `drafts.${event._id}` });

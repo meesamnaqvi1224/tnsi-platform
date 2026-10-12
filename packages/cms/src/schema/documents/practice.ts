@@ -2,7 +2,8 @@ import { defineField, defineType } from 'sanity';
 
 /**
  * Editorial source for a practice (an audio/video/meditation/breathwork/
- * movement/journal exercise). Fields are a direct 1:1 mirror of the
+ * movement/journal exercise, or an interactive practice rendered by a
+ * client component - see `interactiveKey`). Fields are a direct 1:1 mirror of the
  * existing `practices` table (packages/db/src/schema/practices.ts) and its
  * `practice_content_type` enum — nothing here goes beyond what that
  * existing Postgres/API contract already expects.
@@ -43,9 +44,27 @@ export const practice = defineType({
           { title: 'Breathwork', value: 'breathwork' },
           { title: 'Movement', value: 'movement' },
           { title: 'Journal', value: 'journal' },
+          { title: 'Interactive', value: 'interactive' },
         ],
       },
       validation: (r) => r.required(),
+    }),
+    defineField({
+      name: 'interactiveKey',
+      title: 'Interactive practice',
+      type: 'string',
+      description:
+        'Which interactive component this practice opens. Leave Media URL empty and set Duration to 240 seconds. Its on-screen copy is edited in its own content document (e.g. "The Return Path — content"), not here.',
+      options: {
+        list: [{ title: 'The Return Path', value: 'the-return-path' }],
+      },
+      hidden: ({ document }) => document?.contentType !== 'interactive',
+      validation: (r) =>
+        r.custom((value, context) =>
+          context.document?.contentType === 'interactive' && !value
+            ? 'Choose which interactive practice this is.'
+            : true,
+        ),
     }),
     defineField({
       name: 'mediaUrl',

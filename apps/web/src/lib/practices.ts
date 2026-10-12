@@ -19,6 +19,7 @@ const PRACTICE_SUMMARY_COLUMNS = {
   description: practices.description,
   contentType: practices.contentType,
   mediaUrl: practices.mediaUrl,
+  interactiveKey: practices.interactiveKey,
   thumbnailUrl: practices.thumbnailUrl,
   durationSeconds: practices.durationSeconds,
   category: practices.category,
@@ -32,6 +33,8 @@ export type PracticeSummary = {
   description: string | null;
   contentType: string;
   mediaUrl: string | null;
+  /** Set only for `contentType = 'interactive'` - which component the practice page renders. */
+  interactiveKey: string | null;
   thumbnailUrl: string | null;
   durationSeconds: number | null;
   category: string | null;
