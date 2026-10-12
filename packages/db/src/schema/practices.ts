@@ -30,6 +30,13 @@ export const practices = pgTable(
 
     mediaUrl: text('media_url'),
 
+    /**
+     * Only for `contentType = 'interactive'`: which client component the
+     * member practice page renders (e.g. `'the-return-path'`). Null for
+     * every media/journal practice.
+     */
+    interactiveKey: text('interactive_key'),
+
     thumbnailUrl: text('thumbnail_url'),
 
     durationSeconds: integer('duration_seconds'),

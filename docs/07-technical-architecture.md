@@ -97,6 +97,30 @@ what creates SEO topical authority (see
 architecture) and is also what makes an eventual AI guide tractable: it
 reads structured, related content rather than crawling rendered HTML.
 
+### Interactive practices
+
+Most practices are media (audio/video) or journal prompts. An
+**interactive** practice is a client component the member uses directly —
+the first is The Return Path, a labyrinth breathing practice (decision log
+in `PROJECT.md`, 2026-10-12).
+
+- **Content type.** `interactive` is a value of the `practice_content_type`
+  enum, mirrored in the Sanity `practice.contentType` list and the webhook
+  validation list. The practice row has no `mediaUrl`; `interactiveKey`
+  (Sanity field + `practices.interactive_key` column) names the component
+  to render. The member practice page switches on `interactiveKey`; an
+  unknown key renders the existing "not available yet" notice.
+- **Copy is separate from the practice row.** Each interactive practice
+  keeps its on-screen copy in its own Sanity singleton (The Return Path:
+  `returnPathContent`), read server-side with the code copy as fallback.
+  Geometry, timings' structure and level access stay in code.
+- **Two contexts, one component.** A `context` prop (`public` | `member`)
+  changes only the wrapper, the levels allowed and the ending. Public
+  completions are never stored; member completions use
+  `POST /api/v1/practices/[id]/complete`, like any other practice.
+- **Analytics** go to GA4 through `gtag`; **email capture** goes through a
+  server route to Flowi (`upsertFlowiContact`), never from the browser.
+
 ## Performance requirements
 
 Google Lighthouse: Performance, Accessibility, SEO, and Best Practices all

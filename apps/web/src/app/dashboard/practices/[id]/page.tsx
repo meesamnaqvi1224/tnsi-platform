@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import NextLink from 'next/link';
 import { Badge, Container, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { PracticeExperience } from '@/components/dashboard/practice-experience';
+import { ReturnPathPractice } from '@/components/return-path/return-path-practice';
+import { getReturnPathContent } from '@/content/cms/loaders';
 import { SaveToggleButton } from '@/components/dashboard/save-toggle-button';
 import { requireMemberAccessOrRedirect } from '@/lib/auth-api';
 import {
@@ -42,6 +44,16 @@ export async function generateMetadata({ params }: PracticeDetailPageProps) {
 const AUDIO_CONTENT_TYPES = new Set(['audio', 'meditation', 'breathwork']);
 const VIDEO_CONTENT_TYPES = new Set(['video', 'movement']);
 
+/**
+ * Interactive practices render their own component, chosen by
+ * `interactiveKey` (docs/07-technical-architecture.md, Interactive
+ * practices). Members get every level - access to the practice itself is
+ * the existing all-or-nothing member check above. An interactive practice
+ * with an unknown key falls through to the "isn't available yet" notice.
+ */
+const RETURN_PATH_KEY = 'the-return-path';
+const MEMBER_RETURN_PATH_LEVELS: (1 | 2 | 3)[] = [1, 2, 3];
+
 export default async function PracticeDetailPage({ params }: PracticeDetailPageProps) {
   const user = await requireMemberAccessOrRedirect();
   const { id } = await params;
@@ -64,6 +76,9 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
       ? 'video'
       : null;
   const hasPlayableMedia = !!driveEmbedUrl || !!(practice.mediaUrl && mediaKind);
+  const isReturnPath =
+    practice.contentType === 'interactive' && practice.interactiveKey === RETURN_PATH_KEY;
+  const returnPathContent = isReturnPath ? await getReturnPathContent() : null;
 
   const metaParts = [formatContentTypeLabel(practice.contentType)];
   if (duration) metaParts.push(duration);
@@ -108,35 +123,46 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
                   ) : null}
                 </header>
 
-                {!hasPlayableMedia && practice.contentType !== 'journal' ? (
-                  // `journal` genuinely has no media by design; every other
-                  // content type is meant to carry a recording - if one
-                  // doesn't have `mediaUrl` set yet, that's a real content
-                  // gap worth an honest notice rather than a silent empty
-                  // space where a player would otherwise sit. Still shown
-                  // above PracticeExperience, which still offers "Mark as
-                  // Complete" either way.
-                  <div className="border-border/80 bg-background rounded-sm border p-(--space-lg)">
-                    <Text tone="muted">
-                      This practice isn&apos;t available yet. Check back soon.
-                    </Text>
-                  </div>
-                ) : null}
+                {returnPathContent ? (
+                  <ReturnPathPractice
+                    context="member"
+                    content={returnPathContent}
+                    allowedLevels={MEMBER_RETURN_PATH_LEVELS}
+                    practiceId={practice.id}
+                  />
+                ) : (
+                  <>
+                    {!hasPlayableMedia && practice.contentType !== 'journal' ? (
+                      // `journal` genuinely has no media by design; every other
+                      // content type is meant to carry a recording - if one
+                      // doesn't have `mediaUrl` set yet, that's a real content
+                      // gap worth an honest notice rather than a silent empty
+                      // space where a player would otherwise sit. Still shown
+                      // above PracticeExperience, which still offers "Mark as
+                      // Complete" either way.
+                      <div className="border-border/80 bg-background rounded-sm border p-(--space-lg)">
+                        <Text tone="muted">
+                          This practice isn&apos;t available yet. Check back soon.
+                        </Text>
+                      </div>
+                    ) : null}
 
-                <PracticeExperience
-                  practiceId={practice.id}
-                  driveEmbedUrl={driveEmbedUrl}
-                  driveEmbedTitle={practice.title}
-                  mediaUrl={practice.mediaUrl}
-                  mediaKind={mediaKind}
-                  thumbnailUrl={practice.thumbnailUrl}
-                  initialPlayCount={completion?.playCount ?? 0}
-                  initialPositionSeconds={completion?.positionSeconds ?? 0}
-                  initialCompleted={completed}
-                  initialCompletionId={completion?.id ?? null}
-                  initialProgressPct={completion?.progressPct ?? 0}
-                  initialReflection={reflection}
-                />
+                    <PracticeExperience
+                      practiceId={practice.id}
+                      driveEmbedUrl={driveEmbedUrl}
+                      driveEmbedTitle={practice.title}
+                      mediaUrl={practice.mediaUrl}
+                      mediaKind={mediaKind}
+                      thumbnailUrl={practice.thumbnailUrl}
+                      initialPlayCount={completion?.playCount ?? 0}
+                      initialPositionSeconds={completion?.positionSeconds ?? 0}
+                      initialCompleted={completed}
+                      initialCompletionId={completion?.id ?? null}
+                      initialProgressPct={completion?.progressPct ?? 0}
+                      initialReflection={reflection}
+                    />
+                  </>
+                )}
               </Stack>
             </div>
           </Container>

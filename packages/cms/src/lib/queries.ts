@@ -207,3 +207,12 @@ export const POWER_DROP_API_BY_SLUG_QUERY = groq`
     featured
   }
 `;
+
+/**
+ * The Return Path's copy + timings - the `returnPathContent` singleton.
+ * Missing fields are filled from the code defaults by the caller
+ * (apps/web/src/components/return-path/content.ts).
+ */
+export const RETURN_PATH_CONTENT_QUERY = groq`*[_id == "returnPathContent"][0]{
+  intro, settings, choose, practice, checkpoints, ending, email, timings
+}`;

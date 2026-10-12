@@ -16,6 +16,10 @@ export default defineConfig({
   basePath: '/studio',
   projectId: projectId || 'placeholder',
   dataset,
-  schema: { types: schemaTypes },
+  schema: {
+    types: schemaTypes,
+    // Singletons are opened from their own Studio item, never created anew.
+    templates: (templates) => templates.filter((t) => t.schemaType !== 'returnPathContent'),
+  },
   plugins: [structureTool({ structure }), visionTool({ defaultApiVersion: apiVersion })],
 });

@@ -14,6 +14,7 @@ export {
   ARTICLE_API_BY_SLUG_QUERY,
   POWER_DROPS_LIST_API_QUERY,
   POWER_DROP_API_BY_SLUG_QUERY,
+  RETURN_PATH_CONTENT_QUERY,
 } from './lib/queries';
 
 // Schema
@@ -25,6 +26,7 @@ export { lesson } from './schema/documents/lesson';
 export { practice } from './schema/documents/practice';
 export { assessment } from './schema/documents/assessment';
 export { powerDrop } from './schema/documents/powerDrop';
+export { returnPathContent, RETURN_PATH_CONTENT_ID } from './schema/documents/returnPathContent';
 export { author } from './schema/documents/author';
 export { category } from './schema/documents/category';
 export { blockContent } from './schema/objects/blockContent';

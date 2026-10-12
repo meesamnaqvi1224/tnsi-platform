@@ -10,6 +10,7 @@ import { lesson } from './documents/lesson';
 import { practice } from './documents/practice';
 import { assessment } from './documents/assessment';
 import { powerDrop } from './documents/powerDrop';
+import { returnPathContent } from './documents/returnPathContent';
 import { somaticSeries } from './documents/somaticSeries';
 import { somaticCard } from './documents/somaticCard';
 
@@ -22,6 +23,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   practice,
   assessment,
   powerDrop,
+  returnPathContent,
   somaticSeries,
   somaticCard,
   author,

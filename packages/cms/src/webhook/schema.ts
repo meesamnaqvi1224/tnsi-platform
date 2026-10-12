@@ -1,7 +1,7 @@
 import { z } from '@tnsi/validation';
 
 /**
- * The exact same 6 values as `practice_content_type` in Postgres
+ * The exact same 7 values as `practice_content_type` in Postgres
  * (packages/db/src/schema/enums.ts) and the `practice` Sanity schema's
  * `contentType` options list (packages/cms/src/schema/documents/practice.ts).
  * Deliberately duplicated rather than imported from `@tnsi/db` — `packages/cms`
@@ -16,6 +16,7 @@ export const PRACTICE_CONTENT_TYPES = [
   'breathwork',
   'movement',
   'journal',
+  'interactive',
 ] as const;
 
 export type PracticeContentType = (typeof PRACTICE_CONTENT_TYPES)[number];
@@ -31,6 +32,7 @@ export const sanityPracticeDocumentSchema = z.object({
   description: z.string().nullable().optional(),
   contentType: z.enum(PRACTICE_CONTENT_TYPES),
   mediaUrl: z.string().nullable().optional(),
+  interactiveKey: z.string().nullable().optional(),
   thumbnailUrl: z.string().nullable().optional(),
   durationSeconds: z.number().nullable().optional(),
   category: z.string().nullable().optional(),
