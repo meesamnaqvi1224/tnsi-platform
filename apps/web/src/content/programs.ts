@@ -46,8 +46,8 @@ export const programsOverviewContent = {
       title: 'The Regulation Suite™',
       tagline: 'Practical nervous-system support, whenever you need it.',
       paragraphs: [
-        "The Regulation Suite™ is a digital nervous-system support platform — a subscription app designed to help you understand what's happening in your nervous system and find an appropriate response in the moment, without needing to work through complex theory first.",
-        'State-based navigation (Calm My System, Feel Grounded, Release Pressure, Reconnect With Myself, Build Capacity) moves you quickly towards relevant support, drawing on PowerDrops™, somatic regulation practices, guided exercises, meditation and visualisation, and body-based tools.',
+        "The Regulation Suite™ is a digital nervous-system support platform — delivered through a subscription app and digital membership — designed to help you understand what's happening in your nervous system and find an appropriate response in the moment, without needing to work through complex theory first.",
+        'State-based navigation (Calm My System, Feel Grounded, Release Pressure, Reconnect With Myself, Build Capacity) moves you quickly towards relevant support — from PowerDrops™, brief interventions designed for immediate use in moments of pressure or overwhelm, to longer-form somatic regulation practices, guided exercises, meditation and visualisation, and body-based tools.',
         'It supports both immediate regulation and longer-term capacity awareness, and is not a replacement for clinical treatment, crisis intervention, or specialist mental health care.',
         // Pricing per Caroline's source document, stated here as informational
         // content only — the enrolment status below (and the page's own CTA
@@ -59,15 +59,14 @@ export const programsOverviewContent = {
         'People experiencing everyday stress, overwhelm or reduced capacity',
         'Immediate, practical regulation support',
         'Building longer-term nervous-system awareness',
-        'Maintaining progress after the Life Beyond Trauma Method™',
+        'An accessible entry point before deciding on a more structured programme such as The Life Beyond Trauma Method™',
       ],
       cta: { label: 'Explore the Regulation Suite', href: '/programs/regulation-suite' },
       imageSrc: '/images/programs/nav-regulation-suite.webp',
       imageAlt:
         'An open blank notebook and pencil beside a small succulent plant on a wooden table.',
-      heroImageSrc: '/images/programs/regulation-suite/hero.webp',
-      heroImageAlt:
-        'An open blank notebook and pencil beside a small succulent plant on a wooden table, seen from above.',
+      heroImageSrc: '/images/programs/regulation-suite/hero-journal.webp',
+      heroImageAlt: 'A woman in a cream cardigan pauses thoughtfully by a window, journal in hand.',
     },
     {
       id: 'life-beyond-trauma',
@@ -170,12 +169,12 @@ export const programsOverviewContent = {
         label: 'Explore System-Level Executive Advisory',
         href: '/programs/organisational-advisory',
       },
-      imageSrc: '/images/programs/nav-organisational-advisory.webp',
+      imageSrc: '/images/programs/organisational-advisory/thumb-studio.webp',
       imageAlt:
-        'An empty boardroom with a curved wooden table, tan leather chairs and a small plant, seen through glass-walled offices.',
-      heroImageSrc: '/images/programs/organisational-advisory/hero.webp',
+        'A bright, quiet meeting room with a long wooden table, cream chairs and tall arched windows.',
+      heroImageSrc: '/images/programs/organisational-advisory/hero-studio.webp',
       heroImageAlt:
-        'A boardroom with a curved wooden table, tan leather chairs and a small plant, glass-walled offices visible beyond.',
+        'A bright, quiet meeting room with a long wooden table, cream chairs and tall arched windows.',
     },
   ] as const,
 

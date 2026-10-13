@@ -1,10 +1,21 @@
 import type { Metadata } from 'next';
 import NextLink from 'next/link';
+import {
+  Brain,
+  Compass,
+  GraduationCap,
+  HandHeart,
+  MessagesSquare,
+  Stethoscope,
+  type LucideIcon,
+} from 'lucide-react';
 import { buttonVariants, Container, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
+import { IdealForBand } from '@/components/programs/ideal-for-band';
 import { EditorialImage } from '@/components/utility/editorial-image';
+import { FadeIn } from '@/components/utility/fade-in';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { getPathway } from '@/content/programs';
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
@@ -12,6 +23,16 @@ import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from 
 const pathway = getPathway('nervous-system-academy');
 const PAGE_TITLE = pathway.title;
 const PAGE_DESCRIPTION = pathway.tagline;
+
+/** Purely visual pairing of each existing audience label with a line icon. */
+const idealForIcons: Record<string, LucideIcon> = {
+  Therapists: MessagesSquare,
+  Psychologists: Brain,
+  Coaches: Compass,
+  'Healthcare professionals': Stethoscope,
+  Educators: GraduationCap,
+  'Helping professionals': HandHeart,
+};
 
 /**
  * The Academy's three defined routes, per Caroline Reed's
@@ -86,42 +107,57 @@ export default function AcademyPage() {
       <JsonLd data={jsonLd} />
       <SiteHeader />
       <main id="main-content">
-        <Section spacing="xl" aria-labelledby="academy-hero-heading">
-          <Container size="xl">
-            <Stack gap="lg" className="max-w-2xl">
-              <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
-                {pathway.category}
-              </p>
-              <h1
-                id="academy-hero-heading"
-                className="font-heading text-foreground text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl"
-              >
-                {pathway.title}
-              </h1>
-              <Text size="lg" tone="muted" className="max-w-prose leading-relaxed">
-                {pathway.tagline}
-              </Text>
-            </Stack>
-          </Container>
-        </Section>
-
-        {'heroImageSrc' in pathway ? (
-          <Section
-            spacing="xl"
-            className="border-foreground/15 border-t"
-            aria-label="Nervous System Academy"
-          >
-            <Container size="xl">
-              <EditorialImage
+        {/* Hero — one immersive full-bleed composition, matching the Private
+            Executive Advisory and Regulation Suite treatment: image fills the
+            viewport, text sits directly over it with a bottom-to-transparent
+            scrim. */}
+        <section
+          aria-labelledby="academy-hero-heading"
+          className="relative min-h-[92vh] overflow-hidden"
+        >
+          {'heroImageSrc' in pathway ? (
+            <div className="animate-hero-ken-burns absolute inset-0">
+              <ResponsiveImage
                 src={pathway.heroImageSrc}
                 alt={pathway.heroImageAlt}
-                aspect="landscape"
-                className="rounded-lg"
-                sizes="(max-width: 1024px) 100vw, 1152px"
+                fill
+                priority
+                className="object-cover"
+                sizes="100vw"
               />
-            </Container>
-          </Section>
-        ) : null}
+            </div>
+          ) : null}
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
+            aria-hidden
+          />
+
+          <Container
+            size="xl"
+            className="dark text-foreground relative flex min-h-[92vh] flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-3xl) sm:px-(--space-2xl) sm:pb-(--space-4xl)"
+          >
+            <Stack gap="lg" className="max-w-2xl">
+              <FadeIn>
+                <p className="font-mono text-xs tracking-[0.25em] text-white/70 uppercase">
+                  {pathway.category}
+                </p>
+              </FadeIn>
+              <FadeIn delayMs={80}>
+                <h1
+                  id="academy-hero-heading"
+                  className="font-heading text-[2.75rem] leading-[1] font-semibold tracking-tight text-white sm:text-6xl lg:text-[4.5rem] xl:text-[5rem]"
+                >
+                  {pathway.title}
+                </h1>
+              </FadeIn>
+              <FadeIn delayMs={160}>
+                <Text className="max-w-xl text-lg leading-relaxed text-white/90">
+                  {pathway.tagline}
+                </Text>
+              </FadeIn>
+            </Stack>
+          </Container>
+        </section>
 
         <Section
           spacing="xl"
@@ -204,29 +240,12 @@ export default function AcademyPage() {
           </Container>
         </Section>
 
-        <Section
-          spacing="xl"
-          className="border-foreground/15 border-t"
-          aria-labelledby="academy-ideal-heading"
-        >
-          <Container size="xl">
-            <Stack gap="2xl">
-              <Heading as="h2" id="academy-ideal-heading" size="xl">
-                Ideal for
-              </Heading>
-              <ul className="flex flex-wrap gap-(--space-sm)" aria-label="Ideal for">
-                {pathway.idealFor.map((item) => (
-                  <li
-                    key={item}
-                    className="border-foreground/15 text-foreground rounded-full border px-(--space-md) py-(--space-xs) text-sm"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </Stack>
-          </Container>
-        </Section>
+        <IdealForBand
+          headingId="academy-ideal-heading"
+          items={pathway.idealFor}
+          icons={idealForIcons}
+          columns={3}
+        />
 
         <Section
           spacing="xl"

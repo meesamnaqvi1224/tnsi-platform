@@ -38,10 +38,6 @@ export function EaHero() {
         className="dark text-foreground relative flex min-h-[92vh] flex-col justify-end px-(--space-xl) pt-(--space-5xl) pb-(--space-3xl) sm:px-(--space-2xl) sm:pb-(--space-4xl)"
       >
         <Stack gap="xl" className="max-w-4xl">
-          <p className="font-mono text-xs tracking-[0.25em] text-white/70 uppercase">
-            {hero.eyebrow}
-          </p>
-
           <h1
             id="ea-hero-heading"
             className="font-heading text-[2.75rem] leading-[1] font-semibold tracking-tight text-white sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem]"
