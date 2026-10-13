@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "source": "Caroline Somatic healing cards.pdf, page 21 (the nine numbered PowerDrop™ cards). Text transcribed from the card faces; nothing added or reworded.",
+  "excluded": [
+    {
+      "title": "PowerDrop™ Journal Page",
+      "reason": "Marked BONUS on the card sheet. It is a journalling page, not a PowerDrop."
+    }
+  ],
+  "freeSelection": {
+    "status": "owner-confirmed",
+    "note": "Confirmed by the owner: exactly these three PowerDrops are free for every member under the approved Regulation Suite model; the other six are the paid library. The importer enforces exactly three. All nine PowerDrops are published in Sanity (owner-approved), with three free and six paid; the three earlier [Placeholder] PowerDrops were retired to draft, not deleted. The per-entry status values below are what the importer created the documents with (draft); publication was a separate step, and Sanity is now the source of truth for status. freeAccess has no effect until membership is open: while enrolment is closed, nothing is locked.",
+    "selected": [
+      "the-90-second-exhale-drop",
+      "micro-visualization-the-return",
+      "the-powerdown-ritual"
+    ]
+  },
+  "artwork": {
+    "status": "supplied",
+    "note": "The nine final standalone images were supplied by the owner (Free 9 Powerdrop cards.zip, Magnific generations). They were not regenerated: each was locally cleaned and framed only - transparent canvas added, small stray marks removed, edges cut by the original canvas softened, and the Mask Drop Mirror Ritual's white background removed - with every visible pixel of the artwork left unchanged and nothing rescaled. They are renamed deterministically and kept local and uncommitted in the git-ignored artwork directory .local/powerdrop-artwork (the importer's default, same convention as the Core Series artwork). Eight are 1280x960 RGBA PNGs with transparency; the Mask Drop Mirror Ritual image is a 1760x1398 RGBA PNG with transparency. The owner reviewed and approved the cleaned artwork in the mobile UI. The approved free/paid mapping is unchanged by the artwork work. The app shows each at its own aspect ratio with 'contain'. Run the importer with --artwork-dir to upload them."
+  },
+  "powerDrops": [
+    {
+      "slug": "the-90-second-exhale-drop",
+      "title": "The 90-Second Exhale Drop",
+      "category": "Regulation",
+      "focus": "Regulation",
+      "description": "Shift your nervous system from overwhelm into calm—fast.",
+      "duration": "90 seconds",
+      "instructions": [
+        "Inhale for 4 counts",
+        "Hold for 4 counts",
+        "Exhale for 8 counts",
+        "Repeat 3 times"
+      ],
+      "anchorStatement": "I'm allowed to pause.",
+      "sourceTags": ["Calm", "Clarity", "Nervous system reset"],
+      "sortOrder": 1,
+      "featured": false,
+      "freeAccess": true,
+      "status": "draft",
+      "artworkSource": "powerdrop-90-second-exhale.png",
+      "artworkAlt": "Woman seated on a stool with eyes closed and lips slightly parted, one hand on her upper chest and the other on her abdomen."
+    },
+    {
+      "slug": "the-powerdown-ritual",
+      "title": "The Powerdown Ritual",
+      "category": "Transition",
+      "focus": "Transition",
+      "description": "Signal the end of effort. Re-enter rest.",
+      "instructions": [
+        "Turn off one light intentionally",
+        "Remove one \"layer\" (clothing / role)",
+        "Take 3 slow exhales",
+        "Light a candle or pause in stillness"
+      ],
+      "anchorStatement": "I've done enough. I am enough.",
+      "sourceTags": ["Boundary", "Closure", "Rest readiness"],
+      "sortOrder": 2,
+      "featured": false,
+      "freeAccess": true,
+      "status": "draft",
+      "artworkSource": "powerdrop-powerdown-ritual.png",
+      "artworkAlt": "Woman standing beside a wooden table, setting a notebook and phone down, with a chair beside her."
+    },
+    {
+      "slug": "softness-reclaim-reset",
+      "title": "Softness Reclaim Reset",
+      "category": "Softening",
+      "focus": "Softening",
+      "description": "Return the body to safety through gentleness.",
+      "instructions": [
+        "One hand on heart, one on belly",
+        "Slow, deep breathing",
+        "Imagine warmth spreading",
+        "Let tension melt (3–5 min)"
+      ],
+      "anchorStatement": "I can soften without losing strength.",
+      "sourceTags": ["Soften", "Release", "Self-compassion"],
+      "sortOrder": 3,
+      "featured": false,
+      "freeAccess": false,
+      "status": "draft",
+      "artworkSource": "powerdrop-softness-reclaim-reset.png",
+      "artworkAlt": "Woman seated with relaxed shoulders, looking down at her open hands resting in her lap."
+    },
+    {
+      "slug": "mask-drop-mirror-ritual",
+      "title": "Mask Drop Mirror Ritual",
+      "category": "Authenticity",
+      "focus": "Authenticity",
+      "description": "Release performance. Return to self.",
+      "instructions": [
+        "Look into your own eyes",
+        "Breathe slowly",
+        "Speak truth gently",
+        "Acknowledge your worth"
+      ],
+      "anchorStatement": "I release the need to perform. I honor who I am beneath the mask.",
+      "sourceTags": ["Authenticity", "Self-acceptance", "Freedom"],
+      "sortOrder": 4,
+      "featured": false,
+      "freeAccess": false,
+      "status": "draft",
+      "artworkSource": "powerdrop-mask-drop-mirror-ritual.png",
+      "artworkAlt": "Woman standing in front of a full-length mirror, her reflection looking back at her with a hand at its chin."
+    },
+    {
+      "slug": "invisible-labor-dump",
+      "title": "Invisible Labor Dump",
+      "category": "Mental Unload",
+      "focus": "Mental Unload",
+      "description": "Clear the unseen weight you've been carrying.",
+      "instructions": [
+        "Write everything down",
+        "No structure, no filter",
+        "Pause and breathe",
+        "Let it leave your system"
+      ],
+      "anchorStatement": "I don't have to carry this alone.",
+      "sourceTags": ["Clarity", "Lightness", "Mental space"],
+      "sortOrder": 5,
+      "featured": false,
+      "freeAccess": false,
+      "status": "draft",
+      "artworkSource": "powerdrop-invisible-labor-dump.png",
+      "artworkAlt": "Woman in a knit sweater writing in an open notebook at a wooden table, with a mug and a pen beside her."
+    },
+    {
+      "slug": "micro-visualization-the-return",
+      "title": "Micro Visualization: The Return",
+      "category": "Grounding",
+      "focus": "Grounding",
+      "description": "Come back to yourself.",
+      "instructions": [
+        "Imagine a quiet forest path",
+        "Each step releases weight",
+        "Light gathers in your chest",
+        "Breathe in peace and return"
+      ],
+      "anchorStatement": "I return to myself.",
+      "sourceTags": ["Presence", "Grounding", "Inner calm"],
+      "sortOrder": 6,
+      "featured": false,
+      "freeAccess": true,
+      "status": "draft",
+      "artworkSource": "powerdrop-micro-visualization-the-return.png",
+      "artworkAlt": "Woman sitting cross-legged with eyes closed and hands resting on her knees."
+    },
+    {
+      "slug": "body-permission-practice",
+      "title": "Body Permission Practice",
+      "category": "Interoception",
+      "focus": "Interoception",
+      "description": "Rebuild trust with your body.",
+      "instructions": [
+        "Notice any area of tension",
+        "Ask: \"What do you need?\"",
+        "Offer one small response",
+        "Thank your body"
+      ],
+      "anchorStatement": "I honor my body's wisdom.",
+      "sourceTags": ["Awareness", "Trust", "Self-kindness"],
+      "sortOrder": 7,
+      "featured": false,
+      "freeAccess": false,
+      "status": "draft",
+      "artworkSource": "powerdrop-body-permission-practice.png",
+      "artworkAlt": "Woman seated on a woven chair with one hand resting on her chest, looking down with quiet attention."
+    },
+    {
+      "slug": "the-enough-list",
+      "title": "The Enough List",
+      "category": "Self-Worth",
+      "focus": "Self-Worth",
+      "description": "Anchor identity beyond output.",
+      "instructions": [
+        "List qualities, not just achievements",
+        "Include small wins",
+        "Add your values and strengths",
+        "Read when self-doubt appears"
+      ],
+      "anchorStatement": "I am enough without proving.",
+      "sourceTags": ["Self-worth", "Confidence", "Perspective"],
+      "sortOrder": 8,
+      "featured": false,
+      "freeAccess": false,
+      "status": "draft",
+      "artworkSource": "powerdrop-the-enough-list.png",
+      "artworkAlt": "Woman at a wooden table with an open notebook under one hand, a cup of tea and a bowl of stones beside her, looking away with a gentle smile."
+    },
+    {
+      "slug": "microrebel-the-unsent-email",
+      "title": "MicroRebel: The Unsent Email",
+      "category": "Release",
+      "focus": "Release",
+      "description": "Express what you cannot say out loud.",
+      "instructions": [
+        "Write freely and honestly",
+        "No censoring",
+        "Do not send",
+        "Breathe and close"
+      ],
+      "anchorStatement": "My voice matters—even when unheard.",
+      "sourceTags": ["Emotional release", "Freedom", "Relief"],
+      "sortOrder": 9,
+      "featured": false,
+      "freeAccess": false,
+      "status": "draft",
+      "artworkSource": "powerdrop-microrebel-the-unsent-email.png",
+      "artworkAlt": "Woman seated sideways at a wooden desk, leaning back from an open notebook with one arm resting over the chair."
+    }
+  ]
+}

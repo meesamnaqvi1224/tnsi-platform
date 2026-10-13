@@ -11,15 +11,20 @@ import { colors, spacing } from '@/theme';
  * access). The server has already withheld the media — this is only the
  * prompt. It points at the existing Membership & Access screen, which hands
  * membership management off to the website exactly as it already does; no
- * purchase flow lives in the app.
+ * purchase flow lives in the app. Also shown, with its own `message`, for a
+ * PowerDrop™ the server refused (403 `MEMBERSHIP_REQUIRED`).
  */
-export function MembershipLockedNotice() {
+export function MembershipLockedNotice({
+  message = 'This practice is part of the full Regulation Suite™ library, available with a membership.',
+}: {
+  message?: string;
+}) {
   const router = useRouter();
 
   return (
     <Card style={styles.card}>
       <ThemedText variant="body" color={colors.charcoal} style={styles.body}>
-        This practice is part of the full Regulation Suite™ library, available with a membership.
+        {message}
       </ThemedText>
       <PrimaryButton
         label="View Membership"
