@@ -4,6 +4,9 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Sign Up — The Nervous System Institute',
   description: 'Create your TNSI account to access membership content and programs.',
+  // Account pages: crawlable (not blocked in robots.txt, so Google can read this
+  // tag) but kept out of the index; links on them may still be followed.
+  robots: { index: false, follow: true },
 };
 
 export default function SignUpPage() {

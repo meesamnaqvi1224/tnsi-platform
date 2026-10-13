@@ -1,7 +1,8 @@
 import { sanityFetch } from '@tnsi/cms/server';
-import { ARTICLE_BY_SLUG_QUERY, ARTICLE_SLUGS_QUERY } from '@tnsi/cms';
+import { ARTICLE_BY_SLUG_QUERY, ARTICLE_SITEMAP_QUERY, ARTICLE_SLUGS_QUERY } from '@tnsi/cms';
 import { articlesContent } from '@/content/articles';
 import type { ArticleItem } from '@/content/articles';
+import { reliableLastModified } from '@/lib/sitemap-dates';
 import { nervousSystemFrameworkPost } from '@/content/article-posts/nervous-system-framework';
 import type { ArticleBodyBlock, ArticlePost } from '@/content/article-posts/types';
 
@@ -241,6 +242,42 @@ function mapSanityArticle(doc: SanityArticleDetail): ArticlePost {
 export async function getAllArticleSlugs(): Promise<string[]> {
   const sanitySlugs = (await sanityFetch<string[]>(ARTICLE_SLUGS_QUERY)) ?? [];
   return [...new Set([...staticSlugs, ...sanitySlugs])];
+}
+
+export interface ArticleSitemapEntry {
+  slug: string;
+  /** Genuine modification/publication date; absent when none is reliable. */
+  lastModified?: Date;
+}
+
+interface SanityArticleSitemapRow {
+  slug: string;
+  publishedAt?: string | null;
+  _updatedAt?: string | null;
+}
+
+/**
+ * Every article URL for the sitemap, with a `lastModified` only where the CMS
+ * supplies a reliable date (its own `_updatedAt`, else the entered
+ * `publishedAt`). Static fallback articles - slugs with no Sanity document -
+ * only carry a month label ("June 2026") as display copy, not a modification
+ * date, so they get none. The slug set is identical to `getAllArticleSlugs`.
+ */
+export async function getArticleSitemapEntries(
+  now: Date = new Date(),
+): Promise<ArticleSitemapEntry[]> {
+  const rows = (await sanityFetch<SanityArticleSitemapRow[]>(ARTICLE_SITEMAP_QUERY)) ?? [];
+  const bySlug = new Map<string, ArticleSitemapEntry>();
+
+  for (const slug of staticSlugs) bySlug.set(slug, { slug });
+
+  for (const row of rows) {
+    if (!row.slug) continue;
+    const lastModified = reliableLastModified([row._updatedAt, row.publishedAt], now);
+    bySlug.set(row.slug, lastModified ? { slug: row.slug, lastModified } : { slug: row.slug });
+  }
+
+  return [...bySlug.values()];
 }
 
 /**
