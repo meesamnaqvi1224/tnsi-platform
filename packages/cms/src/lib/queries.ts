@@ -63,6 +63,17 @@ export const PROGRAMS_QUERY = groq`
 export const ARTICLE_SLUGS_QUERY = groq`*[_type == "article" && defined(slug.current)].slug.current`;
 
 /**
+ * Slug plus the dates the sitemap's `lastmod` is derived from. `_updatedAt` is
+ * Sanity's own last-edit timestamp; `publishedAt` is the editor-entered
+ * publication date. Both are real document data, never a generation time.
+ */
+export const ARTICLE_SITEMAP_QUERY = groq`*[_type == "article" && defined(slug.current)]{
+  "slug": slug.current,
+  publishedAt,
+  _updatedAt
+}`;
+
+/**
  * Paginated, optionally category-filtered article list for the native
  * mobile API (`/api/v1/articles`) — separate from `ARTICLES_QUERY` above
  * because that one has no params and is tied to the web listing page's
