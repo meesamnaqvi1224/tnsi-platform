@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { getAllArticleSlugs } from '@/lib/articles';
+import { getArticleSitemapEntries } from '@/lib/articles';
 import { absoluteUrl } from '@/lib/seo';
 
 const STATIC_ROUTES = [
@@ -28,20 +28,22 @@ const STATIC_ROUTES = [
   '/cookies',
 ] as const;
 
+/**
+ * `lastModified` is set only from a genuine document date (an article's CMS
+ * `_updatedAt`/`publishedAt`). Static pages have no per-page modification
+ * date anywhere in the codebase, and the sitemap's own generation time is not
+ * one, so those entries omit `lastModified` rather than report a false value.
+ */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
-
   const staticEntries = STATIC_ROUTES.map((path) => ({
     url: absoluteUrl(path),
-    lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: path === '/' ? 1 : 0.8,
   }));
 
-  const articleSlugs = await getAllArticleSlugs();
-  const articleEntries = articleSlugs.map((slug) => ({
+  const articleEntries = (await getArticleSitemapEntries()).map(({ slug, lastModified }) => ({
     url: absoluteUrl(`/articles/${slug}`),
-    lastModified: now,
+    ...(lastModified ? { lastModified } : {}),
     changeFrequency: 'monthly' as const,
     priority: 0.7,
   }));
