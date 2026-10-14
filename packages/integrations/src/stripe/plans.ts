@@ -16,3 +16,17 @@ export const MEMBERSHIP_PLANS = {
 } as const;
 
 export type MembershipPlanTier = keyof typeof MEMBERSHIP_PLANS;
+
+/**
+ * Display copy for the approved annual saving ("approximately 18%"):
+ * £5.99 x 12 = £71.88 against £59 is a 17.9% saving. Kept next to the prices
+ * so the two cannot drift apart (a test recomputes it from `MEMBERSHIP_PLANS`).
+ */
+export const MEMBERSHIP_ANNUAL_SAVING_PERCENT = 18;
+
+/**
+ * The approved number of PowerDrops™ a free account can open. Which three is
+ * an editorial choice made in Sanity (`freeAccess` on each PowerDrop), not
+ * here — this is only the figure shown to members.
+ */
+export const MEMBERSHIP_FREE_POWERDROPS = 3;

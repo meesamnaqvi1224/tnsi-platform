@@ -110,3 +110,30 @@ describe('DashboardPage — Somatic Cards discovery tile', () => {
     expect(html).toContain('Pause for a moment.');
   });
 });
+
+describe('DashboardPage — Your Access follows the resolved membership', () => {
+  const user = (entitlements: Record<string, unknown>) => ({
+    id: 'user-1',
+    fullName: 'Test User',
+    entitlements,
+  });
+
+  it('an ended membership renders as a Free Member, whatever plan the row last held', async () => {
+    mockRequireMemberAccessOrRedirect.mockResolvedValue(
+      user({ tier: 'monthly', status: 'canceled', programs: [], certifications: [], features: [] }),
+    );
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).toContain('Free Member');
+    expect(html).toContain('Your paid membership has ended. Your free account remains active.');
+    expect(html).not.toContain('Monthly Member');
+  });
+
+  it('a paying member still sees their plan', async () => {
+    mockRequireMemberAccessOrRedirect.mockResolvedValue(
+      user({ tier: 'annual', status: 'active', programs: [], certifications: [], features: [] }),
+    );
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).toContain('Annual Member');
+    expect(html).not.toContain('paid membership has ended');
+  });
+});

@@ -113,6 +113,29 @@ describe('POST /api/v1/billing/checkout', () => {
     },
   );
 
+  it.each([
+    ['cancelled and the period over', { tier: 'monthly', status: 'canceled' }],
+    ['expired', { tier: 'annual', status: 'expired' }],
+    [
+      'unpaid past the 7-day grace period',
+      {
+        tier: 'monthly',
+        status: 'past_due',
+        paymentFailedAt: new Date(Date.now() - 8 * 86_400_000),
+      },
+    ],
+  ])(
+    'an ended member (%s) can start a new membership — not refused, no second trial',
+    async (_label, patch) => {
+      openMembership();
+      state.row = { stripeCustomerId: 'cus_1', stripeSubscriptionId: 'sub_old' };
+      state.user!.entitlements = { ...free, ...patch };
+      const res = await POST(request('annual'));
+      expect(res.status).toBe(200);
+      expect(createCheckoutSession.mock.calls[0]![0].offerTrial).toBe(false);
+    },
+  );
+
   it('offers NO trial to an account that has had a subscription before', async () => {
     openMembership();
     state.row = { stripeCustomerId: 'cus_1', stripeSubscriptionId: 'sub_old' };

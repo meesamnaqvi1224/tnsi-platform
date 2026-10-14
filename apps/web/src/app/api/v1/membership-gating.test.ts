@@ -87,6 +87,7 @@ const MEMBERS = {
     paymentFailedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
   }),
   expired: entitlement({ status: 'expired' }),
+  ended: entitlement({ tier: 'annual', status: 'canceled' }),
 };
 
 function asUser(key: keyof typeof MEMBERS) {
@@ -182,16 +183,48 @@ describe('PowerDrops — membership open', () => {
     },
   );
 
-  it.each(['lapsed', 'expired'] as const)(
-    'GET detail: a %s member is refused even a free PowerDrop (existing inactive rule)',
+  it.each(['lapsed', 'expired', 'ended'] as const)(
+    'GET detail: a %s member falls back to the free account — a free PowerDrop still opens',
     async (who) => {
       const { GET } = await import('./powerdrops/[slug]/route');
       state.sanityDrop = drop(true);
       asUser(who);
       const res = await GET(new Request('http://x/api'), params());
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(200);
     },
   );
+
+  it.each(['lapsed', 'expired', 'ended'] as const)(
+    'GET detail: a %s member is refused a paid PowerDrop (403 MEMBERSHIP_REQUIRED) and gets none of its content',
+    async (who) => {
+      const { GET } = await import('./powerdrops/[slug]/route');
+      state.sanityDrop = drop(false);
+      asUser(who);
+      const res = await GET(new Request('http://x/api'), params());
+      expect(res.status).toBe(403);
+      const body = JSON.stringify(await res.json());
+      expect(body).toContain('MEMBERSHIP_REQUIRED');
+      expect(body).not.toContain('Breathe');
+    },
+  );
+
+  it('GET list: an ended member sees the free PowerDrop unlocked and the paid ones locked', async () => {
+    const { GET } = await import('./powerdrops/route');
+    state.sanityList = {
+      items: [
+        { ...drop(true), id: 'free-1' },
+        { ...drop(false), id: 'paid-1' },
+      ],
+      total: 2,
+    };
+    asUser('ended');
+    const { data } = await (await GET(new Request('http://x/api/v1/powerdrops'))).json();
+    const free = data.powerDrops.find((d: { id: string }) => d.id === 'free-1');
+    const paid = data.powerDrops.find((d: { id: string }) => d.id === 'paid-1');
+    expect(free.locked).toBe(false);
+    expect(paid.locked).toBe(true);
+    expect(paid.cardImage).toBeNull();
+  });
 
   it('GET list: every PowerDrop is listed, but paid ones come back locked with the card artwork withheld', async () => {
     const { GET } = await import('./powerdrops/route');
@@ -262,6 +295,13 @@ describe('PowerDrops — membership NOT open (today): nothing is locked early', 
     const { data } = await (await list.GET(new Request('http://x/api/v1/powerdrops'))).json();
     expect(data.powerDrops[0].locked).toBe(false);
     expect(data.powerDrops[0].cardImage).not.toBeNull();
+  });
+
+  it('an ended member is a free member: nothing is locked for them either', async () => {
+    const detail = await import('./powerdrops/[slug]/route');
+    state.sanityDrop = drop(false);
+    asUser('ended');
+    expect((await detail.GET(new Request('http://x/api'), params())).status).toBe(200);
   });
 
   it('half-configured is still closed: launch switch on but no Stripe prices → nothing locked', async () => {

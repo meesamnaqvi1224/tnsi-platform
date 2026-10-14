@@ -14,7 +14,13 @@ export {
   StripeConfigError,
   type StripeConfig,
 } from './stripe/config';
-export { MEMBERSHIP_TRIAL_DAYS, MEMBERSHIP_PLANS, type MembershipPlanTier } from './stripe/plans';
+export {
+  MEMBERSHIP_TRIAL_DAYS,
+  MEMBERSHIP_PLANS,
+  MEMBERSHIP_ANNUAL_SAVING_PERCENT,
+  MEMBERSHIP_FREE_POWERDROPS,
+  type MembershipPlanTier,
+} from './stripe/plans';
 export { getStripeClient, isStripeConfigured } from './stripe/client';
 export { verifyStripeWebhookEvent, StripeWebhookVerificationError } from './stripe/verify';
 export {

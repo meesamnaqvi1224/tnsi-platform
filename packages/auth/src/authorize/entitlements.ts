@@ -121,55 +121,47 @@ function hasEligibleStatus(entitlement: EntitlementRecord, now: Date): boolean {
 }
 
 /**
- * Does this entitlement grant access to member content (Today, Practices,
- * Practice Detail, Saved Practices, Practice History, My Journey)?
+ * Does this user have a member account — i.e. may they use the member area
+ * (Today, Practices, Practice Detail, Saved Practices, Practice History,
+ * My Journey) and whatever free content the commercial model gives a Free
+ * Member?
  *
- * Deliberately NOT the same question `authorizeEntitlement`'s `free`
- * requirement answers above - `free` ignores status entirely by design
- * ("every authenticated user... satisfies it", see its own comment).
- * `hasMemberAccess` is a genuine, status-aware ACTIVE/INACTIVE gate: the
- * seam a future paid-membership requirement plugs into, per the
- * Membership & Entitlements v1 milestone. It reuses the exact same
- * active/trialing-eligible rule already established for
- * programme/certification/feature access above, rather than inventing a
- * second, different eligibility rule.
+ * Approved Regulation Suite™ model: Free account → Paid membership →
+ * Membership ends → back to the Free account. A paid membership that has
+ * ended (cancelled and the paid period over, expired, or payment unresolved
+ * past the 7-day grace period) must never cost the user their free
+ * account, so member-area access does NOT depend on `status`: every user
+ * who has an entitlement row has it.
+ *
+ * What a status-ineligible record loses is PAID access, which is decided
+ * elsewhere and unchanged: `hasPaidAccess` / `resolveMembership` for the
+ * paid library, and `authorizeEntitlement` for programme, certification and
+ * feature requirements (all still gated on `active`/`trialing`/grace).
+ * Which content a free account may open is `canAccessContent`'s job.
  *
  * `null` (no entitlement row at all) has no access - fails closed. In
  * practice this should be rare: a default `free`/`active` row is created
  * synchronously as part of Clerk's `user.created` sync
  * (`packages/auth/src/sync/user.ts`), so almost every authenticated user
- * already has one, and `active` is exactly the state `hasMemberAccess`
- * allows - which is precisely why wiring this in changes no *current*
- * user's access: everyone is `active` by default today, and nothing in
- * this codebase yet transitions a row away from that (Stripe sync exists
- * but is unconfigured/dormant - see packages/integrations/src/stripe).
+ * already has one.
  */
-export function hasMemberAccess(
-  entitlement: EntitlementRecord | null,
-  now: Date = new Date(),
-): boolean {
-  if (!entitlement) return false;
-  return hasEligibleStatus(entitlement, now);
+export function hasMemberAccess(entitlement: EntitlementRecord | null): boolean {
+  return entitlement !== null;
 }
 
 /**
  * Throwing form of `hasMemberAccess`, mirroring `assertEntitlement`'s
  * shape below. Throws `EntitlementRequiredError` (403,
- * `ENTITLEMENT_REQUIRED`) when the user has no active/trialing
- * entitlement; returns normally when they do.
+ * `ENTITLEMENT_REQUIRED`) only when the user has no entitlement row at all;
+ * a user whose paid membership has ended still has their free account and
+ * does not throw.
  */
-export function assertMemberAccess(
-  entitlement: EntitlementRecord | null,
-  now: Date = new Date(),
-): void {
-  if (hasMemberAccess(entitlement, now)) return;
+export function assertMemberAccess(entitlement: EntitlementRecord | null): void {
+  if (hasMemberAccess(entitlement)) return;
 
-  throw new EntitlementRequiredError(
-    ['member'],
-    entitlement ? [entitlement.status] : [],
-    'Member access required.',
-    { reason: entitlement ? 'STATUS_NOT_ELIGIBLE' : 'NO_ENTITLEMENT' },
-  );
+  throw new EntitlementRequiredError(['member'], [], 'Member access required.', {
+    reason: 'NO_ENTITLEMENT',
+  });
 }
 
 /**
@@ -267,8 +259,8 @@ export interface MembershipRecord extends EntitlementRecord {
  *   (paid access continues).
  * - `inactive` — had a paid plan but is no longer eligible: cancelled and
  *   period ended, expired, or payment unresolved past the grace period.
- *   Falls under the existing entitlement architecture's ineligible rule
- *   (no member access).
+ *   Paid access is gone; the user's free account remains (they keep member
+ *   access and free-designated content, and can start a new membership).
  */
 export type MembershipState = 'free' | 'trialing' | 'active' | 'grace' | 'inactive';
 
@@ -301,15 +293,26 @@ export function resolveMembership(
     graceEndsAt: null,
     cancelsAtPeriodEnd: false,
   };
+  const free: ResolvedMembership = {
+    state: 'free',
+    hasPaidAccess: false,
+    graceEndsAt: null,
+    cancelsAtPeriodEnd: false,
+  };
 
-  if (!record || !hasMemberAccess(record, now)) return inactive;
+  if (!record) return inactive;
 
-  if (record.tier === 'free') {
-    return { state: 'free', hasPaidAccess: false, graceEndsAt: null, cancelsAtPeriodEnd: false };
+  // Paid period genuinely over (or never validly running): paid access is
+  // gone, the free account remains. A paid tier here is an ended membership
+  // (`inactive`); a free-tier row is simply a free account.
+  if (!hasEligibleStatus(record, now)) {
+    return record.tier === 'free' ? free : inactive;
   }
 
+  if (record.tier === 'free') return free;
+
   if (record.status === 'past_due') {
-    // hasMemberAccess already proved we're inside grace, so paymentFailedAt is set.
+    // hasEligibleStatus already proved we're inside grace, so paymentFailedAt is set.
     return {
       state: 'grace',
       hasPaidAccess: true,
@@ -352,7 +355,7 @@ export function canAccessContent(
   gatingActive: boolean,
   now: Date = new Date(),
 ): boolean {
-  if (!hasMemberAccess(record, now)) return false;
+  if (!hasMemberAccess(record)) return false;
   if (!gatingActive) return true;
   return content.isFree || hasPaidAccess(record, now);
 }

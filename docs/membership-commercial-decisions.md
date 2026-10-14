@@ -4,75 +4,208 @@
 business language, not engineering language — you should be able to read
 and answer it without understanding any code.
 
-**Status:** Nothing described here has been turned on. No prices exist, no
-real payments can happen, and nothing changes until you make the decisions
-below and engineering is asked to implement them.
+**Status (updated 14 October 2026):** Section 0 is the current source of
+truth: the owner-confirmed policy, what is implemented today, and what is
+planned but not yet built. Nothing is live — membership is closed, no real
+payment can happen, and no Stripe credentials are configured in the production
+project. Sections 1–17 are the original question set, kept unchanged as the
+historical record; where they conflict with Section 0, Section 0 wins.
 
 ---
 
-## 0. Approved model (v1) and implementation status
+## 0. Current policy and implementation status
 
-**Update, October 2026.** The owner has approved the Regulation Suite™
-commercial model ("TNSI Regulation Suite™ Membership & Commercial Model —
-Version 1"). The decision tables later in this document are the original
-questions and are kept for history; where they conflict, this section wins.
+Approved model v1 (8 October 2026) was **amended on 14 October 2026**: the trial
+and Lifetime rules below replace the earlier ones. This section separates three
+things so none is mistaken for another: **0.1** what the owner has decided,
+**0.2** what the code does today, and **0.3** what is planned but not built.
 
-| Decision            | Approved                                                   |
-| ------------------- | ---------------------------------------------------------- |
-| Model               | Free + paid membership, self-serve (no discovery call)     |
-| Monthly / annual    | £5.99 per month / £59 per year                             |
-| Trial               | 30 days, Stripe-native, first subscription only            |
-| Payment failure     | 7-day grace period (counted from the first failed payment) |
-| Cancellation        | Access continues to the end of the paid billing period     |
-| Refunds             | None — nothing in the platform issues or promises refunds  |
-| Free account        | Check-In, selected Practices/resources, 3 PowerDrops™      |
-| Paid                | Full Practice and PowerDrops™ library                      |
-| Lifetime tier       | Not part of the approved model (price intentionally unset) |
-| Life Beyond Trauma™ | Separate programme and commercial journey                  |
+### 0.1 Decisions confirmed by the owner
 
-**Built, but switched off.** The application supports all of the above. It
-stays dormant — website closed, no checkout, no content locked — until
-`REGULATION_SUITE_MEMBERSHIP_OPEN=true` _and_ Stripe is fully configured
-(see `.env.example`). Nothing is live.
+| Decision                 | Confirmed                                                                                                                                                               |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Model                    | Free + paid membership, self-serve (no discovery call)                                                                                                                  |
+| Monthly / annual         | £5.99 per month / £59 per year (about an 18% saving)                                                                                                                    |
+| Trial                    | 30 days with **full paid-feature access**                                                                                                                               |
+| Card for the trial       | **None.** No payment card is required to start a trial                                                                                                                  |
+| When the trial ends      | The account **returns to Free automatically**. No charge and no automatic conversion to paid                                                                            |
+| Becoming a paying member | Only by **explicitly choosing a plan and completing checkout**                                                                                                          |
+| Trial eligibility        | **One trial per verified, normalised email address**, recorded durably. A person using a different email address could claim another trial; this limitation is accepted |
+| Payment failure          | 7-day grace period (counted from the first failed payment)                                                                                                              |
+| Cancellation             | Access continues to the end of the paid billing period                                                                                                                  |
+| Refunds                  | None — nothing in the platform issues or promises refunds                                                                                                               |
+| Free account             | Check-In, selected Practices/resources, 3 PowerDrops™                                                                                                                   |
+| Paid                     | Full Practice and PowerDrops™ library                                                                                                                                   |
+| Lifetime                 | **No new Lifetime purchases.** Existing, legitimate Lifetime members are grandfathered and keep access                                                                  |
+| Life Beyond Trauma™      | Separate programme and separate commercial journey; not part of this membership                                                                                         |
 
-### Launch checklist (in this order)
+**Superseded by the above:** the 8 October wording "Trial: 30 days, Stripe-native,
+first subscription only" and the open question "Is a payment method required to
+start the trial? Currently yes"; and "Lifetime tier: not part of the approved
+model (price intentionally unset)".
 
-1. **Apply database migration `0010`** (adds `entitlements.payment_failed_at`
-   and `practices.is_free`; additive, no data changes) **before deploying this
-   code** — the new queries select those columns.
+### 0.2 Implemented today (checked against the code, 14 October 2026)
+
+- **Free and paid states.** Free, trial, active, cancelled-but-active, payment
+  issue and ended are resolved from the member's entitlement row
+  (`packages/auth/src/authorize/entitlements.ts`, `apps/web/src/lib/membership-view.ts`).
+- **Ended membership → Free account.** A member whose paid access has ended
+  (cancelled and period over, expired, or unpaid past the grace period) keeps
+  the member area and free-designated content and loses paid-only content.
+  `hasMemberAccess` now means "has an account"; paid access is decided
+  separately by `resolveMembership` / `hasPaidAccess`.
+- **7-day payment grace.** Counted from the first failed payment, never
+  restarted by later retries, cleared when payment recovers. Access continues
+  during grace.
+- **Cancellation.** A cancelling member keeps access until Stripe reports the
+  paid period has ended (Stripe's cancel-at-period-end). This relies on Stripe's
+  notification arriving; the platform does not yet check the paid-through date
+  itself (see 0.3).
+- **Entitlements from Stripe.** Webhook events update the member's entitlement;
+  a repeated event simply rewrites the same values.
+- **Display prices.** £5.99 and £59 and the 18% saving are display constants in
+  `packages/integrations/src/stripe/plans.ts` (a test recomputes the saving).
+  The amount actually charged comes from Stripe Prices that have not been
+  created yet.
+- **Closed by default.** Membership stays dormant — website closed, no
+  checkout, no content locked — until `REGULATION_SUITE_MEMBERSHIP_OPEN=true`
+  _and_ Stripe is fully configured. No Stripe credentials are configured in the
+  production project (checked 13 October 2026).
+- **Membership page.** `/dashboard/billing` is the member's Regulation Suite™
+  membership page (see 0.5).
+
+**Implemented today but contradicts the confirmed policy — to be replaced, not
+relied on:**
+
+- The current trial is **Stripe-native**: 30 days started through Stripe
+  Checkout, **payment card collected up front, converting to paid
+  automatically** when the trial ends (`packages/integrations/src/stripe/checkout.ts`).
+  The confirmed policy is a card-free trial with no automatic conversion.
+- **Lifetime is still technically purchasable** if a Lifetime Stripe Price were
+  ever configured, and the webhook still has a path that grants it
+  (`tier-mapping.ts`, `config.ts`, `sync-plan.ts`, `sync-stripe-entitlement.ts`).
+  No Lifetime Price is configured, so nothing can be bought today.
+- Trial eligibility is only "this account has never had a Stripe subscription".
+  It is not keyed to email and is not durable.
+- Trial and membership wording on the membership page, the Regulation Suite
+  page and the mobile membership screen still describes the old trial.
+
+### 0.3 Planned — not implemented yet
+
+None of the following exists in the code today. Until it does, membership must
+stay closed.
+
+- **Card-free, app-managed 30-day trial** with full paid-feature access: trial
+  start and end dates stored against the account and a trial-start endpoint.
+- **Server-side trial expiry**: the account returns to Free when the trial end
+  passes, evaluated on every request, with no charge and no conversion.
+- **Durable, transactional eligibility**: one trial per verified, normalised
+  email, stored in a ledger that survives account deletion, claimed in a single
+  database transaction so simultaneous attempts cannot both succeed.
+- **Checkout without a trial**: no trial and no Stripe-run trial; payment only
+  after an explicit plan choice.
+- **No new Lifetime purchases**, while existing Lifetime entitlements stay
+  intact and cannot be overwritten by subscription events.
+- **Paid-through enforcement on the server**, so a missed Stripe notification
+  cannot leave access open.
+- **Webhook ordering protection**, so a late, older Stripe event cannot overwrite
+  newer membership state.
+- **Updated wording** on the membership page, the Regulation Suite page and the
+  mobile membership screen.
+- A new database migration (`0011`) for the above. It has not been written or
+  applied.
+
+Engineering defaults for the planned work (conservative, open to veto): the
+email key lowercases, trims, strips `+tags` and Gmail dots; a verified primary
+email is required; anyone who has held a paid subscription or a trial claim is
+ineligible; access runs 48 hours past a paid period's end before being cut.
+
+### 0.4 Launch checklist (planned order)
+
+Steps marked _planned_ depend on work in 0.3 that does not exist yet.
+
+1. **Apply database migrations** before deploying the code: `0010` (adds
+   `entitlements.payment_failed_at` and `practices.is_free`; additive) and
+   `0011` _(planned)_.
 2. **Stripe dashboard:** create the two recurring GBP Prices (£5.99/month,
-   £59/year, no trial on the Price itself); set `STRIPE_SECRET_KEY`,
-   `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_ANNUAL`;
-   register the webhook; set the customer portal to cancel _at end of billing
-   period_; align the retry schedule with the 7-day grace period. See
+   £59/year) with **no trial on either Price**; do **not** create a Lifetime
+   Price; set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+   `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_ANNUAL`; register the webhook;
+   set the customer portal to cancel _at end of billing period_; align the
+   retry schedule with the 7-day grace period. See
    `apps/web/src/app/api/webhooks/stripe/README.md`.
-3. **Sanity:** add `freeAccess` to the practice webhook projection
-   (`apps/web/src/app/api/webhooks/sanity/README.md`), then switch on
-   "Free for all members" for **exactly three PowerDrops™** and the selected
-   free Practices. Until this is done, opening membership would make every
-   PowerDrop and Practice paid.
-4. **Test mode first:** run the full flow (trial → payment → grace →
-   cancel) against Stripe test mode with the switch on in a preview
-   environment.
-5. **Launch:** set `REGULATION_SUITE_MEMBERSHIP_OPEN=true` in production and
+3. **Sanity:** the free flag is set on the three confirmed PowerDrops™ (see
+   0.5). Still to designate: which Practices are free. Opening membership before
+   the free content is flagged would make it paid.
+4. **Test mode first:** trial with no card → trial expiry back to Free → a
+   second trial attempt refused → explicit checkout → payment → payment failure
+   and grace → cancel _(planned)_.
+5. **Legacy Lifetime check:** confirm, read-only, that no legitimate Lifetime
+   members exist, or identify them, before launch _(planned)_.
+6. **Launch:** set `REGULATION_SUITE_MEMBERSHIP_OPEN=true` in production and
    redeploy (the Regulation Suite page reads it at build time).
 
-### Open questions for the owner
+### 0.5 Membership page (dashboard V1) and content status
 
-- A member whose paid access has ended (cancelled and period over, expired,
-  or unpaid past the grace period) currently loses the whole member area —
-  the platform's existing rule for an inactive entitlement — rather than
-  falling back to the free tier. Confirm that is intended.
+`/dashboard/billing` is the member's Regulation Suite™ membership page
+(`components/dashboard/membership/membership-overview.tsx`; the state wording
+is derived from the real entitlement row by `lib/membership-view.ts`). It
+covers free, trial, active, cancelled-but-active, payment issue (7-day grace)
+and ended, reuses the existing checkout and billing-portal endpoints, and shows
+no checkout while membership is closed. It does not change what is locked. Its
+trial wording still describes the old Stripe-run trial (a first payment taken
+when the trial ends) and is planned to change (0.3).
+
+- **Which PowerDrops™ (and which Practices) are free** is set in Sanity, with
+  **Free for all members** (`freeAccess`) on each document — nothing is
+  hardcoded. The figure "3" shown to members is `MEMBERSHIP_FREE_POWERDROPS`
+  in `packages/integrations/src/stripe/plans.ts`.
+- **Free PowerDrops™ — confirmed by the owner (8 October 2026):** The
+  90-Second Exhale Drop, Micro Visualization: The Return, and The Powerdown
+  Ritual. The other six are the paid depth. These three carry `freeAccess` in
+  Sanity; it has no effect until membership opens.
+- **The nine PowerDrops™ are now in Sanity (verified read-only, 14 October
+  2026).** They were created on 9 October 2026 and are published, with the
+  cleaned artwork attached and alt text on all nine; the three
+  `[Placeholder]` PowerDrops are now drafts. The importer
+  (`packages/cms/scripts/import-powerdrops.ts`) is idempotent: a dry run
+  reports nothing to create. `content/powerdrops/powerdrops-v1.json` still
+  records every PowerDrop as `draft`, so it no longer matches Sanity for
+  status; the importer never updates existing documents.
+- **Ended membership → Free account (implemented):** a member whose paid access
+  has genuinely ended is treated as a Free Member — they keep the member area
+  and free-designated content, lose paid-only content, and can start a new
+  membership. They do not get a second trial; today that is only approximated
+  by "has had a Stripe subscription", and durable per-email eligibility is
+  planned (0.3). Cancelling during a paid period and the 7-day grace period keep
+  paid access.
+
+### 0.6 Open questions
+
+- ~~A member whose paid access has ended should keep the free account?~~
+  **Resolved:** yes.
+- ~~Is a payment method required to start the trial?~~ **Resolved:** no. The
+  trial needs no card and never converts automatically.
+- ~~Should Lifetime remain available?~~ **Resolved:** no new purchases; existing
+  legitimate Lifetime members are grandfathered. Whether any exist in
+  production has not been verified.
+- Which Practices (beyond the three PowerDrops™) are free?
 - The model lists "Practice history and progress" under paid but does not say
   free members lose it; it is currently recorded for any practice a member can
   open.
 - "Selected educational resources" has no member-gated content type behind it
   (articles are public); nothing is gated for it.
-- Is a payment method required to start the trial? Currently yes (the trial
-  converts automatically).
 - Refund wording for the website terms needs approved copy.
 
 ---
+
+> **Historical record — sections 1–17.** Everything below is the original
+> question set, kept unchanged so the decision history stays visible. It is
+> **superseded by Section 0** wherever they differ, notably: the Lifetime
+> tier and pricing questions (Sections 3, 6), the trial and payment-method
+> questions (Section 7), the PowerDrops™ free/paid question (Section 11), and
+> the "currently implemented access" table (Section 4), which described a
+> platform with no free/paid distinction.
 
 ## 1. Executive Summary
 

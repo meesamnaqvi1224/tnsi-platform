@@ -206,21 +206,17 @@ describe('hasMemberAccess', () => {
     expect(hasMemberAccess(entitlement({ status: 'trialing' }))).toBe(true);
   });
 
-  it('denies a canceled/expired/past_due entitlement (Inactive user)', () => {
-    expect(hasMemberAccess(entitlement({ status: 'canceled' }))).toBe(false);
-    expect(hasMemberAccess(entitlement({ status: 'expired' }))).toBe(false);
-    expect(hasMemberAccess(entitlement({ status: 'past_due' }))).toBe(false);
+  it('still allows a canceled/expired/past_due entitlement — the free account remains when paid access ends', () => {
+    // Approved model: Free account → Paid membership → Membership ends → Free account.
+    // Losing paid access never costs the user their account; paid access itself is
+    // `hasPaidAccess`' question (see the membership tests below).
+    expect(hasMemberAccess(entitlement({ status: 'canceled' }))).toBe(true);
+    expect(hasMemberAccess(entitlement({ status: 'expired' }))).toBe(true);
+    expect(hasMemberAccess(entitlement({ status: 'past_due' }))).toBe(true);
   });
 
   it('denies when there is no entitlement row at all (fails closed)', () => {
     expect(hasMemberAccess(null)).toBe(false);
-  });
-
-  it('ignores tier entirely - member access is a status question, not a billing-plan question', () => {
-    // No `tier` field exists on EntitlementRecord at all (deliberately -
-    // see the module's own comment); this just documents that a free-tier
-    // user with active status has member access, same as any other tier.
-    expect(hasMemberAccess(entitlement({ status: 'active' }))).toBe(true);
   });
 });
 
@@ -229,22 +225,19 @@ describe('assertMemberAccess', () => {
     expect(() => assertMemberAccess(entitlement({ status: 'active' }))).not.toThrow();
   });
 
-  it('throws EntitlementRequiredError (403) for an inactive entitlement, never for a client-supplied claim', () => {
-    // The whole point: nothing about the *shape* of the input lets a caller
-    // fake their way to `true` - this is a plain status check against a
-    // server-fetched record, not a client-provided boolean.
-    expect(() => assertMemberAccess(entitlement({ status: 'canceled' }))).toThrow(
-      EntitlementRequiredError,
-    );
+  it('does not throw for an ended membership — the user is not locked out of their free account', () => {
+    for (const status of ['canceled', 'expired', 'past_due'] as const) {
+      expect(() => assertMemberAccess(entitlement({ status }))).not.toThrow();
+    }
   });
 
-  it('throws for a missing entitlement row', () => {
+  it('throws EntitlementRequiredError for a missing entitlement row', () => {
     expect(() => assertMemberAccess(null)).toThrow(EntitlementRequiredError);
   });
 
-  it('thrown error is a 403, distinct from an authentication (401) failure', () => {
+  it('thrown error is a 403 with a NO_ENTITLEMENT reason, distinct from an authentication (401) failure', () => {
     try {
-      assertMemberAccess(entitlement({ status: 'expired' }));
+      assertMemberAccess(null);
       throw new Error('expected assertMemberAccess to throw');
     } catch (err) {
       expect(err).toBeInstanceOf(EntitlementRequiredError);
@@ -283,27 +276,28 @@ describe('payment-failure grace period (7 days, approved rule)', () => {
 
   const pastDue = membership({ status: 'past_due', paymentFailedAt: FAILED_AT });
 
-  it('keeps access on day 1 (the failure moment itself and the first day after)', () => {
-    expect(hasMemberAccess(pastDue, at(0))).toBe(true);
-    expect(hasMemberAccess(pastDue, at(1 * DAY))).toBe(true);
+  it('keeps paid access on day 1 (the failure moment itself and the first day after)', () => {
+    expect(hasPaidAccess(pastDue, at(0))).toBe(true);
+    expect(hasPaidAccess(pastDue, at(1 * DAY))).toBe(true);
   });
 
-  it('keeps access throughout day 7 — until the 7 full days have elapsed', () => {
-    expect(hasMemberAccess(pastDue, at(6 * DAY))).toBe(true);
-    expect(hasMemberAccess(pastDue, at(7 * DAY - 1))).toBe(true);
+  it('keeps paid access throughout day 7 — until the 7 full days have elapsed', () => {
+    expect(hasPaidAccess(pastDue, at(6 * DAY))).toBe(true);
+    expect(hasPaidAccess(pastDue, at(7 * DAY - 1))).toBe(true);
   });
 
-  it('removes access exactly when the 7 days elapse, and after', () => {
-    expect(hasMemberAccess(pastDue, at(7 * DAY))).toBe(false);
-    expect(hasMemberAccess(pastDue, at(7 * DAY + 1))).toBe(false);
-    expect(hasMemberAccess(pastDue, at(30 * DAY))).toBe(false);
+  it('removes paid access exactly when the 7 days elapse, and after — the account itself remains', () => {
+    expect(hasPaidAccess(pastDue, at(7 * DAY))).toBe(false);
+    expect(hasPaidAccess(pastDue, at(7 * DAY + 1))).toBe(false);
+    expect(hasPaidAccess(pastDue, at(30 * DAY))).toBe(false);
+    expect(hasMemberAccess(pastDue)).toBe(true);
   });
 
-  it('fails closed for past_due with no recorded failure time (never assumes a grace period)', () => {
-    expect(hasMemberAccess(membership({ status: 'past_due', paymentFailedAt: null }), at(0))).toBe(
+  it('fails closed for paid access when past_due has no recorded failure time (never assumes a grace period)', () => {
+    expect(hasPaidAccess(membership({ status: 'past_due', paymentFailedAt: null }), at(0))).toBe(
       false,
     );
-    expect(hasMemberAccess(membership({ status: 'past_due' }), at(0))).toBe(false);
+    expect(hasPaidAccess(membership({ status: 'past_due' }), at(0))).toBe(false);
   });
 
   it('grace applies to protected programme access the same way, and ends the same way', () => {
@@ -317,10 +311,11 @@ describe('payment-failure grace period (7 days, approved rule)', () => {
     expect(authorizeEntitlement(record, requirement, at(8 * DAY)).allowed).toBe(false);
   });
 
-  it('assertMemberAccess honours grace and throws once it is over', () => {
+  it('once grace is over the user is still admitted to the member area, as a free member', () => {
     const record = membership({ status: 'past_due', paymentFailedAt: FAILED_AT });
-    expect(() => assertMemberAccess(record, at(2 * DAY))).not.toThrow();
-    expect(() => assertMemberAccess(record, at(9 * DAY))).toThrow(EntitlementRequiredError);
+    expect(() => assertMemberAccess(record)).not.toThrow();
+    expect(resolveMembership(record, at(2 * DAY)).hasPaidAccess).toBe(true);
+    expect(resolveMembership(record, at(9 * DAY)).hasPaidAccess).toBe(false);
   });
 
   it('is deterministic for a fixed clock', () => {
@@ -341,7 +336,7 @@ describe('resolveMembership — every approved membership state', () => {
       graceEndsAt: null,
       cancelsAtPeriodEnd: false,
     });
-    expect(hasMemberAccess(membership({ tier: 'free' }), now)).toBe(true);
+    expect(hasMemberAccess(membership({ tier: 'free' }))).toBe(true);
   });
 
   it('trialing user: paid access', () => {
@@ -408,6 +403,26 @@ describe('resolveMembership — every approved membership state', () => {
   it('no entitlement row at all: inactive (fails closed)', () => {
     expect(resolveMembership(null, now).state).toBe('inactive');
     expect(hasPaidAccess(null, now)).toBe(false);
+    expect(hasMemberAccess(null)).toBe(false);
+  });
+
+  it('a free-tier row with a leftover non-active status is simply a free account, not an ended membership', () => {
+    for (const status of ['canceled', 'expired', 'past_due'] as const) {
+      expect(resolveMembership(membership({ tier: 'free', status }), now).state).toBe('free');
+    }
+  });
+
+  it('an ended paid membership keeps the member area (as a free member) but not paid access', () => {
+    for (const record of [
+      membership({ tier: 'monthly', status: 'canceled' }),
+      membership({ tier: 'annual', status: 'expired' }),
+      membership({ status: 'past_due', paymentFailedAt: FAILED_AT }),
+    ]) {
+      const when = at(8 * DAY);
+      expect(hasMemberAccess(record)).toBe(true);
+      expect(resolveMembership(record, when).hasPaidAccess).toBe(false);
+      expect(resolveMembership(record, when).state).toBe('inactive');
+    }
   });
 });
 
@@ -421,11 +436,8 @@ describe('canAccessContent — free vs paid Regulation Suite™ content', () => 
     expect(canAccessContent(membership({ tier: 'free' }), freeContent, false, now)).toBe(true);
   });
 
-  it('gating off still never lets through someone with no member access', () => {
+  it('gating off still never lets through someone with no account at all', () => {
     expect(canAccessContent(null, freeContent, false, now)).toBe(false);
-    expect(canAccessContent(membership({ status: 'expired' }), freeContent, false, now)).toBe(
-      false,
-    );
   });
 
   it('gating on: a free user gets free-designated content only', () => {
@@ -449,8 +461,48 @@ describe('canAccessContent — free vs paid Regulation Suite™ content', () => 
     ['past grace', membership({ status: 'past_due', paymentFailedAt: FAILED_AT }), at(8 * DAY)],
     ['canceled', membership({ status: 'canceled' }), now],
     ['expired', membership({ status: 'expired' }), now],
-  ])('gating on: %s member is denied (existing inactive rule)', (_label, record, when) => {
+  ])('gating on: %s member falls back to the free account', (_label, record, when) => {
+    // Free-designated content stays open; paid-only content does not.
+    expect(canAccessContent(record, freeContent, true, when)).toBe(true);
     expect(canAccessContent(record, paidContent, true, when)).toBe(false);
-    expect(canAccessContent(record, freeContent, true, when)).toBe(false);
+  });
+});
+
+describe('approved access matrix (membership open)', () => {
+  const now = at(2 * DAY);
+  const rows: [string, MembershipRecord & { cancelAtPeriodEnd?: boolean }, Date, boolean][] = [
+    // label, record, clock, paid access expected
+    ['free', membership({ tier: 'free', status: 'active' }), now, false],
+    ['trialing', membership({ status: 'trialing' }), now, true],
+    ['active', membership({ status: 'active' }), now, true],
+    [
+      'cancelled but still within the paid period',
+      membership({ cancelAtPeriodEnd: true }),
+      now,
+      true,
+    ],
+    [
+      'past_due within the 7-day grace',
+      membership({ status: 'past_due', paymentFailedAt: FAILED_AT }),
+      at(6 * DAY),
+      true,
+    ],
+    ['cancelled and ended', membership({ status: 'canceled' }), now, false],
+    ['expired', membership({ status: 'expired' }), now, false],
+    [
+      'past_due beyond the grace period',
+      membership({ status: 'past_due', paymentFailedAt: FAILED_AT }),
+      at(8 * DAY),
+      false,
+    ],
+  ];
+
+  it.each(rows)('%s', (_label, record, when, paid) => {
+    // Everyone with an account keeps the member area and the free content…
+    expect(hasMemberAccess(record)).toBe(true);
+    expect(canAccessContent(record, { isFree: true }, true, when)).toBe(true);
+    // …and only paid access opens paid-only content.
+    expect(hasPaidAccess(record, when)).toBe(paid);
+    expect(canAccessContent(record, { isFree: false }, true, when)).toBe(paid);
   });
 });

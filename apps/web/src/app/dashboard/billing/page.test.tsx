@@ -3,10 +3,10 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { resolveMembership } from '@tnsi/auth/authorize/entitlements';
 
 /**
- * Billing page copy and controls for every membership state, rendering the
- * real page with the resolved membership (computed by the same
- * `resolveMembership` the server's access checks use). Auth and the
- * database are mocked; no Stripe call is made.
+ * The membership page's copy and controls for every state, rendering the real
+ * page with the resolved membership (computed by the same `resolveMembership`
+ * the server's access checks use). Auth and the database are mocked; no Stripe
+ * call is made.
  */
 
 const mockRequireAuthOrRedirect = vi.fn();
@@ -25,7 +25,7 @@ const NOW = Date.now();
 const DAY = 24 * 60 * 60 * 1000;
 
 function billing(overrides: {
-  tier?: 'free' | 'monthly' | 'annual';
+  tier?: 'free' | 'monthly' | 'annual' | 'lifetime';
   status?: 'active' | 'trialing' | 'past_due' | 'canceled' | 'expired';
   paymentFailedAt?: Date | null;
   cancelAtPeriodEnd?: boolean;
@@ -68,6 +68,15 @@ async function render(state: ReturnType<typeof billing>, search: Record<string, 
   return renderToStaticMarkup(await BillingPage({ searchParams: Promise.resolve(search) }));
 }
 
+/** The visible text only — so assertions are about what a member reads, not markup. */
+function text(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&#x27;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ');
+}
+
 const KEYS = [
   'REGULATION_SUITE_MEMBERSHIP_OPEN',
   'STRIPE_SECRET_KEY',
@@ -96,150 +105,370 @@ afterEach(() => {
   }
 });
 
-describe('BillingPage — membership closed (today)', () => {
-  it('shows the free account with NO checkout buttons and the not-open message', async () => {
+const PAID_INCLUDES = [
+  'Full Practice Library',
+  'Full PowerDrops™',
+  'Guided nervous-system exercises',
+  'Somatic practices',
+  'Meditation & visualisation',
+  'Reflective tools',
+  'Body-based practices',
+  'Educational resources',
+  'State-based support',
+  'Practice history',
+  'Progress',
+  'Ongoing additions to the library',
+];
+
+describe('MembershipPage — membership not open (today)', () => {
+  it('free member: shows the free account and pricing, but no working checkout and the not-open reason', async () => {
     const html = await render(billing({}));
-    expect(html).toContain('Free Member');
-    expect(html).toContain('not open for enrolment yet');
-    expect(html).not.toContain('Start free trial');
-    expect(html).not.toContain('Subscribe');
-    expect(html).not.toContain('lifetime');
+    const t = text(html);
+    expect(t).toContain('Regulation Suite™');
+    expect(t).toContain('Free Member');
+    expect(t).toContain('Explore the foundations of nervous-system support');
+    expect(t).toContain('not open for enrolment yet');
+    // The call to action exists but cannot be used, and says why.
+    expect(html).toMatch(/<button[^>]*\sdisabled=""[^>]*>[^<]*Start Your 30-Day Trial/);
+    expect(t).toContain('£5.99 / month');
+    expect(t).toContain('£59 / year');
+  });
+
+  it('never offers the unapproved lifetime tier', async () => {
+    expect(await render(billing({}))).not.toMatch(/lifetime/i);
   });
 });
 
-describe('BillingPage — membership open', () => {
+describe('MembershipPage — free member (membership open)', () => {
   beforeEach(openMembership);
 
-  it('free account, never subscribed: offers the 30-day trial on both approved plans, no lifetime', async () => {
-    const html = await render(billing({}));
-    expect(html).toContain('30-day free trial');
-    expect(html).toContain('Start free trial — £5.99/month');
-    expect(html).toContain('Start free trial — £59/year');
-    expect(html).not.toMatch(/lifetime/i);
-    expect(html).not.toContain('not open for enrolment');
-  });
-
-  it('a former subscriber is NOT offered a second trial', async () => {
-    const html = await render(
-      billing({
-        tier: 'monthly',
-        status: 'canceled',
-        hasStripeCustomer: true,
-        hasHadSubscription: true,
-      }),
-    );
-    expect(html).toContain('Membership ended');
-    expect(html).toContain('Subscribe — £5.99/month');
-    expect(html).toContain('Subscribe — £59/year');
-    expect(html).not.toContain('Start free trial');
-    expect(html).toContain('Manage billing');
-  });
-
-  it('trialing: shows the trial and trial end, offers billing management, no subscribe buttons', async () => {
-    const html = await render(
-      billing({
-        tier: 'monthly',
-        status: 'trialing',
-        hasStripeCustomer: true,
-        hasHadSubscription: true,
-        currentPeriodEnd: new Date(NOW + 20 * DAY),
-      }),
-    );
-    expect(html).toContain('Free trial');
-    expect(html).toContain('30-day free trial ends');
-    expect(html).toContain('Manage billing');
-    expect(html).not.toContain('Subscribe —');
-    expect(html).not.toContain('Start free trial');
-  });
-
-  it('active monthly and annual: shows renewal date and billing management', async () => {
-    for (const [tier, label] of [
-      ['monthly', 'Monthly Member'],
-      ['annual', 'Annual Member'],
-    ] as const) {
-      const html = await render(
-        billing({
-          tier,
-          status: 'active',
-          hasStripeCustomer: true,
-          hasHadSubscription: true,
-          currentPeriodEnd: new Date(NOW + 10 * DAY),
-        }),
-      );
-      expect(html).toContain(label);
-      expect(html).toContain('renews');
-      expect(html).toContain('Manage billing');
+  it('shows Your Access with the approved free contents', async () => {
+    const t = text(await render(billing({})));
+    expect(t).toContain('Your Access');
+    for (const item of [
+      'Daily Check-In',
+      'Selected Practices',
+      'Selected Resources',
+      '3 selected PowerDrops™',
+      'Explore Regulation Suite™',
+    ]) {
+      expect(t).toContain(item);
     }
   });
 
-  it('cancelled at period end: access continues to the end date, then will not renew', async () => {
-    const html = await render(
-      billing({
-        tier: 'annual',
-        status: 'active',
-        cancelAtPeriodEnd: true,
-        hasStripeCustomer: true,
-        hasHadSubscription: true,
-        currentPeriodEnd: new Date(NOW + 40 * DAY),
+  it('links only to real destinations (PowerDrops™ has no web page, so it is not a link)', async () => {
+    const html = await render(billing({}));
+    expect(html).toContain('href="/dashboard"');
+    expect(html).toContain('href="/dashboard/practices"');
+    expect(html).toContain('href="/programs/regulation-suite"');
+    expect(html).not.toMatch(/<a[^>]*>[^<]*selected PowerDrops/);
+  });
+
+  it('explains the upgrade, shows both approved prices, the saving and the trial', async () => {
+    const t = text(await render(billing({})));
+    expect(t).toContain('Explore Full Membership');
+    expect(t).toContain('£5.99 / month');
+    expect(t).toContain('£59 / year');
+    expect(t).toContain('Save approximately 18%');
+    expect(t).toContain('30-day trial');
+    expect(t).toContain('Start Your 30-Day Trial');
+    expect(t).toContain('Choose Annual');
+    for (const item of PAID_INCLUDES) expect(t).toContain(item);
+  });
+
+  it('a working checkout (membership open) is not disabled and the not-open message is gone', async () => {
+    const html = await render(billing({}));
+    expect(html).not.toMatch(/<button[^>]*\sdisabled=""[^>]*>[^<]*Start Your 30-Day Trial/);
+    expect(text(html)).not.toContain('not open for enrolment');
+  });
+
+  it('does not show Manage Membership to someone with no membership', async () => {
+    expect(text(await render(billing({})))).not.toContain('Manage Membership');
+  });
+
+  it('an account with no entitlement row is a free account, not an ended membership', async () => {
+    const t = text(
+      await render({
+        ...billing({}),
+        membership: resolveMembership(null),
       }),
     );
-    expect(html).toContain('access continues until');
-    expect(html).toContain('then won&#x27;t renew');
-    expect(html).not.toContain('Subscribe —');
+    expect(t).toContain('Free Member');
+    expect(t).not.toContain('Membership ended');
   });
+});
 
-  it('payment failed, inside grace: warns, states when access ends, points to billing management', async () => {
-    const html = await render(
-      billing({
-        tier: 'monthly',
-        status: 'past_due',
-        paymentFailedAt: new Date(NOW - 2 * DAY),
-        hasStripeCustomer: true,
-        hasHadSubscription: true,
-      }),
+describe('MembershipPage — trial', () => {
+  beforeEach(openMembership);
+
+  it('shows the real number of days left, the end date and full access, with the plan that follows', async () => {
+    const t = text(
+      await render(
+        billing({
+          tier: 'monthly',
+          status: 'trialing',
+          hasStripeCustomer: true,
+          hasHadSubscription: true,
+          currentPeriodEnd: new Date(NOW + 20 * DAY),
+        }),
+      ),
     );
-    expect(html).toContain('We could not take your latest payment');
-    expect(html).toContain('Your access continues until');
-    expect(html).toContain('Payment needs attention');
-    expect(html).toContain('Manage billing');
+    expect(t).toContain('Trial Membership');
+    expect(t).toContain('20 days remaining');
+    expect(t).toContain('full member access during your trial');
+    expect(t).toContain('Trial ends');
+    expect(t).toContain('continues on the Monthly plan (£5.99/month)');
+    expect(t).toContain('Your Membership Includes');
+    expect(t).toContain('Manage Membership');
+    expect(t).not.toContain('Start Your 30-Day Trial');
   });
 
-  it('payment failed, past the 7-day grace: shown as ended, with a way back', async () => {
-    const html = await render(
-      billing({
-        tier: 'monthly',
-        status: 'past_due',
-        paymentFailedAt: new Date(NOW - 8 * DAY),
-        hasStripeCustomer: true,
-        hasHadSubscription: true,
-      }),
+  it('does not invent a countdown when the stored trial end is unknown', async () => {
+    const t = text(
+      await render(
+        billing({
+          tier: 'monthly',
+          status: 'trialing',
+          hasStripeCustomer: true,
+          hasHadSubscription: true,
+          currentPeriodEnd: null,
+        }),
+      ),
     );
-    expect(html).toContain('Membership ended');
-    expect(html).not.toContain('We could not take your latest payment');
-    expect(html).toContain('Subscribe — £5.99/month');
+    expect(t).toContain('Trial Membership');
+    expect(t).not.toMatch(/\d+ days? remaining/);
+  });
+});
+
+describe('MembershipPage — active paid member', () => {
+  beforeEach(openMembership);
+
+  it('monthly and annual: plan, billing status, next billing date, inclusions and Manage Membership', async () => {
+    for (const [tier, plan] of [
+      ['monthly', 'Monthly · £5.99/month'],
+      ['annual', 'Annual · £59/year'],
+    ] as const) {
+      const t = text(
+        await render(
+          billing({
+            tier,
+            status: 'active',
+            hasStripeCustomer: true,
+            hasHadSubscription: true,
+            currentPeriodEnd: new Date(NOW + 10 * DAY),
+          }),
+        ),
+      );
+      expect(t).toContain('Active Membership');
+      expect(t).toContain(plan);
+      expect(t).toContain('Billing status Active');
+      expect(t).toContain('Next billing date');
+      for (const item of PAID_INCLUDES) expect(t).toContain(item);
+      expect(t).toContain('Manage Membership');
+      expect(t).not.toContain('Start Your 30-Day Trial');
+      expect(t).not.toContain('Explore Full Membership');
+    }
   });
 
-  it('returning from checkout before the webhook lands does not claim the membership is active', async () => {
-    const html = await render(billing({}), { success: 'true' });
-    expect(html).toContain('confirming your membership');
-    expect(html).not.toContain('Your membership is now active');
+  it('omits the next billing date rather than invent one when none is stored', async () => {
+    const t = text(
+      await render(
+        billing({
+          tier: 'monthly',
+          status: 'active',
+          hasStripeCustomer: true,
+          hasHadSubscription: true,
+          currentPeriodEnd: null,
+        }),
+      ),
+    );
+    expect(t).not.toContain('Next billing date');
   });
 
-  it('returning from checkout once the trial is recorded confirms the trial', async () => {
-    const html = await render(
+  it('a member with no Stripe customer is not given a billing portal button that cannot work', async () => {
+    const t = text(
+      await render(billing({ tier: 'monthly', status: 'active', hasStripeCustomer: false })),
+    );
+    expect(t).not.toContain('Manage Membership');
+    expect(t).toContain('please contact us');
+  });
+});
+
+describe('MembershipPage — cancelled, access continues', () => {
+  beforeEach(openMembership);
+
+  it('says membership is ending, states the date, keeps full access and offers Resume Membership', async () => {
+    const end = new Date(NOW + 40 * DAY);
+    const t = text(
+      await render(
+        billing({
+          tier: 'annual',
+          status: 'active',
+          cancelAtPeriodEnd: true,
+          hasStripeCustomer: true,
+          hasHadSubscription: true,
+          currentPeriodEnd: end,
+        }),
+      ),
+    );
+    expect(t).toContain('Membership ending');
+    expect(t).toContain(
+      `Your membership remains active until ${end.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.`,
+    );
+    expect(t).toContain('You keep full member access until then');
+    expect(t).toContain('Your Membership Includes');
+    expect(t).toContain('Resume Membership');
+    expect(t).not.toContain('Membership ended');
+  });
+});
+
+describe('MembershipPage — payment failure (grace)', () => {
+  beforeEach(openMembership);
+
+  it('calmly states the issue, that membership continues, the real grace end, and offers Update Payment Method', async () => {
+    const t = text(
+      await render(
+        billing({
+          tier: 'monthly',
+          status: 'past_due',
+          paymentFailedAt: new Date(NOW - 2 * DAY),
+          hasStripeCustomer: true,
+          hasHadSubscription: true,
+        }),
+      ),
+    );
+    expect(t).toContain('Payment issue');
+    expect(t).toContain("We couldn't process your latest membership payment.");
+    expect(t).toContain('Your membership remains active for now.');
+    expect(t).toContain('Please update your payment method to keep uninterrupted access.');
+    expect(t).toMatch(/Your access continues until .+ — 5 days remaining/);
+    expect(t).toContain('Update Payment Method');
+    expect(t).toContain('Your Membership Includes');
+  });
+
+  it('past the 7-day grace period it is shown as ended, with no payment warning', async () => {
+    const t = text(
+      await render(
+        billing({
+          tier: 'monthly',
+          status: 'past_due',
+          paymentFailedAt: new Date(NOW - 8 * DAY),
+          hasStripeCustomer: true,
+          hasHadSubscription: true,
+        }),
+      ),
+    );
+    expect(t).toContain('Membership ended');
+    expect(t).not.toContain("We couldn't process your latest membership payment.");
+  });
+});
+
+describe('MembershipPage — ended', () => {
+  beforeEach(openMembership);
+
+  const ended = () =>
+    billing({
+      tier: 'monthly',
+      status: 'canceled',
+      hasStripeCustomer: true,
+      hasHadSubscription: true,
+    });
+
+  it('says the free account remains active and lists what is still available', async () => {
+    const html = await render(ended());
+    const t = text(html);
+    // The free account really is open to them now, so the list links to it.
+    expect(html).toContain('href="/dashboard"');
+    expect(html).toContain('href="/dashboard/practices"');
+    expect(t).toContain('Membership ended');
+    expect(t).toContain('The free account remains active.');
+    expect(t).toContain('Still Available');
+    for (const item of [
+      'Daily Check-In',
+      'Selected Practices',
+      'Selected Resources',
+      '3 selected PowerDrops™',
+    ]) {
+      expect(t).toContain(item);
+    }
+    expect(t).not.toContain('Your Membership Includes');
+  });
+
+  it('offers a way back and a restart — and no second trial', async () => {
+    const html = await render(ended());
+    const t = text(html);
+    expect(t).toContain('Return to the Regulation Suite');
+    expect(html).toContain('href="/programs/regulation-suite"');
+    expect(t).toContain('Start Membership');
+    expect(t).not.toContain('Start Your 30-Day Trial');
+    expect(t).not.toContain('30-day trial with full member access');
+  });
+});
+
+describe('MembershipPage — returning from Stripe', () => {
+  beforeEach(openMembership);
+
+  it('before the webhook lands, does not claim the membership is active', async () => {
+    const t = text(await render(billing({}), { success: 'true' }));
+    expect(t).toContain('confirming your membership');
+    expect(t).not.toContain('Your membership is now active');
+  });
+
+  it('once the trial is recorded, confirms the trial', async () => {
+    const t = text(
+      await render(
+        billing({
+          tier: 'monthly',
+          status: 'trialing',
+          hasStripeCustomer: true,
+          hasHadSubscription: true,
+          currentPeriodEnd: new Date(NOW + 30 * DAY),
+        }),
+        { success: 'true' },
+      ),
+    );
+    expect(t).toContain('Your free trial has started');
+  });
+
+  it('checkout cancelled: says nothing was charged', async () => {
+    expect(text(await render(billing({}), { canceled: 'true' }))).toContain(
+      'you have not been charged',
+    );
+  });
+});
+
+describe('MembershipPage — language', () => {
+  beforeEach(openMembership);
+
+  it('never promises refunds or makes treatment claims, in any state', async () => {
+    const states = [
+      billing({}),
       billing({
         tier: 'monthly',
         status: 'trialing',
         hasStripeCustomer: true,
-        hasHadSubscription: true,
+        currentPeriodEnd: new Date(NOW + DAY),
       }),
-      { success: 'true' },
-    );
-    expect(html).toContain('Your free trial has started');
-  });
-
-  it('never promises refunds', async () => {
-    const html = await render(billing({}));
-    expect(html.toLowerCase()).not.toContain('refund');
+      billing({
+        tier: 'annual',
+        status: 'active',
+        hasStripeCustomer: true,
+        currentPeriodEnd: new Date(NOW + DAY),
+      }),
+      billing({ tier: 'monthly', status: 'canceled', hasHadSubscription: true }),
+    ];
+    for (const state of states) {
+      const t = text(await render(state)).toLowerCase();
+      expect(t).not.toContain('refund');
+      for (const claim of [
+        /\bcure\b/,
+        /heal trauma/,
+        /fix your nervous system/,
+        /eliminate anxiety/,
+        /guarantee/,
+      ]) {
+        expect(t).not.toMatch(claim);
+      }
+    }
   });
 });

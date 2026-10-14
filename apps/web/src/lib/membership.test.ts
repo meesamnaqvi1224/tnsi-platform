@@ -121,7 +121,7 @@ describe('contentAccessFor — all membership states, gating on', () => {
     }
   });
 
-  it('payment failed, after the grace period: nothing (existing inactive rule)', () => {
+  it('payment failed, after the grace period: back to the free account (free content only)', () => {
     const access = contentAccessFor(
       entitlement({ status: 'past_due', paymentFailedAt: FAILED_AT }),
       {
@@ -130,8 +130,9 @@ describe('contentAccessFor — all membership states, gating on', () => {
       },
     );
     expect(access.canOpen({ isFree: false })).toBe(false);
-    expect(access.canOpen({ isFree: true })).toBe(false);
+    expect(access.canOpen({ isFree: true })).toBe(true);
     expect(access.membership.state).toBe('inactive');
+    expect(access.membership.hasPaidAccess).toBe(false);
   });
 
   it('cancelled at period end: still full access, flagged as not renewing', () => {
@@ -143,10 +144,11 @@ describe('contentAccessFor — all membership states, gating on', () => {
     expect(access.membership.cancelsAtPeriodEnd).toBe(true);
   });
 
-  it('expired / canceled: nothing', () => {
+  it('expired / canceled (ended): a free member again — free content only, no paid content', () => {
     for (const status of ['expired', 'canceled'] as const) {
       const access = contentAccessFor(entitlement({ status }), open);
       expect(access.canOpen({ isFree: false })).toBe(false);
+      expect(access.canOpen({ isFree: true })).toBe(true);
       expect(access.membership.state).toBe('inactive');
     }
   });

@@ -255,12 +255,17 @@ export default async function DashboardPage() {
 
   const checkInStreak = computeCheckInStreak(checkInHistory.checkIns);
   const firstName = user.fullName?.trim().split(/\s+/)[0] || null;
+  // The label follows the resolved membership, not the stored tier: a member
+  // whose paid membership has ended is a Free Member again, whatever plan the
+  // row last held.
+  const { membership } = contentAccess;
   const tier = user.entitlements?.tier ?? 'free';
-  const accessLabel = TIER_LABELS[tier];
-  const accessDescription =
-    tier === 'free'
-      ? "You're currently exploring the institute as a free member."
-      : `Your current membership tier is ${accessLabel}.`;
+  const accessLabel = TIER_LABELS[membership.hasPaidAccess ? tier : 'free'];
+  const accessDescription = membership.hasPaidAccess
+    ? `Your current membership tier is ${accessLabel}.`
+    : membership.state === 'inactive'
+      ? 'Your paid membership has ended. Your free account remains active.'
+      : "You're currently exploring the institute as a free member.";
   const accessActivity = accessActivitySentence(completedCount, inProgressCount);
   // Zero is hidden rather than shown, matching accessActivitySentence's own
   // "don't display an empty/zero quantified state" rule just above.
@@ -342,7 +347,7 @@ export default async function DashboardPage() {
                     href="/dashboard/billing"
                     className="interaction-text-link-underline w-fit text-sm whitespace-nowrap"
                   >
-                    Manage billing
+                    View membership
                   </NextLink>
                 </section>
 
