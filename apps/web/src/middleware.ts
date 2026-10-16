@@ -43,6 +43,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhooks/sanity',
   '/api/webhooks/sanity-somatic',
   '/api/webhooks/stripe',
+  '/api/internal/crm-outbox', // secured by CRON_SECRET inside the route
   '/api/health',
   '/api/newsletter',
   '/api/contact',
@@ -77,6 +78,7 @@ const isIgnoredRoute = createRouteMatcher([
   '/api/webhooks/sanity', // Webhook endpoint must be accessible without Clerk middleware
   '/api/webhooks/sanity-somatic', // Somatic Series/Card sync webhook - same reasoning, its own Sanity signature is the real auth
   '/api/webhooks/stripe', // Webhook endpoint must be accessible without Clerk middleware
+  '/api/internal/crm-outbox', // Called by the scheduler with a bearer secret, not by a signed-in user
 ]);
 
 export default clerkMiddleware(async (auth, request) => {

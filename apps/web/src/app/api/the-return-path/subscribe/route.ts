@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
-import { FlowiConfigError, FlowiRequestError, upsertFlowiContact } from '@tnsi/integrations';
+import {
+  addFlowiContactTags,
+  FlowiConfigError,
+  FlowiRequestError,
+  upsertFlowiContact,
+} from '@tnsi/integrations';
 
 /**
  * Email capture at the end of The Return Path's public page. Same Flowi
@@ -42,11 +47,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await upsertFlowiContact({
-      email,
-      source: SOURCE,
-      tags: [RETURN_PATH_FLOWI_TAG],
-    });
+    const result = await upsertFlowiContact({ email, source: SOURCE });
+    // Added, never sent with the upsert: an upsert's `tags` would REPLACE the
+    // contact's existing tags. The sequence keys on this tag, so a failure to add
+    // it is reported (the visitor is not told they are signed up).
+    await addFlowiContactTags(result.contactId, [RETURN_PATH_FLOWI_TAG]);
     return NextResponse.json({ subscribed: true, alreadySubscribed: !result.isNew });
   } catch (error) {
     if (error instanceof FlowiConfigError) {

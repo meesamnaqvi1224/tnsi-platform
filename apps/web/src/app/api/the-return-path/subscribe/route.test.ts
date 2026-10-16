@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const upsertFlowiContact = vi.fn();
+const addFlowiContactTags = vi.fn();
 
 vi.mock('@tnsi/integrations', () => {
   class FlowiConfigError extends Error {}
@@ -12,7 +13,7 @@ vi.mock('@tnsi/integrations', () => {
       super(message);
     }
   }
-  return { upsertFlowiContact, FlowiConfigError, FlowiRequestError };
+  return { upsertFlowiContact, addFlowiContactTags, FlowiConfigError, FlowiRequestError };
 });
 
 const { POST } = await import('./route');
@@ -30,6 +31,7 @@ const post = (body: unknown) =>
 describe('POST /api/the-return-path/subscribe', () => {
   beforeEach(() => {
     upsertFlowiContact.mockReset();
+    addFlowiContactTags.mockReset().mockResolvedValue(undefined);
   });
 
   it('upserts the contact in Flowi tagged "The Return Path" and returns 200', async () => {
@@ -37,11 +39,20 @@ describe('POST /api/the-return-path/subscribe', () => {
     const res = await post({ email: '  person@example.com ', consent: true });
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ subscribed: true, alreadySubscribed: false });
+    // The upsert carries no tags (an upsert's tags would replace the contact's
+    // existing ones); the tag is added afterwards to the contact it returned.
     expect(upsertFlowiContact).toHaveBeenCalledWith({
       email: 'person@example.com',
       source: 'TNSI website — The Return Path',
-      tags: ['The Return Path'],
     });
+    expect(addFlowiContactTags).toHaveBeenCalledWith('c1', ['The Return Path']);
+  });
+
+  it('does not report success when the tag could not be added (the sequence keys on it)', async () => {
+    upsertFlowiContact.mockResolvedValue({ isNew: true, contactId: 'c1' });
+    addFlowiContactTags.mockRejectedValue(new FlowiRequestError('x', 503));
+    const res = await post({ email: 'person@example.com', consent: true });
+    expect(res.status).toBe(502);
   });
 
   it('rejects a missing or malformed email without calling Flowi', async () => {

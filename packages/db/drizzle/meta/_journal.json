@@ -78,6 +78,13 @@
       "when": 1791818180608,
       "tag": "0010_add_interactive_practices",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791900000000,
+      "tag": "0010a_add_crm_outbox",
+      "breakpoints": true
     }
   ]
 }
