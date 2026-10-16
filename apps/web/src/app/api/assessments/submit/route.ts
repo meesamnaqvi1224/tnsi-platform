@@ -5,7 +5,7 @@ import {
   type AssessmentScoringMethod,
   type AssessmentScoringRules,
 } from '@tnsi/core';
-import { FlowiConfigError, FlowiRequestError, upsertFlowiContact } from '@tnsi/integrations';
+import { assessmentPayload, attemptNow, enqueueCrmEvent } from '@/lib/crm-outbox';
 import { getAssessmentBySlug } from '@/content/cms/loaders';
 import { assessmentSubmissionSchema } from '@/lib/validation';
 
@@ -74,35 +74,32 @@ export async function POST(request: Request) {
 
   const { score, resultTier } = prepared.result;
 
-  await db.insert(assessmentSubmissions).values({
-    assessmentSlug,
-    email,
-    answers,
-    score,
-    resultTier,
+  // The submission and its CRM event are stored together: either both exist or
+  // neither does, so a visitor's result is never recorded without being queued.
+  const outboxId = await db.transaction(async (trx) => {
+    await trx.insert(assessmentSubmissions).values({
+      assessmentSlug,
+      email,
+      answers,
+      score,
+      resultTier,
+    });
+    return enqueueCrmEvent(trx, {
+      kind: 'assessment',
+      email,
+      // Only the contact, a tag and the result tier's name go to the CRM. The
+      // answers and the score stay in our own database.
+      payload: assessmentPayload({
+        assessmentTitle: assessment.title,
+        crmPipeline: assessment.crmPipeline,
+        resultTier,
+      }),
+    });
   });
 
-  // Flowi sync is best-effort: a CRM outage or missing credentials must
-  // never stop a visitor from seeing their result, since that's the whole
-  // point of a lead-generation assessment. The tag/pipeline mapping is
-  // intentionally minimal — no result-tier-specific tag is sent, since no
-  // such mapping has been approved yet (see the C9 decision doc). Once one
-  // is, it belongs on the assessment/result-tier content itself (e.g. a
-  // `crmPipeline`-style field on the result tier), not guessed here.
-  try {
-    await upsertFlowiContact({
-      email,
-      source: `TNSI website — ${assessment.title} assessment`,
-      tags: [
-        'TNSI Website Assessment',
-        ...(assessment.crmPipeline ? [assessment.crmPipeline] : []),
-      ],
-    });
-  } catch (error) {
-    if (!(error instanceof FlowiConfigError) && !(error instanceof FlowiRequestError)) {
-      console.error('[assessment submit] unexpected Flowi error:', error);
-    }
-  }
+  // Best effort; a CRM outage or missing credentials must never stop a visitor
+  // seeing their result. A failure leaves the stored row for the worker.
+  await attemptNow(outboxId).catch(() => undefined);
 
   const matchedTier = resultTier
     ? assessment.resultTiers.find((tier) => tier.key === resultTier)
