@@ -28,6 +28,17 @@ const FLOWI_API_VERSION = '2021-07-28';
 /** How long one Flowi call may take unless the caller sets a shorter limit. */
 export const FLOWI_DEFAULT_TIMEOUT_MS = 8000;
 
+/**
+ * The timeout to hand to `AbortSignal.timeout`, which only accepts a whole number of
+ * milliseconds: a fractional value (such as one computed from `performance.now()`)
+ * makes Node throw `RangeError ERR_OUT_OF_RANGE` before any request is sent. Rounds
+ * down to at least 1 ms, and falls back to the default for anything not a finite number.
+ */
+export function toRequestTimeoutMs(timeoutMs: number | undefined): number {
+  if (timeoutMs === undefined || !Number.isFinite(timeoutMs)) return FLOWI_DEFAULT_TIMEOUT_MS;
+  return Math.max(1, Math.floor(timeoutMs));
+}
+
 export interface FlowiCallOptions {
   /** Abort the request after this many milliseconds (default `FLOWI_DEFAULT_TIMEOUT_MS`). */
   timeoutMs?: number;
@@ -170,7 +181,7 @@ export async function upsertFlowiContact(
     },
     body: JSON.stringify(buildUpsertBody(input, locationId)),
     // Never let a slow CRM hold up a visitor's request or a worker run.
-    signal: AbortSignal.timeout(options.timeoutMs ?? FLOWI_DEFAULT_TIMEOUT_MS),
+    signal: AbortSignal.timeout(toRequestTimeoutMs(options.timeoutMs)),
   });
 
   if (!response.ok) {
@@ -218,7 +229,7 @@ export async function addFlowiContactTags(
         Accept: 'application/json',
       },
       body: JSON.stringify({ tags }),
-      signal: AbortSignal.timeout(options.timeoutMs ?? FLOWI_DEFAULT_TIMEOUT_MS),
+      signal: AbortSignal.timeout(toRequestTimeoutMs(options.timeoutMs)),
     },
   );
 

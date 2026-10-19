@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   addFlowiContactTags,
   buildUpsertBody,
+  toRequestTimeoutMs,
   classifyFlowiFailure,
   FlowiConfigError,
   FlowiRequestError,
@@ -181,6 +182,29 @@ describe('Flowi HTTP calls (fake fetch)', () => {
     spy.mockRestore();
   });
 
+  it('accepts a FRACTIONAL timeout (regression: AbortSignal.timeout throws RangeError on non-integers)', async () => {
+    // Real AbortSignal.timeout is used here, as in production: a fractional value used to
+    // throw before any request was sent, so every immediate delivery attempt failed.
+    fetchMock.mockResolvedValue(ok({ new: true, contact: { id: 'c1' } }));
+    await expect(
+      upsertFlowiContact({ email: 'a@example.test', source: 's' }, { timeoutMs: 2999.78 }),
+    ).resolves.toEqual({ isNew: true, contactId: 'c1' });
+    fetchMock.mockResolvedValue(ok({}));
+    await expect(addFlowiContactTags('c1', ['T'], { timeoutMs: 1234.5 })).resolves.toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('hands AbortSignal.timeout a whole number, whatever the caller passes', async () => {
+    const spy = vi.spyOn(AbortSignal, 'timeout');
+    fetchMock.mockResolvedValue(ok({ new: true, contact: { id: 'c1' } }));
+    await upsertFlowiContact({ email: 'a@example.test', source: 's' }, { timeoutMs: 2999.99 });
+    expect(spy).toHaveBeenLastCalledWith(2999);
+    fetchMock.mockResolvedValue(ok({}));
+    await addFlowiContactTags('c1', ['T'], { timeoutMs: 0.4 });
+    expect(spy).toHaveBeenLastCalledWith(1);
+    spy.mockRestore();
+  });
+
   it('add tags: nothing to add means no request; a missing contact id is refused', async () => {
     await addFlowiContactTags('c1', []);
     expect(fetchMock).not.toHaveBeenCalled();
@@ -190,5 +214,21 @@ describe('Flowi HTTP calls (fake fetch)', () => {
   it('add tags: a non-2xx response is a FlowiRequestError carrying the status', async () => {
     fetchMock.mockResolvedValue(fail(403));
     await expect(addFlowiContactTags('c1', ['T'])).rejects.toMatchObject({ status: 403 });
+  });
+});
+
+describe('toRequestTimeoutMs', () => {
+  it.each([
+    [undefined, 8000],
+    [3000, 3000],
+    [2999.78, 2999],
+    [0.2, 1],
+    [0, 1],
+    [-50, 1],
+    [Number.NaN, 8000],
+    [Number.POSITIVE_INFINITY, 8000],
+  ])('%s → %s', (input, expected) => {
+    expect(toRequestTimeoutMs(input)).toBe(expected);
+    expect(Number.isInteger(toRequestTimeoutMs(input))).toBe(true);
   });
 });

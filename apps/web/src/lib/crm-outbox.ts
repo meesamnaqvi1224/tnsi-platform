@@ -182,7 +182,9 @@ async function sendClaimed(
         name: 'TimeoutError',
       });
     }
-    return { timeoutMs: left };
+    // Whole milliseconds: `performance.now()` differences are fractional, and a fractional
+    // timeout makes `AbortSignal.timeout` throw before any request is made.
+    return { timeoutMs: Math.max(1, Math.floor(left)) };
   };
 
   const savedContactId = row.contactId;

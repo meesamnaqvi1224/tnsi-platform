@@ -21,6 +21,19 @@ const RUN = `outbox-it-${Date.now()}`;
 const MIN = 60 * 1000;
 
 /**
+ * What Node's `AbortSignal.timeout` does with a fractional delay. The real client passes
+ * the timeout straight to it, so a fake that accepted any number would hide this failure.
+ */
+function rejectNonIntegerTimeout(options?: { timeoutMs?: number }) {
+  if (options?.timeoutMs !== undefined && !Number.isInteger(options.timeoutMs)) {
+    throw Object.assign(
+      new RangeError(`The value of "delay" is out of range. Received ${options.timeoutMs}`),
+      { code: 'ERR_OUT_OF_RANGE' },
+    );
+  }
+}
+
+/**
  * A fake Flowi: contacts keyed by email, each with a set of tags. `upsert` never
  * changes tags (exactly like the real endpoint when no `tags` field is sent);
  * `addTags` only ever adds. Failures can be queued per step.
@@ -56,6 +69,7 @@ class FakeSender {
     this.contacts.set(email, { id: `contact-${RUN}-${++contactSeq}`, tags: new Set(tags) });
   }
   async upsert(input: { email: string }, options?: { timeoutMs?: number }) {
+    rejectNonIntegerTimeout(options);
     this.calls.push({ email: input.email, keys: Object.keys(input) });
     this.upsertOptions.push(options);
     await this.onSend?.(input.email);
@@ -84,6 +98,7 @@ class FakeSender {
     return { isNew: true, contactId: created.id };
   }
   async addTags(contactId: string, tags: string[], options?: { timeoutMs?: number }) {
+    rejectNonIntegerTimeout(options);
     this.tagCalls.push({ contactId, tags });
     this.tagOptions.push(options);
     if (this.hangTags) {
@@ -722,6 +737,27 @@ describe.skipIf(!TEST_URL)('CRM outbox against a real database', () => {
       now: () => new Date(Date.now() + 5),
       immediateBudgetMs: 150,
       ...extra,
+    });
+
+    it('delivers on the immediate attempt even when the clock is fractional (regression: RangeError)', async () => {
+      const { id, email: e } = await enqueue();
+      let tick = 0;
+      const fractionalClock = () => (tick += 0.37); // like performance.now(): never a whole number
+
+      const result = await m.outbox.attemptNow(id, {
+        sender,
+        now: () => new Date(Date.now() + 5),
+        clockMs: fractionalClock,
+      });
+
+      expect(result).toMatchObject({ ok: true });
+      const row = await rowOf(id);
+      expect(row.status).toBe('sent'); // used to stay pending with last_error "RangeError"
+      expect(row.lastError).toBeNull();
+      expect(sender.contacts.get(e)!.tags.has('T')).toBe(true);
+      for (const o of [...sender.upsertOptions, ...sender.tagOptions]) {
+        expect(Number.isInteger(o!.timeoutMs)).toBe(true);
+      }
     });
 
     it('passes a short timeout, not the 8 s default, to the upsert', async () => {
