@@ -85,6 +85,93 @@ describe('POST /api/contact', () => {
     expect(attempt).not.toHaveBeenCalled();
   });
 
+  describe('when storing fails, what is logged', () => {
+    const SECRETS = [
+      'db.example.com',
+      'hunter2',
+      'ada@example.test',
+      'Hello, I would like',
+      'crm_outbox',
+    ];
+
+    function failWith(error: unknown) {
+      enqueue.mockRejectedValue(error);
+      const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      return spy;
+    }
+
+    it('logs only the error class and code for a database error, never the message or any request data', async () => {
+      const spy = failWith(
+        Object.assign(
+          new Error(
+            'relation "crm_outbox" does not exist at host db.example.com password=hunter2 for ada@example.test',
+          ),
+          { name: 'PostgresError', code: '42P01' },
+        ),
+      );
+      const res = await post(valid);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+      const line = String(spy.mock.calls[0]!.join(' '));
+      expect(line).toBe('[contact] could not store the enquiry: PostgresError 42P01');
+      for (const secret of SECRETS) expect(line).not.toContain(secret);
+      // The visitor-facing response is unchanged.
+      expect(res.status).toBe(500);
+      expect(await res.json()).toEqual({
+        error: 'We could not send your message. Please try again.',
+      });
+      spy.mockRestore();
+    });
+
+    it('logs a connection failure by its code', async () => {
+      const spy = failWith(
+        Object.assign(new Error('getaddrinfo ENOTFOUND db.example.com'), { code: 'ENOTFOUND' }),
+      );
+      await post(valid);
+      const line = String(spy.mock.calls[0]!.join(' '));
+      expect(line).toBe('[contact] could not store the enquiry: Error ENOTFOUND');
+      expect(line).not.toContain('db.example.com');
+      spy.mockRestore();
+    });
+
+    it.each([
+      ['a string', 'boom with hunter2'],
+      ['null', null],
+      ['undefined', undefined],
+      ['a number', 42],
+    ])('treats %s as an unknown error without echoing it', async (_label, thrown) => {
+      const spy = failWith(thrown);
+      const res = await post(valid);
+      const line = String(spy.mock.calls[0]!.join(' '));
+      expect(line).toBe('[contact] could not store the enquiry: UnknownError');
+      expect(res.status).toBe(500);
+      spy.mockRestore();
+    });
+
+    it('ignores a name or code that is not in the safe format, instead of logging it', async () => {
+      const spy = failWith(
+        Object.assign(new Error('x'), {
+          name: 'Error: password=hunter2',
+          code: 'select * from users',
+        }),
+      );
+      await post(valid);
+      const line = String(spy.mock.calls[0]!.join(' '));
+      expect(line).toBe('[contact] could not store the enquiry: UnknownError');
+      expect(line).not.toContain('hunter2');
+      spy.mockRestore();
+    });
+
+    it('ignores a non-string code (e.g. a numeric errno)', async () => {
+      const spy = failWith(Object.assign(new TypeError('x'), { code: 12 }));
+      await post(valid);
+      expect(String(spy.mock.calls[0]!.join(' '))).toBe(
+        '[contact] could not store the enquiry: TypeError',
+      );
+      spy.mockRestore();
+    });
+  });
+
   it('rejects an invalid body before storing anything', async () => {
     expect((await post({ ...valid, email: 'not-an-email' })).status).toBe(400);
     expect((await post({ ...valid, message: '' })).status).toBe(400);

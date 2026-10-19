@@ -5,6 +5,22 @@ import { contactFormSchema } from '@/lib/validation';
 
 export const runtime = 'nodejs';
 
+const SAFE_NAME = /^[A-Za-z][A-Za-z0-9]{0,39}$/;
+const SAFE_CODE = /^[A-Z0-9_]{3,32}$/;
+
+/**
+ * Why storing failed, in a fixed safe shape: the error's class name and machine code
+ * only (e.g. "PostgresError 42P01" for a missing table, "Error ENOTFOUND" for an
+ * unreachable host). Never the message, which can echo the connection host or query
+ * text, and never any request data. Anything unexpected becomes "UnknownError".
+ */
+function describeStorageFailure(error: unknown): string {
+  if (typeof error !== 'object' || error === null) return 'UnknownError';
+  const { name, code } = error as { name?: unknown; code?: unknown };
+  const safeName = typeof name === 'string' && SAFE_NAME.test(name) ? name : 'UnknownError';
+  return typeof code === 'string' && SAFE_CODE.test(code) ? `${safeName} ${code}` : safeName;
+}
+
 /**
  * Contact form. The enquiry is stored FIRST, in the CRM outbox, so it is never
  * lost: if Flowi is slow, down or not configured, the visitor still succeeds and
@@ -40,9 +56,9 @@ export async function POST(request: Request) {
       email,
       payload: contactFormPayload({ name, organisation, subject, message }),
     });
-  } catch {
+  } catch (error) {
     // Not stored: the one case where we must tell the visitor it did not go through.
-    console.error('[contact] could not store the enquiry');
+    console.error(`[contact] could not store the enquiry: ${describeStorageFailure(error)}`);
     return NextResponse.json(
       { error: 'We could not send your message. Please try again.' },
       { status: 500 },
