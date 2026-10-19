@@ -6,7 +6,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { syncClerkUser } from '@tnsi/auth/sync/user';
-import { userSyncOps } from '@/lib/user-sync-ops';
 
 /**
  * POST /api/webhooks/clerk
@@ -19,6 +18,8 @@ import { userSyncOps } from '@/lib/user-sync-ops';
  */
 export async function POST(request: NextRequest) {
   try {
+    // Load database-backed operations only when handling a request, not at build time.
+    const { userSyncOps } = await import('@/lib/user-sync-ops');
     // Get raw body as text for signature verification
     const payload = await request.text();
 
