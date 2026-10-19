@@ -148,6 +148,70 @@ follow-ups, programme onboarding, renewals, re-engagement. See
 adapter in `packages/integrations`, driven by domain events defined in
 `packages/core`.
 
+### CRM outbox (how the website forms reach Flowi)
+
+Contact form, newsletter and assessment submissions are written to a durable
+queue (`crm_outbox`, Postgres) and then sent to Flowi with retries. The assessment
+row is stored in the same transaction as the visitor's own submission, so a CRM
+outage, slow response or missing credential can never lose a submission.
+
+- **Delivery:** one immediate attempt when the form is submitted, then a worker
+  (`GET /api/internal/crm-outbox`, bearer `CRON_SECRET`, fails closed when unset)
+  retries. Delivery is **two steps**: upsert the contact, then add the TNSI tag with
+  Flowi's Add Tags call. The upsert never sends `tags`, because Flowi documents that
+  tags on an upsert "overwrite all current tags associated with the contact", which
+  would wipe the tags Caroline's automations use. A row is `sent` only when both
+  steps succeeded; if the tag step fails the row stays `pending` with the Flowi
+  contact id saved, so the retry only re-adds the tag.
+- **Immediate attempt:** made inside the visitor's own request, after the submission
+  is stored, with one shared limit of about 3 seconds across both Flowi calls
+  (`OUTBOX.immediateBudgetMs`). If Flowi is slow the row simply stays `pending` for
+  the worker; the visitor's response never depends on Flowi. The worker's own calls
+  keep the longer 8-second limit.
+- **Stale contact id:** if adding tags returns 404 for a contact id saved on the row
+  (the contact was deleted or merged in Flowi), the id is cleared and the row retried;
+  the next attempt upserts again to get a fresh id. Only that case clears it.
+- **Failure handling:** temporary failures (429, 5xx, timeouts, network) retry with
+  doubling back-off (2 min up to 6 h) up to 10 attempts. Configuration/permission
+  failures (not configured, 401, 403, 404) are retried only 5 times. Any other 4xx is
+  a rejected request and is not retried. After that the row is left `failed`, never
+  deleted. Rows sent more than 30 days ago are deleted. These numbers are
+  engineering defaults in `apps/web/src/lib/crm-outbox.ts`.
+- **Visibility and recovery:** the worker's response reports `failedRows` and
+  `failedBy` (counts per category such as `HTTP 401` - no emails, payloads or provider
+  text). `requeueFailed()` puts failed rows back in the queue (optionally one
+  category) once the cause is fixed; it is a tested function that is **not exposed
+  by any route yet** - exposing it is an access-control decision.
+- **Time budget:** the worker claims one row at a time and stops starting new rows
+  after 40 s, so a run (each row can make two 8 s Flowi calls) finishes inside the
+  route's 60 s limit; unprocessed rows wait for the next run.
+- **What is sent:** contact form - name, email, tag, and the message, subject and
+  organisation in the "TNSI Website" custom fields (IDs in
+  `packages/integrations/src/flowi-fields.ts`); newsletter - email and tag (the
+  marketing-consent field is deliberately not set until the consent wording is
+  decided); assessment - email, tag and the result tier's name only, **never the
+  answers or the score**.
+- **Direction:** one way, from the website to Flowi. Nothing changed in Flowi
+  affects access or any other website state.
+- **Scheduler (Vercel Hobby plan):** `apps/web/vercel.json` runs the worker **once
+  a day at 06:00 UTC (11:30 India time)**. Hobby cron jobs cannot run more often
+  than daily, and a more frequent schedule makes the deployment fail (a test guards
+  this); Hobby also only promises the run happens within that hour, and cron runs
+  only on production deployments. Needs `CRON_SECRET` set on the Vercel project.
+- **What that means for retries:** the immediate attempt when a form is submitted
+  covers the normal case. If Flowi is down at that moment the row waits for the next
+  daily run, so a failed delivery is retried about once a day, not every few
+  minutes, and the 10-attempt limit means roughly ten days before a row is left as
+  `failed`. Moving to Vercel Pro and changing the schedule to `*/5 * * * *` (the
+  worker's back-off already supports it) makes recovery near-immediate.
+- **Running twice is safe:** the worker claims rows with `FOR UPDATE SKIP LOCKED`
+  and a short lease, so two overlapping runs never take the same row, and a repeat
+  delivery of a row would only rewrite the same contact in Flowi (matched by email).
+- **Not done yet:** applying the `crm_outbox` migration to production (before this
+  code is deployed), adding `CRON_SECRET`, verification of the custom-field payload
+  against the live Flowi account with a throw-away contact, and an admin view of
+  failed rows. Membership state is not mirrored into Flowi (separate project).
+
 ## Notification System
 
 Email, in-app, future push. Examples: course reminders, upcoming webinars,

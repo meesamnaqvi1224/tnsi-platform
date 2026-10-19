@@ -2,6 +2,13 @@ export const VERSION = '0.0.0';
 
 export {
   upsertFlowiContact,
+  buildUpsertBody,
+  classifyFlowiFailure,
+  addFlowiContactTags,
+  FLOWI_DEFAULT_TIMEOUT_MS,
+  type FlowiCallOptions,
+  type FlowiFailureKind,
+  type FlowiCustomFieldValue,
   FlowiConfigError,
   FlowiRequestError,
   type FlowiUpsertContactInput,
@@ -40,3 +47,4 @@ export {
   type PurchasableTier,
   type EntitlementStatus,
 } from './stripe/tier-mapping';
+export { FLOWI_FIELD } from './flowi-fields';
