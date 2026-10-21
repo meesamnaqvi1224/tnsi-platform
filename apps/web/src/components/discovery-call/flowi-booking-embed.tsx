@@ -8,7 +8,7 @@ import { FlowiBookingFallback } from '@/components/discovery-call/flowi-booking-
  * URL, not a secret — safe to inline directly rather than an env var (no
  * architectural reason exists to make this configurable).
  */
-const FLOWI_BOOKING_URL = 'https://link.flowi.io/widget/booking/BzelZstBijzA9lnwjIV2';
+const FLOWI_BOOKING_URL = 'https://link.flowi.io/widget/booking/0GFMuCOcgA00SLNI9RFY';
 
 /**
  * Plain iframe embed — no third-party embed script. `onError` only catches
