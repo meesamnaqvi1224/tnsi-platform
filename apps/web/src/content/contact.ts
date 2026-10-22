@@ -23,7 +23,7 @@ export const contactContent = {
     imageSrc: '/images/shared/caroline-portrait-warm.webp',
     imageAlt: 'Portrait of Caroline Reed — warm natural light, editorial treatment.',
     primaryCta: { label: 'Book Discovery Call', href: '/book-a-call' },
-    secondaryCta: { label: 'Email Us', href: 'mailto:hello@tnsi.org' },
+    secondaryCta: { label: 'Send a Message', href: '#contact-form' },
   },
 
   methods: {
@@ -33,16 +33,16 @@ export const contactContent = {
       {
         id: 'general',
         title: 'General Enquiries',
-        email: 'hello@tnsi.org',
-        href: 'mailto:hello@tnsi.org',
+        linkLabel: 'Send a message',
+        href: '#contact-form',
         description: 'Questions about the Institute, our approach or how to get started.',
         responseTime: 'Within two business days',
       },
       {
         id: 'programmes',
         title: 'Programme Questions',
-        email: 'programmes@tnsi.org',
-        href: 'mailto:programmes@tnsi.org',
+        linkLabel: 'Send a message',
+        href: '#contact-form',
         description:
           'Enquiries about the Life Beyond Trauma Method, Practitioner Certification and programme fit.',
         responseTime: 'Within two business days',
@@ -50,16 +50,16 @@ export const contactContent = {
       {
         id: 'executive',
         title: 'Private & System-Level Executive Advisory',
-        email: 'executive@tnsi.org',
-        href: 'mailto:executive@tnsi.org',
+        linkLabel: 'Send a message',
+        href: '#contact-form',
         description: 'Individual leadership and organisational advisory engagements.',
         responseTime: 'Within three business days',
       },
       {
         id: 'partnerships',
         title: 'Speaking & Partnerships',
-        email: 'partnerships@tnsi.org',
-        href: 'mailto:partnerships@tnsi.org',
+        linkLabel: 'Send a message',
+        href: '#contact-form',
         description: 'Speaking invitations, university collaborations and research partnerships.',
         responseTime: 'Within three business days',
       },
@@ -108,7 +108,7 @@ export const contactContent = {
       {
         question: 'How do I know which programme is right?',
         answer:
-          'A Discovery Call is the simplest way to determine fit. You can also email programmes@tnsi.org with a brief description of your situation and we will guide you toward the appropriate pathway.',
+          'A Discovery Call is the simplest way to determine fit. You can also send us a message through the contact form with a brief description of your situation and we will guide you toward the appropriate pathway.',
       },
     ],
   },
@@ -132,7 +132,7 @@ export const contactContent = {
     heading: 'Interested in collaborating?',
     supportingCopy:
       'We welcome conversations with universities, healthcare providers, leadership organisations and research partners.',
-    primaryCta: { label: 'Partnership Enquiry', href: 'mailto:partnerships@tnsi.org' },
+    primaryCta: { label: 'Partnership Enquiry', href: '#contact-form' },
     secondaryCta: { label: 'Research Collaboration', href: '/research' },
   },
 

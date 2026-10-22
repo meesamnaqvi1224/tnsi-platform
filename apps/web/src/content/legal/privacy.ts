@@ -52,14 +52,14 @@ export const privacyContent = {
       heading: 'Your Rights',
       paragraphs: [
         'Depending on your location, you may have rights to access, correct, delete or restrict processing of your personal data, and to object to certain processing or request data portability.',
-        'To exercise these rights, contact us at hello@tnsi.org. You also have the right to lodge a complaint with your local data protection authority.',
+        'To exercise these rights, contact us through our Contact page. You also have the right to lodge a complaint with your local data protection authority.',
       ],
     },
     {
       id: 'contact',
       heading: 'Contact',
       paragraphs: [
-        'For privacy-related enquiries, contact The Nervous System Institute at hello@tnsi.org or via our Contact page.',
+        'For privacy-related enquiries, contact The Nervous System Institute via our Contact page.',
       ],
     },
   ] satisfies readonly LegalSection[],
