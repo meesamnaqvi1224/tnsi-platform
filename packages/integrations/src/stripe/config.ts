@@ -71,3 +71,14 @@ export function isMembershipOpen(): boolean {
     process.env.REGULATION_SUITE_MEMBERSHIP_OPEN === 'true' && isMembershipCheckoutConfigured()
   );
 }
+
+/**
+ * Optional id of a restricted Stripe Billing Portal configuration (one that
+ * allows payment methods, cancellation, invoices and billing history but NOT
+ * plan switching or products the app does not sell). When set, every portal
+ * session uses it; when unset Stripe uses the account's default configuration,
+ * which has not been inspected. Returns undefined, never an empty string.
+ */
+export function getPortalConfigurationId(): string | undefined {
+  return process.env.STRIPE_PORTAL_CONFIGURATION_ID || undefined;
+}

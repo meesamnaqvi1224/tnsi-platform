@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { isMembershipCheckoutConfigured, isMembershipOpen } from './config';
+import {
+  getPortalConfigurationId,
+  isMembershipCheckoutConfigured,
+  isMembershipOpen,
+} from './config';
 import { CHECKOUT_TIERS, isCheckoutTier } from './tier-mapping';
 
 const KEYS = [
@@ -89,5 +93,22 @@ describe('isMembershipOpen', () => {
     configure();
     process.env.REGULATION_SUITE_MEMBERSHIP_OPEN = 'true';
     expect(isMembershipOpen()).toBe(true);
+  });
+});
+
+describe('getPortalConfigurationId', () => {
+  const original = process.env.STRIPE_PORTAL_CONFIGURATION_ID;
+  afterEach(() => {
+    if (original === undefined) delete process.env.STRIPE_PORTAL_CONFIGURATION_ID;
+    else process.env.STRIPE_PORTAL_CONFIGURATION_ID = original;
+  });
+
+  it('is undefined when unset or empty, and the id when set', () => {
+    delete process.env.STRIPE_PORTAL_CONFIGURATION_ID;
+    expect(getPortalConfigurationId()).toBeUndefined();
+    process.env.STRIPE_PORTAL_CONFIGURATION_ID = '';
+    expect(getPortalConfigurationId()).toBeUndefined();
+    process.env.STRIPE_PORTAL_CONFIGURATION_ID = 'bpc_placeholder';
+    expect(getPortalConfigurationId()).toBe('bpc_placeholder');
   });
 });

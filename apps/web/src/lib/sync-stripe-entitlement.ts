@@ -10,6 +10,9 @@ import {
 } from '@tnsi/integrations';
 import type Stripe from 'stripe';
 
+/** Entitlement states that count as a live membership. */
+const LIVE_STATUSES: ReadonlySet<string> = new Set(['active', 'trialing', 'past_due']);
+
 export interface SyncStripeEntitlementResult {
   action: EntitlementSyncPlan['action'];
   detail: string;
@@ -43,6 +46,7 @@ export async function syncStripeEvent(event: Stripe.Event): Promise<SyncStripeEn
           userId: session.metadata?.userId ?? null,
           paymentStatus: session.payment_status,
           priceId,
+          sessionCreatedAt: toDate(session.created),
         },
         priceIds,
       );
@@ -155,6 +159,46 @@ async function applyPlan(plan: EntitlementSyncPlan): Promise<SyncStripeEntitleme
     }
 
     case 'sync-subscription': {
+      const current = await db
+        .select({
+          tier: entitlements.tier,
+          status: entitlements.status,
+          stripeSubscriptionId: entitlements.stripeSubscriptionId,
+        })
+        .from(entitlements)
+        .where(eq(entitlements.stripeCustomerId, plan.stripeCustomerId))
+        .limit(1);
+
+      // A legitimate legacy Lifetime entitlement is never overwritten or revoked
+      // by subscription events.
+      if (current[0]?.tier === 'lifetime') {
+        return {
+          action: 'skip',
+          detail: `legacy Lifetime entitlement preserved for customer ${plan.stripeCustomerId}`,
+        };
+      }
+
+      // A second, different live subscription must not take over the entitlement.
+      // It is left for manual review (never cancelled or refunded automatically).
+      const incomingLive = LIVE_STATUSES.has(plan.values.status);
+      const currentLive = current[0] ? LIVE_STATUSES.has(current[0].status) : false;
+      if (
+        current[0]?.stripeSubscriptionId &&
+        current[0].stripeSubscriptionId !== plan.values.stripeSubscriptionId &&
+        currentLive &&
+        incomingLive
+      ) {
+        console.warn('[stripe webhook] DUPLICATE_SUBSCRIPTION_REVIEW', {
+          customer: plan.stripeCustomerId,
+          existing: current[0].stripeSubscriptionId,
+          incoming: plan.values.stripeSubscriptionId,
+        });
+        return {
+          action: 'skip',
+          detail: `second live subscription for customer ${plan.stripeCustomerId} flagged for manual review`,
+        };
+      }
+
       const result = await db
         .update(entitlements)
         .set({
@@ -183,6 +227,18 @@ async function applyPlan(plan: EntitlementSyncPlan): Promise<SyncStripeEntitleme
     }
 
     case 'mark-past-due': {
+      const lifetime = await db
+        .select({ tier: entitlements.tier })
+        .from(entitlements)
+        .where(eq(entitlements.stripeCustomerId, plan.stripeCustomerId))
+        .limit(1);
+      if (lifetime[0]?.tier === 'lifetime') {
+        return {
+          action: 'skip',
+          detail: `legacy Lifetime entitlement preserved for customer ${plan.stripeCustomerId}`,
+        };
+      }
+
       const result = await db
         .update(entitlements)
         .set({ status: 'past_due', updatedAt: new Date() })

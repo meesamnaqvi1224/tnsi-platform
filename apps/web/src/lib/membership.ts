@@ -10,3 +10,27 @@ import { isMembershipOpen } from '@tnsi/integrations';
  * Re-exported here so the web app has one import point for "is membership open?".
  */
 export { isMembershipOpen };
+
+/** The slice of an entitlement row the duplicate-subscription check needs. */
+export interface MembershipEntitlement {
+  tier: 'free' | 'monthly' | 'annual' | 'lifetime';
+  status: 'active' | 'past_due' | 'canceled' | 'trialing' | 'expired';
+}
+
+/**
+ * Whether this entitlement already holds paid membership: a paid or legacy
+ * Lifetime tier that is active, in a trial, or in payment grace (past due). Such
+ * a member must manage their plan in the billing portal, never start another
+ * subscription. Free accounts, and ended (canceled/expired) memberships, may buy.
+ */
+export function holdsPaidMembership(
+  entitlement: MembershipEntitlement | null | undefined,
+): boolean {
+  if (!entitlement) return false;
+  if (entitlement.tier === 'free') return false;
+  return (
+    entitlement.status === 'active' ||
+    entitlement.status === 'trialing' ||
+    entitlement.status === 'past_due'
+  );
+}

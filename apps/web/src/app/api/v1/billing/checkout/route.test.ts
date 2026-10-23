@@ -8,7 +8,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
  */
 
 const state = vi.hoisted(() => ({
-  user: null as null | { id: string; email: string },
+  user: null as null | { id: string; email: string; entitlements: Record<string, unknown> | null },
+  customerId: null as string | null,
+  /** What the compare-and-set UPDATE returns (empty = another request already saved a customer). */
+  saved: [] as { stripeCustomerId: string | null }[] | 'created',
+  updates: 0,
 }));
 
 vi.mock('@/lib/auth-api', () => ({
@@ -19,18 +23,40 @@ vi.mock('@/lib/auth-api', () => ({
 }));
 
 vi.mock('@tnsi/db', () => {
-  const chain = { from: () => chain, where: () => chain, limit: async () => [] };
-  return { db: { select: () => chain }, entitlements: {} };
+  const select = {
+    from: () => select,
+    where: () => select,
+    limit: async () => [{ stripeCustomerId: state.customerId }],
+  };
+  const update = {
+    set: () => update,
+    where: () => update,
+    returning: async () => {
+      state.updates += 1;
+      return state.saved === 'created' ? [{ stripeCustomerId: 'cus_new' }] : state.saved;
+    },
+  };
+  return { db: { select: () => select, update: () => update }, entitlements: {} };
 });
 
 const createCheckoutSession = vi.fn();
+const ensureStripeCustomer = vi.fn();
 vi.mock('@tnsi/integrations', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@tnsi/integrations')>();
-  return { ...actual, createCheckoutSession: (input: unknown) => createCheckoutSession(input) };
+  return {
+    ...actual,
+    createCheckoutSession: (input: unknown) => createCheckoutSession(input),
+    ensureStripeCustomer: (input: unknown) => ensureStripeCustomer(input),
+  };
 });
 
 const { POST } = await import('./route');
-const { MembershipClosedError, StripeConfigError } = await import('@tnsi/integrations');
+const {
+  AlreadySubscribedError,
+  CheckoutInProgressError,
+  MembershipClosedError,
+  StripeConfigError,
+} = await import('@tnsi/integrations');
 
 const KEYS = [
   'REGULATION_SUITE_MEMBERSHIP_OPEN',
@@ -40,6 +66,7 @@ const KEYS = [
   'STRIPE_PRICE_ID_ANNUAL',
   'STRIPE_PRICE_ID_LIFETIME',
 ];
+const FREE = { tier: 'free', status: 'active' };
 const saved = Object.fromEntries(KEYS.map((k) => [k, process.env[k]]));
 
 function configureBilling() {
@@ -65,7 +92,12 @@ function request(body: unknown) {
 beforeEach(() => {
   createCheckoutSession.mockReset();
   createCheckoutSession.mockResolvedValue({ url: 'https://checkout.stripe.test/session' });
-  state.user = { id: 'user-1', email: 'member@example.com' };
+  ensureStripeCustomer.mockReset();
+  ensureStripeCustomer.mockResolvedValue('cus_new');
+  state.user = { id: 'user-1', email: 'member@example.com', entitlements: FREE };
+  state.customerId = null;
+  state.saved = 'created';
+  state.updates = 0;
   for (const k of KEYS) delete process.env[k];
 });
 
@@ -150,9 +182,88 @@ describe('POST /api/v1/billing/checkout', () => {
       const response = await POST(request({ tier }));
       expect(response.status).toBe(200);
       expect(createCheckoutSession).toHaveBeenCalledTimes(1);
-      expect(createCheckoutSession.mock.calls[0]![0]).toMatchObject({ tier, userId: 'user-1' });
+      expect(createCheckoutSession.mock.calls[0]![0]).toMatchObject({
+        tier,
+        userId: 'user-1',
+        stripeCustomerId: 'cus_new',
+      });
     },
   );
+
+  it.each([
+    ['monthly', 'active'],
+    ['annual', 'active'],
+    ['monthly', 'trialing'],
+    ['annual', 'past_due'],
+    ['lifetime', 'active'],
+  ])(
+    'refuses a second subscription for a current %s member (%s) with 409',
+    async (tier, status) => {
+      openMembership();
+      state.user = { id: 'user-1', email: 'm@example.com', entitlements: { tier, status } };
+      const response = await POST(request({ tier: 'annual' }));
+      expect(response.status).toBe(409);
+      expect((await response.json()).error.code).toBe('ALREADY_A_MEMBER');
+      expect(createCheckoutSession).not.toHaveBeenCalled();
+      expect(ensureStripeCustomer).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    ['free', 'active'],
+    ['monthly', 'canceled'],
+    ['annual', 'expired'],
+  ])('lets an eligible %s account with status %s start a checkout', async (tier, status) => {
+    openMembership();
+    state.user = { id: 'user-1', email: 'm@example.com', entitlements: { tier, status } };
+    const response = await POST(request({ tier: 'monthly' }));
+    expect(response.status).toBe(200);
+  });
+
+  it('reuses the saved Stripe customer and does not create another', async () => {
+    openMembership();
+    state.customerId = 'cus_existing';
+    await POST(request({ tier: 'monthly' }));
+    expect(ensureStripeCustomer).not.toHaveBeenCalled();
+    expect(createCheckoutSession.mock.calls[0]![0]).toMatchObject({
+      stripeCustomerId: 'cus_existing',
+    });
+  });
+
+  it('creates and saves a customer once for a first purchase', async () => {
+    openMembership();
+    await POST(request({ tier: 'monthly' }));
+    expect(ensureStripeCustomer).toHaveBeenCalledWith({
+      userId: 'user-1',
+      email: 'member@example.com',
+    });
+    expect(state.updates).toBe(1);
+  });
+
+  it("uses the winner's customer when a concurrent request saved one first", async () => {
+    openMembership();
+    state.saved = [{ stripeCustomerId: 'cus_winner' }];
+    await POST(request({ tier: 'annual' }));
+    expect(createCheckoutSession.mock.calls[0]![0]).toMatchObject({
+      stripeCustomerId: 'cus_winner',
+    });
+  });
+
+  it('answers 409 when Stripe reports a live subscription the local row did not show', async () => {
+    openMembership();
+    createCheckoutSession.mockRejectedValue(new AlreadySubscribedError('exists'));
+    const response = await POST(request({ tier: 'monthly' }));
+    expect(response.status).toBe(409);
+    expect((await response.json()).error.code).toBe('ALREADY_A_MEMBER');
+  });
+
+  it('answers 409 for a repeated identical request that is already in progress', async () => {
+    openMembership();
+    createCheckoutSession.mockRejectedValue(new CheckoutInProgressError('busy'));
+    const response = await POST(request({ tier: 'monthly' }));
+    expect(response.status).toBe(409);
+    expect((await response.json()).error.code).toBe('CHECKOUT_IN_PROGRESS');
+  });
 
   it('answers 503 without detail if the integration itself refuses (closed)', async () => {
     openMembership();

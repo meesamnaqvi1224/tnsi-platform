@@ -25,6 +25,7 @@ export {
 export { getStripeClient, isStripeConfigured } from './stripe/client';
 export { verifyStripeWebhookEvent, StripeWebhookVerificationError } from './stripe/verify';
 export {
+  LIFETIME_SALES_ENDED_AT,
   planForCheckoutSessionCompleted,
   planForSubscriptionEvent,
   planForInvoicePaymentFailed,
@@ -35,7 +36,10 @@ export {
   type InvoicePaymentFailedInput,
 } from './stripe/sync-plan';
 export {
+  AlreadySubscribedError,
+  CheckoutInProgressError,
   createCheckoutSession,
+  ensureStripeCustomer,
   MembershipClosedError,
   UnpurchasableTierError,
   type CreateCheckoutSessionInput,
