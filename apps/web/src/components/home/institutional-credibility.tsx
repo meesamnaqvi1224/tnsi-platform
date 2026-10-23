@@ -32,7 +32,7 @@ export function InstitutionalCredibility() {
             size="lg"
             className="mx-auto mt-(--space-sm) max-w-3xl text-center text-4xl sm:text-5xl lg:text-[3.25rem]"
           >
-            Fifteen years of clinical observation. One coherent framework.
+            Over 25 years of clinical observation. One coherent framework.
           </Heading>
         </FadeIn>
 

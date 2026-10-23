@@ -53,7 +53,7 @@ export const programsOverviewContent = {
         // content only — the enrolment status below (and the page's own CTA
         // section) is unchanged, since no live subscription/entitlement flow
         // exists yet for this product (see docs/membership-commercial-decisions.md).
-        'The current model is priced at £5.99 per month, with the ability to cancel at any time.',
+        'When membership opens it will cost £5.99 per month or £59 per year. A 30-day free trial with full access is available once per person and needs no payment card; if you do not subscribe, your account returns to the free version with no charge. You can cancel at any time and keep access until the end of the period you have paid for. Payments are not refunded.',
       ],
       idealFor: [
         'People experiencing everyday stress, overwhelm or reduced capacity',

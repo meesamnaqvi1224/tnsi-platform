@@ -78,7 +78,7 @@ const academyRoutes = [
       'The Academy’s advanced professional route — for practitioners seeking certification to deliver specialist TNSI methodologies that require clinical judgement, professional formulation, assessment, or work with complex presentations.',
       'Entry requires applicants to be appropriately qualified clinicians, holding the relevant licence, registration, regulation, or recognised professional standing for their discipline and jurisdiction. Candidates complete structured theoretical education, formal assessment, practical application, supervised practice, and competency review.',
     ],
-    note: 'One of the Pathway’s advanced routes is the Private Executive Advisory Practitioner Certification — based on a 16-module professional curriculum built around the Capacity Recalibration Model™ and the complete Private Executive Advisory client journey.',
+    note: 'One of the Pathway’s advanced routes is the Private Executive Advisory Practitioner Certification — based on a professional curriculum built around the Capacity Recalibration Model™ and the complete Private Executive Advisory client journey.',
   },
 ] as const;
 

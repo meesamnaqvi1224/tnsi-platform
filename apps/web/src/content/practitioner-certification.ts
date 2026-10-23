@@ -76,7 +76,7 @@ export const practitionerCertificationContent = {
     chapter: '04',
     heading: 'Private Executive Advisory Practitioner Certification',
     intro:
-      'One of the Pathway’s advanced certification routes is the Private Executive Advisory Practitioner Certification — based on a 16-module professional curriculum built around the Capacity Recalibration Model™ and the complete Private Executive Advisory client journey. Practitioners learn the methodology as an integrated professional system. The curriculum’s stages include:',
+      'One of the Pathway’s advanced certification routes is the Private Executive Advisory Practitioner Certification — based on a professional curriculum built around the Capacity Recalibration Model™ and the complete Private Executive Advisory client journey. Practitioners learn the methodology as an integrated professional system. The curriculum’s stages include:',
     modules: [
       { number: 1, title: 'Enquiry & Suitability' },
       { number: 2, title: 'Assessment' },
@@ -100,7 +100,7 @@ export const practitionerCertificationContent = {
       {
         title: 'Structured Educational Material',
         description:
-          'Curriculum grounded in peer-reviewed research and more than twenty years of clinical observation — not therapeutic trend or anecdote.',
+          'Curriculum grounded in peer-reviewed research and more than 25 years of clinical observation — not therapeutic trend or anecdote.',
       },
       {
         title: 'Case-Based Learning & Simulations',
@@ -137,8 +137,6 @@ export const practitionerCertificationContent = {
       items: [
         'Formally assessed competency to deliver the methodology',
         'Supervised Practice Portfolio and ongoing supervision',
-        'Listing on the TNSI Practitioner Registry',
-        'Annual reapproval and continuing professional development',
       ],
     },
   },
@@ -149,7 +147,7 @@ export const practitionerCertificationContent = {
     imageSrc: '/images/programs/practitioner/founder-portrait.webp',
     imageAlt: 'Portrait of Caroline Reed, founder of The Nervous System Institute.',
     paragraphs: [
-      'Caroline Reed brings more than twenty years of clinical experience in trauma recovery and nervous system education.',
+      'Caroline Reed brings more than 25 years of clinical experience in trauma recovery and nervous system education.',
       'Her teaching combines neuroscience, psychology, somatic approaches and practical implementation into one coherent framework.',
       'This certification reflects decades of research, practice and refinement.',
     ],
@@ -178,12 +176,7 @@ export const practitionerCertificationContent = {
       {
         question: 'Will I receive certification?',
         answer:
-          'Candidates who complete the required theoretical education, formal assessment, and supervised practice receive TNSI Practitioner Certification and may be listed on the TNSI Practitioner Registry, subject to ongoing supervision and annual reapproval requirements.',
-      },
-      {
-        question: 'What is the TNSI Practitioner Registry?',
-        answer:
-          'A formal record of individuals recognised by the Institute as having completed an approved professional pathway — giving clients, organisations, and professionals a way to identify practitioners whose training status has been formally recognised by The Nervous System Institute.',
+          'Candidates who complete the required theoretical education, formal assessment, and supervised practice receive TNSI Practitioner Certification. Details of any continuing supervision or professional-development requirements are provided as part of the Academy application process.',
       },
     ],
   },
