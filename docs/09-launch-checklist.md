@@ -107,7 +107,11 @@ Test at: **1440px**, **1280px**, **1024px**, **768px**, **390px**, ultra-wide (1
 - [ ] Connect contact form server action to email service (Resend / SendGrid)
 - [ ] Replace placeholder SVG photography with approved editorial assets
 - [ ] Add Caroline Reed approved portrait to `/public`
-- [ ] Configure analytics (privacy-compliant)
+- [ ] Configure analytics (privacy-compliant) — **W-01 (PR #9): consent-gated Google Analytics implemented; production analytics stays OFF until every gate below is closed**
+  - [x] Technical: GA loads only after "Accept analytics"; Reject / no choice / withdrawal keep it off; "Cookie preferences" footer control; fails closed without a valid `NEXT_PUBLIC_GA_MEASUREMENT_ID`; UTM kept in memory until consent; unused `utm` removed from the Return Path sign-up request. Verified in a browser with a fake ID and intercepted Google requests; axe-core 0 violations on the banner.
+  - [ ] Owner/legal approval of the proposed `cookies.ts` / `privacy.ts` wording (Google's role, international transfers, retention, lawful basis, Global Privacy Control, Do Not Track, `lastUpdated` date, whether UTM should accompany sign-up)
+  - [ ] Manual screen-reader pass (VoiceOver on iOS Safari and macOS Safari; NVDA on Windows Chrome/Firefox): banner announced as a dialog with its title and description; Reject and Accept reachable in order and announced by name; choice announced; "Cookie preferences" reopens with focus on the heading and the current choice announced; Escape/Close returns focus to the footer control
+  - [ ] Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in Vercel **Production only**, then redeploy (value is inlined at build); check the live site sends nothing to Google before Accept
 - [ ] Set up error monitoring (Sentry or equivalent)
 - [ ] Run full Visual + Responsive + Accessibility QA on production URL
 
