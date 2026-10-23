@@ -33,7 +33,9 @@ export const cookiesContent = {
     {
       id: 'contact',
       heading: 'Contact',
-      paragraphs: ['Questions about our use of cookies may be directed to hello@tnsi.org.'],
+      paragraphs: [
+        'Questions about our use of cookies may be directed to us through our Contact page.',
+      ],
     },
   ] satisfies readonly LegalSection[],
 };

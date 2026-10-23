@@ -159,7 +159,7 @@ export const facultyContent = {
     ],
     supportingCopy:
       'Speaking engagements are tailored to context — from academic symposia to executive leadership forums. Each presentation is grounded in research and clinical practice, not motivational rhetoric.',
-    primaryCta: { label: 'Invite Caroline to Speak', href: 'mailto:partnerships@tnsi.org' },
+    primaryCta: { label: 'Invite Caroline to Speak', href: '/contact#contact-form' },
     secondaryCta: { label: 'Contact the Institute', href: '/contact' },
   },
 

@@ -26,7 +26,7 @@ export const discoveryCallContent = {
     imageAlt:
       'Two women in a warm, unhurried conversation over a pot of tea at a wooden table in soft natural light.',
     primaryCta: { label: 'Schedule Your Call', href: '#booking' },
-    secondaryCta: { label: 'Email Us Instead', href: 'mailto:hello@tnsi.org' },
+    secondaryCta: { label: 'Send a Message Instead', href: '/contact#contact-form' },
   },
 
   process: {
@@ -133,7 +133,7 @@ export const discoveryCallContent = {
       {
         question: 'Can organisations book consultations?',
         answer:
-          'Yes. Leaders interested in the Private Executive Advisory and organisations interested in the System-Level Executive Advisory can book a Discovery Call to discuss scope, context and fit. For dedicated organisational enquiries, you may also email executive@tnsi.org.',
+          'Yes. Leaders interested in the Private Executive Advisory and organisations interested in the System-Level Executive Advisory can book a Discovery Call to discuss scope, context and fit. For dedicated organisational enquiries, you may also send an enquiry through our contact form.',
       },
     ],
   },
@@ -153,10 +153,10 @@ export const discoveryCallContent = {
     heading: 'Alternative ways to connect',
     items: [
       {
-        id: 'email',
-        title: 'Email',
-        value: 'hello@tnsi.org',
-        href: 'mailto:hello@tnsi.org',
+        id: 'contact-form',
+        title: 'Contact form',
+        value: 'Send a message',
+        href: '/contact#contact-form',
         description: 'For general enquiries and questions before booking.',
       },
       {
@@ -168,8 +168,8 @@ export const discoveryCallContent = {
       {
         id: 'organisation',
         title: 'Organisation Enquiries',
-        value: 'executive@tnsi.org',
-        href: 'mailto:executive@tnsi.org',
+        value: 'Send an organisation enquiry',
+        href: '/contact#contact-form',
         description: 'For executive advisory, team programmes and organisational partnerships.',
       },
     ],
