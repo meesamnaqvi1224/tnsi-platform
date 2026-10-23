@@ -47,3 +47,14 @@ export function getStripeConfig(): StripeConfig {
     priceIds: readPriceIds(),
   };
 }
+
+/**
+ * Whether billing is fully configured for the approved plans: the secret key,
+ * the webhook secret, and a Price for BOTH the monthly and annual plan. Reports
+ * only yes/no - it never returns or logs a value. A missing piece means no
+ * checkout may be offered.
+ */
+export function isMembershipCheckoutConfigured(): boolean {
+  const { secretKey, webhookSecret, priceIds } = getStripeConfig();
+  return Boolean(secretKey && webhookSecret && priceIds.monthly && priceIds.annual);
+}

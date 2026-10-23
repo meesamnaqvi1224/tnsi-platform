@@ -1,13 +1,18 @@
 import 'server-only';
 import { getStripeClient } from './client';
 import { getStripeConfig } from './config';
-import { checkoutModeForTier, resolvePriceId, type PurchasableTier } from './tier-mapping';
+import {
+  checkoutModeForTier,
+  isCheckoutTier,
+  resolvePriceId,
+  type CheckoutTier,
+} from './tier-mapping';
 
 /** Thrown when the requested tier has no Stripe Price configured yet — never a fabricated fallback price. */
 export class UnpurchasableTierError extends Error {}
 
 export interface CreateCheckoutSessionInput {
-  tier: PurchasableTier;
+  tier: CheckoutTier;
   /** Our internal user id — stamped into Checkout Session metadata so the webhook can link the resulting customer/subscription back to this user without ever trusting anything the browser sends. */
   userId: string;
   userEmail: string;
@@ -27,6 +32,10 @@ export interface CreateCheckoutSessionInput {
 export async function createCheckoutSession(
   input: CreateCheckoutSessionInput,
 ): Promise<{ url: string }> {
+  // Second line of defence behind the request schema: only approved plans can reach Stripe.
+  if (!isCheckoutTier(input.tier)) {
+    throw new UnpurchasableTierError(`The "${String(input.tier)}" tier cannot be purchased.`);
+  }
   const { priceIds } = getStripeConfig();
   const priceId = resolvePriceId(input.tier, priceIds);
   if (!priceId) {

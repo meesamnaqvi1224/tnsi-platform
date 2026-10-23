@@ -15,7 +15,12 @@ export {
   type FlowiUpsertContactResult,
 } from './flowi';
 
-export { getStripeConfig, StripeConfigError, type StripeConfig } from './stripe/config';
+export {
+  getStripeConfig,
+  isMembershipCheckoutConfigured,
+  StripeConfigError,
+  type StripeConfig,
+} from './stripe/config';
 export { getStripeClient, isStripeConfigured } from './stripe/client';
 export { verifyStripeWebhookEvent, StripeWebhookVerificationError } from './stripe/verify';
 export {
@@ -37,14 +42,17 @@ export { createBillingPortalSession, NoStripeCustomerError } from './stripe/port
 export {
   ENTITLEMENT_TIERS,
   PURCHASABLE_TIERS,
+  CHECKOUT_TIERS,
   ENTITLEMENT_STATUSES,
   isPurchasableTier,
+  isCheckoutTier,
   checkoutModeForTier,
   resolvePriceId,
   mapPriceIdToTier,
   mapStripeSubscriptionStatus,
   type EntitlementTier,
   type PurchasableTier,
+  type CheckoutTier,
   type EntitlementStatus,
 } from './stripe/tier-mapping';
 export { FLOWI_FIELD } from './flowi-fields';

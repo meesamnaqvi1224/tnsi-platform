@@ -10,13 +10,14 @@ import {
 import { checkoutRequestSchema } from '@/lib/validation';
 import { success, unauthorized, badRequest, internalError } from '@/lib/api-response';
 import { absoluteUrl } from '@/lib/seo';
+import { isMembershipOpen } from '@/lib/membership';
 
 export const runtime = 'nodejs';
 
 /**
  * Starts a Stripe Checkout Session for the authenticated user. The only
- * client input is `tier` — a closed enum of the three tiers this app
- * already knows about (see `checkoutRequestSchema`); the actual Stripe
+ * client input is `tier` — a closed enum of the approved plans (monthly and
+ * annual; there is no Lifetime plan - see `checkoutRequestSchema`); the actual Stripe
  * Price id, checkout mode, and amount are all resolved server-side from
  * that tier, never accepted from the request body.
  */
@@ -38,6 +39,12 @@ export async function POST(request: Request) {
   const result = checkoutRequestSchema.safeParse(body);
   if (!result.success) {
     return badRequest('Validation failed', { errors: result.error.flatten().fieldErrors });
+  }
+
+  // Closed unless membership has been deliberately opened AND billing is fully
+  // configured. Nothing is started - or pretended - before then.
+  if (!isMembershipOpen()) {
+    return NextResponse.json({ error: 'Billing is not available right now.' }, { status: 503 });
   }
 
   const existing = await db

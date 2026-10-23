@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Alert, Button, Stack } from '@tnsi/ui';
-import type { PurchasableTier } from '@tnsi/integrations';
+import type { CheckoutTier } from '@tnsi/integrations';
 
 interface CheckoutResponseBody {
   data?: { url?: string };
@@ -24,7 +24,7 @@ function errorMessage(body: CheckoutResponseBody | null): string {
  * Stripe URL itself and never sends anything beyond the tier name the
  * server already recognises — the server resolves the real price.
  */
-export function SubscribeButton({ tier, label }: { tier: PurchasableTier; label: string }) {
+export function SubscribeButton({ tier, label }: { tier: CheckoutTier; label: string }) {
   const [status, setStatus] = React.useState<Status>('idle');
   const [message, setMessage] = React.useState<string | null>(null);
 
