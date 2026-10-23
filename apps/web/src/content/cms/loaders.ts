@@ -5,7 +5,7 @@ import {
   PROGRAMS_QUERY,
   RETURN_PATH_CONTENT_QUERY,
 } from '@tnsi/cms';
-import { articlesContent, type ArticleItem } from '@/content/articles';
+import type { ArticleItem } from '@/content/articles';
 import { programsOverviewContent } from '@/content/programs';
 import {
   resolveReturnPathContent,
@@ -58,12 +58,15 @@ const VARIANT_PATTERN: ArticleItem['variant'][] = [
 
 /**
  * Latest articles for the Articles listing. Reads from Sanity and maps into
- * the ArticleItem shape the cards render; falls back to the hardcoded
- * content when the CMS is not configured or returns nothing.
+ * the ArticleItem shape the cards render. Only articles with a real body are
+ * returned (the query filters them); empty when the CMS is not configured or
+ * has none.
  */
 export async function getLatestArticles(): Promise<readonly ArticleItem[]> {
   const docs = await sanityFetch<SanityArticle[]>(ARTICLES_QUERY);
-  if (!docs || docs.length === 0) return articlesContent.latest.items;
+  // No fallback to the static listing: those entries pointed at article pages
+  // with no body. With no published articles the listing is simply empty.
+  if (!docs || docs.length === 0) return [];
 
   return docs.map((doc, index) => ({
     id: doc.id,

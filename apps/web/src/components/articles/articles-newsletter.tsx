@@ -1,3 +1,4 @@
+import NextLink from 'next/link';
 import { ChapterMarker, Container, Section, Stack, Text } from '@tnsi/ui';
 import { NewsletterForm } from '@/components/utility/newsletter-form';
 import { articlesContent } from '@/content/articles';
@@ -19,7 +20,10 @@ export function ArticlesNewsletter() {
             <NewsletterForm idPrefix="articles-newsletter" submitLabel={newsletter.submitLabel} />
 
             <Text size="xs" tone="muted" className="max-w-sm">
-              {newsletter.privacyNote}
+              {newsletter.privacyNote}{' '}
+              <NextLink href="/privacy" className="underline underline-offset-4">
+                Privacy Policy
+              </NextLink>
             </Text>
           </Stack>
         </div>
