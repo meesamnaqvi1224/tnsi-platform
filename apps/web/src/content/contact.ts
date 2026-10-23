@@ -115,16 +115,14 @@ export const contactContent = {
 
   visit: {
     chapter: '05',
-    heading: 'Visit & connect',
+    heading: 'Where we work',
     description:
-      'The Nervous System Institute is an international educational institution. While our primary work is conducted virtually, we maintain a professional presence for consultations, partnerships and institutional relationships.',
-    placeholders: [
-      { label: 'Office location', value: 'United Kingdom — address forthcoming' },
+      'The Nervous System Institute works internationally, with a primary presence in the United Kingdom. Our work is conducted virtually, by secure video.',
+    details: [
       { label: 'Business hours', value: 'Monday\u2013Friday, 9:00\u201317:00 GMT' },
       { label: 'Virtual appointments', value: 'Available worldwide via secure video' },
       { label: 'International support', value: 'Enquiries welcomed from all time zones' },
     ],
-    mapAlt: 'Map placeholder — Institute location forthcoming.',
   },
 
   collaboration: {

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import NextLink from 'next/link';
 import {
   Alert,
   Button,
@@ -16,6 +17,18 @@ import {
   Text,
 } from '@tnsi/ui';
 import type { Assessment } from '@/content/cms/loaders';
+
+/**
+ * What actually happens: the result is shown on screen, and the email and
+ * answers are saved (the email also becomes a contact record). No email is sent
+ * to the visitor, so the copy must not say or imply that one is.
+ */
+export const ASSESSMENT_EMAIL_NOTE =
+  'Your result appears on the next screen. We save your email and answers, and add your email to the Institute’s contact records.';
+
+/** Shown when the server could not match the answers to a result. */
+export const ASSESSMENT_NO_RESULT_MESSAGE =
+  'We’ve recorded your answers, but a result isn’t available to show you right now.';
 
 export interface AssessmentExperienceProps {
   assessment: Assessment;
@@ -150,7 +163,10 @@ export function AssessmentExperience({ assessment }: AssessmentExperienceProps) 
                 {submitting ? 'Submitting…' : 'See your result'}
               </Button>
               <Text tone="muted" className="text-sm">
-                We’ll use your email to send you your result and related resources.
+                {ASSESSMENT_EMAIL_NOTE}{' '}
+                <NextLink href="/privacy" className="underline underline-offset-4">
+                  Privacy Policy
+                </NextLink>
               </Text>
             </Stack>
           </Form>
@@ -185,7 +201,7 @@ function AssessmentResult({ title, result }: { title: string; result: SubmitResu
                 Thank you for completing the assessment
               </Heading>
               <Text tone="muted" className="max-w-prose leading-relaxed">
-                We’ve recorded your answers. We’ll follow up with your personalised result and
+                {ASSESSMENT_NO_RESULT_MESSAGE}
                 recommendations shortly.
               </Text>
             </>

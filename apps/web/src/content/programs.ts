@@ -116,7 +116,7 @@ export const programsOverviewContent = {
       cta: { label: 'Explore the Academy', href: '/programs/academy' },
       relatedCta: {
         label:
-          'The Practitioner Certification Pathway is the Academy’s current advanced certification route, available today.',
+          'The Practitioner Certification Pathway is the Academy’s current advanced certification route. Applications are made through a conversation with the Institute.',
         href: '/programs/practitioner-certification',
       },
       imageSrc: '/images/programs/nav-academy.webp',

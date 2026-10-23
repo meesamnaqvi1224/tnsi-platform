@@ -71,7 +71,7 @@ const academyRoutes = [
   {
     id: 'practitioner-certification-pathway',
     title: 'The Practitioner Certification Pathway',
-    status: 'Available today',
+    status: 'Open to enquiries',
     imageSrc: '/images/programs/featured-practitioner.webp',
     imageAlt: 'Five practitioners in cream knitwear in quiet conversation beside tall windows.',
     paragraphs: [

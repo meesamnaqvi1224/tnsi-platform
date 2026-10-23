@@ -273,7 +273,7 @@ export const researchContent = {
         title: 'Clinical Observation',
         description:
           'Ongoing documentation of nervous system-informed interventions across clinical settings — tracking patterns, outcomes and practitioner observations.',
-        status: 'Active — data collection phase',
+        status: 'In development',
         futurePublication: 'Clinical Observation Report — anticipated 2027',
       },
       {
@@ -281,7 +281,7 @@ export const researchContent = {
         title: 'Educational Outcomes',
         description:
           'Evaluating practitioner and participant outcomes across TNSI certification and educational programmes.',
-        status: 'Active — longitudinal study',
+        status: 'In development',
         futurePublication: 'Educational Outcomes White Paper — anticipated 2027',
       },
       {
@@ -289,7 +289,7 @@ export const researchContent = {
         title: 'Leadership Capacity',
         description:
           'Investigating the relationship between autonomic regulation, executive decision-making and organisational culture in senior leadership contexts.',
-        status: 'Planning — advisory cohort forming',
+        status: 'Planning',
         futurePublication: 'Leadership Capacity Study — anticipated 2028',
       },
     ],

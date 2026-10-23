@@ -16,7 +16,7 @@ export function VisitSection() {
             </Text>
 
             <dl className="flex flex-col gap-(--space-lg)">
-              {visit.placeholders.map(({ label, value }) => (
+              {visit.details.map(({ label, value }) => (
                 <div
                   key={label}
                   className="border-border flex flex-col gap-(--space-xs) border-t pt-(--space-lg)"

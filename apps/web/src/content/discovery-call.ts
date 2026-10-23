@@ -108,7 +108,7 @@ export const discoveryCallContent = {
       {
         question: 'How long is the Discovery Call?',
         answer:
-          'Discovery Calls are typically thirty minutes. This is enough time to understand your situation, answer your questions and discuss potential next steps — without rushing.',
+          'Discovery Calls are 20 minutes. This is enough time to understand your situation, answer your questions and discuss potential next steps — without rushing.',
       },
       {
         question: 'Is there any obligation afterwards?',
