@@ -26,6 +26,19 @@ export function GoogleAnalytics() {
     getAnalyticsController().hydrate(firstPath.current);
   }, []);
 
+  // The browser reads Global Privacy Control once per navigation, but extensions
+  // and settings can change it while the tab is open: look again whenever the tab
+  // is shown or focused, so a signal that has turned on stops analytics.
+  useEffect(() => {
+    const refresh = () => getAnalyticsController().refreshSignal();
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, []);
+
   // Every path change, including the first. The controller sends a page view
   // only when analytics is active and the path differs from the last one sent,
   // so the initial mount and an unchanged path never produce a duplicate.

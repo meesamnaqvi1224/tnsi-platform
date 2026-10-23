@@ -149,7 +149,9 @@ describe('footer "Cookie preferences" control', () => {
     vi.doMock('@/lib/analytics-config', () => ({ GA_MEASUREMENT_ID: 'G-TEST1234' }));
     const { CookiePreferencesButton } = await import('./cookie-preferences-button');
     const html = renderToStaticMarkup(<CookiePreferencesButton className="footer-link" />);
-    expect(html).toBe('<button type="button" class="footer-link">Cookie preferences</button>');
+    expect(html).toBe(
+      '<button type="button" data-cookie-preferences="" class="footer-link">Cookie preferences</button>',
+    );
   });
 
   it('is not rendered at all when analytics is not configured - nothing to choose', async () => {
@@ -157,5 +159,29 @@ describe('footer "Cookie preferences" control', () => {
     vi.doMock('@/lib/analytics-config', () => ({ GA_MEASUREMENT_ID: undefined }));
     const { CookiePreferencesButton } = await import('./cookie-preferences-button');
     expect(renderToStaticMarkup(<CookiePreferencesButton className="footer-link" />)).toBe('');
+  });
+});
+
+describe('Global Privacy Control notice', () => {
+  it('is absent when no signal is present', () => {
+    const html = render();
+    expect(html).not.toContain('Global Privacy Control');
+    expect(html).not.toContain('cookie-consent-gpc');
+  });
+
+  it('explains that analytics stays off, is part of the dialog description, and keeps Reject and Accept equal', () => {
+    for (const mode of ['first-visit', 'preferences'] as const) {
+      const html = render({
+        mode,
+        gpc: true,
+        currentChoice: mode === 'preferences' ? 'granted' : 'unset',
+      });
+      expect(html).toContain('Global Privacy Control signal, so analytics stays off');
+      expect(html).toContain('aria-describedby="cookie-consent-body cookie-consent-gpc"');
+      const [reject, accept] = buttons(html);
+      expect(reject?.label).toBe('Reject analytics');
+      expect(accept?.label).toBe('Accept analytics');
+      expect(classOf(reject?.attributes ?? '')).toBe(classOf(accept?.attributes ?? ''));
+    }
   });
 });

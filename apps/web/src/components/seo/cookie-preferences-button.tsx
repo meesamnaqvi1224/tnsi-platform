@@ -15,6 +15,7 @@ export function CookiePreferencesButton({ className }: { className?: string }) {
   return (
     <button
       type="button"
+      data-cookie-preferences=""
       className={className}
       onClick={(event) => {
         rememberPreferencesTrigger(event.currentTarget);

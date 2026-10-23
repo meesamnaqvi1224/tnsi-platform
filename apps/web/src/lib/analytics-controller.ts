@@ -41,11 +41,15 @@ import {
  *    while analytics is accepted (the sign-up request carries no UTM fields). Rejecting or
  *    withdrawing clears them, and an old stored copy is removed on page load.
  *
- * PRIVACY SIGNALS (Global Privacy Control, Do Not Track): deliberately NOT read.
- * Analytics is opt-in, so with no Accept nothing runs regardless of any signal.
- * What an Accept should do when a signal is present is an open owner/legal
- * decision (see the W-01 report); no behaviour is implemented, and nothing here
- * claims compliance with any signal.
+ * GLOBAL PRIVACY CONTROL: read from `navigator.globalPrivacyControl`. While it
+ * is on, analytics never starts: a saved Accept does not enable it, a new Accept
+ * is stored but stays inert, and a running session is stopped by
+ * `refreshSignal()` (the saved choice is kept, never rewritten by the signal).
+ * Turning the signal off does not start anything mid-session; a saved Accept
+ * applies on the next page load. This is a conservative technical behaviour,
+ * not a statement that any law is satisfied.
+ * DO NOT TRACK: not read and not supported. It is a separate, discontinued
+ * signal and is deliberately not treated as GPC.
  *
  * Every browser dependency is injected, so tests run in plain Node and can never
  * reach the real Google endpoint.
@@ -61,6 +65,11 @@ export interface AnalyticsState {
   consent: ConsentStatus;
   /** Whether the visitor has asked to see their choice again (footer "Cookie preferences"). */
   preferencesOpen: boolean;
+  /**
+   * Whether the browser is sending a Global Privacy Control signal. While it is,
+   * analytics stays off whatever the saved choice is.
+   */
+  gpc: boolean;
 }
 
 export interface GaWindow {
@@ -87,6 +96,8 @@ export interface AnalyticsDeps {
   /** Where campaign parameters come from (the URL) and may be kept (`sessionStorage`). */
   campaign: { search(): string; storage: CampaignStorage | null };
   now(): Date;
+  /** Reads the browser's Global Privacy Control signal. Omitted or throwing means no signal. */
+  gpc?(): boolean;
 }
 
 export interface AnalyticsController {
@@ -95,6 +106,12 @@ export interface AnalyticsController {
   deny(): void;
   openPreferences(): void;
   closePreferences(): void;
+  /**
+   * Re-reads the Global Privacy Control signal. If it has turned on, analytics
+   * stops at once (the saved choice is kept). If it has turned off, nothing is
+   * started mid-session: a saved acceptance takes effect on the next page load.
+   */
+  refreshSignal(): void;
   routeChanged(path: string): void;
   track(name: string, params?: Record<string, unknown>): void;
   /** Reads UTM parameters from the current URL into memory only - no storage, no sending. */
@@ -124,6 +141,7 @@ export function createAnalyticsController(deps: AnalyticsDeps): AnalyticsControl
     configured: Boolean(id),
     consent: 'unset',
     preferencesOpen: false,
+    gpc: false,
   };
   let state = serverState;
   const listeners = new Set<() => void>();
@@ -136,13 +154,22 @@ export function createAnalyticsController(deps: AnalyticsDeps): AnalyticsControl
   let memoryChoice: ConsentChoice | null = null; // keeps the choice for this page load if storage is blocked
   let campaignMemory: UtmParams = {}; // landing-URL parameters, in memory only until accepted
 
+  function gpcActive(): boolean {
+    try {
+      return deps.gpc?.() === true;
+    } catch {
+      return false;
+    }
+  }
+
   function setState(patch: Partial<AnalyticsState>): void {
     const next = { ...state, ...patch };
     if (
       next.ready === state.ready &&
       next.configured === state.configured &&
       next.consent === state.consent &&
-      next.preferencesOpen === state.preferencesOpen
+      next.preferencesOpen === state.preferencesOpen &&
+      next.gpc === state.gpc
     ) {
       return; // keep the snapshot identity stable for useSyncExternalStore
     }
@@ -194,7 +221,7 @@ export function createAnalyticsController(deps: AnalyticsDeps): AnalyticsControl
   }
 
   function enable(): void {
-    if (!id || active) return; // already running: a second Accept must not repeat the page view
+    if (!id || active || gpcActive()) return; // GPC on: never start. Already running: a second Accept must not repeat the page view
     deps.win[`ga-disable-${id}`] = false;
     if (!initialised) {
       installGtag();
@@ -241,7 +268,8 @@ export function createAnalyticsController(deps: AnalyticsDeps): AnalyticsControl
       hydrated = true;
       currentPath = path;
       const saved = id ? (readConsent(deps.storage) ?? memoryChoice) : null;
-      if (saved === 'granted') {
+      const gpc = gpcActive();
+      if (saved === 'granted' && !gpc) {
         enable();
       } else {
         // Never chosen, rejected, or analytics not configured: make sure no
@@ -250,21 +278,21 @@ export function createAnalyticsController(deps: AnalyticsDeps): AnalyticsControl
         expireAnalyticsCookies();
         clearCampaign();
       }
-      setState({ ready: true, consent: saved ?? 'unset' });
+      setState({ ready: true, consent: saved ?? 'unset', gpc });
     },
 
     grant() {
       if (!id) return;
       persist('granted');
-      enable();
-      setState({ consent: 'granted', preferencesOpen: false });
+      enable(); // does nothing while GPC is on
+      setState({ consent: 'granted', preferencesOpen: false, gpc: gpcActive() });
     },
 
     deny() {
       if (!id) return;
       persist('denied');
       disable();
-      setState({ consent: 'denied', preferencesOpen: false });
+      setState({ consent: 'denied', preferencesOpen: false, gpc: gpcActive() });
     },
 
     openPreferences() {
@@ -273,6 +301,14 @@ export function createAnalyticsController(deps: AnalyticsDeps): AnalyticsControl
 
     closePreferences() {
       setState({ preferencesOpen: false });
+    },
+
+    refreshSignal() {
+      if (!hydrated) return;
+      const gpc = gpcActive();
+      if (gpc === state.gpc) return;
+      if (gpc && active) disable();
+      setState({ gpc });
     },
 
     routeChanged(path) {
@@ -393,6 +429,8 @@ export function getAnalyticsController(): AnalyticsController {
     cookies: browserCookieJar(),
     campaign: { search: () => window.location.search, storage: browserSessionStorage() },
     now: () => new Date(),
+    gpc: () =>
+      (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true,
   });
   return browserController;
 }

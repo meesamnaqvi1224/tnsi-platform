@@ -38,6 +38,8 @@ interface Options {
   session?: Record<string, string>;
   /** Pass null to simulate blocked sessionStorage. */
   sessionStorage?: CampaignStorage | null;
+  /** Starting value of the Global Privacy Control signal. */
+  gpc?: boolean;
 }
 
 function makeEnv(options: Options = {}) {
@@ -47,6 +49,7 @@ function makeEnv(options: Options = {}) {
   const jar = [...(options.cookies ?? [])];
   const expired: string[] = [];
   let search = options.search ?? '';
+  let gpc = options.gpc ?? false;
   const sessionData = new Map(Object.entries(options.session ?? {}));
   const sessionWrites: string[] = [];
   const sessionStorage: CampaignStorage | null =
@@ -79,6 +82,7 @@ function makeEnv(options: Options = {}) {
     },
     campaign: { search: () => search, storage: sessionStorage },
     now: () => NOW,
+    gpc: () => gpc,
   };
   /** Everything pushed to Google's dataLayer, as plain arrays. */
   const layer = () => (win.dataLayer ?? []).map((entry) => Array.from(entry as ArrayLike<unknown>));
@@ -96,6 +100,9 @@ function makeEnv(options: Options = {}) {
     events,
     sessionData,
     sessionWrites,
+    setGpc: (next: boolean) => {
+      gpc = next;
+    },
     setSearch: (next: string) => {
       search = next;
     },
@@ -103,8 +110,8 @@ function makeEnv(options: Options = {}) {
 }
 
 /** A fresh controller on a fresh page load that shares the same saved storage. */
-function reload(previous: ReturnType<typeof makeEnv>, path = '/') {
-  const next = makeEnv({ storage: previous.storage, cookies: previous.jar });
+function reload(previous: ReturnType<typeof makeEnv>, path = '/', gpc = false) {
+  const next = makeEnv({ storage: previous.storage, cookies: previous.jar, gpc });
   const controller = createAnalyticsController(next.deps);
   controller.hydrate(path);
   return { ...next, controller };
@@ -766,5 +773,110 @@ describe('advertising features', () => {
     expect(
       env.layer().filter((entry) => entry[0] === 'consent' && entry[1] === 'default'),
     ).toHaveLength(1);
+  });
+});
+
+describe('Global Privacy Control', () => {
+  it('keeps analytics off on a first visit and still lets the visitor choose', () => {
+    const env = makeEnv({ gpc: true });
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/');
+
+    expect(controller.getState()).toMatchObject({ ready: true, consent: 'unset', gpc: true });
+    expect(env.scripts).toEqual([]);
+    expect(env.win.gtag).toBeUndefined();
+  });
+
+  it('does not let a saved Accept start analytics while the signal is on, and keeps the saved choice', () => {
+    const first = makeEnv();
+    const a = createAnalyticsController(first.deps);
+    a.hydrate('/');
+    a.grant();
+
+    const next = reload(first, '/', true);
+    expect(next.scripts).toEqual([]);
+    expect(next.layer()).toEqual([]);
+    expect(next.controller.getState()).toMatchObject({ consent: 'granted', gpc: true });
+    expect(next.deps.storage?.getItem(CONSENT_STORAGE_KEY)).toContain('granted'); // not rewritten by the signal
+  });
+
+  it('stores a new Accept made under the signal but stays inert', () => {
+    const env = makeEnv({ gpc: true });
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/programs');
+    controller.grant();
+
+    expect(controller.getState()).toMatchObject({ consent: 'granted', gpc: true });
+    expect(env.scripts).toEqual([]);
+    expect(env.layer()).toEqual([]);
+    controller.routeChanged('/about');
+    controller.track('x');
+    expect(env.layer()).toEqual([]);
+    expect(env.deps.storage?.getItem(CONSENT_STORAGE_KEY)).toContain('granted');
+  });
+
+  it('records Reject normally under the signal', () => {
+    const env = makeEnv({ gpc: true });
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/');
+    controller.deny();
+    expect(controller.getState()).toMatchObject({ consent: 'denied', gpc: true });
+  });
+
+  it('gives no campaign parameters while the signal is on', () => {
+    const env = makeEnv({ gpc: true, search: '?utm_source=newsletter' });
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/');
+    controller.grant();
+    expect(controller.getCampaignParams()).toEqual({});
+    expect(env.sessionWrites).toEqual([]);
+  });
+
+  it('stops a running session when the signal turns on, keeping the saved choice', () => {
+    const env = makeEnv({ cookies: [] });
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/');
+    controller.grant();
+    env.jar.push('_ga', '_ga_TEST1234');
+    const views = env.pageViews().length;
+
+    env.setGpc(true);
+    controller.refreshSignal();
+
+    expect(controller.getState()).toMatchObject({ consent: 'granted', gpc: true });
+    expect(env.win[`ga-disable-${ID}`]).toBe(true);
+    expect(env.expired.sort()).toEqual(['_ga', '_ga_TEST1234']);
+    controller.routeChanged('/next');
+    controller.track('x');
+    expect(env.pageViews()).toHaveLength(views);
+    expect(env.events()).toEqual([]);
+    expect(env.deps.storage?.getItem(CONSENT_STORAGE_KEY)).toContain('granted');
+  });
+
+  it('does not start analytics mid-session when the signal turns off; the next load applies the saved choice', () => {
+    const env = makeEnv({ gpc: true });
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/');
+    controller.grant();
+    env.setGpc(false);
+    controller.refreshSignal();
+
+    expect(controller.getState()).toMatchObject({ consent: 'granted', gpc: false });
+    expect(env.scripts).toEqual([]);
+
+    const next = reload(env, '/', false);
+    expect(next.scripts).toHaveLength(1);
+  });
+
+  it('behaves exactly as before when the signal is absent or unreadable', () => {
+    const env = makeEnv();
+    env.deps.gpc = () => {
+      throw new Error('blocked');
+    };
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/');
+    controller.grant();
+    expect(env.scripts).toHaveLength(1);
+    expect(controller.getState().gpc).toBe(false);
   });
 });
