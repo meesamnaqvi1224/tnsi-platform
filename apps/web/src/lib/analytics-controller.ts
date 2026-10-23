@@ -30,11 +30,15 @@ import {
  *    `track()` and route-change page views.
  *  - Initialisation happens at most once per page load, and a page view is sent
  *    at most once per distinct path.
- *
+ *  - Measurement only: when analytics starts, advertising storage, ad user data
+ *    and ad personalization are declared denied (consent default, before
+ *    config), and Google signals / ad-personalization signals are switched off
+ *    on every page view. What the Analytics property itself is set to is
+ *    outside this code and unverified.
  *  - Campaign (UTM) parameters follow the same rule. They may be READ from the
  *    landing URL into memory (nothing stored, nothing sent), but are written to
- *    `sessionStorage` and returned to callers - and so reach analytics events or
- *    the sign-up request - only while analytics is accepted. Rejecting or
+ *    `sessionStorage` and returned to callers - and so reach analytics events - only
+ *    while analytics is accepted (the sign-up request carries no UTM fields). Rejecting or
  *    withdrawing clears them, and an old stored copy is removed on page load.
  *
  * PRIVACY SIGNALS (Global Privacy Control, Do Not Track): deliberately NOT read.
@@ -101,6 +105,17 @@ export interface AnalyticsController {
   getServerState(): AnalyticsState;
   subscribe(listener: () => void): () => void;
 }
+
+/**
+ * Sent with every page view: this site measures visits only. Google's
+ * `allow_google_signals` (demographics/interest reporting) and
+ * `allow_ad_personalization_signals` both default to true, so they are switched
+ * off explicitly rather than left to the Analytics property's settings.
+ */
+const MEASUREMENT_ONLY = {
+  allow_google_signals: false,
+  allow_ad_personalization_signals: false,
+} as const;
 
 export function createAnalyticsController(deps: AnalyticsDeps): AnalyticsController {
   const id = deps.measurementId;
@@ -174,7 +189,7 @@ export function createAnalyticsController(deps: AnalyticsDeps): AnalyticsControl
 
   function sendPageView(): void {
     if (!id || !deps.win.gtag) return;
-    deps.win.gtag('config', id, { page_path: currentPath });
+    deps.win.gtag('config', id, { page_path: currentPath, ...MEASUREMENT_ONLY });
     lastSentPath = currentPath;
   }
 
@@ -183,6 +198,14 @@ export function createAnalyticsController(deps: AnalyticsDeps): AnalyticsControl
     deps.win[`ga-disable-${id}`] = false;
     if (!initialised) {
       installGtag();
+      // Must come before js/config (Google's required order). Analytics was
+      // just accepted; advertising storage and signals were never requested.
+      deps.win.gtag?.('consent', 'default', {
+        analytics_storage: 'granted',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+      });
       deps.win.gtag?.('js', deps.now());
       sendPageView();
       deps.loadScript(`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`);

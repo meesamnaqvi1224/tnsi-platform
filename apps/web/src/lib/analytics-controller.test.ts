@@ -15,6 +15,7 @@ import { CONSENT_STORAGE_KEY, CONSENT_VERSION, type ConsentStorage } from './ana
  */
 const ID = 'G-TEST1234';
 const NOW = new Date('2026-10-23T12:00:00.000Z');
+const MEASUREMENT_ONLY = { allow_google_signals: false, allow_ad_personalization_signals: false };
 
 function makeStorage(): ConsentStorage & { data: Map<string, string> } {
   const data = new Map<string, string>();
@@ -169,8 +170,10 @@ describe('Accept', () => {
     controller.grant();
 
     expect(env.scripts).toEqual([`https://www.googletagmanager.com/gtag/js?id=${ID}`]);
-    expect(env.layer()[0]?.[0]).toBe('js');
-    expect(env.pageViews()).toEqual([['config', ID, { page_path: '/programs' }]]);
+    expect(env.layer().map((entry) => entry[0])).toEqual(['consent', 'js', 'config']);
+    expect(env.pageViews()).toEqual([
+      ['config', ID, { page_path: '/programs', ...MEASUREMENT_ONLY }],
+    ]);
     expect(controller.getState().consent).toBe('granted');
   });
 
@@ -265,7 +268,9 @@ describe('reload: the saved choice is respected', () => {
     const second = reload(first, '/resources');
     expect(second.controller.getState().consent).toBe('granted');
     expect(second.scripts).toHaveLength(1);
-    expect(second.pageViews()).toEqual([['config', ID, { page_path: '/resources' }]]);
+    expect(second.pageViews()).toEqual([
+      ['config', ID, { page_path: '/resources', ...MEASUREMENT_ONLY }],
+    ]);
   });
 
   it('stays off after a saved Reject', () => {
@@ -383,7 +388,9 @@ describe('route changes', () => {
     expect(env.layer()).toEqual([]); // nothing before consent
 
     controller.grant();
-    expect(env.pageViews()).toEqual([['config', ID, { page_path: '/programs' }]]);
+    expect(env.pageViews()).toEqual([
+      ['config', ID, { page_path: '/programs', ...MEASUREMENT_ONLY }],
+    ]);
   });
 });
 
@@ -437,7 +444,9 @@ describe('reopening preferences', () => {
       '/',
       '/about',
     ]);
-    const consentUpdates = env.layer().filter((entry) => entry[0] === 'consent');
+    const consentUpdates = env
+      .layer()
+      .filter((entry) => entry[0] === 'consent' && entry[1] === 'update');
     expect(
       consentUpdates.map((entry) => (entry[2] as { analytics_storage: string }).analytics_storage),
     ).toEqual(['denied', 'granted']);
@@ -716,5 +725,46 @@ describe('campaign (UTM) parameters follow the consent choice', () => {
       c2.getCampaignParams();
       c2.deny();
     }).not.toThrow();
+  });
+});
+
+describe('advertising features', () => {
+  it('declares advertising consent denied before js/config and turns Google signals off', () => {
+    const env = makeEnv();
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/programs');
+    controller.grant();
+
+    const [first] = env.layer();
+    expect(first?.[0]).toBe('consent');
+    expect(first?.[1]).toBe('default');
+    expect(first?.[2]).toEqual({
+      analytics_storage: 'granted',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+    });
+    expect(env.pageViews()[0]?.[2]).toMatchObject({
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false,
+    });
+  });
+
+  it('keeps signals off on later route changes and after a re-accept', () => {
+    const env = makeEnv();
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/a');
+    controller.grant();
+    controller.routeChanged('/b');
+    controller.deny();
+    controller.grant();
+    controller.routeChanged('/c');
+
+    for (const view of env.pageViews()) {
+      expect(view[2]).toMatchObject({ allow_google_signals: false });
+    }
+    expect(
+      env.layer().filter((entry) => entry[0] === 'consent' && entry[1] === 'default'),
+    ).toHaveLength(1);
   });
 });
