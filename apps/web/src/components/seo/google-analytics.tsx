@@ -1,55 +1,37 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import Script from 'next/script';
 import { usePathname } from 'next/navigation';
-
-const GA_MEASUREMENT_ID = 'G-233HWVPKCK';
-
-declare global {
-  interface Window {
-    dataLayer: unknown[];
-    gtag: (...args: unknown[]) => void;
-  }
-}
+import { getAnalyticsController } from '@/lib/analytics-controller';
 
 /**
- * Base GA4 installation - gtag.js loads once (afterInteractive, so it never
- * blocks first paint) and configures the property once, both in this one
- * component mounted from the root layout. App Router client-side navigation
- * doesn't trigger a new page load, so gtag's own automatic pageview never
- * fires again after the first - this effect re-sends `config` with the new
- * page_path on every route change instead, skipping the initial mount so
- * the first pageview isn't counted twice.
+ * Connects the app to the analytics consent controller; renders nothing itself.
+ *
+ * Google Analytics is NOT installed here any more. This component only
+ *  - reads the visitor's saved choice once, after hydration, and
+ *  - reports App Router route changes (client-side navigation does not reload
+ *    the page, so GA's own automatic page view fires only for the first load).
+ *
+ * The controller decides what, if anything, reaches Google: with no saved
+ * "accept", no script is loaded and no event is sent. Mounted once, from the
+ * root layout.
  */
 export function GoogleAnalytics() {
   const pathname = usePathname();
-  const isFirstRender = useRef(true);
+  const firstPath = useRef(pathname);
 
+  // Read the saved choice once. The controller ignores a second call, which
+  // matters because React strict mode runs effects twice in development.
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    if (typeof window.gtag !== 'function') return;
-    window.gtag('config', GA_MEASUREMENT_ID, { page_path: pathname });
+    getAnalyticsController().hydrate(firstPath.current);
+  }, []);
+
+  // Every path change, including the first. The controller sends a page view
+  // only when analytics is active and the path differs from the last one sent,
+  // so the initial mount and an unchanged path never produce a duplicate.
+  useEffect(() => {
+    getAnalyticsController().routeChanged(pathname);
   }, [pathname]);
 
-  return (
-    <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy="afterInteractive"
-      />
-      <Script id="ga4-init" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          window.gtag = gtag;
-          gtag('js', new Date());
-          gtag('config', '${GA_MEASUREMENT_ID}');
-        `}
-      </Script>
-    </>
-  );
+  return null;
 }
