@@ -49,7 +49,7 @@ export const accessibilityContent = {
       id: 'contact',
       heading: 'Report an Accessibility Issue',
       paragraphs: [
-        'If you experience difficulty accessing any part of our website, please contact us at hello@tnsi.org with a description of the issue and the page URL. We aim to respond within two business days.',
+        'If you experience difficulty accessing any part of our website, please contact us through our Contact page with a description of the issue and the page URL. We aim to respond within two business days.',
       ],
     },
   ] satisfies readonly LegalSection[],

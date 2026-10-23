@@ -85,7 +85,7 @@ Test at: **1440px**, **1280px**, **1024px**, **768px**, **390px**, ultra-wide (1
 
 ## Content QA
 
-- [ ] All placeholder emails use `@tnsi.org` domain consistently
+- [ ] No `@tnsi.org` addresses remain anywhere (`tnsi.org` is an unintended domain the Institute does not use - see the 23 Oct 2026 removal); official contact email addresses are TBC by the owner and are not published until verified
 - [ ] Caroline Reed biography consistent across About, Faculty, Discovery Call
 - [ ] Programme links resolve (Life Beyond Trauma → `/method`)
 - [ ] Article slugs in search index match published articles

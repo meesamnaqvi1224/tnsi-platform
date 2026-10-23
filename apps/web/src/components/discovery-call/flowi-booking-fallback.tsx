@@ -22,16 +22,16 @@ export function FlowiBookingFallback() {
           We couldn&rsquo;t load the booking tool
         </p>
         <Text tone="muted" className="text-sm leading-relaxed">
-          Please try refreshing the page. If the problem continues, email us directly and
+          Please try refreshing the page. If the problem continues, send us a message and
           we&rsquo;ll arrange a time that works for you.
         </Text>
       </Stack>
 
       <a
-        href="mailto:hello@tnsi.org"
+        href="/contact#contact-form"
         className={cn(buttonVariants({ variant: 'primary', size: 'md' }))}
       >
-        Email Us
+        Send a Message
       </a>
     </div>
   );

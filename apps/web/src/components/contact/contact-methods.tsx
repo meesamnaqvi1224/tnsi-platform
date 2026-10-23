@@ -25,7 +25,7 @@ export function ContactMethods() {
                     href={item.href}
                     className="interaction-text-link text-foreground hover:text-muted-foreground text-base font-medium"
                   >
-                    {item.email}
+                    {item.linkLabel}
                   </NextLink>
                 </Stack>
                 <Text tone="muted" className="text-sm leading-relaxed">

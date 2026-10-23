@@ -55,7 +55,7 @@ export const termsContent = {
     {
       id: 'contact',
       heading: 'Contact',
-      paragraphs: ['Questions about these terms may be directed to hello@tnsi.org.'],
+      paragraphs: ['Questions about these terms may be directed to us through our Contact page.'],
     },
   ] satisfies readonly LegalSection[],
 };
