@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@tnsi/db';
 import { attemptNow, contactFormPayload, enqueueCrmEvent } from '@/lib/crm-outbox';
 import { contactFormSchema } from '@/lib/validation';
+import { honeypotTripped, isCrossOrigin, isRateLimited, TOO_MANY_REQUESTS } from '@/lib/form-guard';
 
 export const runtime = 'nodejs';
 
@@ -36,6 +37,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400 });
   }
 
+  if (isCrossOrigin(request)) {
+    return NextResponse.json({ error: 'Invalid request.' }, { status: 403 });
+  }
+  // A filled honeypot is a bot: answer as if it worked, store nothing.
+  if (honeypotTripped(body)) {
+    return NextResponse.json({ submitted: true });
+  }
+
   const result = contactFormSchema.safeParse(body);
   if (!result.success) {
     return NextResponse.json(
@@ -48,6 +57,13 @@ export async function POST(request: Request) {
   }
 
   const { name, email, organisation, subject, message } = result.data;
+
+  if (await isRateLimited(db, 'contact_form', email)) {
+    return NextResponse.json(TOO_MANY_REQUESTS, {
+      status: 429,
+      headers: { 'Retry-After': '3600' },
+    });
+  }
 
   let id: string;
   try {

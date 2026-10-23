@@ -8,6 +8,7 @@ import {
 import { assessmentPayload, attemptNow, enqueueCrmEvent } from '@/lib/crm-outbox';
 import { getAssessmentBySlug } from '@/content/cms/loaders';
 import { assessmentSubmissionSchema } from '@/lib/validation';
+import { honeypotTripped, isCrossOrigin, isRateLimited, TOO_MANY_REQUESTS } from '@/lib/form-guard';
 
 export const runtime = 'nodejs';
 
@@ -31,6 +32,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400 });
   }
 
+  if (isCrossOrigin(request)) {
+    return NextResponse.json({ error: 'Invalid request.' }, { status: 403 });
+  }
+  // A filled honeypot is a bot: answer as if it worked, store nothing.
+  if (honeypotTripped(body)) {
+    return NextResponse.json({ submitted: true, result: null }, { status: 201 });
+  }
+
   const parsed = assessmentSubmissionSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
@@ -43,6 +52,13 @@ export async function POST(request: Request) {
   }
 
   const { assessmentSlug, email, answers } = parsed.data;
+
+  if (await isRateLimited(db, 'assessment', email)) {
+    return NextResponse.json(TOO_MANY_REQUESTS, {
+      status: 429,
+      headers: { 'Retry-After': '3600' },
+    });
+  }
 
   const assessment = await getAssessmentBySlug(assessmentSlug);
   if (!assessment) {

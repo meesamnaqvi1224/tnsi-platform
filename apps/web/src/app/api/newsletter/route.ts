@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import { db } from '@tnsi/db';
 import { attemptNow, enqueueCrmEvent, newsletterPayload } from '@/lib/crm-outbox';
+import { honeypotTripped, isCrossOrigin, isRateLimited, TOO_MANY_REQUESTS } from '@/lib/form-guard';
 
 export const runtime = 'nodejs';
 
 /** Simple, deliberately permissive format check — Flowi is the real validator. */
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_EMAIL_LENGTH = 254;
 
 interface NewsletterRequestBody {
   email?: unknown;
@@ -25,13 +27,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400 });
   }
 
+  if (isCrossOrigin(request)) {
+    return NextResponse.json({ error: 'Invalid request.' }, { status: 403 });
+  }
+  // A filled honeypot is a bot: answer as if it worked, store nothing.
+  if (honeypotTripped(body)) {
+    return NextResponse.json({ subscribed: true, alreadySubscribed: false });
+  }
+
   const email = typeof body.email === 'string' ? body.email.trim() : '';
 
   if (!email) {
     return NextResponse.json({ error: 'Email is required.' }, { status: 400 });
   }
-  if (!EMAIL_PATTERN.test(email)) {
+  if (email.length > MAX_EMAIL_LENGTH || !EMAIL_PATTERN.test(email)) {
     return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 });
+  }
+
+  if (await isRateLimited(db, 'newsletter', email)) {
+    return NextResponse.json(TOO_MANY_REQUESTS, {
+      status: 429,
+      headers: { 'Retry-After': '3600' },
+    });
   }
 
   let id: string;
