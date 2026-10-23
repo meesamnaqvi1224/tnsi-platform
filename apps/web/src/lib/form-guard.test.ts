@@ -4,7 +4,14 @@ vi.mock('@tnsi/db', () => ({
   crmOutbox: { kind: 'kind', email: 'email', createdAt: 'created_at' },
 }));
 
-import { FORM_LIMITS, honeypotTripped, isCrossOrigin, isRateLimited } from './form-guard';
+import {
+  FORM_LIMITS,
+  honeypotTripped,
+  isBodyTooLarge,
+  isCrossOrigin,
+  isRateLimited,
+  withinRateLimit,
+} from './form-guard';
 
 function request(headers: Record<string, string>) {
   return new Request('http://example.test/api/contact', { method: 'POST', headers });
@@ -29,6 +36,26 @@ describe('isCrossOrigin', () => {
 
   it('refuses an Origin that is not a URL', () => {
     expect(isCrossOrigin(request({ origin: 'not a url', host: 'site.test' }))).toBe(true);
+  });
+
+  it('refuses a request the browser marks as cross-site, whatever its Origin says', () => {
+    expect(
+      isCrossOrigin(
+        request({ origin: 'https://site.test', host: 'site.test', 'sec-fetch-site': 'cross-site' }),
+      ),
+    ).toBe(true);
+  });
+
+  it('accepts a request the browser marks same-origin', () => {
+    expect(
+      isCrossOrigin(
+        request({
+          origin: 'https://site.test',
+          host: 'site.test',
+          'sec-fetch-site': 'same-origin',
+        }),
+      ),
+    ).toBe(false);
   });
 
   it('does not treat a missing Origin as hostile (non-browser callers)', () => {
@@ -90,5 +117,146 @@ describe('isRateLimited', () => {
       },
     };
     expect(await isRateLimited(broken, 'contact_form', 'a@b.test')).toBe(false);
+  });
+});
+
+describe('isBodyTooLarge', () => {
+  it('refuses a declared body over the limit and accepts one under it', () => {
+    expect(isBodyTooLarge(request({ 'content-length': '20001' }))).toBe(true);
+    expect(isBodyTooLarge(request({ 'content-length': '5000' }))).toBe(false);
+  });
+
+  it('leaves a body with no declared length to validation', () => {
+    expect(isBodyTooLarge(request({}))).toBe(false);
+  });
+});
+
+/** Finds the advisory-lock key inside a drizzle `sql` object. */
+function lockKeyOf(query: unknown): string {
+  const found: string[] = [];
+  const walk = (node: unknown) => {
+    if (typeof node === 'string' && /^(contact_form|newsletter|assessment):/.test(node)) {
+      found.push(node);
+    } else if (Array.isArray(node)) node.forEach(walk);
+    else if (node && typeof node === 'object') Object.values(node).forEach(walk);
+  };
+  walk(query);
+  return found[0] ?? '';
+}
+
+/**
+ * A fake database with real mutual exclusion on the advisory lock, a shared row
+ * count, and per-transaction counting - enough to show concurrent submissions
+ * from one address cannot all pass the check.
+ */
+function lockingDb(options: { failLock?: boolean; rows?: Record<string, number> } = {}) {
+  const rows: Record<string, number> = options.rows ?? {};
+  const tails = new Map<string, Promise<void>>();
+  let keyOfCurrent = '';
+  const make = () => {
+    let release: () => void = () => undefined;
+    let key = '';
+    const tx = {
+      execute: async (query: unknown) => {
+        if (options.failLock) throw new Error('lock failed');
+        key = lockKeyOf(query);
+        const previous = tails.get(key) ?? Promise.resolve();
+        const mine = new Promise<void>((resolve) => (release = resolve));
+        tails.set(
+          key,
+          previous.then(() => mine),
+        );
+        await previous;
+        keyOfCurrent = key;
+      },
+      select: () => ({
+        from: () => ({ where: async () => [{ n: rows[keyOfCurrent || key] ?? 0 }] }),
+      }),
+      bump: () => {
+        rows[key] = (rows[key] ?? 0) + 1;
+      },
+      done: () => release(),
+    };
+    return tx;
+  };
+  return {
+    rows,
+    transaction: async <R>(fn: (tx: ReturnType<typeof make>) => Promise<R>): Promise<R> => {
+      const tx = make();
+      try {
+        return await fn(tx);
+      } finally {
+        tx.done();
+      }
+    },
+    bump: () => undefined,
+  };
+}
+
+describe('withinRateLimit', () => {
+  it('runs the work, with the transaction, when under the limit', async () => {
+    const db = lockingDb();
+    const result = await withinRateLimit(db, 'contact_form', 'a@b.test', async (tx) => {
+      tx.bump();
+      return 'stored';
+    });
+    expect(result).toEqual({ limited: false, value: 'stored' });
+  });
+
+  it('does not run the work when the address is at its limit', async () => {
+    const db = lockingDb({ rows: { 'contact_form:a@b.test': FORM_LIMITS.perEmail.max } });
+    const work = vi.fn(async () => 'stored');
+    // The fake counts per lock key; seed the key the function will use.
+    const result = await withinRateLimit(db, 'contact_form', 'A@B.test ', work);
+    expect(result).toEqual({ limited: true });
+    expect(work).not.toHaveBeenCalled();
+  });
+
+  it('lets only the allowed number of CONCURRENT submissions from one address through', async () => {
+    const db = lockingDb();
+    const attempts = Array.from({ length: 12 }, () =>
+      withinRateLimit(db, 'newsletter', 'Same@Example.test', async (tx) => {
+        await new Promise((resolve) => setTimeout(resolve, 1)); // widen the race window
+        tx.bump();
+        return 'stored';
+      }),
+    );
+    const results = await Promise.all(attempts);
+    expect(results.filter((r) => !r.limited)).toHaveLength(FORM_LIMITS.perEmail.max);
+    expect(results.filter((r) => r.limited)).toHaveLength(12 - FORM_LIMITS.perEmail.max);
+  });
+
+  it('does not let different addresses block each other', async () => {
+    const db = lockingDb();
+    const results = await Promise.all(
+      Array.from({ length: 8 }, (_, i) =>
+        withinRateLimit(db, 'newsletter', `user${i}@example.test`, async (tx) => {
+          tx.bump();
+          return 'stored';
+        }),
+      ),
+    );
+    expect(results.every((r) => !r.limited)).toBe(true);
+  });
+
+  it('fails open when the limiter itself fails, running the work once outside the transaction', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const db = lockingDb({ failLock: true });
+    const work = vi.fn(async () => 'stored');
+    const result = await withinRateLimit(db, 'contact_form', 'a@b.test', work);
+    expect(result).toEqual({ limited: false, value: 'stored' });
+    expect(work).toHaveBeenCalledTimes(1);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('propagates a failure of the work itself, unchanged, without retrying it or failing open', async () => {
+    const db = lockingDb();
+    const boom = new Error('could not store');
+    const work = vi.fn(async () => {
+      throw boom;
+    });
+    await expect(withinRateLimit(db, 'contact_form', 'a@b.test', work)).rejects.toBe(boom);
+    expect(work).toHaveBeenCalledTimes(1);
   });
 });

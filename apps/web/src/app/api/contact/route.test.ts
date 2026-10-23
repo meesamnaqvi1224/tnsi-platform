@@ -6,7 +6,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * against PostgreSQL in lib/crm-outbox.integration.test.ts.
  */
 
-vi.mock('@tnsi/db', () => ({ db: { marker: 'db' } }));
+vi.mock('@tnsi/db', () => {
+  // Under-limit fake database: counting returns 0 and the transaction runs its work directly.
+  const tx = {
+    execute: async () => undefined,
+    select: () => ({ from: () => ({ where: async () => [{ n: 0 }] }) }),
+  };
+  return {
+    crmOutbox: { kind: 'kind', email: 'email', createdAt: 'created_at' },
+    db: { marker: 'db', ...tx, transaction: async (fn: (t: typeof tx) => unknown) => fn(tx) },
+  };
+});
 const enqueue = vi.fn();
 const attempt = vi.fn();
 vi.mock('@/lib/crm-outbox', async () => {

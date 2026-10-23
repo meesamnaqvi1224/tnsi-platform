@@ -8,7 +8,14 @@ import {
 import { assessmentPayload, attemptNow, enqueueCrmEvent } from '@/lib/crm-outbox';
 import { getAssessmentBySlug } from '@/content/cms/loaders';
 import { assessmentSubmissionSchema } from '@/lib/validation';
-import { honeypotTripped, isCrossOrigin, isRateLimited, TOO_MANY_REQUESTS } from '@/lib/form-guard';
+import {
+  honeypotTripped,
+  isBodyTooLarge,
+  isCrossOrigin,
+  isRateLimited,
+  TOO_MANY_REQUESTS,
+  withinRateLimit,
+} from '@/lib/form-guard';
 
 export const runtime = 'nodejs';
 
@@ -25,6 +32,10 @@ export const runtime = 'nodejs';
  * and inventing one is explicitly out of scope for this phase.
  */
 export async function POST(request: Request) {
+  if (isBodyTooLarge(request)) {
+    return NextResponse.json({ error: 'Invalid request.' }, { status: 413 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -53,6 +64,7 @@ export async function POST(request: Request) {
 
   const { assessmentSlug, email, answers } = parsed.data;
 
+  // Early, cheap refusal before the CMS is read; the binding check is atomic with the write below.
   if (await isRateLimited(db, 'assessment', email)) {
     return NextResponse.json(TOO_MANY_REQUESTS, {
       status: 429,
@@ -92,7 +104,7 @@ export async function POST(request: Request) {
 
   // The submission and its CRM event are stored together: either both exist or
   // neither does, so a visitor's result is never recorded without being queued.
-  const outboxId = await db.transaction(async (trx) => {
+  const stored = await withinRateLimit(db, 'assessment', email, async (trx) => {
     await trx.insert(assessmentSubmissions).values({
       assessmentSlug,
       email,
@@ -112,6 +124,13 @@ export async function POST(request: Request) {
       }),
     });
   });
+  if (stored.limited) {
+    return NextResponse.json(TOO_MANY_REQUESTS, {
+      status: 429,
+      headers: { 'Retry-After': '3600' },
+    });
+  }
+  const outboxId = stored.value;
 
   // Best effort; a CRM outage or missing credentials must never stop a visitor
   // seeing their result. A failure leaves the stored row for the worker.

@@ -6,19 +6,28 @@ const state = vi.hoisted(() => ({ counts: [0, 0] as number[], calls: 0, transact
 vi.mock('@tnsi/db', () => ({
   assessmentSubmissions: {},
   crmOutbox: { kind: 'kind', email: 'email', createdAt: 'created_at' },
-  db: {
-    select: () => ({
-      from: () => ({ where: async () => [{ n: state.counts[state.calls++] ?? 0 }] }),
-    }),
-    transaction: async () => {
-      state.transactions += 1;
-      return 'outbox-1';
-    },
-  },
+  db: (() => {
+    const self = {
+      execute: async () => undefined,
+      select: () => ({
+        from: () => ({ where: async () => [{ n: state.counts[state.calls++] ?? 0 }] }),
+      }),
+      insert: () => ({ values: async () => undefined }),
+      transaction: async (fn: (t: unknown) => unknown) => {
+        state.transactions += 1;
+        return fn(self);
+      },
+    };
+    return self;
+  })(),
 }));
 vi.mock('@/lib/crm-outbox', async () => {
   const actual = await vi.importActual<typeof import('@/lib/crm-outbox')>('@/lib/crm-outbox');
-  return { ...actual, attemptNow: async () => ({ ok: true, isNew: true }) };
+  return {
+    ...actual,
+    enqueueCrmEvent: async () => 'outbox-1',
+    attemptNow: async () => ({ ok: true, isNew: true }),
+  };
 });
 const getAssessmentBySlug = vi.fn();
 vi.mock('@/content/cms/loaders', () => ({
@@ -95,5 +104,15 @@ describe('POST /api/assessments/submit — abuse handling', () => {
     expect(res.status).toBe(400);
     expect(state.calls).toBe(0);
     expect(state.transactions).toBe(0);
+  });
+
+  it('refuses a declared oversized body with 413 before reading it', async () => {
+    const res = await post(valid, { 'content-length': '999999' });
+    expect(res.status).toBe(413);
+  });
+
+  it('refuses a request the browser marks cross-site', async () => {
+    const res = await post(valid, { 'sec-fetch-site': 'cross-site' });
+    expect(res.status).toBe(403);
   });
 });

@@ -9,6 +9,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const insertedSubmissions: unknown[] = [];
 const trx = {
+  execute: async () => undefined,
+  select: () => ({ from: () => ({ where: async () => [{ n: 0 }] }) }),
   insert: () => ({
     values: (v: unknown) => {
       insertedSubmissions.push(v);
@@ -18,8 +20,9 @@ const trx = {
 };
 const transaction = vi.fn(async (fn: (t: typeof trx) => Promise<unknown>) => fn(trx));
 vi.mock('@tnsi/db', () => ({
-  db: { transaction: (fn: never) => transaction(fn) },
+  db: { transaction: (fn: never) => transaction(fn), ...trx },
   assessmentSubmissions: {},
+  crmOutbox: { kind: 'kind', email: 'email', createdAt: 'created_at' },
 }));
 
 const enqueue = vi.fn();

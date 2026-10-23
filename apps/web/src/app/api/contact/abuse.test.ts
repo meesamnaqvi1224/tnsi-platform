@@ -5,11 +5,16 @@ const state = vi.hoisted(() => ({ counts: [0, 0] as number[], calls: 0 }));
 
 vi.mock('@tnsi/db', () => ({
   crmOutbox: { kind: 'kind', email: 'email', createdAt: 'created_at' },
-  db: {
-    select: () => ({
-      from: () => ({ where: async () => [{ n: state.counts[state.calls++] ?? 0 }] }),
-    }),
-  },
+  db: (() => {
+    const self = {
+      execute: async () => undefined,
+      select: () => ({
+        from: () => ({ where: async () => [{ n: state.counts[state.calls++] ?? 0 }] }),
+      }),
+      transaction: async (fn: (t: unknown) => unknown) => fn(self),
+    };
+    return self;
+  })(),
 }));
 const enqueue = vi.fn();
 const attempt = vi.fn();
@@ -91,5 +96,15 @@ describe('POST /api/contact — abuse handling', () => {
     expect(res.status).toBe(400);
     expect(state.calls).toBe(0);
     expect(enqueue).not.toHaveBeenCalled();
+  });
+
+  it('refuses a declared oversized body with 413 before reading it', async () => {
+    const res = await post(valid, { 'content-length': '999999' });
+    expect(res.status).toBe(413);
+  });
+
+  it('refuses a request the browser marks cross-site', async () => {
+    const res = await post(valid, { 'sec-fetch-site': 'cross-site' });
+    expect(res.status).toBe(403);
   });
 });

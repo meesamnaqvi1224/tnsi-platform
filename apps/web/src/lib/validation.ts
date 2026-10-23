@@ -68,9 +68,12 @@ export const practiceReflectionSchema = z.object({
 
 export type PracticeReflectionInput = z.infer<typeof practiceReflectionSchema>;
 
+/** One email rule for every public form: trimmed, a valid address, at most 254 characters (the RFC limit). */
+export const emailSchema = z.string().trim().email().max(254);
+
 export const contactFormSchema = z.object({
   name: z.string().trim().min(1).max(200),
-  email: z.string().trim().email().max(320),
+  email: emailSchema,
   organisation: z.string().trim().max(200).optional(),
   subject: z.string().trim().min(1).max(200),
   message: z.string().trim().min(1).max(5000),
@@ -93,7 +96,7 @@ export type ContactFormInput = z.infer<typeof contactFormSchema>;
  */
 export const assessmentSubmissionSchema = z.object({
   assessmentSlug: z.string().trim().min(1).max(200),
-  email: z.string().trim().email().max(320),
+  email: emailSchema,
   answers: z.record(z.string().min(1).max(200), z.string().min(1).max(200)),
 });
 
