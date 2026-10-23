@@ -22,6 +22,16 @@ import {
  * this event id before" bookkeeping.
  */
 
+/**
+ * New Lifetime purchases were discontinued by the owner on 23 October 2026. A
+ * one-time Lifetime payment is granted only if its Checkout Session was created
+ * BEFORE this moment (a legitimate purchase whose webhook arrives or is
+ * redelivered late). Anything later is never granted just because a signed event
+ * says so: it is skipped and reported for manual review. Existing Lifetime
+ * entitlements are untouched by this.
+ */
+export const LIFETIME_SALES_ENDED_AT = new Date('2026-10-23T00:00:00.000Z');
+
 export interface SubscriptionSyncValues {
   tier: PurchasableTier;
   status: EntitlementStatus;
@@ -52,6 +62,8 @@ export interface CheckoutSessionCompletedInput {
   paymentStatus: string;
   /** The price actually purchased, when the webhook payload includes line items. */
   priceId: string | null;
+  /** When the Checkout Session was created (Stripe's `created`). Unknown means not provably a pre-discontinuation purchase. */
+  sessionCreatedAt?: Date | null;
 }
 
 export function planForCheckoutSessionCompleted(
@@ -77,6 +89,13 @@ export function planForCheckoutSessionCompleted(
       return {
         action: 'skip',
         reason: 'one-time checkout price did not resolve to the lifetime tier',
+      };
+    }
+    if (!input.sessionCreatedAt || input.sessionCreatedAt >= LIFETIME_SALES_ENDED_AT) {
+      return {
+        action: 'skip',
+        reason:
+          'new Lifetime purchases are discontinued: not granted automatically, needs manual review',
       };
     }
     return { action: 'grant-lifetime', userId: input.userId, stripeCustomerId: input.customerId };

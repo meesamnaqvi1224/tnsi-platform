@@ -15,10 +15,17 @@ export {
   type FlowiUpsertContactResult,
 } from './flowi';
 
-export { getStripeConfig, StripeConfigError, type StripeConfig } from './stripe/config';
+export {
+  getStripeConfig,
+  isMembershipCheckoutConfigured,
+  isMembershipOpen,
+  StripeConfigError,
+  type StripeConfig,
+} from './stripe/config';
 export { getStripeClient, isStripeConfigured } from './stripe/client';
 export { verifyStripeWebhookEvent, StripeWebhookVerificationError } from './stripe/verify';
 export {
+  LIFETIME_SALES_ENDED_AT,
   planForCheckoutSessionCompleted,
   planForSubscriptionEvent,
   planForInvoicePaymentFailed,
@@ -29,7 +36,11 @@ export {
   type InvoicePaymentFailedInput,
 } from './stripe/sync-plan';
 export {
+  AlreadySubscribedError,
+  CheckoutInProgressError,
   createCheckoutSession,
+  ensureStripeCustomer,
+  MembershipClosedError,
   UnpurchasableTierError,
   type CreateCheckoutSessionInput,
 } from './stripe/checkout';
@@ -37,14 +48,17 @@ export { createBillingPortalSession, NoStripeCustomerError } from './stripe/port
 export {
   ENTITLEMENT_TIERS,
   PURCHASABLE_TIERS,
+  CHECKOUT_TIERS,
   ENTITLEMENT_STATUSES,
   isPurchasableTier,
+  isCheckoutTier,
   checkoutModeForTier,
   resolvePriceId,
   mapPriceIdToTier,
   mapStripeSubscriptionStatus,
   type EntitlementTier,
   type PurchasableTier,
+  type CheckoutTier,
   type EntitlementStatus,
 } from './stripe/tier-mapping';
 export { FLOWI_FIELD } from './flowi-fields';

@@ -15,6 +15,7 @@ import {
 import { ManageBillingButton, SubscribeButton } from '@/components/dashboard/billing-actions';
 import { requireAuthOrRedirect } from '@/lib/auth-api';
 import { getBillingState } from '@/lib/billing';
+import { isMembershipOpen } from '@/lib/membership';
 import { createPageMetadata } from '@/lib/seo';
 
 export const metadata = createPageMetadata({
@@ -47,6 +48,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
   const user = await requireAuthOrRedirect();
   const billing = await getBillingState(user.id);
   const { success, canceled } = await searchParams;
+  const membershipOpen = isMembershipOpen();
 
   const cardTitleClassName = 'font-heading text-2xl font-semibold tracking-tight text-foreground';
 
@@ -95,14 +97,21 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                         <ManageBillingButton />
                       ) : (
                         <Stack gap="sm">
-                          <Text tone="muted" size="sm">
-                            Choose a membership to unlock full access.
-                          </Text>
-                          <Stack direction="row" gap="sm" wrap="wrap">
-                            <SubscribeButton tier="monthly" label="Subscribe monthly" />
-                            <SubscribeButton tier="annual" label="Subscribe annually" />
-                            <SubscribeButton tier="lifetime" label="Get lifetime access" />
-                          </Stack>
+                          {membershipOpen ? (
+                            <>
+                              <Text tone="muted" size="sm">
+                                Choose a membership to unlock full access.
+                              </Text>
+                              <Stack direction="row" gap="sm" wrap="wrap">
+                                <SubscribeButton tier="monthly" label="Subscribe monthly" />
+                                <SubscribeButton tier="annual" label="Subscribe annually" />
+                              </Stack>
+                            </>
+                          ) : (
+                            <Text tone="muted" size="sm">
+                              Membership is not open yet.
+                            </Text>
+                          )}
                         </Stack>
                       )}
                     </Stack>

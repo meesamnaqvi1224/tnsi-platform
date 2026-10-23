@@ -15,6 +15,19 @@ export type EntitlementTier = (typeof ENTITLEMENT_TIERS)[number];
 export const PURCHASABLE_TIERS = ['monthly', 'annual', 'lifetime'] as const;
 export type PurchasableTier = (typeof PURCHASABLE_TIERS)[number];
 
+/**
+ * The tiers a visitor may START a checkout for. `lifetime` stays in
+ * PURCHASABLE_TIERS only so existing Lifetime entitlements keep syncing from
+ * Stripe; the approved Regulation Suite model has no Lifetime plan, so it can
+ * no longer be bought.
+ */
+export const CHECKOUT_TIERS = ['monthly', 'annual'] as const;
+export type CheckoutTier = (typeof CHECKOUT_TIERS)[number];
+
+export function isCheckoutTier(value: string): value is CheckoutTier {
+  return (CHECKOUT_TIERS as readonly string[]).includes(value);
+}
+
 export function isPurchasableTier(value: string): value is PurchasableTier {
   return (PURCHASABLE_TIERS as readonly string[]).includes(value);
 }
