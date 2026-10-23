@@ -175,6 +175,19 @@ Build Brief for Claude Code" (Claude Docs). Decisions approved 2026-10-12:
   `page_view`.
 - **Expo app is out of scope for v1** (phase 2).
 
+### 2026-10-23 — W-02 public claims and customer-journey audit
+
+Read-only audit of the public website against the code, the live site and the
+Notion decisions register; findings, evidence, owners and a remediation order
+are in [`docs/10-website-claims-and-journeys-audit.md`](./docs/10-website-claims-and-journeys-audit.md).
+No P0. Headline P1s: Google Analytics loads before consent on production
+(fixed by W-01 / PR #9, unmerged); 12 of 22 sitemap article URLs are
+placeholders or show another article's body; the assessment promises an email
+that nothing sends; billing buttons (incl. Lifetime) exist on production
+`main`; Practitioner Certification registry/reapproval/"available today" and
+the research page's "active study" lines are presented as current without
+confirmation. No code, CMS, environment, billing or deployment change was made.
+
 ## Open decisions
 
 None recorded yet beyond the log above.

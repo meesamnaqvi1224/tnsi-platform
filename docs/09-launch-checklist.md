@@ -110,6 +110,7 @@ Test at: **1440px**, **1280px**, **1024px**, **768px**, **390px**, ultra-wide (1
 - [ ] Configure analytics (privacy-compliant)
 - [ ] Set up error monitoring (Sentry or equivalent)
 - [ ] Run full Visual + Responsive + Accessibility QA on production URL
+- [ ] Work through the prioritised findings in [10-website-claims-and-journeys-audit.md](./10-website-claims-and-journeys-audit.md) (W-02: public claims, customer journeys, product/content mismatches; items marked Verified / Unverified / Owner decision / Legal review)
 
 ---
 
