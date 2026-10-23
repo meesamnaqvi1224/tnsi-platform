@@ -58,3 +58,16 @@ export function isMembershipCheckoutConfigured(): boolean {
   const { secretKey, webhookSecret, priceIds } = getStripeConfig();
   return Boolean(secretKey && webhookSecret && priceIds.monthly && priceIds.annual);
 }
+
+/**
+ * Whether Regulation Suite membership is open for purchase: deliberately
+ * launched (`REGULATION_SUITE_MEMBERSHIP_OPEN` is exactly the string "true" -
+ * unset, empty, "TRUE", "1", " true" and anything else are closed) AND billing
+ * fully configured. This is the single definition; `createCheckoutSession`
+ * enforces it itself, so no caller can start a purchase while it is closed.
+ */
+export function isMembershipOpen(): boolean {
+  return (
+    process.env.REGULATION_SUITE_MEMBERSHIP_OPEN === 'true' && isMembershipCheckoutConfigured()
+  );
+}

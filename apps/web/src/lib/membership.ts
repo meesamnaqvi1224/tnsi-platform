@@ -1,20 +1,12 @@
-import { isMembershipCheckoutConfigured } from '@tnsi/integrations';
+import { isMembershipOpen } from '@tnsi/integrations';
 
 /**
- * Whether Regulation Suite membership is open for purchase.
+ * Whether Regulation Suite membership is open for purchase. The single
+ * definition lives in `@tnsi/integrations` (`isMembershipOpen`): open only when
+ * `REGULATION_SUITE_MEMBERSHIP_OPEN` is exactly "true" AND Stripe is fully
+ * configured (secret key, webhook secret, monthly and annual Prices). The safe
+ * default - the variable unset - is closed.
  *
- * Open ONLY when it has been deliberately launched
- * (`REGULATION_SUITE_MEMBERSHIP_OPEN=true`, exactly) AND billing is fully
- * configured (Stripe secret key, webhook secret, and both the monthly and
- * annual Price). Either half missing keeps it closed, so a half-configured
- * environment can never expose a checkout. The safe default - the variable
- * unset - is closed.
- *
- * Server-side only: every checkout decision goes through here and nothing a
- * client sends is consulted.
+ * Re-exported here so the web app has one import point for "is membership open?".
  */
-export function isMembershipOpen(): boolean {
-  return (
-    process.env.REGULATION_SUITE_MEMBERSHIP_OPEN === 'true' && isMembershipCheckoutConfigured()
-  );
-}
+export { isMembershipOpen };

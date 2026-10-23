@@ -1,12 +1,15 @@
 import 'server-only';
 import { getStripeClient } from './client';
-import { getStripeConfig } from './config';
+import { getStripeConfig, isMembershipOpen } from './config';
 import {
   checkoutModeForTier,
   isCheckoutTier,
   resolvePriceId,
   type CheckoutTier,
 } from './tier-mapping';
+
+/** Thrown when a purchase is attempted while membership is closed or billing is not fully configured. */
+export class MembershipClosedError extends Error {}
 
 /** Thrown when the requested tier has no Stripe Price configured yet — never a fabricated fallback price. */
 export class UnpurchasableTierError extends Error {}
@@ -32,6 +35,10 @@ export interface CreateCheckoutSessionInput {
 export async function createCheckoutSession(
   input: CreateCheckoutSessionInput,
 ): Promise<{ url: string }> {
+  // The launch gate lives here too, so no caller can reach Stripe while closed.
+  if (!isMembershipOpen()) {
+    throw new MembershipClosedError('Membership is not open.');
+  }
   // Second line of defence behind the request schema: only approved plans can reach Stripe.
   if (!isCheckoutTier(input.tier)) {
     throw new UnpurchasableTierError(`The "${String(input.tier)}" tier cannot be purchased.`);

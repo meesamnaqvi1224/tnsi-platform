@@ -18,6 +18,7 @@ export {
 export {
   getStripeConfig,
   isMembershipCheckoutConfigured,
+  isMembershipOpen,
   StripeConfigError,
   type StripeConfig,
 } from './stripe/config';
@@ -35,6 +36,7 @@ export {
 } from './stripe/sync-plan';
 export {
   createCheckoutSession,
+  MembershipClosedError,
   UnpurchasableTierError,
   type CreateCheckoutSessionInput,
 } from './stripe/checkout';

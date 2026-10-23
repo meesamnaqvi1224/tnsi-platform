@@ -30,6 +30,7 @@ vi.mock('@tnsi/integrations', async (importOriginal) => {
 });
 
 const { POST } = await import('./route');
+const { MembershipClosedError, StripeConfigError } = await import('@tnsi/integrations');
 
 const KEYS = [
   'REGULATION_SUITE_MEMBERSHIP_OPEN',
@@ -92,7 +93,7 @@ describe('POST /api/v1/billing/checkout', () => {
     expect(createCheckoutSession).not.toHaveBeenCalled();
   });
 
-  it.each(['1', 'TRUE', 'yes', 'false', ''])(
+  it.each(['1', 'TRUE', 'True', 'yes', ' true', 'true ', 'false', ''])(
     'stays closed unless the launch variable is exactly "true" (got %j)',
     async (value) => {
       configureBilling();
@@ -152,4 +153,34 @@ describe('POST /api/v1/billing/checkout', () => {
       expect(createCheckoutSession.mock.calls[0]![0]).toMatchObject({ tier, userId: 'user-1' });
     },
   );
+
+  it('answers 503 without detail if the integration itself refuses (closed)', async () => {
+    openMembership();
+    createCheckoutSession.mockRejectedValue(new MembershipClosedError('Membership is not open.'));
+    const response = await POST(request({ tier: 'monthly' }));
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: 'Billing is not available right now.' });
+  });
+
+  it('never echoes a configuration error message or any secret value', async () => {
+    openMembership();
+    createCheckoutSession.mockRejectedValue(
+      new StripeConfigError('Stripe is not configured - set STRIPE_SECRET_KEY=sk_test_placeholder'),
+    );
+    const response = await POST(request({ tier: 'annual' }));
+    const text = JSON.stringify(await response.json());
+    expect(response.status).toBe(503);
+    expect(text).not.toMatch(/sk_|whsec_|price_|STRIPE_/);
+  });
+
+  it('answers a generic 500 for an unexpected failure, with no internal detail', async () => {
+    openMembership();
+    createCheckoutSession.mockRejectedValue(new Error('boom sk_test_placeholder'));
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const response = await POST(request({ tier: 'monthly' }));
+    expect(response.status).toBe(500);
+    expect(JSON.stringify(await response.json())).not.toMatch(/boom|sk_/);
+    expect(JSON.stringify(logged.mock.calls)).not.toMatch(/boom|sk_/);
+    logged.mockRestore();
+  });
 });

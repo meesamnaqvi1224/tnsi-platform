@@ -4,6 +4,7 @@ import { db, entitlements } from '@tnsi/db';
 import { eq } from 'drizzle-orm';
 import {
   createCheckoutSession,
+  MembershipClosedError,
   StripeConfigError,
   UnpurchasableTierError,
 } from '@tnsi/integrations';
@@ -67,10 +68,14 @@ export async function POST(request: Request) {
     if (error instanceof UnpurchasableTierError) {
       return badRequest(error.message);
     }
-    if (error instanceof StripeConfigError) {
+    if (error instanceof StripeConfigError || error instanceof MembershipClosedError) {
       return NextResponse.json({ error: 'Billing is not available right now.' }, { status: 503 });
     }
-    console.error('[billing checkout] failed:', error);
+    // Log the error's type only: provider messages can echo parts of keys or customer data.
+    console.error(
+      '[billing checkout] failed:',
+      error instanceof Error ? error.name : 'UnknownError',
+    );
     return internalError('Could not start checkout. Please try again.');
   }
 }

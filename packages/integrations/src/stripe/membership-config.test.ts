@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { isMembershipCheckoutConfigured } from './config';
+import { isMembershipCheckoutConfigured, isMembershipOpen } from './config';
 import { CHECKOUT_TIERS, isCheckoutTier } from './tier-mapping';
 
 const KEYS = [
@@ -59,5 +59,35 @@ describe('checkout tiers', () => {
     expect(isCheckoutTier('lifetime')).toBe(false);
     expect(isCheckoutTier('free')).toBe(false);
     expect(isCheckoutTier('monthly')).toBe(true);
+  });
+});
+
+describe('isMembershipOpen', () => {
+  const original = process.env.REGULATION_SUITE_MEMBERSHIP_OPEN;
+  afterEach(() => {
+    if (original === undefined) delete process.env.REGULATION_SUITE_MEMBERSHIP_OPEN;
+    else process.env.REGULATION_SUITE_MEMBERSHIP_OPEN = original;
+  });
+
+  it('is closed by default and when billing is not configured', () => {
+    delete process.env.REGULATION_SUITE_MEMBERSHIP_OPEN;
+    expect(isMembershipOpen()).toBe(false);
+    process.env.REGULATION_SUITE_MEMBERSHIP_OPEN = 'true';
+    expect(isMembershipOpen()).toBe(false);
+  });
+
+  it.each(['TRUE', 'True', '1', 'yes', 'on', ' true', 'true ', 'false', '', 'truee'])(
+    'is closed for the launch value %j even with billing configured',
+    (value) => {
+      configure();
+      process.env.REGULATION_SUITE_MEMBERSHIP_OPEN = value;
+      expect(isMembershipOpen()).toBe(false);
+    },
+  );
+
+  it('is open only for exactly "true" with billing configured', () => {
+    configure();
+    process.env.REGULATION_SUITE_MEMBERSHIP_OPEN = 'true';
+    expect(isMembershipOpen()).toBe(true);
   });
 });
