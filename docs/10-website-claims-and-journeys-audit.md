@@ -185,3 +185,22 @@ WC-12, WC-16, WC-20, WC-25, WC-29/30/32, PC-04/07/08/09/10, TD-05/06/07: label a
 - **Real bookings, applications, contact messages and assessment submissions:** deliberately not submitted.
 - **Owner-reported items** (16 modules prepared; three free PowerDrops; PowerDrops published in Sanity) are recorded as reported, not inspected.
 - **Manual screen-reader checks** of the consent banner remain open (W-01).
+
+## 14. Remediation status (added 23 October 2026)
+
+The findings above are unchanged. Fixes have been prepared as separate, unmerged PRs; nothing is deployed. “Fixed in PR” means implemented and tested on that branch, not live.
+
+| Finding                                                  | Status                                                                                                                                            | PR  |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| TD-01 GA before consent; PV-05 consent/GPC               | Implemented, tested; production analytics stays off until a measurement ID is set after legal approval                                            | #9  |
+| PC-01 placeholder / mismatched articles                  | Fixed: 404 + removed from sitemap, listings and `/resources`; no CMS content changed (GROQ filter needs a preview check against the live dataset) | #11 |
+| TD-03 / WC-17 assessment email promise                   | Copy corrected (result on screen); no email system built                                                                                          | #11 |
+| WC-14 discovery-call length; WC-19 contact placeholders  | Fixed (20 minutes; placeholders removed)                                                                                                          | #11 |
+| Prospectus label; “Available today” (WC-03, partly)      | Relabelled to what the pages do                                                                                                                   | #11 |
+| WC-09 research initiative status                         | “Active/longitudinal/cohort forming” → “In development/Planning”                                                                                  | #11 |
+| WC-26 accessibility claim; WC-27 / PV-03 newsletter note | Corrected to match measured evidence and the privacy policy                                                                                       | #11 |
+| PV-02 forms without privacy link                         | Link added to assessment, contact and newsletter forms (no wording written)                                                                       | #11 |
+| TD-02 billing / Lifetime                                 | Checkout closed behind `REGULATION_SUITE_MEMBERSHIP_OPEN` + Stripe config; Lifetime rejected; billing page shows no purchase while closed         | #12 |
+| WC-31 Return Path                                        | Unchanged and still unlaunched (`noindex`, not linked); now covered by a sitemap-exclusion test                                                   | #11 |
+
+**Still open (owner/Caroline/legal — not changed):** WC-01/02 registry and annual reapproval; WC-04 module count; WC-05/06/08/10/11/12 research and biography claims; WC-13, WC-20–25 positioning and wording; PV-01/04/06 privacy-policy content and Flowi/Drive embeds; TD-04 spam protection and email verification; TD-05–07; PC-02–10 content inventory, Somatic Card alt text (needs a schema and sync change), PowerDrop status, domain decision; the Flowi email/notification verification pass.
