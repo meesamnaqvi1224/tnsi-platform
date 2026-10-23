@@ -204,3 +204,18 @@ The findings above are unchanged. Fixes have been prepared as separate, unmerged
 | WC-31 Return Path                                        | Unchanged and still unlaunched (`noindex`, not linked); now covered by a sitemap-exclusion test                                                   | #11 |
 
 **Still open (owner/Caroline/legal — not changed):** WC-01/02 registry and annual reapproval; WC-04 module count; WC-05/06/08/10/11/12 research and biography claims; WC-13, WC-20–25 positioning and wording; PV-01/04/06 privacy-policy content and Flowi/Drive embeds; TD-04 spam protection and email verification; TD-05–07; PC-02–10 content inventory, Somatic Card alt text (needs a schema and sync change), PowerDrop status, domain decision; the Flowi email/notification verification pass.
+
+### Update after the owner's decisions (23 October 2026)
+
+The owner decided the open questions; see the decisions-log entry in `PROJECT.md`. Status of each affected finding:
+
+| Finding                                   | Decision                                   | Status                                                                                                                                                                           |
+| ----------------------------------------- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| WC-01 / WC-02 registry, annual reapproval | Remove until confirmed                     | Removed from the Practitioner Certification page (PR #11)                                                                                                                        |
+| WC-04 module count                        | No claim unless the curriculum supports it | “16-module” removed (PR #11)                                                                                                                                                     |
+| WC-08 / WC-09 / WC-10 research claims     | Remove or qualify                          | Four numeric statistics and the anticipated publication dates removed; initiatives are “Planned” (PR #11). The “reviewed quarterly by faculty” FAQ remains unconfirmed           |
+| WC-11 / PC-02 biography duration          | “25+ years of experience”                  | All public copy standardised (PR #11). **The Sanity author bio (“over fifteen years”) must be edited in Studio — not changed here**                                              |
+| WC-21 Regulation Suite terms              | Approved as displayed                      | Page states the approved terms “when membership opens” (PR #11). **The 30-day card-free trial exists only on the unreleased membership branch; checkout on `main` has no trial** |
+| TD-02 billing                             | Closed; no Lifetime; no duplicates         | Launch gate, Lifetime rejection, duplicate-subscription protection, Lifetime webhook handling (PR #12)                                                                           |
+| TD-04 form abuse                          | Approved task                              | Origin check, honeypot, rate limits (PR #13). Email verification and CAPTCHA not built                                                                                           |
+| TD-01 / PV-05 analytics                   | Disabled; GPC takes precedence             | PR #9 (GPC wins over saved consent). GA4 property and cookie-wording approvals pending                                                                                           |
