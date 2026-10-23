@@ -58,23 +58,6 @@ export const searchContent = {
       keywords: ['nervous system', 'framework', 'regulation', 'polyvagal'],
     },
     {
-      id: 'article-polyvagal',
-      title: 'Polyvagal Theory in Practice',
-      excerpt:
-        'Translating Stephen Porges\u2019 research into clinical and educational application.',
-      href: '/articles/polyvagal-theory-in-practice',
-      group: 'articles' as const,
-      keywords: ['polyvagal', 'theory', 'practice', 'neuroscience'],
-    },
-    {
-      id: 'article-window',
-      title: 'Understanding the Window of Tolerance',
-      excerpt: 'How autonomic state shapes capacity, learning and relational engagement.',
-      href: '/articles/window-of-tolerance',
-      group: 'articles' as const,
-      keywords: ['window', 'tolerance', 'regulation', 'trauma'],
-    },
-    {
       id: 'program-certification',
       title: 'Practitioner Certification',
       excerpt: 'Structured certification for professionals integrating nervous system science.',
