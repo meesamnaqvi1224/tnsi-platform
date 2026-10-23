@@ -91,9 +91,10 @@ describe('consent panel (first visit)', () => {
     expect(html).toContain('Cookie preferences');
   });
 
-  it('has mobile-friendly layout: stacked full-width 44px buttons, scrollable, safe-area padding', () => {
+  it('has mobile-friendly layout: two equal full-width 44px buttons (grid), scrollable, safe-area padding', () => {
     expect(html).toContain('flex-col');
     expect(html).toContain('sm:flex-row');
+    expect(html).toContain('grid-cols-2');
     expect(html).toContain('w-full');
     expect(html).toContain('min-h-11');
     expect(html).toContain('max-h-[85dvh]');

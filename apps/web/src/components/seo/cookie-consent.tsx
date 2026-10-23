@@ -46,12 +46,12 @@ export function CookieConsentView({
       data-cookie-consent={mode}
       className="border-border bg-background fixed inset-x-0 bottom-0 z-50 max-h-[85dvh] overflow-y-auto border-t shadow-[0_-8px_30px_rgba(0,0,0,0.08)]"
     >
-      <div className="mx-auto flex max-w-5xl flex-col gap-(--space-lg) p-(--space-lg) pb-[max(var(--space-lg),env(safe-area-inset-bottom))] sm:flex-row sm:items-end sm:justify-between sm:gap-(--space-2xl) sm:p-(--space-xl)">
+      <div className="mx-auto flex max-w-5xl flex-col gap-(--space-md) p-(--space-md) pb-[max(var(--space-md),env(safe-area-inset-bottom))] sm:flex-row sm:items-end sm:justify-between sm:gap-(--space-2xl) sm:p-(--space-xl)">
         <div className="flex max-w-2xl flex-col gap-(--space-sm)">
           <h2
             id={COOKIE_CONSENT_TITLE_ID}
             tabIndex={-1}
-            className="font-heading text-foreground text-lg font-semibold tracking-tight outline-none"
+            className="font-heading text-foreground text-base font-semibold tracking-tight outline-none sm:text-lg"
           >
             Cookies and analytics
           </h2>
@@ -88,7 +88,7 @@ export function CookieConsentView({
           </p>
         </div>
 
-        <div className="flex flex-col gap-(--space-sm) sm:flex-row sm:items-center">
+        <div className="grid grid-cols-2 gap-(--space-sm) sm:flex sm:flex-row sm:items-center">
           <Button
             variant="outline"
             size="lg"
@@ -109,7 +109,7 @@ export function CookieConsentView({
             <Button
               variant="ghost"
               size="lg"
-              className="min-h-11 w-full sm:w-auto"
+              className="col-span-2 min-h-11 w-full sm:w-auto"
               onClick={onClose}
             >
               Close
