@@ -11,17 +11,23 @@
 export const ENTITLEMENT_TIERS = ['free', 'monthly', 'annual', 'lifetime'] as const;
 export type EntitlementTier = (typeof ENTITLEMENT_TIERS)[number];
 
-/** The purchasable tiers — `free` has no Stripe Price and is never a checkout target. */
-export const PURCHASABLE_TIERS = ['monthly', 'annual', 'lifetime'] as const;
+/**
+ * The tiers that can be BOUGHT today: the two recurring plans. `free` has no
+ * Stripe Price, and `lifetime` is deliberately absent - it is closed to new
+ * purchases (owner decision, October 2026). It stays in `ENTITLEMENT_TIERS` and
+ * in the database enum because legitimate existing Lifetime memberships must be
+ * preserved indefinitely; removing it here is what makes it impossible to buy,
+ * while nothing about stored rows changes.
+ */
+export const PURCHASABLE_TIERS = ['monthly', 'annual'] as const;
 export type PurchasableTier = (typeof PURCHASABLE_TIERS)[number];
 
 /**
- * The tiers a visitor may START a checkout for. `lifetime` stays in
- * PURCHASABLE_TIERS only so existing Lifetime entitlements keep syncing from
- * Stripe; the approved Regulation Suite model has no Lifetime plan, so it can
- * no longer be bought.
+ * The plans a visitor may START a checkout for: the same two recurring plans.
+ * Kept as a separate name so the request schema and the checkout function say
+ * what they mean; `lifetime` is not in it and can never be requested.
  */
-export const CHECKOUT_TIERS = ['monthly', 'annual'] as const;
+export const CHECKOUT_TIERS = PURCHASABLE_TIERS;
 export type CheckoutTier = (typeof CHECKOUT_TIERS)[number];
 
 export function isCheckoutTier(value: string): value is CheckoutTier {
@@ -43,15 +49,13 @@ export const ENTITLEMENT_STATUSES = [
 export type EntitlementStatus = (typeof ENTITLEMENT_STATUSES)[number];
 
 /**
- * `monthly`/`annual` are recurring — Stripe Checkout needs `mode: 'subscription'`.
- * `lifetime` is a one-time purchase (no recurring interval exists for it
- * anywhere in this repo) — Checkout needs `mode: 'payment'`. This is a
- * technical consequence of `lifetime` already existing in the tier enum,
- * not a new business rule: a "lifetime" tier can only sensibly be sold as
- * a one-time charge.
+ * Every purchasable plan is a recurring subscription, so Stripe Checkout always
+ * runs in `subscription` mode. (There is no one-time purchase mode any more:
+ * the only one-time product was Lifetime, which is closed to new purchases.)
  */
-export function checkoutModeForTier(tier: PurchasableTier): 'subscription' | 'payment' {
-  return tier === 'lifetime' ? 'payment' : 'subscription';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- keeps callers tier-keyed
+export function checkoutModeForTier(_tier: PurchasableTier): 'subscription' {
+  return 'subscription';
 }
 
 /**

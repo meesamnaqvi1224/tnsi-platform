@@ -10,6 +10,7 @@ import { requireMemberAccess, memberAccessErrorResponse } from '@/lib/auth-api';
 import { getPracticeHistory } from '@/lib/practices';
 import { practiceHistoryListQuerySchema } from '@/lib/validation';
 import { success, badRequest } from '@/lib/api-response';
+import { contentAccessFor, withPracticeAccess } from '@/lib/membership';
 
 export const runtime = 'nodejs';
 
@@ -35,7 +36,12 @@ export async function GET(request: Request) {
   // route never accepts one from the client, only ever uses the
   // authenticated caller's own id, so a member can never read another
   // member's history.
-  const { history, hasMore } = await getPracticeHistory(user.id, limit, offset);
+  const { history: rows, hasMore } = await getPracticeHistory(user.id, limit, offset);
+
+  // Past sessions stay visible (it's the member's own record), but media for
+  // practices they can no longer open is withheld like everywhere else.
+  const access = contentAccessFor(user.entitlements);
+  const history = rows.map((entry) => withPracticeAccess(entry, access));
 
   return success({
     history,

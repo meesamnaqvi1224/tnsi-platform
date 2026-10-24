@@ -1,176 +1,254 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { SQL } from 'drizzle-orm';
+import type Stripe from 'stripe';
+import { createFakeDb } from './test-support/fake-trx';
 
 /**
- * Stripe event -> entitlement behaviour for the cases that protect members:
- * legacy Lifetime entitlements are preserved, new Lifetime grants are refused,
- * and a second live subscription never takes over an existing one. The database
- * is a fake; nothing touches Stripe or a real database.
+ * Event dispatch and mapping for the Stripe webhook executor, with no database
+ * and no Stripe call (see test-support/fake-trx.ts). The properties that need
+ * a real database - the row lock, rollback, replay and concurrency - are
+ * covered against PostgreSQL in stripe-sync.integration.test.ts.
  */
-const db = vi.hoisted(() => ({
-  rows: [] as Record<string, unknown>[],
-  users: [{ id: 'user-1' }] as Record<string, unknown>[],
-  updates: [] as Record<string, unknown>[],
-  selects: 0,
-}));
 
-vi.mock('@tnsi/db', () => {
-  const entitlements = { __t: 'entitlements' };
-  const users = { __t: 'users' };
-  return {
-    entitlements,
-    users,
-    db: {
-      select: () => ({
-        from: (table: { __t: string }) => ({
-          where: () => ({
-            limit: async () => (table.__t === 'users' ? db.users : db.rows),
-          }),
-        }),
-      }),
-      update: () => ({
-        set: (values: Record<string, unknown>) => ({
-          where: () => {
-            db.updates.push(values);
-            return { returning: async () => [{ userId: 'user-1' }] };
-          },
-        }),
-      }),
-    },
-  };
-});
+vi.mock('@tnsi/db', () => ({
+  db: {},
+  entitlements: {
+    userId: 'userId',
+    stripeCustomerId: 'stripeCustomerId',
+    paymentFailedAt: { name: 'payment_failed_at' },
+    metadata: { name: 'metadata' },
+  },
+}));
 
 const { syncStripeEvent } = await import('./sync-stripe-entitlement');
 
-const KEYS = ['STRIPE_PRICE_ID_MONTHLY', 'STRIPE_PRICE_ID_ANNUAL', 'STRIPE_PRICE_ID_LIFETIME'];
+const KEYS = ['STRIPE_PRICE_ID_MONTHLY', 'STRIPE_PRICE_ID_ANNUAL'];
 const saved = Object.fromEntries(KEYS.map((k) => [k, process.env[k]]));
 
-function subscriptionEvent(id: string, status = 'active', price = 'price_monthly') {
-  return {
-    type: 'customer.subscription.updated',
-    data: {
-      object: {
-        id,
-        customer: 'cus_1',
-        status,
-        cancel_at_period_end: false,
-        canceled_at: null,
-        current_period_start: 1_790_000_000,
-        current_period_end: 1_792_600_000,
-        items: { data: [{ price: { id: price } }] },
-      },
-    },
-  } as never;
-}
-
-function lifetimeCheckout(created: number) {
-  return {
-    type: 'checkout.session.completed',
-    data: {
-      object: {
-        id: 'cs_1',
-        mode: 'payment',
-        payment_status: 'paid',
-        customer: 'cus_1',
-        created,
-        metadata: { userId: 'user-1' },
-        line_items: { data: [{ price: { id: 'price_lifetime' } }] },
-      },
-    },
-  } as never;
-}
-
 beforeEach(() => {
-  db.rows = [];
-  db.users = [{ id: 'user-1' }];
-  db.updates = [];
-  process.env.STRIPE_PRICE_ID_MONTHLY = 'price_monthly';
-  process.env.STRIPE_PRICE_ID_ANNUAL = 'price_annual';
-  process.env.STRIPE_PRICE_ID_LIFETIME = 'price_lifetime';
+  process.env.STRIPE_PRICE_ID_MONTHLY = 'price_m';
+  process.env.STRIPE_PRICE_ID_ANNUAL = 'price_a';
 });
-
 afterEach(() => {
   for (const k of KEYS) {
     if (saved[k] === undefined) delete process.env[k];
     else process.env[k] = saved[k];
   }
-  vi.restoreAllMocks();
 });
 
-describe('legacy Lifetime entitlements', () => {
-  it('are not overwritten or revoked by a subscription event', async () => {
-    db.rows = [{ tier: 'lifetime', status: 'active', stripeSubscriptionId: null }];
-    const result = await syncStripeEvent(subscriptionEvent('sub_new', 'canceled'));
-    expect(result.action).toBe('skip');
-    expect(result.detail).toContain('Lifetime');
-    expect(db.updates).toEqual([]);
-  });
+const EVENT_UNIX = Math.floor(new Date('2026-10-01T09:00:00Z').getTime() / 1000);
 
-  it('are not marked past due by a failed invoice', async () => {
-    db.rows = [{ tier: 'lifetime', status: 'active', stripeSubscriptionId: null }];
-    const result = await syncStripeEvent({
-      type: 'invoice.payment_failed',
-      data: { object: { customer: 'cus_1', subscription: 'sub_x' } },
-    } as never);
-    expect(result.action).toBe('skip');
-    expect(db.updates).toEqual([]);
-  });
+const linkedRow = {
+  userId: 'user-1',
+  tier: 'free',
+  stripeCustomerId: 'cus_1',
+  stripeSubscriptionId: null,
+};
 
-  it('are still granted for a legitimate purchase made before sales ended (late delivery)', async () => {
-    const result = await syncStripeEvent(lifetimeCheckout(1_790_000_000)); // 2026-09-21
-    expect(result.action).toBe('grant-lifetime');
-    expect(db.updates[0]).toMatchObject({ tier: 'lifetime', status: 'active' });
-  });
-});
+function subscription(
+  overrides: Partial<Stripe.Subscription> & { price?: string } = {},
+): Stripe.Subscription {
+  const { price = 'price_m', ...rest } = overrides;
+  return {
+    id: 'sub_1',
+    customer: 'cus_1',
+    status: 'active',
+    cancel_at_period_end: false,
+    current_period_start: EVENT_UNIX,
+    current_period_end: EVENT_UNIX + 30 * 86400,
+    canceled_at: null,
+    metadata: {},
+    items: { data: [{ price: { id: price } }] },
+    ...rest,
+  } as unknown as Stripe.Subscription;
+}
 
-describe('new Lifetime purchases', () => {
-  it('are never granted just because a signed event says so', async () => {
-    const result = await syncStripeEvent(lifetimeCheckout(1_792_800_000)); // after 2026-10-23
-    expect(result.action).toBe('skip');
-    expect(result.detail).toContain('discontinued');
-    expect(db.updates).toEqual([]);
-  });
-});
+function lifecycleEvent(type: string, sub: Partial<Stripe.Subscription> = {}) {
+  return {
+    type,
+    created: EVENT_UNIX,
+    data: { object: subscription(sub) },
+  } as unknown as Stripe.Event;
+}
 
-describe('other subscription events keep working', () => {
-  it('updates the entitlement for the same subscription', async () => {
-    db.rows = [{ tier: 'monthly', status: 'active', stripeSubscriptionId: 'sub_1' }];
-    const result = await syncStripeEvent(subscriptionEvent('sub_1', 'active'));
-    expect(result.action).toBe('sync-subscription');
-    expect(db.updates[0]).toMatchObject({ tier: 'monthly', status: 'active' });
+/** Runs one event through the executor against a linked Free row with Stripe answering `current`. */
+async function run(event: Stripe.Event, current: Stripe.Subscription, rows = [linkedRow]) {
+  const fake = createFakeDb([rows]);
+  const reader = { retrieveSubscription: vi.fn().mockResolvedValue(current) };
+  const result = await syncStripeEvent(event, {
+    reader,
+    runTransaction: fake.runTransaction,
+    now: () => new Date('2026-10-01T10:00:00Z'),
   });
+  return { result, reader, writes: fake.state.committedSets, fake };
+}
 
-  it('records a first subscription on a free row', async () => {
-    db.rows = [{ tier: 'free', status: 'active', stripeSubscriptionId: null }];
-    const result = await syncStripeEvent(subscriptionEvent('sub_1', 'trialing'));
-    expect(result.action).toBe('sync-subscription');
-    expect(db.updates[0]).toMatchObject({ tier: 'monthly', status: 'trialing' });
-  });
-
-  it('lets a new subscription replace an ended one', async () => {
-    db.rows = [{ tier: 'monthly', status: 'canceled', stripeSubscriptionId: 'sub_old' }];
-    const result = await syncStripeEvent(subscriptionEvent('sub_new', 'active', 'price_annual'));
-    expect(result.action).toBe('sync-subscription');
-    expect(db.updates[0]).toMatchObject({ tier: 'annual', stripeSubscriptionId: 'sub_new' });
-  });
-
-  it('applies a cancellation of the current subscription', async () => {
-    db.rows = [{ tier: 'monthly', status: 'active', stripeSubscriptionId: 'sub_1' }];
-    await syncStripeEvent(subscriptionEvent('sub_1', 'canceled'));
-    expect(db.updates[0]).toMatchObject({ status: 'canceled' });
-  });
-});
-
-describe('a second live subscription', () => {
-  it('does not take over the entitlement and is flagged for manual review', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-    db.rows = [{ tier: 'monthly', status: 'active', stripeSubscriptionId: 'sub_1' }];
-    const result = await syncStripeEvent(subscriptionEvent('sub_2', 'active', 'price_annual'));
-    expect(result.action).toBe('skip');
-    expect(result.detail).toContain('manual review');
-    expect(db.updates).toEqual([]);
-    expect(warn).toHaveBeenCalledWith(
-      '[stripe webhook] DUPLICATE_SUBSCRIPTION_REVIEW',
-      expect.objectContaining({ existing: 'sub_1', incoming: 'sub_2' }),
+describe('syncStripeEvent — what is written comes from Stripe’s current state, not the event', () => {
+  it('reads the subscription from Stripe for a lifecycle event, under the row lock', async () => {
+    const { reader, fake } = await run(
+      lifecycleEvent('customer.subscription.updated'),
+      subscription(),
     );
+    expect(reader.retrieveSubscription).toHaveBeenCalledWith('sub_1');
+    expect(fake.state.forUpdateCalls).toBe(1);
+  });
+
+  it('writes Stripe’s answer even when the event payload says something older', async () => {
+    // The event claims past_due; Stripe's current state is active.
+    const { writes } = await run(
+      lifecycleEvent('customer.subscription.updated', { status: 'past_due' }),
+      subscription({ status: 'active' }),
+    );
+    expect(writes[0]).toMatchObject({ status: 'active', paymentFailedAt: null });
+  });
+
+  it('trialing (a pre-existing Stripe trial): written as trialing, grace anchor cleared', async () => {
+    const { writes } = await run(
+      lifecycleEvent('customer.subscription.created'),
+      subscription({ status: 'trialing' }),
+    );
+    expect(writes[0]).toMatchObject({ tier: 'monthly', status: 'trialing', paymentFailedAt: null });
+  });
+
+  it('annual price: written as the annual tier', async () => {
+    const { writes } = await run(
+      lifecycleEvent('customer.subscription.updated'),
+      subscription({ price: 'price_a' }),
+    );
+    expect(writes[0]).toMatchObject({ tier: 'annual', status: 'active' });
+  });
+
+  it('past_due: status written and the anchor set with first-failure-wins COALESCE', async () => {
+    const { writes } = await run(
+      lifecycleEvent('customer.subscription.updated'),
+      subscription({ status: 'past_due' }),
+    );
+    expect(writes[0]!.status).toBe('past_due');
+    expect(writes[0]!.paymentFailedAt).toBeInstanceOf(SQL);
+  });
+
+  it('cancel-at-period-end: stays active with the flag recorded — access is not cut early', async () => {
+    const { writes } = await run(
+      lifecycleEvent('customer.subscription.updated'),
+      subscription({ cancel_at_period_end: true }),
+    );
+    expect(writes[0]).toMatchObject({ status: 'active', cancelAtPeriodEnd: true });
+  });
+
+  it('subscription ended (canceled): status written, anchor left untouched', async () => {
+    const { writes } = await run(
+      lifecycleEvent('customer.subscription.deleted'),
+      subscription({ status: 'canceled', canceled_at: EVENT_UNIX }),
+    );
+    expect(writes[0]!.status).toBe('canceled');
+    expect(writes[0]).not.toHaveProperty('paymentFailedAt');
+  });
+
+  it('records when the row was last synced from Stripe', async () => {
+    const { writes } = await run(lifecycleEvent('customer.subscription.updated'), subscription());
+    expect(writes[0]!.stripeSyncedAt).toEqual(new Date('2026-10-01T10:00:00Z'));
+  });
+
+  it('an unrecognised price is skipped — never guessed into a tier', async () => {
+    const { result, writes } = await run(
+      lifecycleEvent('customer.subscription.updated'),
+      subscription({ price: 'price_unknown' }),
+    );
+    expect(result.action).toBe('skip');
+    expect(writes).toHaveLength(0);
+  });
+
+  it('skips a subscription that belongs to a different Stripe customer', async () => {
+    const { result, writes } = await run(
+      lifecycleEvent('customer.subscription.updated'),
+      subscription({ customer: 'cus_other' as never }),
+    );
+    expect(result).toMatchObject({ action: 'skip', detail: expect.stringContaining('customer') });
+    expect(writes).toHaveLength(0);
+  });
+});
+
+describe('syncStripeEvent — invoice.payment_failed', () => {
+  const invoiceEvent = {
+    type: 'invoice.payment_failed',
+    created: EVENT_UNIX,
+    data: { object: { customer: 'cus_1', subscription: 'sub_1' } },
+  } as unknown as Stripe.Event;
+
+  it('refreshes the subscription from Stripe; if past due, the anchor is first-failure-wins COALESCE', async () => {
+    const { result, writes } = await run(invoiceEvent, subscription({ status: 'past_due' }));
+    expect(result.action).toBe('sync-subscription');
+    expect(writes[0]!.status).toBe('past_due');
+    expect(writes[0]!.paymentFailedAt).toBeInstanceOf(SQL);
+  });
+
+  it('does NOT mark a member past due if Stripe now says the payment recovered', async () => {
+    const { writes } = await run(invoiceEvent, subscription({ status: 'active' }));
+    expect(writes[0]).toMatchObject({ status: 'active', paymentFailedAt: null });
+  });
+
+  it('ignores a failed invoice that is not for a subscription', async () => {
+    const fake = createFakeDb();
+    const reader = { retrieveSubscription: vi.fn() };
+    const result = await syncStripeEvent(
+      {
+        ...invoiceEvent,
+        data: { object: { customer: 'cus_1', subscription: null } },
+      } as unknown as Stripe.Event,
+      { reader, runTransaction: fake.runTransaction },
+    );
+    expect(result.action).toBe('skip');
+    expect(reader.retrieveSubscription).not.toHaveBeenCalled();
+  });
+});
+
+describe('syncStripeEvent — checkout.session.completed', () => {
+  const sessionEvent = (overrides: Record<string, unknown> = {}) =>
+    ({
+      type: 'checkout.session.completed',
+      created: EVENT_UNIX,
+      data: {
+        object: {
+          mode: 'subscription',
+          customer: 'cus_1',
+          subscription: 'sub_1',
+          metadata: { userId: 'user-1' },
+          ...overrides,
+        },
+      },
+    }) as unknown as Stripe.Event;
+
+  it('syncs the new subscription immediately, without waiting for the subscription event', async () => {
+    const { result, writes } = await run(sessionEvent(), subscription());
+    expect(result.action).toBe('sync-subscription');
+    expect(writes[0]).toMatchObject({ tier: 'monthly', status: 'active' });
+  });
+
+  it('never grants anything for a one-time payment: Lifetime is closed to new purchases', async () => {
+    const fake = createFakeDb();
+    const reader = { retrieveSubscription: vi.fn() };
+    const result = await syncStripeEvent(sessionEvent({ mode: 'payment', subscription: null }), {
+      reader,
+      runTransaction: fake.runTransaction,
+    });
+    expect(result).toMatchObject({ action: 'skip', detail: expect.stringMatching(/Lifetime/i) });
+    expect(fake.state.selectCalls).toBe(0);
+    expect(fake.state.committedSets).toHaveLength(0);
+  });
+
+  it('refuses a session with no userId in metadata', async () => {
+    const fake = createFakeDb();
+    const result = await syncStripeEvent(sessionEvent({ metadata: {} }), {
+      reader: { retrieveSubscription: vi.fn() },
+      runTransaction: fake.runTransaction,
+    });
+    expect(result.action).toBe('skip');
+  });
+});
+
+describe('syncStripeEvent — other event types', () => {
+  it('ignores event types it does not handle', async () => {
+    const result = await syncStripeEvent({ type: 'charge.refunded' } as unknown as Stripe.Event);
+    expect(result).toEqual({ action: 'skip', detail: 'unhandled event type: charge.refunded' });
   });
 });

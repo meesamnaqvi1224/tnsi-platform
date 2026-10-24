@@ -2,10 +2,15 @@ import { Linking, StyleSheet, View } from 'react-native';
 import { Card, ErrorNotice, PrimaryButton, ScreenContainer, ThemedText } from '@/components';
 import { MembershipSkeleton } from '@/components/profile/MembershipSkeleton';
 import { useEntitlements } from '@/hooks/useEntitlements';
-import { formatArticleDate } from '@/lib/format';
+import { membershipDetailLines } from '@/lib/membership-copy';
 import { env } from '@/lib/env';
 import { colors, spacing } from '@/theme';
-import type { Entitlements, EntitlementStatus, EntitlementTier } from '@/api/types';
+import type {
+  Entitlements,
+  EntitlementStatus,
+  EntitlementTier,
+  MembershipState,
+} from '@/api/types';
 
 const TIER_LABEL: Record<EntitlementTier, string> = {
   free: 'Free Member',
@@ -27,6 +32,27 @@ const STATUS_LABEL: Record<EntitlementStatus, string> = {
   canceled: 'Canceled',
   expired: 'Expired',
 };
+
+/**
+ * Preferred over `STATUS_LABEL` whenever the server sends its resolved
+ * `membership` — this is the server's own answer to "where does this member
+ * stand?", so what the app says always matches what the server enforces
+ * (e.g. a payment-failed member inside the 7-day grace period is still
+ * entitled, which the raw `past_due` status alone doesn't say).
+ */
+const MEMBERSHIP_STATE_LABEL: Record<MembershipState, string> = {
+  free: 'Free account',
+  trialing: 'Free trial',
+  active: 'Active',
+  grace: 'Payment needs attention',
+  inactive: 'Membership ended',
+};
+
+function statusLabelFor(entitlements: Entitlements): string {
+  return entitlements.membership
+    ? MEMBERSHIP_STATE_LABEL[entitlements.membership.state]
+    : STATUS_LABEL[entitlements.status];
+}
 
 /**
  * The real, already-existing web billing page - not invented. Same
@@ -74,11 +100,11 @@ function MembershipContent({
       <Card style={styles.card}>
         <View
           accessible
-          accessibilityLabel={`Membership: ${TIER_LABEL[entitlements.tier]}. Status: ${STATUS_LABEL[entitlements.status]}`}
+          accessibilityLabel={`Membership: ${TIER_LABEL[entitlements.tier]}. Status: ${statusLabelFor(entitlements)}`}
         >
           <ThemedText variant="heading">{TIER_LABEL[entitlements.tier]}</ThemedText>
           <ThemedText variant="body" color={colors.charcoal} style={styles.statusLine}>
-            Status: {STATUS_LABEL[entitlements.status]}
+            Status: {statusLabelFor(entitlements)}
           </ThemedText>
         </View>
 
@@ -146,33 +172,26 @@ function MembershipContent({
   );
 }
 
+function DetailLine({ children }: { children: string }) {
+  return (
+    <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
+      {children}
+    </ThemedText>
+  );
+}
+
 function AccessDetail({ entitlements }: { entitlements: Entitlements }) {
-  if (entitlements.tier === 'free') {
-    return (
-      <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
-        You currently have free access to TNSI.
-      </ThemedText>
-    );
-  }
-
-  if (entitlements.cancelAtPeriodEnd && entitlements.currentPeriodEnd) {
-    return (
-      <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
-        Your access continues until {formatArticleDate(entitlements.currentPeriodEnd)}, after which
-        your membership will not renew.
-      </ThemedText>
-    );
-  }
-
-  if (entitlements.status === 'active' && entitlements.currentPeriodEnd) {
-    return (
-      <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
-        Renews {formatArticleDate(entitlements.currentPeriodEnd)}.
-      </ThemedText>
-    );
-  }
-
-  return null;
+  // What to say is decided in `membershipDetailLines` (unit-tested); the screen
+  // only displays the server's resolved membership and never derives it.
+  const lines = membershipDetailLines(entitlements);
+  if (lines.length === 0) return null;
+  return (
+    <>
+      {lines.map((line) => (
+        <DetailLine key={line}>{line}</DetailLine>
+      ))}
+    </>
+  );
 }
 
 function SectionLabel({ children }: { children: string }) {

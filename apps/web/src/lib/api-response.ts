@@ -28,6 +28,16 @@ export function forbidden(message = 'Access denied') {
   return error('FORBIDDEN', message, 403);
 }
 
+/**
+ * 403 for content that exists but belongs to the paid Regulation Suite™
+ * library, requested by a member without paid access. A distinct code from
+ * `FORBIDDEN` so clients (the mobile app) can show a membership prompt
+ * rather than a generic error. Never includes billing details.
+ */
+export function membershipRequired(message = 'A Regulation Suite membership is required.') {
+  return error('MEMBERSHIP_REQUIRED', message, 403);
+}
+
 export function notFound(message = 'Resource not found') {
   return error('NOT_FOUND', message, 404);
 }

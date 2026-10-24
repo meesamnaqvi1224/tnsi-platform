@@ -220,7 +220,10 @@ function LinkRow({ label, path, last }: { label: string; path: string; last?: bo
 }
 
 function MembershipSummary({ entitlements }: { entitlements: import('@/api/types').Entitlements }) {
-  const statusNote = STATUS_NOTE[entitlements.status];
+  // The server's resolved membership wins: an app-managed free trial is a Free
+  // account with status `active`, so only `membership.state` can say "trial".
+  const statusNote =
+    entitlements.membership?.state === 'trialing' ? 'Free trial' : STATUS_NOTE[entitlements.status];
   const hasPrograms = entitlements.programs.length > 0;
   const hasCertifications = entitlements.certifications.length > 0;
   const showRenewal =

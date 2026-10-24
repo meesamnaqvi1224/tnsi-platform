@@ -108,6 +108,7 @@ Test at: **1440px**, **1280px**, **1024px**, **768px**, **390px**, ultra-wide (1
   - [x] Lifetime purchases rejected server-side; existing Lifetime entitlements preserved (webhook never overwrites or revokes them; signed Lifetime payments after 23 Oct 2026 are skipped for manual review)
   - [x] Duplicate-subscription protection: refused for current members, Stripe checked for live subscriptions, one Stripe customer per user, session reuse/expiry, idempotency keys, second live subscription flagged (never auto-cancelled)
   - [ ] **Stripe Dashboard (not inspected; owner/account holder):** create the two recurring GBP Prices (£5.99/month, £59/year) with no trial and no Lifetime Price; create a **restricted Billing Portal configuration** (payment methods, cancellation at period end, invoices, history; no plan switching) and set `STRIPE_PORTAL_CONFIGURATION_ID`; webhook endpoint and signing secret; retry schedule aligned with the 7-day grace period
+  - [ ] Release procedure, rollback and the Clerk/Stripe test steps: [membership-release-runbook.md](./membership-release-runbook.md)
   - [ ] See [membership-trial-integration-plan.md](./membership-trial-integration-plan.md) for how the trial reaches `main`
   - [ ] **The 30-day card-free trial is not implemented on `main`** (checkout has no trial). It exists only on the unreleased membership branch; it must be merged and tested before the public page's trial wording is true at launch
   - [ ] Test-mode run: trial → checkout → payment → failure and grace → cancel → second-subscription attempt refused

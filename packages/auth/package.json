@@ -14,7 +14,11 @@
     "./client/web": "./src/client/web.ts",
     "./client/server": "./src/client/server.ts",
     "./session/helpers": "./src/session/helpers.ts",
-    "./authorize/entitlements": "./src/authorize/entitlements.ts"
+    "./authorize/entitlements": "./src/authorize/entitlements.ts",
+    "./trial/email": "./src/trial/email.ts",
+    "./trial/eligibility": "./src/trial/eligibility.ts",
+    "./trial/testing": "./src/trial/in-memory-trial-store.test-support.ts",
+    "./verify/email": "./src/verify/email.ts"
   },
   "scripts": {
     "lint": "eslint .",
