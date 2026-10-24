@@ -85,6 +85,13 @@
       "when": 1791900000000,
       "tag": "0010a_add_crm_outbox",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792823405421,
+      "tag": "0012_add_membership_trial_grace_and_free_content",
+      "breakpoints": true
     }
   ]
 }

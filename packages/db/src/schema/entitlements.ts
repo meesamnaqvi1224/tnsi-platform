@@ -7,6 +7,7 @@ import {
   jsonb,
   unique,
   primaryKey,
+  check,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { users } from './users';
@@ -54,6 +55,36 @@ export const entitlements = pgTable(
 
     canceledAt: timestamp('canceled_at', { withTimezone: true }),
 
+    // Set when the first still-unresolved recurring payment failure happens
+    // (from the Stripe webhook's own event time) and cleared when the
+    // subscription recovers. It anchors the approved 7-day payment-failure
+    // grace period (`PAYMENT_GRACE_PERIOD_DAYS` in @tnsi/auth) — Stripe's
+    // `past_due` status alone says a payment failed, not when. Never
+    // overwritten by later retries, so the grace clock can't restart.
+    paymentFailedAt: timestamp('payment_failed_at', { withTimezone: true }),
+
+    // App-managed free trial (Regulation Suite membership policy, amended
+    // 14 Oct 2026): 30 days, full paid-feature access, no payment card, and
+    // no Stripe involvement. A trial is a Free account (tier `free`) with a
+    // future `trialEndsAt`; once it passes the account is simply Free again -
+    // evaluated from these dates when access is decided, never by a stored
+    // status flip and never with a charge. Both are null until a trial is
+    // claimed, and are kept afterwards as history. One trial per verified,
+    // normalised email is enforced by `trial_claims`, not by these columns.
+    trialStartedAt: timestamp('trial_started_at', { withTimezone: true }),
+
+    trialEndsAt: timestamp('trial_ends_at', { withTimezone: true }),
+
+    // When this row's Stripe-derived fields (tier, status, period, cancel
+    // flag, subscription id) were last fetched from Stripe. Every Stripe
+    // write is conditional on this being null or no later than the new
+    // fetch time, so a slower, older fetch - a late webhook, or a concurrent
+    // read-time reconciliation - can never overwrite newer state. Null means
+    // "never synced from Stripe" (every free account, and any row written
+    // before this column existed - including legacy Lifetime rows, which
+    // are never touched by Stripe subscription syncs).
+    stripeSyncedAt: timestamp('stripe_synced_at', { withTimezone: true }),
+
     metadata: jsonb('metadata').$type<Record<string, unknown>>().notNull().default({}),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -73,6 +104,12 @@ export const entitlements = pgTable(
     ),
     uniqueEntitlementsStripeSubscription: unique('unique_entitlements_stripe_subscription').on(
       table.stripeSubscriptionId,
+    ),
+    // A trial window is either absent or complete and forward-moving - never
+    // half-set, never ending before it starts.
+    trialWindow: check(
+      'entitlements_trial_window',
+      sql`(${table.trialStartedAt} IS NULL AND ${table.trialEndsAt} IS NULL) OR (${table.trialStartedAt} IS NOT NULL AND ${table.trialEndsAt} IS NOT NULL AND ${table.trialEndsAt} > ${table.trialStartedAt})`,
     ),
   }),
 );
