@@ -9,28 +9,38 @@ import {
  * Pure decision logic for what a verified Stripe webhook event should do to
  * the `entitlements` table — no database access, no Stripe SDK calls. Every
  * input here is a plain value extracted from the real Stripe event by the
- * caller (see apps/web/src/lib/sync-stripe-entitlement.ts), which mirrors
- * the pattern already established for the Sanity practice webhook
- * (packages/cms/src/webhook/sync-plan.ts): parse/validate → pure decision
- * → thin DB executor → thin route handler.
+ * caller (see apps/web/src/lib/sync-stripe-entitlement.ts).
  *
- * Every plan is a deterministic function of its input, and every DB write
- * the executor performs from a plan is a plain `UPDATE ... WHERE`, never an
- * insert or an increment — replaying the same event twice therefore always
- * produces the same resulting row, which is what makes this safe against
- * Stripe's at-least-once webhook delivery without any separate "have I seen
- * this event id before" bookkeeping.
+ * ## Events identify; Stripe's current state decides
+ * Stripe delivers events at least once and in no guaranteed order, and an
+ * event's payload is a snapshot that may already be stale when it arrives. So
+ * a webhook event is used ONLY to learn WHICH subscription changed
+ * (`refresh-subscription`). The executor then reads that subscription's
+ * current state from Stripe (the source of truth) while holding the member's
+ * row lock, and `planForSubscriptionEvent` below maps THAT state to the row.
+ * Replaying a duplicate, delivering a stale event late, or two events racing
+ * all end in the same place: the row reflects what Stripe says now. No event
+ * timestamp is used to order anything.
+ *
+ * ## Lifetime
+ * There is no plan that grants Lifetime. It was a one-time purchase and is
+ * closed to new purchases; a one-time checkout event is skipped with a reason.
+ * Existing Lifetime rows are protected by the executor and never written here.
  */
 
 /**
- * New Lifetime purchases were discontinued by the owner on 23 October 2026. A
- * one-time Lifetime payment is granted only if its Checkout Session was created
- * BEFORE this moment (a legitimate purchase whose webhook arrives or is
- * redelivered late). Anything later is never granted just because a signed event
- * says so: it is skipped and reported for manual review. Existing Lifetime
- * entitlements are untouched by this.
+ * What a subscription update does to the payment-failure grace anchor
+ * (`entitlements.payment_failed_at`, which drives the approved 7-day grace
+ * period — see `PAYMENT_GRACE_PERIOD_DAYS` in @tnsi/auth):
+ *
+ * - `start` — the subscription is `past_due`: record `at` as the failure
+ *   time, but only if none is recorded yet (the executor keeps an existing
+ *   value, so repeated failed retries never restart the clock).
+ * - `clear` — the subscription is healthy again (`active`/`trialing`).
+ * - `keep` — any other state; leave the column alone.
  */
-export const LIFETIME_SALES_ENDED_AT = new Date('2026-10-23T00:00:00.000Z');
+export type PaymentFailureUpdate =
+  { action: 'start'; at: Date } | { action: 'clear' } | { action: 'keep' };
 
 export interface SubscriptionSyncValues {
   tier: PurchasableTier;
@@ -40,72 +50,85 @@ export interface SubscriptionSyncValues {
   currentPeriodEnd: Date | null;
   cancelAtPeriodEnd: boolean;
   canceledAt: Date | null;
+  paymentFailure: PaymentFailureUpdate;
 }
 
 export type EntitlementSyncPlan =
-  /** First contact from a subscription checkout — links the customer id to our user. The subscription's own status/price/period arrive moments later via `customer.subscription.created`, which is what actually grants access. */
-  | { action: 'link-customer'; userId: string; stripeCustomerId: string }
-  /** A one-time (lifetime) checkout completed and was paid — grants immediately; there is no ongoing subscription object for a one-time purchase. */
-  | { action: 'grant-lifetime'; userId: string; stripeCustomerId: string }
-  /** Authoritative subscription state from `customer.subscription.created` / `.updated` / `.deleted` — all three carry a full subscription object, so one plan builder handles all three. */
+  /** Read the subscription's CURRENT state from Stripe, then apply `planForSubscriptionEvent` to it. `userId` is the checkout metadata hint used only to link a not-yet-linked customer; `eventTime` is Stripe's own timestamp for the triggering event (the grace anchor if the subscription is past due), or null when there is no triggering event (a read-time refresh). */
+  | {
+      action: 'refresh-subscription';
+      subscriptionId: string;
+      stripeCustomerId: string;
+      userId: string | null;
+      eventTime: Date | null;
+    }
+  /** Authoritative subscription state mapped onto the row. */
   | { action: 'sync-subscription'; stripeCustomerId: string; values: SubscriptionSyncValues }
-  /** A renewal payment failed — defensive, minimal update (status only); `customer.subscription.updated` normally also fires with the same status change. */
-  | { action: 'mark-past-due'; stripeCustomerId: string }
   /** Nothing safe to do with this event — never guessed at, always explained. */
   | { action: 'skip'; reason: string };
 
 export interface CheckoutSessionCompletedInput {
   mode: string;
   customerId: string | null;
+  /** The subscription the session created (subscription mode only). */
+  subscriptionId: string | null;
   /** The internal user id we set as Checkout Session metadata at creation time — never client-writable after that point, since the session was created server-side. */
   userId: string | null;
-  paymentStatus: string;
-  /** The price actually purchased, when the webhook payload includes line items. */
-  priceId: string | null;
-  /** When the Checkout Session was created (Stripe's `created`). Unknown means not provably a pre-discontinuation purchase. */
-  sessionCreatedAt?: Date | null;
 }
 
 export function planForCheckoutSessionCompleted(
   input: CheckoutSessionCompletedInput,
-  priceIds: Record<PurchasableTier, string | undefined>,
 ): EntitlementSyncPlan {
+  if (input.mode === 'payment') {
+    return {
+      action: 'skip',
+      reason: 'one-time purchases are not accepted: Lifetime is closed to new purchases',
+    };
+  }
+  if (input.mode !== 'subscription') {
+    return { action: 'skip', reason: `unsupported checkout mode: ${input.mode}` };
+  }
   if (!input.userId) {
     return { action: 'skip', reason: 'checkout session has no userId in metadata' };
   }
   if (!input.customerId) {
     return { action: 'skip', reason: 'checkout session has no customer id' };
   }
-
-  if (input.mode === 'payment') {
-    if (input.paymentStatus !== 'paid') {
-      return {
-        action: 'skip',
-        reason: `one-time checkout payment not completed (status: ${input.paymentStatus})`,
-      };
-    }
-    const tier = input.priceId ? mapPriceIdToTier(input.priceId, priceIds) : null;
-    if (tier !== 'lifetime') {
-      return {
-        action: 'skip',
-        reason: 'one-time checkout price did not resolve to the lifetime tier',
-      };
-    }
-    if (!input.sessionCreatedAt || input.sessionCreatedAt >= LIFETIME_SALES_ENDED_AT) {
-      return {
-        action: 'skip',
-        reason:
-          'new Lifetime purchases are discontinued: not granted automatically, needs manual review',
-      };
-    }
-    return { action: 'grant-lifetime', userId: input.userId, stripeCustomerId: input.customerId };
+  if (!input.subscriptionId) {
+    return { action: 'skip', reason: 'checkout session has no subscription id' };
   }
+  return {
+    action: 'refresh-subscription',
+    subscriptionId: input.subscriptionId,
+    stripeCustomerId: input.customerId,
+    userId: input.userId,
+    eventTime: null,
+  };
+}
 
-  if (input.mode === 'subscription') {
-    return { action: 'link-customer', userId: input.userId, stripeCustomerId: input.customerId };
+export interface SubscriptionLifecycleEventInput {
+  customerId: string | null;
+  subscriptionId: string;
+  /** Stripe's own timestamp for this event (`event.created`). */
+  eventTime: Date;
+  /** `metadata.userId` on the subscription, when we set one at checkout. */
+  userId: string | null;
+}
+
+/** `customer.subscription.created` / `.updated` / `.deleted`: refresh that subscription from Stripe. */
+export function planForSubscriptionLifecycleEvent(
+  input: SubscriptionLifecycleEventInput,
+): EntitlementSyncPlan {
+  if (!input.customerId) {
+    return { action: 'skip', reason: 'subscription event has no customer id' };
   }
-
-  return { action: 'skip', reason: `unsupported checkout mode: ${input.mode}` };
+  return {
+    action: 'refresh-subscription',
+    subscriptionId: input.subscriptionId,
+    stripeCustomerId: input.customerId,
+    userId: input.userId,
+    eventTime: input.eventTime,
+  };
 }
 
 export interface SubscriptionEventInput {
@@ -117,6 +140,14 @@ export interface SubscriptionEventInput {
   currentPeriodEnd: Date | null;
   cancelAtPeriodEnd: boolean;
   canceledAt: Date | null;
+  /** Stripe's own timestamp for this event (`event.created`) — the grace anchor if this is the first sign of a payment problem. Never `new Date()`, so replays are deterministic. */
+  eventTime: Date;
+}
+
+function paymentFailureUpdateFor(status: EntitlementStatus, eventTime: Date): PaymentFailureUpdate {
+  if (status === 'past_due') return { action: 'start', at: eventTime };
+  if (status === 'active' || status === 'trialing') return { action: 'clear' };
+  return { action: 'keep' };
 }
 
 /**
@@ -141,17 +172,20 @@ export function planForSubscriptionEvent(
     };
   }
 
+  const status = mapStripeSubscriptionStatus(input.status);
+
   return {
     action: 'sync-subscription',
     stripeCustomerId: input.customerId,
     values: {
       tier,
-      status: mapStripeSubscriptionStatus(input.status),
+      status,
       stripeSubscriptionId: input.subscriptionId,
       currentPeriodStart: input.currentPeriodStart,
       currentPeriodEnd: input.currentPeriodEnd,
       cancelAtPeriodEnd: input.cancelAtPeriodEnd,
       canceledAt: input.canceledAt,
+      paymentFailure: paymentFailureUpdateFor(status, input.eventTime),
     },
   };
 }
@@ -159,8 +193,11 @@ export function planForSubscriptionEvent(
 export interface InvoicePaymentFailedInput {
   customerId: string | null;
   subscriptionId: string | null;
+  /** Stripe's own timestamp for this event (`event.created`). */
+  eventTime: Date;
 }
 
+/** `invoice.payment_failed`: refresh the subscription from Stripe; if it is past due, `eventTime` anchors the 7-day grace. */
 export function planForInvoicePaymentFailed(input: InvoicePaymentFailedInput): EntitlementSyncPlan {
   if (!input.customerId) {
     return { action: 'skip', reason: 'invoice has no customer id' };
@@ -168,5 +205,11 @@ export function planForInvoicePaymentFailed(input: InvoicePaymentFailedInput): E
   if (!input.subscriptionId) {
     return { action: 'skip', reason: 'invoice is not associated with a subscription' };
   }
-  return { action: 'mark-past-due', stripeCustomerId: input.customerId };
+  return {
+    action: 'refresh-subscription',
+    subscriptionId: input.subscriptionId,
+    stripeCustomerId: input.customerId,
+    userId: null,
+    eventTime: input.eventTime,
+  };
 }
