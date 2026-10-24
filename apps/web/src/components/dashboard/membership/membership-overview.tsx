@@ -285,9 +285,9 @@ function ManageSection({ view }: { view: MembershipView }) {
         <div className="flex flex-col gap-4">
           <ManageBillingButton label={label} variant="primary" />
           <p className="text-muted-foreground max-w-[60ch] text-sm leading-relaxed">
-            Billing is handled securely by Stripe. Update your payment method, view invoices or
-            change your plan from the billing portal. If you cancel, your access continues until the
-            end of the period you have paid for.
+            Billing is handled securely by Stripe. Update your payment method, view your invoices
+            and billing history, or cancel from the billing portal. If you cancel, your access
+            continues until the end of the period you have paid for.
           </p>
         </div>
       ) : (
