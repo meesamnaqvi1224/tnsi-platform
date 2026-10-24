@@ -151,6 +151,10 @@ export interface Practice {
   reflection?: PracticeReflectionState | null;
   /** Whether the authenticated member currently has this practice saved. Populated by GET /api/v1/practices and GET /api/v1/practices/[id] - absent/undefined from /today, which doesn't attach it (Home doesn't show a save control). */
   saved?: boolean;
+  /** Part of the free introductory selection (editorial flag). Informational - `locked` is what decides what the member can open. */
+  isFree?: boolean;
+  /** Decided by the server: true when this practice is in the paid library and the member lacks paid access. `mediaUrl` is then null - the server withholds it. Absent from older servers, i.e. treated as unlocked. */
+  locked?: boolean;
 }
 
 /**
@@ -405,6 +409,36 @@ export type EntitlementStatus = 'active' | 'past_due' | 'canceled' | 'trialing' 
  * ids) - deliberately not modeled here since nothing in this app should
  * ever display them.
  */
+export type MembershipState = 'free' | 'trialing' | 'active' | 'grace' | 'inactive';
+
+/**
+ * The server's resolved membership (GET /api/v1/me/entitlements ->
+ * `membership`). The app displays this; it never derives paid access from
+ * `tier`/`status` itself, so what it shows is what the server enforces.
+ * Optional so the app still works against a server without it.
+ */
+export interface MembershipSummary {
+  state: MembershipState;
+  /** Full Regulation Suite library (trialing, active, or inside the payment grace period). */
+  hasPaidAccess: boolean;
+  /** Only while `state` is `grace`: when access ends if the payment isn't resolved. */
+  graceEndsAt: string | null;
+  /** Cancelled but still inside the paid period - `currentPeriodEnd` is when access ends. */
+  cancelsAtPeriodEnd: boolean;
+  /** Whether free/paid locking is in force at all (false until membership opens). */
+  contentLocking: boolean;
+  /** Only while `state` is `grace`: a failed payment, or a renewal the server could not confirm. */
+  graceReason?: 'payment_failed' | 'renewal_unconfirmed' | null;
+  /** The end of the paid period, when known. */
+  paidThrough?: string | null;
+  /** Only while `state` is `trialing`: when the free trial ends. */
+  trialEndsAt?: string | null;
+  /** A free account whose trial has ended (it is Free again). */
+  trialExpired?: boolean;
+  /** Whether the account may start its free trial now (the server still decides). */
+  trialAvailable?: boolean;
+}
+
 export interface Entitlements {
   tier: EntitlementTier;
   status: EntitlementStatus;
@@ -416,6 +450,7 @@ export interface Entitlements {
   cancelAtPeriodEnd: boolean;
   /** Real field, already returned by the API - null unless the membership has actually been canceled. */
   canceledAt: string | null;
+  membership?: MembershipSummary;
 }
 
 /** Mirrors apps/web/src/lib/assessment-api.ts's `ApiAssessmentChoice` - deliberately no score `value`, the server owns scoring. */
@@ -487,6 +522,10 @@ export interface PowerDropSummary {
   cardImage: PowerDropImage | null;
   focus: string;
   featured: boolean;
+  /** Part of the free introductory selection of three. */
+  isFree?: boolean;
+  /** Decided by the server: true when this PowerDrop is in the paid library and the member lacks paid access. `cardImage` is then null. Absent from older servers, i.e. treated as unlocked. */
+  locked?: boolean;
 }
 
 /** Response shape of GET /api/v1/powerdrops, per that route. */
