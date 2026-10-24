@@ -50,12 +50,16 @@ afterEach(() => {
 });
 
 describe('Regulation Suite page — membership closed (today)', () => {
-  it('keeps the closed message and the Discovery Call link, and offers no trial or sign-up', () => {
+  it('keeps the closed message and the Discovery Call link, offers no trial or sign-up, and only DESCRIBES the approved terms for when membership opens', () => {
     const { html, text } = render();
     expect(text).toContain('Not yet open for enrolment');
     expect(html).toContain('href="/book-a-call"');
     expect(text).not.toContain('Get started');
-    expect(text).not.toMatch(/free trial/i);
+    // Owner-approved terms may be described, but only as a future state - never offered.
+    expect(text).toContain('When membership opens');
+    expect(text).toContain('£5.99 per month');
+    expect(text).toContain('£59 per year');
+    expect(text).not.toMatch(/start your|create your account|try the full|available now/i);
     expect(html).not.toContain('/sign-up');
   });
 });
