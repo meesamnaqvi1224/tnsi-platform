@@ -1,8 +1,8 @@
 # Membership free-trial integration plan
 
-**Status:** plan only. Written 24 October 2026 from a read-only inspection of the
-unreleased membership branch. Nothing here has been merged, deployed, migrated or
-run against Stripe or a production database.
+**Status:** plan, now executed on the branch `feat/membership-trial-integration` (24 October 2026; see
+section 6). Nothing here has been merged, deployed, migrated on any shared database or run
+against Stripe or a production database.
 
 ## 1. Where the trial lives today
 
@@ -97,3 +97,30 @@ Files expected to conflict: `apps/web/src/lib/membership.ts`, `billing/checkout/
 - Mobile membership copy changed in the same working tree and needs its own check.
 - Decisions: whether the plus-tag/dot limitation is acceptable; a named backup for
   manual duplicate-subscription review; counsel's review of the "no refunds" wording.
+
+## 6. Execution record (24 October 2026)
+
+- **Preserved, not modified:** `feat/membership-trial-policy` (HEAD `efc5157`), its
+  86 uncommitted/untracked files, `stash@{0}` (`78384c0`). A snapshot commit of the
+  working tree (`0245ca7`, including untracked files) is kept as the local ref
+  `refs/preserve/membership-wip-20261024`, the stash as `refs/preserve/membership-stash0-20261024`,
+  and an unencrypted temporary archive of the 86 files is in `~/tnsi-backups/`. A tree
+  comparison afterwards showed the working tree byte-identical to the snapshot.
+- **Integration branch:** `feat/membership-trial-integration`, based on PR #12's branch.
+  Membership files were applied per file with a three-way merge (base = the original
+  merge-base); 19 conflicted files were resolved with the membership version as the
+  base and PR #12's safeguards re-applied. Unrelated work on the original branch
+  (Google sign-in, PowerDrop artwork UI, Human Expansion, Somatic series 06, PROJECT.md,
+  AUDIT_REPORT.md, `.gitignore`) was deliberately left out.
+- **Migration:** the old `0010`/`0011` were replaced by one regenerated migration `0012`
+  (see `docs/membership-commercial-decisions.md` 0.2b).
+- **Ported from PR #12:** the launch gate and plan allow-list inside `createCheckoutSession`
+  and `ensureStripeCustomer`, strict `"true"` matching, `MembershipClosedError` mapping,
+  the optional `STRIPE_PORTAL_CONFIGURATION_ID`, and the route-level gate tests.
+  **Not ported (superseded):** PR #12's own duplicate-subscription code (the membership
+  row-lock design is stronger) and its Lifetime late-delivery cutoff (membership never
+  grants Lifetime from Stripe at all).
+- **Tested** against a throwaway PostgreSQL 17 run locally (not production): every
+  migration `0000`-`0012` applied from empty, and the full web suite passed 716/716
+  including the trial, Stripe-sync, CRM-outbox and somatic integration suites.
+  Stripe was simulated; **no Stripe test-mode run has been done**.
