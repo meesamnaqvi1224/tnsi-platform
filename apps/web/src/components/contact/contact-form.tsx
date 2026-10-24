@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import NextLink from 'next/link';
 import {
   Alert,
   Button,
@@ -169,7 +170,10 @@ export function ContactForm() {
                   {submitting ? 'Sending…' : form.submitLabel}
                 </Button>
                 <Text tone="muted" className="text-sm">
-                  {form.note}
+                  {form.note}{' '}
+                  <NextLink href="/privacy" className="underline underline-offset-4">
+                    Privacy Policy
+                  </NextLink>
                 </Text>
               </Stack>
             </Form>

@@ -36,7 +36,7 @@ export const researchContent = {
     paragraphs: [
       'Evidence matters because human suffering is too consequential to be addressed through intuition alone. The nervous system is a biological system — and biological systems respond to interventions that respect their architecture.',
       'Neuroscience alone is not enough. Neural mechanisms do not translate automatically into clinical wisdom. Laboratory findings require interpretation, context and the disciplined observation of what happens when theory meets a real person in a real room.',
-      'Clinical experience matters because practitioners encounter complexity that no single study can contain. Fifteen years at the bedside teaches patterns that meta-analyses cannot fully capture — provided that experience is held accountable to evidence rather than anecdote.',
+      'Clinical experience matters because practitioners encounter complexity that no single study can contain. Over 25 years at the bedside teaches patterns that meta-analyses cannot fully capture — provided that experience is held accountable to evidence rather than anecdote.',
       'Lived experience matters because the people we serve are not data points. Their bodies carry histories that research is still learning to measure. Honouring that experience is not anti-scientific — it is scientifically necessary.',
       'The Nervous System Institute integrates neuroscience, attachment theory, trauma psychology and somatic practice because no single discipline holds the full picture. Integration is not eclecticism. It is intellectual honesty.',
     ],
@@ -53,28 +53,24 @@ export const researchContent = {
         title: 'Neuroscience',
         description:
           'The physiological foundations of regulation, threat detection and autonomic state — drawn from peer-reviewed literature and translated for clinical and educational application.',
-        statistic: '40+ peer-reviewed sources integrated',
       },
       {
         id: 'attachment-theory',
         title: 'Attachment Theory',
         description:
           'How early relational experience shapes nervous system development, co-regulation capacity and the architecture of safety across the lifespan.',
-        statistic: '25 years of attachment research reviewed',
       },
       {
         id: 'trauma-psychology',
         title: 'Trauma Psychology',
         description:
           'The intersection of trauma physiology, memory, dissociation and recovery — informed by clinical research and decades of trauma-informed practice.',
-        statistic: '15+ trauma-specific frameworks examined',
       },
       {
         id: 'somatic-practice',
         title: 'Somatic Practice',
         description:
           'Body-based approaches to regulation and healing — evaluated through clinical outcomes, physiological measurement and practitioner observation.',
-        statistic: '12 somatic modalities cross-referenced',
       },
     ],
   },
@@ -266,31 +262,28 @@ export const researchContent = {
 
   initiatives: {
     chapter: '07',
-    heading: 'Current Research Initiatives',
+    heading: 'Research Directions',
     items: [
       {
         id: 'clinical-observation',
         title: 'Clinical Observation',
         description:
-          'Ongoing documentation of nervous system-informed interventions across clinical settings — tracking patterns, outcomes and practitioner observations.',
-        status: 'Active — data collection phase',
-        futurePublication: 'Clinical Observation Report — anticipated 2027',
+          'Planned documentation of nervous system-informed interventions across clinical settings, recording patterns, outcomes and practitioner observations.',
+        status: 'Planned',
       },
       {
         id: 'educational-outcomes',
         title: 'Educational Outcomes',
         description:
-          'Evaluating practitioner and participant outcomes across TNSI certification and educational programmes.',
-        status: 'Active — longitudinal study',
-        futurePublication: 'Educational Outcomes White Paper — anticipated 2027',
+          'Planned evaluation of practitioner and participant outcomes across TNSI certification and educational programmes.',
+        status: 'Planned',
       },
       {
         id: 'leadership-capacity',
         title: 'Leadership Capacity',
         description:
-          'Investigating the relationship between autonomic regulation, executive decision-making and organisational culture in senior leadership contexts.',
-        status: 'Planning — advisory cohort forming',
-        futurePublication: 'Leadership Capacity Study — anticipated 2028',
+          'A planned investigation of the relationship between autonomic regulation, executive decision-making and organisational culture in senior leadership contexts.',
+        status: 'Planned',
       },
     ],
   },
@@ -312,7 +305,7 @@ export const researchContent = {
       {
         question: 'Does TNSI publish research?',
         answer:
-          'The Institute publishes educational articles, research summaries and clinical guides. Formal research publications — including white papers and outcome studies — are in development as part of our current research initiatives.',
+          'The Institute publishes educational articles, research summaries and clinical guides. It does not yet publish formal research papers or outcome studies.',
       },
       {
         question: 'How are new findings integrated?',

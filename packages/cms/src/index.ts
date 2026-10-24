@@ -5,6 +5,7 @@ export { apiVersion, dataset, projectId, sanityConfigured, readToken } from './e
 export { client } from './lib/client';
 export { urlForImage } from './lib/image';
 export {
+  ARTICLE_MIN_BODY_CHARS,
   ARTICLES_QUERY,
   ARTICLE_BY_SLUG_QUERY,
   PROGRAMS_QUERY,

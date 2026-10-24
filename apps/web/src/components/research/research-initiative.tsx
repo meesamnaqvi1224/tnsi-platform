@@ -21,12 +21,6 @@ export function ResearchInitiative({ initiative }: ResearchInitiativeProps) {
           </dt>
           <dd className="text-foreground text-sm">{initiative.status}</dd>
         </div>
-        <div className="flex flex-col gap-(--space-2xs)">
-          <dt className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">
-            Future Publication
-          </dt>
-          <dd className="text-muted-foreground text-sm italic">{initiative.futurePublication}</dd>
-        </div>
       </dl>
     </article>
   );
