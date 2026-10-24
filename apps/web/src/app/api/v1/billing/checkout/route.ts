@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-api';
-import { db, entitlements } from '@tnsi/db';
-import { and, eq, isNull } from 'drizzle-orm';
 import {
-  AlreadySubscribedError,
-  CheckoutInProgressError,
-  createCheckoutSession,
-  ensureStripeCustomer,
+  describeStripeFailure,
   MembershipClosedError,
   StripeConfigError,
   UnpurchasableTierError,
@@ -20,25 +15,34 @@ import {
   internalError,
 } from '@/lib/api-response';
 import { absoluteUrl } from '@/lib/seo';
-import { holdsPaidMembership, isMembershipOpen } from '@/lib/membership';
+import { isMembershipOpen } from '@/lib/membership';
+import { startCheckout } from '@/lib/start-checkout';
 
 export const runtime = 'nodejs';
 
 /**
- * Starts a Stripe Checkout Session for the authenticated user. The only client
- * input is `tier` - a closed enum of the approved plans (monthly and annual;
- * there is no Lifetime plan - see `checkoutRequestSchema`); the Price and amount
- * are resolved server-side from that tier, never accepted from the request.
+ * Starts a Stripe Checkout Session for the authenticated user. The only
+ * client input is `tier` — a closed enum of the two purchasable plans (see
+ * `checkoutRequestSchema`; "lifetime" is rejected here, it is closed to new
+ * purchases). The Stripe Price id and amount are resolved server-side from that
+ * tier, never accepted from the request body.
  *
- * Enforced here, all server-side (the browser cannot bypass any of it):
- * - authentication first;
- * - closed unless membership is deliberately open AND billing fully configured;
- * - a member who already holds paid membership (active, trialing, or in payment
- *   grace) is refused a second subscription (409) - they use the billing portal;
- * - one Stripe customer per user, created once with an idempotency key and saved
- *   with a compare-and-set UPDATE, so concurrent first requests cannot make two;
- * - `createCheckoutSession` then checks Stripe itself for a live subscription and
- *   reuses or expires this member's own open session (see checkout.ts).
+ * Regulation Suite™ membership rules enforced here, all server-side:
+ * - Closed until membership is deliberately opened AND billing is fully
+ *   configured (`isMembershipOpen`) — no checkout is ever started, or
+ *   pretended, before then.
+ * - A member who already holds paid access (trialing, active, or in
+ *   payment grace) is refused a second subscription — they manage their
+ *   plan in the billing portal instead. Decided on the member's locked,
+ *   current row (see `startCheckout`), so simultaneous requests cannot race.
+ * - At most one payable checkout exists per member: a repeat for the same plan
+ *   is sent back to the open session, a different plan expires the earlier one
+ *   first, and a purchase that has completed but not yet been recorded blocks a
+ *   second one (see `startCheckout`).
+ * - Checkout never carries a trial. The 30-day free trial is app-managed
+ *   (POST /api/v1/billing/trial): no card, no Stripe subscription, and it
+ *   returns to Free at the end. A subscription is only ever created here, by
+ *   an explicit plan choice, and is charged from the start.
  */
 export async function POST(request: Request) {
   let user;
@@ -60,73 +64,57 @@ export async function POST(request: Request) {
     return badRequest('Validation failed', { errors: result.error.flatten().fieldErrors });
   }
 
-  // Closed unless membership has been deliberately opened AND billing is fully
-  // configured. Nothing is started - or pretended - before then.
   if (!isMembershipOpen()) {
     return NextResponse.json({ error: 'Billing is not available right now.' }, { status: 503 });
   }
 
-  if (holdsPaidMembership(user.entitlements)) {
-    return apiError(
-      'ALREADY_A_MEMBER',
-      'You already have a membership. Manage it from the billing page.',
-      409,
-    );
-  }
-
   try {
-    const existing = await db
-      .select({ stripeCustomerId: entitlements.stripeCustomerId })
-      .from(entitlements)
-      .where(eq(entitlements.userId, user.id))
-      .limit(1);
-
-    let stripeCustomerId = existing[0]?.stripeCustomerId ?? null;
-    if (!stripeCustomerId) {
-      const created = await ensureStripeCustomer({ userId: user.id, email: user.email });
-      // First writer wins; a concurrent request that lost re-reads the winner's id.
-      const saved = await db
-        .update(entitlements)
-        .set({ stripeCustomerId: created, updatedAt: new Date() })
-        .where(and(eq(entitlements.userId, user.id), isNull(entitlements.stripeCustomerId)))
-        .returning({ stripeCustomerId: entitlements.stripeCustomerId });
-      stripeCustomerId = saved[0]?.stripeCustomerId ?? created;
-    }
-
-    const { url } = await createCheckoutSession({
-      tier: result.data.tier,
+    const outcome = await startCheckout({
       userId: user.id,
-      stripeCustomerId,
-      successUrl: absoluteUrl('/dashboard/billing?success=true'),
+      userEmail: user.email,
+      tier: result.data.tier,
+      // `{CHECKOUT_SESSION_ID}` is substituted by Stripe. The return page treats it
+      // as an unverified claim: it re-reads the session from Stripe and checks it
+      // belongs to this member before anything is recorded.
+      successUrl: `${absoluteUrl('/dashboard/billing?success=true')}&session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: absoluteUrl('/dashboard/billing?canceled=true'),
     });
-    return success({ url });
-  } catch (error) {
-    if (error instanceof AlreadySubscribedError) {
+
+    if (outcome.status === 'already_a_member') {
       return apiError(
         'ALREADY_A_MEMBER',
         'You already have a membership. Manage it from the billing page.',
         409,
       );
     }
-    if (error instanceof CheckoutInProgressError) {
+    if (outcome.status === 'checkout_in_progress') {
       return apiError(
         'CHECKOUT_IN_PROGRESS',
-        'A checkout is already in progress. Please wait a moment and try again.',
+        'Your payment is still being confirmed. Please check your membership page in a few minutes before trying again.',
         409,
       );
     }
+    if (outcome.status === 'review_required') {
+      return apiError(
+        'REVIEW_REQUIRED',
+        'Your membership needs a quick manual check before another purchase can be made. Please contact us - you will not be charged again in the meantime.',
+        409,
+      );
+    }
+    if (outcome.status === 'no_account') {
+      return apiError('FORBIDDEN', 'Member access required.', 403);
+    }
+    return success({ url: outcome.url });
+  } catch (error) {
     if (error instanceof UnpurchasableTierError) {
       return badRequest(error.message);
     }
     if (error instanceof StripeConfigError || error instanceof MembershipClosedError) {
       return NextResponse.json({ error: 'Billing is not available right now.' }, { status: 503 });
     }
-    // Log the error's type only: provider messages can echo parts of keys or customer data.
-    console.error(
-      '[billing checkout] failed:',
-      error instanceof Error ? error.name : 'UnknownError',
-    );
+    // Class, code, status and request id only: a Stripe or database error's
+    // message can echo request parameters.
+    console.error('[billing checkout] failed:', describeStripeFailure(error));
     return internalError('Could not start checkout. Please try again.');
   }
 }

@@ -13,6 +13,7 @@ import { eq, and, desc } from 'drizzle-orm';
 import { isPracticeSaved } from '@/lib/practices';
 import { practiceIdParam } from '@/lib/validation';
 import { success, notFound } from '@/lib/api-response';
+import { contentAccessFor, withPracticeAccess } from '@/lib/membership';
 
 export const runtime = 'nodejs';
 
@@ -74,8 +75,13 @@ export async function GET(request: Request, { params }: RouteParams) {
 
   const saved = await isPracticeSaved(user.id, id);
 
+  // A practice outside the member's access is returned WITHOUT its media
+  // (`locked: true`) so the client can show a membership prompt; the file
+  // location never leaves the server. See `withPracticeAccess`.
+  const access = contentAccessFor(user.entitlements);
+
   return success({
-    ...practice[0],
+    ...withPracticeAccess(practice[0], access),
     saved,
     progress: completion[0]
       ? {

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { SignOutButton } from '@clerk/nextjs';
 import {
   Award,
+  BadgeCheck,
   BookOpen,
   Calendar,
   Compass,
@@ -55,6 +56,7 @@ const navItems: NavItem[] = [
   { label: 'Practices', icon: Sparkles, href: '/dashboard/practices' },
   { label: 'My Journey', icon: Compass, href: '/dashboard/journey' },
   { label: 'Somatic Cards', icon: Layers, href: '/dashboard/somatic-cards' },
+  { label: 'Membership', icon: BadgeCheck, href: '/dashboard/billing' },
   { label: 'Programs', icon: GraduationCap },
   { label: 'Workshops', icon: Presentation },
   { label: 'Resources', icon: FileText },

@@ -48,6 +48,16 @@ describe('DashboardSidebar', () => {
     expect(html).toContain('My Journey');
   });
 
+  it('renders a Membership item that links to the membership page and is not marked "Soon"', () => {
+    const html = renderToStaticMarkup(<DashboardSidebar />);
+    expect(html).toContain('Membership');
+    expect(html).toContain('href="/dashboard/billing"');
+    const idx = html.indexOf('Membership');
+    const nextItem = html.indexOf('Programs', idx);
+    const badge = html.indexOf('Soon', idx);
+    expect(badge === -1 || badge > nextItem).toBe(true);
+  });
+
   it('existing roadmap ("Soon") items are unchanged', () => {
     const html = renderToStaticMarkup(<DashboardSidebar />);
     for (const label of [
