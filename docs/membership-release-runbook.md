@@ -35,8 +35,10 @@ PostgreSQL 17 databases only**:
 
 - **Preferred: roll forward / leave the schema.** The change is additive and, with membership closed, unused;
   old code ignores it. Rolling back the _code_ needs no database change.
-- **Schema rollback** (only before any trial has been claimed; it deletes the one-trial-per-email records and
-  would let those people claim again). Export first: `COPY trial_claims TO ...`. Tested on a disposable
+- **Schema rollback - DO NOT USE ONCE ANY TRIAL HAS BEEN CLAIMED.** It drops `trial_claims`, which deletes the
+  one-trial-per-email records and would let everyone who has had a trial claim another. Before running it,
+  confirm `SELECT count(*) FROM trial_claims` is `0`; if it is not, stop and roll forward instead. It is
+  otherwise only for a failed migration before launch. Export first: `COPY trial_claims TO ...`. Tested on a disposable
   database (rows, legacy Lifetime row and the other 12 migration records preserved):
 
   ```sql
@@ -112,6 +114,40 @@ unmerged PowerDrop artwork work and is a separate follow-up. A web-only launch i
 ## 5. Open items before launch
 
 Stripe test mode, Clerk test instance, restricted portal configuration, `TRIAL_ELIGIBILITY_*` secrets generated
-and stored, counsel's review of the "no refunds" wording, a named backup for manual duplicate-subscription
-review, the `somatic-prod` Vercel project's missing Preview `DATABASE_URL` (external configuration; a required
-check that fails on every PR), and a separate launch authorisation.
+and stored, counsel's review of the "no refunds" wording and the privacy/cookie wording, a named backup for
+manual duplicate-subscription review, Vercel Firewall rate-limit rules (section 6), approval to enable analytics,
+a restore point and an approved run of migration `0012`, and a separate launch authorisation. (The
+`somatic-prod` Vercel project's Preview configuration was fixed on 26 Oct 2026: Clerk and Sanity variables,
+Next.js preset, `apps/web` root directory, and a separate Neon `Preview` branch for `DATABASE_URL`; its PR check
+passes.)
+
+## 6. External configuration checklist (names only; never paste a secret into chat or commit it)
+
+Use a **non-production** environment for all of this: a local run or the `somatic-prod` Preview deployment, a
+Clerk **development** instance, Stripe **test mode**, and a database that is not the production Neon branch.
+
+| Where                                | Variable / action                                                                                                                                                                                                                                                  | Notes                                                                                                                                                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Clerk (development instance)         | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` (`pk_test_`), `CLERK_SECRET_KEY` (`sk_test_`)                                                                                                                                                                                  | Already set for `somatic-prod` Preview. Rotate the secret that was pasted in chat.                                                                                                                 |
+| Stripe test mode                     | `STRIPE_SECRET_KEY` (`sk_test_`)                                                                                                                                                                                                                                   | Server only.                                                                                                                                                                                       |
+| Stripe test mode                     | Two recurring GBP Prices, **no trial**: £5.99 per month, £59 per year. Set `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_ANNUAL`                                                                                                                                     | No Lifetime Price.                                                                                                                                                                                 |
+| Stripe test mode                     | Webhook endpoint `<test-origin>/api/webhooks/stripe` with events `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`; set `STRIPE_WEBHOOK_SECRET` (`whsec_`) | A Preview URL is behind Vercel deployment protection, so Stripe cannot reach it; use the Stripe CLI (`stripe listen --forward-to localhost:3000/api/webhooks/stripe`) against a local run instead. |
+| Stripe test mode                     | Billing Portal configuration: payment methods, invoice history, cancel at period end ON; plan switching and unsold products OFF. Set `STRIPE_PORTAL_CONFIGURATION_ID`                                                                                              | The default configuration has not been inspected.                                                                                                                                                  |
+| Test environment only                | `TRIAL_ELIGIBILITY_SECRET` (at least 32 chars; `openssl rand -base64 48`), `TRIAL_ELIGIBILITY_KEY_VERSION=1`                                                                                                                                                       | Use a **different** secret from production. Never reuse a test secret in production.                                                                                                               |
+| Test environment only                | `REGULATION_SUITE_MEMBERSHIP_OPEN=true`                                                                                                                                                                                                                            | Read at build time. Leave unset in Production.                                                                                                                                                     |
+| Vercel Firewall (Production project) | Add rate-limit rules (below)                                                                                                                                                                                                                                       | Currently no custom rules exist.                                                                                                                                                                   |
+
+**Vercel Firewall rate limits** (checked 26 Oct 2026: the `tnsi-platform` project has no custom rules). The
+in-app limits (`form-guard.ts`: 5 submissions per email per hour, 300 per form per 10 minutes) are a second layer,
+not a replacement. Suggested rules, per client IP, action "Rate limit" with a 429 response:
+
+| Path (POST)                                         | Limit                                                |
+| --------------------------------------------------- | ---------------------------------------------------- |
+| `/api/contact`                                      | 5 requests per 10 minutes                            |
+| `/api/newsletter`                                   | 5 requests per 10 minutes                            |
+| `/api/assessments/submit`                           | 10 requests per 10 minutes                           |
+| `/api/v1/billing/trial`, `/api/v1/billing/checkout` | 10 requests per 10 minutes (once membership is open) |
+
+**Safest way to share test secrets with the verification run:** create a file **outside** the repository (for
+example `~/tnsi-verification/test-secrets.env`, `chmod 600`) holding only the test-mode values above, and tell
+the engineer it exists. The run loads it into the process environment without printing it.
