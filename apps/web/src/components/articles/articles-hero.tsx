@@ -1,59 +1,68 @@
 import NextLink from 'next/link';
-import { buttonVariants, Container, Stack, Text } from '@tnsi/ui';
-import { SectionImage } from '@/components/utility/section-image';
+import { ArrowDown } from 'lucide-react';
+import { Container } from '@tnsi/ui';
+import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { articlesContent } from '@/content/articles';
 
 const { hero } = articlesContent;
 
+/**
+ * The masthead. The title and introduction sit on the page ground and the
+ * photograph beside them is cropped to a fixed frame, so the image is part of
+ * the composition instead of a backdrop the text has to be read over. The
+ * whole block stays well under a screen tall, so the first article is already
+ * hinted at on arrival.
+ */
 export function ArticlesHero() {
   return (
-    <section
-      aria-labelledby="articles-hero-heading"
-      className="border-border relative flex min-h-[85vh] items-end overflow-hidden border-b"
-    >
-      <SectionImage src={hero.imageSrc} alt={hero.imageAlt} priority sizes="100vw" />
-
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_oklch,var(--background)_88%,transparent)_0%,color-mix(in_oklch,var(--background)_35%,transparent)_60%,transparent_100%)]"
-      />
-
+    <section aria-labelledby="articles-hero-heading" className="border-border border-b">
       <Container
         size="xl"
-        className="relative z-10 px-(--space-xl) pt-(--space-4xl) pb-(--space-5xl) sm:px-(--space-2xl)"
+        className="grid grid-cols-1 gap-x-(--space-2xl) gap-y-(--space-2xl) py-(--space-3xl) md:grid-cols-12 md:items-end lg:gap-x-(--space-3xl) lg:py-(--space-4xl)"
       >
-        <Stack gap="2xl" className="max-w-3xl">
-          <div className="flex flex-col gap-(--space-sm)">
-            <p className="text-muted-foreground text-xs tracking-[0.15em] uppercase">
-              {hero.eyebrow}
-            </p>
-          </div>
+        <div className="flex flex-col gap-(--space-xl) md:col-span-6 lg:col-span-5 lg:pb-(--space-sm)">
+          <p className="text-muted-foreground font-mono text-[0.6875rem] tracking-[0.18em] uppercase">
+            {hero.eyebrow}
+          </p>
 
           <h1
             id="articles-hero-heading"
-            className="font-heading text-foreground text-4xl leading-[0.98] font-semibold tracking-tight sm:text-5xl md:text-6xl lg:text-[5.5rem] xl:text-[6.5rem]"
+            className="font-heading text-foreground text-6xl leading-[0.92] font-semibold tracking-tight sm:text-7xl lg:text-[6.5rem]"
           >
             {hero.headline}
           </h1>
 
-          <Stack gap="lg">
-            <p className="text-foreground max-w-2xl text-lg leading-snug font-medium sm:text-xl lg:text-2xl">
+          <div className="flex flex-col gap-(--space-md)">
+            <p className="font-heading text-foreground max-w-[30ch] text-2xl leading-snug font-medium text-balance sm:text-3xl">
               {hero.supportingHeadline}
             </p>
-            <Text tone="muted" className="max-w-prose leading-relaxed">
+            <p className="text-muted-foreground max-w-[44ch] leading-relaxed">
               {hero.supportingCopy}
-            </Text>
-          </Stack>
-
-          <div>
-            <NextLink
-              href={hero.primaryCta.href}
-              className={buttonVariants({ variant: 'primary', size: 'lg' })}
-            >
-              {hero.primaryCta.label}
-            </NextLink>
+            </p>
           </div>
-        </Stack>
+
+          <NextLink
+            href={hero.primaryCta.href}
+            className="interaction-text-link text-foreground group inline-flex w-fit items-center gap-(--space-sm) text-sm font-medium tracking-wide"
+          >
+            {hero.primaryCta.label}
+            <ArrowDown
+              aria-hidden
+              className="duration-base ease-standard size-4 transition-transform group-hover:translate-y-1 motion-reduce:transition-none"
+            />
+          </NextLink>
+        </div>
+
+        <div className="bg-secondary relative aspect-[4/3] overflow-hidden md:col-span-6 md:aspect-[4/5] lg:col-span-7 lg:aspect-[5/4]">
+          <ResponsiveImage
+            src={hero.imageSrc}
+            alt={hero.imageAlt}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 58vw"
+            className="object-cover object-[60%_50%]"
+          />
+        </div>
       </Container>
     </section>
   );

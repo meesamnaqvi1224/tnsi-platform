@@ -1,6 +1,6 @@
 import NextLink from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { Text } from '@tnsi/ui';
+import { ArticleMeta } from '@/components/articles/article-card';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
 
 export interface FeaturedArticleProps {
@@ -14,6 +14,12 @@ export interface FeaturedArticleProps {
   href: string;
 }
 
+/**
+ * The featured article: the largest headline on the page, with the photograph
+ * taking seven of twelve columns and the text set to a comfortable measure
+ * beside it. The "Read Article" link covers the card, so the photograph and
+ * headline are clickable with a single tab stop.
+ */
 export function FeaturedArticle({
   category,
   publishedAt,
@@ -25,44 +31,36 @@ export function FeaturedArticle({
   href,
 }: FeaturedArticleProps) {
   return (
-    <article className="border-border grid grid-cols-1 border-t lg:grid-cols-[3fr_2fr]">
-      <div className="bg-secondary relative min-h-[55vh] overflow-hidden lg:min-h-[75vh]">
+    <article className="group/story has-[a:focus-visible]:outline-ring relative grid grid-cols-1 items-center gap-x-(--space-3xl) gap-y-(--space-xl) has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-8 lg:grid-cols-12">
+      <div className="bg-secondary relative aspect-[3/2] overflow-hidden lg:col-span-7">
         <ResponsiveImage
           src={imageSrc}
           alt={imageAlt}
           fill
-          className="object-cover"
-          sizes="(max-width: 1024px) 100vw, 60vw"
+          sizes="(max-width: 1024px) 100vw, 58vw"
+          className="object-cover motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-out motion-safe:group-hover/story:scale-[1.03]"
         />
       </div>
 
-      <div className="flex flex-col justify-center px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl) lg:px-(--space-3xl)">
-        <div className="flex max-w-md flex-col gap-(--space-xl)">
-          <div className="flex flex-col gap-(--space-xs)">
-            <span className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase">
-              {category}
-            </span>
-            <span className="text-muted-foreground text-xs">
-              {publishedAt} · {readingTime}
-            </span>
-          </div>
+      <div className="flex flex-col gap-(--space-lg) lg:col-span-5 lg:pl-(--space-xl)">
+        <ArticleMeta category={category} publishedAt={publishedAt} readingTime={readingTime} />
 
-          <h3 className="font-heading text-foreground text-3xl leading-[1.08] font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-            {title}
-          </h3>
+        <h3 className="font-heading text-foreground text-4xl leading-[1.04] font-semibold tracking-tight text-balance decoration-1 underline-offset-[0.2em] group-hover/story:underline motion-reduce:no-underline sm:text-5xl lg:text-[3.5rem]">
+          {title}
+        </h3>
 
-          <Text tone="muted" className="leading-relaxed">
-            {summary}
-          </Text>
+        <p className="text-muted-foreground max-w-[44ch] text-base leading-relaxed text-pretty sm:text-lg">
+          {summary}
+        </p>
 
-          <NextLink
-            href={href}
-            className="interaction-text-link text-foreground group inline-flex items-center gap-(--space-sm) text-sm font-medium tracking-wide"
-          >
-            Read Article
-            <ArrowRight aria-hidden className="interaction-arrow size-4" />
-          </NextLink>
-        </div>
+        <NextLink
+          href={href}
+          className="interaction-text-link text-foreground inline-flex w-fit items-center gap-(--space-sm) text-sm font-medium tracking-wide after:absolute after:inset-0 after:content-[''] focus-visible:ring-0 focus-visible:ring-offset-0"
+        >
+          Read Article
+          <span className="sr-only">: {title}</span>
+          <ArrowRight aria-hidden className="interaction-arrow size-4" />
+        </NextLink>
       </div>
     </article>
   );

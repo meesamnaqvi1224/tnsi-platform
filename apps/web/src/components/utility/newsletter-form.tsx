@@ -53,7 +53,11 @@ export function NewsletterForm({ idPrefix, submitLabel }: NewsletterFormProps) {
 
   if (status === 'success') {
     return (
-      <div className="flex min-h-11 w-full items-center justify-center">
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex min-h-11 w-full items-center justify-center"
+      >
         <Text className="text-foreground text-sm font-medium">{message}</Text>
       </div>
     );
