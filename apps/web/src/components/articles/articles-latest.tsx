@@ -1,118 +1,88 @@
-import { ChapterMarker, Container, Section, Text } from '@tnsi/ui';
-import { ArticleCard } from '@/components/articles/article-card';
+import NextLink from 'next/link';
+import { Container, Section } from '@tnsi/ui';
+import { EditorialIndex, LeadStory, PairedStories } from '@/components/articles/article-card';
+import { CategoryNavigation } from '@/components/articles/category-navigation';
 import { articlesContent } from '@/content/articles';
-import type { ArticleItem } from '@/content/articles';
 import { getLatestArticles } from '@/content/cms/loaders';
+import { filterByCategory, groupArticlesForLayout } from '@/lib/article-layout';
+import type { ArticleCategoryCount } from '@/lib/articles';
 
 const { latest } = articlesContent;
 
-type ArticleGroup =
-  | { type: 'large'; items: [ArticleItem] }
-  | { type: 'medium'; items: [ArticleItem, ArticleItem] }
-  | { type: 'compact'; items: [ArticleItem, ArticleItem, ArticleItem] };
-
-function groupArticles(items: readonly ArticleItem[]): ArticleGroup[] {
-  const groups: ArticleGroup[] = [];
-  let index = 0;
-
-  while (index < items.length) {
-    const large = items[index];
-    if (large?.variant === 'large') {
-      groups.push({ type: 'large', items: [large] });
-      index += 1;
-    }
-
-    const medium = items.slice(index, index + 2).filter((item) => item.variant === 'medium');
-    if (medium.length === 2) {
-      groups.push({ type: 'medium', items: medium as [ArticleItem, ArticleItem] });
-      index += 2;
-    }
-
-    const compact = items.slice(index, index + 3).filter((item) => item.variant === 'compact');
-    if (compact.length === 3) {
-      groups.push({ type: 'compact', items: compact as [ArticleItem, ArticleItem, ArticleItem] });
-      index += 3;
-    } else {
-      break;
-    }
-  }
-
-  return groups;
-}
-
-/** "Trauma Recovery" -> "trauma-recovery" — matches the slugs already used
- * in articlesContent.categories.items[].id/href (?category=trauma-recovery). */
-function slugify(label: string): string {
-  return label.toLowerCase().trim().replace(/\s+/g, '-');
-}
-
 export interface ArticlesLatestProps {
-  /** From the `?category=` query param — filters to matching articles when set. */
+  /** From the `?category=` query param - filters to matching articles when set. */
   category?: string;
+  categories: ArticleCategoryCount[];
 }
 
-export async function ArticlesLatest({ category }: ArticlesLatestProps) {
+/**
+ * The listing: heading, category filter, then every matching article in the
+ * lead / pair / index rhythm. The grouping places each article exactly once,
+ * so no category or list length can hide one.
+ */
+export async function ArticlesLatest({ category, categories }: ArticlesLatestProps) {
   const allItems = await getLatestArticles();
-  const items = category
-    ? allItems.filter((item) => slugify(item.category) === category.toLowerCase())
-    : allItems;
-  const articleGroups = groupArticles(items);
+  const items = filterByCategory(allItems, category);
+  const groups = groupArticlesForLayout(items);
 
   return (
     <Section
       id="latest"
       spacing="none"
-      className="border-border border-t"
-      aria-label={latest.heading}
+      className="scroll-mt-20"
+      aria-labelledby="articles-latest-heading"
     >
-      <Container size="xl" className="px-(--space-xl) py-(--space-4xl) sm:px-(--space-2xl)">
-        <ChapterMarker index={latest.chapter} as="h2" title={latest.heading} />
-      </Container>
+      <Container
+        size="xl"
+        className="flex flex-col gap-(--space-2xl) pt-(--space-3xl) lg:pt-(--space-4xl)"
+      >
+        <div className="flex flex-col gap-(--space-xl)">
+          <h2
+            id="articles-latest-heading"
+            className="font-heading text-foreground text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl"
+          >
+            {latest.heading}
+          </h2>
 
-      {items.length === 0 ? (
-        <Container size="xl" className="px-(--space-xl) pb-(--space-4xl) sm:px-(--space-2xl)">
-          <Text tone="muted">
-            No articles found in this category yet. Browse all articles below.
-          </Text>
-        </Container>
-      ) : null}
+          <div className="flex flex-col gap-(--space-md)">
+            <CategoryNavigation categories={categories} activeCategory={category} />
+            <p className="text-muted-foreground font-mono text-[0.625rem] tracking-[0.15em] uppercase tabular-nums">
+              {items.length} {items.length === 1 ? 'article' : 'articles'}
+            </p>
+          </div>
+        </div>
 
-      <div className="flex flex-col">
-        {articleGroups.map((group, groupIndex) => {
-          if (group.type === 'large') {
-            return <ArticleCard key={group.items[0].id} article={group.items[0]} />;
-          }
-
-          if (group.type === 'medium') {
-            return (
-              <div
-                key={`medium-${groupIndex}`}
-                className="border-border grid grid-cols-1 border-t lg:grid-cols-2"
-              >
-                {group.items.map((article) => (
-                  <ArticleCard key={article.id} article={article} />
-                ))}
-              </div>
-            );
-          }
-
-          return (
-            <div
-              key={`compact-${groupIndex}`}
-              className="border-border grid grid-cols-1 border-t md:grid-cols-3"
+        {items.length === 0 ? (
+          <p className="text-muted-foreground max-w-prose pb-(--space-4xl) leading-relaxed">
+            No articles found in this category yet.{' '}
+            <NextLink
+              href="/articles#latest"
+              className="interaction-text-link text-foreground underline underline-offset-4"
             >
-              {group.items.map((article) => (
-                <div
-                  key={article.id}
-                  className="border-border px-(--space-xl) md:border-l md:first:border-l-0"
-                >
-                  <ArticleCard article={article} />
-                </div>
-              ))}
-            </div>
-          );
-        })}
-      </div>
+              Browse all Insights
+            </NextLink>
+            .
+          </p>
+        ) : null}
+
+        <div className="flex flex-col gap-(--space-3xl) pb-(--space-4xl) lg:gap-(--space-4xl)">
+          {groups.map((group, groupIndex) => {
+            const key = `${group.kind}-${group.items[0]?.id ?? groupIndex}`;
+            if (group.kind === 'lead') {
+              // Alternate the image side from one lead story to the next.
+              const leadsBefore = groups
+                .slice(0, groupIndex)
+                .filter((earlier) => earlier.kind === 'lead').length;
+              const flip = leadsBefore % 2 === 1;
+              return <LeadStory key={key} article={group.items[0]} flip={flip} />;
+            }
+            if (group.kind === 'pair') {
+              return <PairedStories key={key} articles={group.items} />;
+            }
+            return <EditorialIndex key={key} articles={group.items} />;
+          })}
+        </div>
+      </Container>
     </Section>
   );
 }

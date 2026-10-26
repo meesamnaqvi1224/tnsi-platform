@@ -2,7 +2,6 @@ import { Container, PageQuote, Section } from '@tnsi/ui';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
-import { ArticlesCategories } from '@/components/articles/articles-categories';
 import { ArticlesClosing } from '@/components/articles/articles-closing';
 import { ArticlesFeatured } from '@/components/articles/articles-featured';
 import { ArticlesHero } from '@/components/articles/articles-hero';
@@ -47,8 +46,7 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
       <main id="main-content">
         <ArticlesHero />
         <ArticlesFeatured />
-        <ArticlesCategories categories={categoryCounts} activeCategory={category} />
-        <ArticlesLatest category={category} />
+        <ArticlesLatest category={category} categories={categoryCounts} />
         <ArticlesNewsletter />
         <ArticlesClosing />
 
