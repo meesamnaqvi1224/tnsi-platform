@@ -108,6 +108,12 @@ Test at: **1440px**, **1280px**, **1024px**, **768px**, **390px**, ultra-wide (1
 - [ ] Replace placeholder SVG photography with approved editorial assets
 - [ ] Add Caroline Reed approved portrait to `/public`
 - [ ] Configure analytics (privacy-compliant)
+- [ ] Public form security (owner-approved task; PR `feat/form-security`)
+  - [x] Same-origin check, hidden honeypot field, per-email and per-form rate limits (counted from the existing `crm_outbox` rows, no new table or service), stricter newsletter email validation, 429 + `Retry-After`, silent success for bot submissions. Applies to contact, newsletter and assessment. Fails open if the limiter itself errors.
+  - [ ] **Email verification / double opt-in is NOT built.** It needs a way to send mail (a Flowi workflow or a transactional email provider; owner decision #8 is open). Until then anyone can sign up another person's address (limited to 5/hour per address). Build this together with the Flowi workflows.
+  - [ ] No CAPTCHA (would add a third-party service and a privacy disclosure); revisit if abuse persists.
+  - [ ] The Return Path sign-up (`/api/the-return-path/subscribe`) is unchanged and unlaunched; apply the same guard before launch.
+  - [ ] `crm_outbox` has no index on `(kind, email, created_at)`; add one (a migration, separately authorised) if the table grows large.
 - [ ] Set up error monitoring (Sentry or equivalent)
 - [ ] Run full Visual + Responsive + Accessibility QA on production URL
 

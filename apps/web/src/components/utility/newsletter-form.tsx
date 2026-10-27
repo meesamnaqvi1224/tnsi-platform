@@ -1,6 +1,8 @@
 'use client';
 
 import * as React from 'react';
+import { HoneypotField } from '@/components/utility/honeypot-field';
+import { HONEYPOT_FIELD } from '@/lib/form-guard-constants';
 import { buttonVariants, cn, Input, Text, ValidationMessage } from '@tnsi/ui';
 
 export interface NewsletterFormProps {
@@ -24,6 +26,7 @@ export function NewsletterForm({ idPrefix, submitLabel }: NewsletterFormProps) {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const honeypot = new FormData(event.currentTarget).get(HONEYPOT_FIELD);
     setStatus('submitting');
     setMessage(null);
 
@@ -31,7 +34,7 @@ export function NewsletterForm({ idPrefix, submitLabel }: NewsletterFormProps) {
       const response = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, ...(honeypot ? { [HONEYPOT_FIELD]: honeypot } : {}) }),
       });
 
       const data = (await response.json().catch(() => null)) as NewsletterResponseBody | null;
@@ -69,6 +72,7 @@ export function NewsletterForm({ idPrefix, submitLabel }: NewsletterFormProps) {
         className="flex w-full min-w-0 flex-col gap-(--space-md) sm:flex-row sm:items-stretch"
         noValidate
       >
+        <HoneypotField />
         <label htmlFor={emailId} className="sr-only">
           Email address
         </label>

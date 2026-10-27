@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import NextLink from 'next/link';
+import { HoneypotField } from '@/components/utility/honeypot-field';
+import { HONEYPOT_FIELD } from '@/lib/form-guard-constants';
 import {
   Alert,
   Button,
@@ -48,6 +50,7 @@ export function ContactForm() {
           organisation: data.get('organisation') || undefined,
           subject: data.get('subject'),
           message: data.get('message'),
+          [HONEYPOT_FIELD]: data.get(HONEYPOT_FIELD) || undefined,
         }),
       });
 
@@ -89,6 +92,7 @@ export function ContactForm() {
             </div>
           ) : (
             <Form onSubmit={handleSubmit} className="w-full max-w-xl min-w-0">
+              <HoneypotField />
               {status === 'error' && errorMessage ? (
                 <Alert variant="destructive">{errorMessage}</Alert>
               ) : null}

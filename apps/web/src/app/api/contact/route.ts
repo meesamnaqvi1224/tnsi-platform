@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server';
 import { db } from '@tnsi/db';
 import { attemptNow, contactFormPayload, enqueueCrmEvent } from '@/lib/crm-outbox';
 import { contactFormSchema } from '@/lib/validation';
+import {
+  honeypotTripped,
+  isBodyTooLarge,
+  isCrossOrigin,
+  TOO_MANY_REQUESTS,
+  withinRateLimit,
+} from '@/lib/form-guard';
 
 export const runtime = 'nodejs';
 
@@ -29,11 +36,23 @@ function describeStorageFailure(error: unknown): string {
  * "TNSI Website" custom fields).
  */
 export async function POST(request: Request) {
+  if (isBodyTooLarge(request)) {
+    return NextResponse.json({ error: 'Invalid request.' }, { status: 413 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400 });
+  }
+
+  if (isCrossOrigin(request)) {
+    return NextResponse.json({ error: 'Invalid request.' }, { status: 403 });
+  }
+  // A filled honeypot is a bot: answer as if it worked, store nothing.
+  if (honeypotTripped(body)) {
+    return NextResponse.json({ submitted: true });
   }
 
   const result = contactFormSchema.safeParse(body);
@@ -51,11 +70,21 @@ export async function POST(request: Request) {
 
   let id: string;
   try {
-    id = await enqueueCrmEvent(db, {
-      kind: 'contact_form',
-      email,
-      payload: contactFormPayload({ name, organisation, subject, message }),
-    });
+    // The limit check and the write are one atomic step per email address.
+    const stored = await withinRateLimit(db, 'contact_form', email, (executor) =>
+      enqueueCrmEvent(executor, {
+        kind: 'contact_form',
+        email,
+        payload: contactFormPayload({ name, organisation, subject, message }),
+      }),
+    );
+    if (stored.limited) {
+      return NextResponse.json(TOO_MANY_REQUESTS, {
+        status: 429,
+        headers: { 'Retry-After': '3600' },
+      });
+    }
+    id = stored.value;
   } catch (error) {
     // Not stored: the one case where we must tell the visitor it did not go through.
     console.error(`[contact] could not store the enquiry: ${describeStorageFailure(error)}`);

@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import NextLink from 'next/link';
+import { HoneypotField } from '@/components/utility/honeypot-field';
+import { HONEYPOT_FIELD } from '@/lib/form-guard-constants';
 import {
   Alert,
   Button,
@@ -65,6 +67,7 @@ export function AssessmentExperience({ assessment }: AssessmentExperienceProps) 
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const honeypot = new FormData(event.currentTarget).get(HONEYPOT_FIELD);
     setStatus('submitting');
     setErrorMessage(null);
 
@@ -72,7 +75,12 @@ export function AssessmentExperience({ assessment }: AssessmentExperienceProps) 
       const response = await fetch('/api/assessments/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assessmentSlug: assessment.slug, answers, email }),
+        body: JSON.stringify({
+          assessmentSlug: assessment.slug,
+          answers,
+          email,
+          ...(honeypot ? { [HONEYPOT_FIELD]: honeypot } : {}),
+        }),
       });
 
       const data = (await response.json().catch(() => null)) as SubmitResponseBody | null;
@@ -111,6 +119,7 @@ export function AssessmentExperience({ assessment }: AssessmentExperienceProps) 
           </Stack>
 
           <Form onSubmit={handleSubmit}>
+            <HoneypotField />
             {status === 'error' && errorMessage ? (
               <Alert variant="destructive">{errorMessage}</Alert>
             ) : null}
