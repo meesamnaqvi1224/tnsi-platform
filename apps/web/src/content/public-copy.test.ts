@@ -46,7 +46,7 @@ describe('public copy', () => {
     const regulation = programsOverviewContent.pathways.find((p) => p.id === 'regulation-suite')!;
     const text = regulation.paragraphs.join(' ');
     expect(text).toContain('£5.99 per month');
-    expect(text).toContain('£59 per year');
+    expect(text).toContain('£59.99 per year');
     expect(text).toContain('30-day free trial');
     expect(text).toContain('no payment card');
     expect(text).toContain('Payments are not refunded');
