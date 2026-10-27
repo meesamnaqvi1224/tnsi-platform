@@ -4,6 +4,7 @@ import { requireAuthOrRedirect } from '@/lib/auth-api';
 import { getBillingState } from '@/lib/billing';
 import { reconcileCheckoutReturn } from '@/lib/reconcile-checkout-session';
 import { isMembershipOpen } from '@/lib/membership';
+import { parsePreselectedPlan } from '@/lib/membership-links';
 import { buildMembershipView } from '@/lib/membership-view';
 import { createPageMetadata } from '@/lib/seo';
 
@@ -15,7 +16,12 @@ export const metadata = createPageMetadata({
 });
 
 interface BillingPageProps {
-  searchParams: Promise<{ success?: string; canceled?: string; session_id?: string | string[] }>;
+  searchParams: Promise<{
+    success?: string;
+    canceled?: string;
+    session_id?: string | string[];
+    plan?: string | string[];
+  }>;
 }
 
 /**
@@ -26,7 +32,7 @@ interface BillingPageProps {
  */
 export default async function BillingPage({ searchParams }: BillingPageProps) {
   const user = await requireAuthOrRedirect();
-  const { success, canceled, session_id: sessionId } = await searchParams;
+  const { success, canceled, session_id: sessionId, plan } = await searchParams;
   // Returning from Checkout: verify the session with Stripe BEFORE reading the
   // membership, so a payment that has cleared is already reflected below. The
   // identifier is an unverified claim; see `reconcileCheckoutReturn`.
@@ -47,6 +53,8 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
               checkoutSuccess={Boolean(success)}
               checkoutOutcome={checkoutReturn?.status}
               checkoutCanceled={Boolean(canceled)}
+              // Only which radio starts selected, from a closed list. It never starts checkout.
+              defaultPlan={parsePreselectedPlan(plan)}
             />
           </div>
         </Container>

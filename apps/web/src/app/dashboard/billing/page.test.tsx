@@ -685,3 +685,43 @@ describe('MembershipPage — language', () => {
     }
   });
 });
+
+describe('MembershipPage - plan preselection from ?plan=', () => {
+  /** Whether the radio for `plan` is the selected one (attribute order is not fixed, so read the whole tag). */
+  const checked = (html: string, plan: string) => {
+    const tags = html.match(/<input[^>]*name="membership-plan"[^>]*>/g) ?? [];
+    const tag = tags.find((t) => t.includes(`value="${plan}"`));
+    return Boolean(tag && /\schecked(=|\s|\/|>)/.test(tag));
+  };
+
+  it('starts with the plan named in the link selected, without starting checkout', async () => {
+    openMembership();
+    const html = await render(billing({}), { plan: 'annual' });
+    expect(checked(html, 'annual')).toBe(true);
+    expect(checked(html, 'monthly')).toBe(false);
+    expect(html).not.toContain('/api/');
+  });
+
+  it('falls back to monthly for anything that is not one of the two plans', async () => {
+    openMembership();
+    for (const plan of ['lifetime', 'ANNUAL', '', 'x']) {
+      const html = await render(billing({}), { plan });
+      expect(checked(html, 'monthly')).toBe(true);
+      expect(checked(html, 'annual')).toBe(false);
+    }
+  });
+
+  it('does not change what a member who already pays sees', async () => {
+    openMembership();
+    const html = await render(
+      billing({
+        tier: 'monthly',
+        hasStripeCustomer: true,
+        hasHadSubscription: true,
+        currentPeriodEnd: new Date(NOW + 20 * DAY),
+      }),
+      { plan: 'annual' },
+    );
+    expect(html).not.toContain('name="membership-plan"');
+  });
+});

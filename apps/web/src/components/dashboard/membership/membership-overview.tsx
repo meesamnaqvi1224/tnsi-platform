@@ -307,9 +307,11 @@ function ManageSection({ view }: { view: MembershipView }) {
 function UpgradeSection({
   view,
   membershipOpen,
+  defaultPlan,
 }: {
   view: MembershipView;
   membershipOpen: boolean;
+  defaultPlan?: MembershipPlanOption['tier'];
 }) {
   const returning = view.kind === 'ended';
   const inTrial = view.kind === 'trialing';
@@ -363,6 +365,7 @@ function UpgradeSection({
         <h3 className={sectionHeadingClass}>Choose your plan</h3>
         <MembershipCheckout
           plans={CHECKOUT_PLANS}
+          defaultTier={defaultPlan}
           ctaLabel="Start Membership"
           unavailableReason={
             membershipOpen
@@ -454,6 +457,8 @@ export interface MembershipOverviewProps {
   checkoutOutcome?: CheckoutReturnStatus;
   /** Left Stripe Checkout without paying (`?canceled=true`). */
   checkoutCanceled?: boolean;
+  /** Which plan starts selected (from `?plan=`, already validated). Selecting is not purchasing: checkout still needs the button. */
+  defaultPlan?: MembershipPlanOption['tier'];
 }
 
 export function MembershipOverview({
@@ -462,6 +467,7 @@ export function MembershipOverview({
   checkoutSuccess = false,
   checkoutOutcome,
   checkoutCanceled = false,
+  defaultPlan,
 }: MembershipOverviewProps) {
   const rows = detailRows(view);
   const isPaidState = view.hasPaidAccess;
@@ -522,7 +528,9 @@ export function MembershipOverview({
       ) : null}
 
       {isPaidState && !actionFirst ? <ManageSection view={view} /> : null}
-      {showUpgrade ? <UpgradeSection view={view} membershipOpen={membershipOpen} /> : null}
+      {showUpgrade ? (
+        <UpgradeSection view={view} membershipOpen={membershipOpen} defaultPlan={defaultPlan} />
+      ) : null}
     </div>
   );
 }

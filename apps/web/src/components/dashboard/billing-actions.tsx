@@ -167,8 +167,8 @@ const NO_INIT = () => ({});
 
 /**
  * Opens the Stripe Billing Portal — the one place a member updates a payment
- * method, resumes a cancelled renewal, changes plan, views invoices or
- * cancels. Only a handoff to `/api/v1/billing/portal`; no billing screen is
+ * method, resumes a cancelled renewal, views invoices or cancels. (The portal
+ * configuration deliberately does not allow switching plans.) Only a handoff to `/api/v1/billing/portal`; no billing screen is
  * recreated here.
  */
 export function ManageBillingButton({

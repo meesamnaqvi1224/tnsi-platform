@@ -2,16 +2,17 @@ import type { Metadata } from 'next';
 import NextLink from 'next/link';
 import { BatteryLow, DoorOpen, Sprout, Zap, type LucideIcon } from 'lucide-react';
 import { buttonVariants, Container, Section, Stack, Text } from '@tnsi/ui';
-import { MEMBERSHIP_PLANS, MEMBERSHIP_TRIAL_DAYS } from '@tnsi/integrations';
 import { JsonLd } from '@/components/seo/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { IdealForBand } from '@/components/programs/ideal-for-band';
+import { RegulationSuiteMembership } from '@/components/programs/regulation-suite-membership';
 import { EditorialImage } from '@/components/utility/editorial-image';
 import { FadeIn } from '@/components/utility/fade-in';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
 import { getPathway } from '@/content/programs';
 import { isMembershipOpen } from '@/lib/membership';
+import { signUpToMembershipHref } from '@/lib/membership-links';
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
 const pathway = getPathway('regulation-suite');
@@ -41,7 +42,7 @@ export const metadata: Metadata = createPageMetadata({
  * untouched - this only passes Clerk's standard redirect. Nothing on this page
  * starts a trial or a payment.
  */
-const GET_STARTED_HREF = '/sign-up?redirect_url=%2Fdashboard%2Fbilling';
+const GET_STARTED_HREF = signUpToMembershipHref();
 
 export default function RegulationSuitePage() {
   // Evaluated when the page is built: membership opens with a deliberate
@@ -113,6 +114,16 @@ export default function RegulationSuitePage() {
                   {pathway.tagline}
                 </Text>
               </FadeIn>
+              {membershipOpen ? (
+                <FadeIn delayMs={240}>
+                  <NextLink
+                    href={GET_STARTED_HREF}
+                    className={buttonVariants({ variant: 'primary', size: 'lg' })}
+                  >
+                    Get started
+                  </NextLink>
+                </FadeIn>
+              ) : null}
             </Stack>
           </Container>
         </section>
@@ -155,6 +166,9 @@ export default function RegulationSuitePage() {
           columns={2}
         />
 
+        {/* Open only: the free trial and the paid plans, kept visibly separate. */}
+        {membershipOpen ? <RegulationSuiteMembership /> : null}
+
         {/* Final CTA — wide editorial closing panel; the existing nav/card photo
             of the same notebook scene gives the panel a visual counterpart
             without introducing a new image. */}
@@ -177,7 +191,7 @@ export default function RegulationSuitePage() {
                     </h2>
                     <Text size="lg" tone="muted" className="max-w-prose leading-relaxed">
                       {membershipOpen
-                        ? `Eligible accounts can try the full Regulation Suite™ free for ${MEMBERSHIP_TRIAL_DAYS} days. No payment card is required, and nothing is charged when the trial ends: your account simply returns to Free unless you choose a paid plan. One free trial is available per verified email address. Paid membership is ${MEMBERSHIP_PLANS.monthly.price} per ${MEMBERSHIP_PLANS.monthly.interval} or ${MEMBERSHIP_PLANS.annual.price} per ${MEMBERSHIP_PLANS.annual.interval}, and you can cancel at any time. No discovery call is needed.`
+                        ? 'Create an account to see whether you are eligible for the free trial, or to choose a membership plan.'
                         : 'The Regulation Suite™ is not yet available for enrolment. In the meantime, book a Discovery Call to discuss your nervous system education options with the Institute.'}
                     </Text>
                   </Stack>
