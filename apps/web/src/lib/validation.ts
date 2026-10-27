@@ -1,6 +1,6 @@
 import { z } from '@tnsi/validation';
 import { practiceContentTypeEnum, postPracticeResponseEnum } from '@tnsi/db/schema';
-import { PURCHASABLE_TIERS } from '@tnsi/integrations';
+import { CHECKOUT_TIERS } from '@tnsi/integrations';
 
 export const practiceContentType = z.enum(practiceContentTypeEnum.enumValues);
 
@@ -108,7 +108,7 @@ export type AssessmentSubmissionInput = z.infer<typeof assessmentSubmissionSchem
  * charged beyond picking one of these three names.
  */
 export const checkoutRequestSchema = z.object({
-  tier: z.enum(PURCHASABLE_TIERS),
+  tier: z.enum(CHECKOUT_TIERS),
 });
 
 export type CheckoutRequestInput = z.infer<typeof checkoutRequestSchema>;

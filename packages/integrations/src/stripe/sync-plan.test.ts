@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  LIFETIME_SALES_ENDED_AT,
   planForCheckoutSessionCompleted,
   planForInvoicePaymentFailed,
   planForSubscriptionEvent,
@@ -53,9 +54,14 @@ describe('planForCheckoutSessionCompleted', () => {
     });
   });
 
-  it('grants lifetime immediately for a paid one-time checkout', () => {
+  it('still grants a LEGITIMATE (pre-discontinuation) paid Lifetime purchase delivered late', () => {
     const plan = planForCheckoutSessionCompleted(
-      checkoutInput({ mode: 'payment', paymentStatus: 'paid', priceId: 'price_lifetime' }),
+      checkoutInput({
+        mode: 'payment',
+        paymentStatus: 'paid',
+        priceId: 'price_lifetime',
+        sessionCreatedAt: new Date('2026-10-01T10:00:00Z'),
+      }),
       priceIds,
     );
     expect(plan).toEqual({
@@ -64,6 +70,27 @@ describe('planForCheckoutSessionCompleted', () => {
       stripeCustomerId: 'cus_123',
     });
   });
+
+  it.each([
+    ['created after Lifetime sales ended', new Date('2026-10-23T09:00:00Z')],
+    ['created exactly when sales ended', LIFETIME_SALES_ENDED_AT],
+    ['of unknown creation time', null],
+    ['with no creation time supplied', undefined],
+  ])(
+    'never grants a new Lifetime purchase just because the event is signed (%s)',
+    (_label, createdAt) => {
+      const plan = planForCheckoutSessionCompleted(
+        checkoutInput({
+          mode: 'payment',
+          paymentStatus: 'paid',
+          priceId: 'price_lifetime',
+          sessionCreatedAt: createdAt,
+        }),
+        priceIds,
+      );
+      expect(plan).toEqual({ action: 'skip', reason: expect.stringContaining('discontinued') });
+    },
+  );
 
   it('skips a one-time checkout that has not actually been paid', () => {
     const plan = planForCheckoutSessionCompleted(
@@ -96,6 +123,7 @@ describe('planForCheckoutSessionCompleted', () => {
       mode: 'payment',
       paymentStatus: 'paid',
       priceId: 'price_lifetime',
+      sessionCreatedAt: new Date('2026-10-01T10:00:00Z'),
     });
     expect(planForCheckoutSessionCompleted(input, priceIds)).toEqual(
       planForCheckoutSessionCompleted(input, priceIds),

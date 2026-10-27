@@ -47,3 +47,38 @@ export function getStripeConfig(): StripeConfig {
     priceIds: readPriceIds(),
   };
 }
+
+/**
+ * Whether billing is fully configured for the approved plans: the secret key,
+ * the webhook secret, and a Price for BOTH the monthly and annual plan. Reports
+ * only yes/no - it never returns or logs a value. A missing piece means no
+ * checkout may be offered.
+ */
+export function isMembershipCheckoutConfigured(): boolean {
+  const { secretKey, webhookSecret, priceIds } = getStripeConfig();
+  return Boolean(secretKey && webhookSecret && priceIds.monthly && priceIds.annual);
+}
+
+/**
+ * Whether Regulation Suite membership is open for purchase: deliberately
+ * launched (`REGULATION_SUITE_MEMBERSHIP_OPEN` is exactly the string "true" -
+ * unset, empty, "TRUE", "1", " true" and anything else are closed) AND billing
+ * fully configured. This is the single definition; `createCheckoutSession`
+ * enforces it itself, so no caller can start a purchase while it is closed.
+ */
+export function isMembershipOpen(): boolean {
+  return (
+    process.env.REGULATION_SUITE_MEMBERSHIP_OPEN === 'true' && isMembershipCheckoutConfigured()
+  );
+}
+
+/**
+ * Optional id of a restricted Stripe Billing Portal configuration (one that
+ * allows payment methods, cancellation, invoices and billing history but NOT
+ * plan switching or products the app does not sell). When set, every portal
+ * session uses it; when unset Stripe uses the account's default configuration,
+ * which has not been inspected. Returns undefined, never an empty string.
+ */
+export function getPortalConfigurationId(): string | undefined {
+  return process.env.STRIPE_PORTAL_CONFIGURATION_ID || undefined;
+}

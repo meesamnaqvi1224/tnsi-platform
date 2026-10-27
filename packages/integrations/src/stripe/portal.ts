@@ -1,5 +1,6 @@
 import 'server-only';
 import { getStripeClient } from './client';
+import { getPortalConfigurationId } from './config';
 
 /** Thrown when the caller has never completed a checkout — there is no Stripe customer to open a portal session for. */
 export class NoStripeCustomerError extends Error {}
@@ -21,6 +22,8 @@ export async function createBillingPortalSession(input: {
   const session = await getStripeClient().billingPortal.sessions.create({
     customer: input.stripeCustomerId,
     return_url: input.returnUrl,
+    // A restricted configuration (no plan switching) when the owner has created one.
+    ...(getPortalConfigurationId() ? { configuration: getPortalConfigurationId() } : {}),
   });
 
   return { url: session.url };
