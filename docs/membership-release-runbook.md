@@ -1,8 +1,10 @@
 # Membership release runbook (trial integration)
 
-**Status:** reviewed 24 October 2026 on branch `feat/membership-trial-integration`. Nothing here has been run
-against a shared or production system. Membership stays **closed** until a separate, explicit launch
-authorisation.
+**Status (27 October 2026):** branch `feat/membership-trial-integration`. The integration was verified against
+Stripe **Sandbox**, a Clerk **development** instance and a **disposable local PostgreSQL** (section 3). Nothing has
+been run against production, nothing from this work has been pushed, merged or deployed, and membership stays
+**closed** until a separate, explicit launch authorisation. **The integration is NOT fully launch-ready:** section 3
+lists what is verified, and sections 3.3 and 5 list what is not.
 
 ## 1. Migration `0012_add_membership_trial_grace_and_free_content`
 
@@ -78,31 +80,84 @@ PostgreSQL 17 databases only**:
 | Launch gate                | Closed unless `REGULATION_SUITE_MEMBERSHIP_OPEN` is exactly `true` **and** Stripe is fully configured; enforced in the checkout route, the trial route and inside the Stripe functions                       | route + unit tests                                                 |
 | Secrets                    | `TRIAL_ELIGIBILITY_*` are read at request time on the server only (imported by the trial route and `@tnsi/auth` only), never `NEXT_PUBLIC`, never logged                                                     | grep review; log-redaction test                                    |
 
-## 3. Integration checks that have NOT been run (do not treat as passed)
+## 3. Integration verification (27 October 2026)
 
-No authorised test credentials or test instances were available. Never use live credentials.
+Everything below ran on one machine, outside production. **Nothing was run against live Stripe, the production
+Clerk instance or any production database.** The test harness (scripts, test users and secrets) lives outside the
+repository and is not committed.
 
-**Clerk (test instance)** - needs a Clerk test instance and its secret key:
+### 3.1 How it was run
 
-1. Create three users: verified primary email; unverified primary email; verified `name+tag@...`.
-2. With membership open **in a test deployment only**: unverified user -> `403 EMAIL_NOT_VERIFIED`; verified user -> `201`
-   and 30 days; second attempt -> `409`; a second account with the same verified email -> `409`; `name+tag@` ->
-   its own trial.
+- **App:** `next dev` on `localhost:3000` from this branch, `REGULATION_SUITE_MEMBERSHIP_OPEN=true` in that one
+  process only (production is unchanged and closed).
+- **Database:** disposable local PostgreSQL 17 (loopback only, empty), migrations `0000`-`0012` applied (13 records).
+- **Stripe:** Sandbox (test-mode keys; both Prices non-live: monthly 599 GBP per month, annual 5999 GBP per year,
+  no trial) and Stripe CLI 1.55.1 forwarding the five events to `localhost:3000/api/webhooks/stripe` with the CLI's
+  own signing secret.
+- **Clerk:** development instance (`*.clerk.accounts.dev`), throwaway users with verified test addresses, real
+  session tokens accepted by the app.
+- **Cleanup:** the Sandbox customers and Clerk users created were deleted afterwards; all local processes were stopped.
 
-**Stripe (test mode)** - needs test keys, two recurring GBP Prices (no trial, no Lifetime), a webhook endpoint
-(Stripe CLI `listen` works) and its signing secret:
+**Method labels** used in the table: **Live Sandbox** = a real Stripe Sandbox operation produced a real, signed
+webhook that the app processed. **Locally forged** = a request built by the test harness, not sent by Stripe.
+**Simulated** = a database or clock manipulation standing in for something that cannot be waited for.
 
-1. Trial claim creates nothing in Stripe. 2. Explicit checkout with `4242...`; webhook activates the plan.
-2. Second checkout while subscribed -> refused. 4. Two different-plan requests at once -> one payable session.
-3. `4000 0000 0000 0341` (fails after attach) -> `past_due`, 7-day grace anchored to the first failure.
-4. Cancel at period end -> access continues, then ends. 7. Replay a webhook from the CLI -> no change.
-5. A Lifetime request -> `400`. 9. Confirm the abandoned-session expiry (about 31 minutes) and the session
-   list's read-after-write behaviour, which are still assumptions.
+### 3.2 Results
 
-**Restricted Billing Portal configuration** (Dashboard, test mode first): enable payment methods, invoice
-history and cancellation at period end; disable plan switching and any product not sold; set the id as
-`STRIPE_PORTAL_CONFIGURATION_ID`; confirm a portal session offers no plan change. The default configuration has
-not been inspected.
+| Scenario                                  | Result                     | Method                                     | What was observed                                                                                                                                                                                                                                                                                                                                                               |
+| ----------------------------------------- | -------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Monthly checkout: session creation        | PASS                       | Live Sandbox                               | App created a real Checkout Session: monthly Price, 599 GBP, subscription mode, no trial, the app's own Stripe customer, user metadata, localhost return URL. Stripe accepted the roughly 31-minute `expires_at`.                                                                                                                                                               |
+| Monthly checkout: payment and entitlement | PASS (payment substituted) | Live Sandbox                               | The Checkout page was **not** used (3.3). The same customer was subscribed through the Stripe API with Stripe's test-card token. The real `customer.subscription.created` webhook (HTTP 200) moved the entitlement to monthly / active, paid through one month.                                                                                                                 |
+| Annual checkout                           | PASS (payment substituted) | Live Sandbox                               | Session: annual Price, 5999 GBP, yearly, no trial. Same substituted payment. Entitlement annual / active, paid through 27 Oct 2027.                                                                                                                                                                                                                                             |
+| Invalid webhook signatures                | PASS                       | Locally forged                             | Six forged variants (no header, garbage, wrong signature, wrong secret, tampered body, 1-hour-old timestamp) all returned 400 and changed nothing. A correctly signed harmless event was accepted and skipped.                                                                                                                                                                  |
+| Webhook replay safety                     | PASS                       | Locally forged re-delivery of a real event | A real event body fetched from Stripe was re-signed by the harness and delivered 3 times in sequence and 8 at once: always 200, entitlement identical, one row, one subscription. This was **not** a Stripe-initiated resend.                                                                                                                                                   |
+| Out-of-order event                        | PASS                       | Locally forged re-delivery                 | Re-delivering the older "created" event after an immediate cancellation did not restore access.                                                                                                                                                                                                                                                                                 |
+| Duplicate subscription                    | PASS                       | Live Sandbox                               | A second live subscription created through the API: entitlement stayed on the first, `duplicateStripeSubscriptions` recorded in the entitlement metadata, a "manual review needed" log line written, both subscriptions stayed active, no refund and no cancellation. A further checkout attempt returned 409 `ALREADY_A_MEMBER`.                                               |
+| Cancellation at period end                | PASS                       | Live Sandbox                               | `cancelsAtPeriodEnd` became true and access continued to the paid-through date; resuming the subscription synced back. The lapse at the end of the period was **not** observed (3.3).                                                                                                                                                                                           |
+| Immediate cancellation                    | PASS                       | Live Sandbox                               | Subscription ended, entitlement canceled, state inactive, no paid-through, access ended at once.                                                                                                                                                                                                                                                                                |
+| Failed payment                            | PASS                       | Live Sandbox                               | A failing renewal invoice was produced by switching the subscription to Stripe's always-declining test card and resetting its billing cycle to now (not a natural renewal). Stripe set `past_due`; the app recorded the failure time; the member was in grace with access intact; the grace end was exactly 7 days after the failure.                                           |
+| Grace expiry                              | PASS                       | **Simulated**                              | The failure timestamp was backdated in the disposable database: 6 days gave access (grace); 8 days gave no access even though the new billing period ran on. This is **not** a live seven-day wait.                                                                                                                                                                             |
+| Failed-payment recovery                   | PASS                       | Live Sandbox                               | Paying the failed invoice with a working card restored the member to active and cleared the failure time.                                                                                                                                                                                                                                                                       |
+| Entitlement synchronization               | PASS                       | Live Sandbox                               | Created, updated, deleted and failed-payment events all changed the entitlement correctly; 13 of 13 events forwarded by the Stripe CLI returned 200.                                                                                                                                                                                                                            |
+| Billing Portal through the app            | PASS                       | Live Sandbox                               | Subscribers receive a `billing.stripe.com` session (200); a member with no billing history gets 400. The configuration was read back from Stripe: payment-method updates on, invoice history on, cancellation at period end on, plan switching and quantity changes off, pausing off, customer-information editing off. The portal screens themselves were not clicked through. |
+| Card-free trial (live Clerk)              | PASS                       | Live Clerk, disposable database            | A verified member claimed a trial: 201, exactly 30 days, no Stripe customer or subscription created. A second claim and a claim by an account holding a paid plan both returned 409 `TRIAL_NOT_AVAILABLE`.                                                                                                                                                                      |
+| Trial: unverified primary email           | **BLOCKED**                | n/a                                        | Clerk refuses to make an unverified address a primary email in this instance (`breaks_instance_invariant`), so the account state cannot be created and the case cannot be reproduced live. It is covered only by route tests with a simulated provider.                                                                                                                         |
+
+### 3.3 Not verified: do not treat as passed
+
+- **Hosted Checkout page and `checkout.session.completed`.** No card details were entered into Stripe's hosted page,
+  so the real payment path, the `checkout.session.completed` handler and the success-page reconciliation
+  (`?success=true&session_id=...`) have **not** been exercised live. Session creation was; payment was substituted
+  with an API-created subscription. One manual Sandbox checkout (test card `4242 4242 4242 4242`) is still needed.
+- **Lapse at the end of a paid period.** A subscription cancelled at period end was not observed running out; the
+  Sandbox cannot advance time for customers the app creates (the app has no test-clock hook).
+- **A real renewal cycle.** The failure above was forced by resetting the billing cycle; a natural renewal, and the
+  period-boundary behaviour around it, were not tested.
+- **Grace expiry in real time** (simulated only), and Stripe's own retry and dunning schedule.
+- **Not re-run in this cycle** (covered earlier only by tests that simulate Stripe): two different-plan requests at
+  once leaving one payable session; a Lifetime request returning 400; a plus-tag address receiving its own trial; a
+  second account with the same email; Clerk failure failing closed.
+- **Abandoned-session expiry.** Stripe accepted a 31-minute `expires_at`, but expiry at 31 minutes and the session
+  list's read-after-write behaviour were not observed.
+- **Events from a live endpoint.** The Stripe CLI delivered events (API version 2023-10-16); a registered
+  Dashboard endpoint, and the API version of the live account, were not tested. The app re-reads state from the
+  Stripe API, which limits the risk.
+- **Interactive Billing Portal.** Only the configuration and session creation were checked.
+
+### 3.4 Duplicate-subscription manual review: required before launch
+
+Verified behaviour: the second subscription is **flagged and never cancelled or refunded**. Today the only signals
+are one server log line ("duplicate live subscription ignored; manual review needed") and the
+`duplicateStripeSubscriptions` list in `entitlements.metadata`. Nothing tells a person. Before launch this needs:
+
+1. **A named owner and a named backup.** The TNSI account owner/operator owns the runbook; a named backup must be
+   assigned.
+2. **An alerting mechanism.** A flagged case must reach a person without anyone reading logs or querying the
+   database (for example an email, or a task, to the owner). The mechanism is a decision and is not built.
+3. **A documented procedure.** Proposed, for the owner to approve: find the member from the flag; look at both
+   subscriptions and their payments in Stripe; keep the first, with the member's agreement; end the duplicate
+   according to the approved billing policy (refunds only where the policy or law requires, with counsel's wording
+   settled); clear the flag; record the case and outcome. No step is automatic.
 
 ## 4. Mobile scope
 
@@ -113,11 +168,22 @@ unmerged PowerDrop artwork work and is a separate follow-up. A web-only launch i
 
 ## 5. Open items before launch
 
-Stripe test mode, Clerk test instance, restricted portal configuration, `TRIAL_ELIGIBILITY_*` secrets generated
-and stored, counsel's review of the "no refunds" wording and the privacy/cookie wording, a named backup for
-manual duplicate-subscription review, Vercel Firewall rate-limit rules (section 6), approval to enable analytics,
-a restore point and an approved run of migration `0012`, and a separate launch authorisation. (The
-`somatic-prod` Vercel project's Preview configuration was fixed on 26 Oct 2026: Clerk and Sanity variables,
+**Not launch-ready.** Verified: see section 3.2. Outstanding release requirements:
+
+- **Untested paths** listed in section 3.3, above all a manual Sandbox checkout through the hosted page.
+- **Live-mode Stripe configuration** (none exists or has been touched): live Prices at **£5.99 per month** and
+  **£59.99 per year** with no trial and no Lifetime Price, a restricted live Billing Portal configuration like the
+  Sandbox one, a live webhook endpoint with its own signing secret, and a retry schedule that covers the 7-day grace.
+- **`TRIAL_ELIGIBILITY_*` production secrets**, generated separately from the test ones and stored safely.
+- **Duplicate-subscription manual review**: named owner and backup, an alerting mechanism and an approved
+  procedure (section 3.4).
+- **Counsel's review** of the "no refunds" wording and the privacy and cookie wording; **approval** to enable
+  analytics; **Vercel Firewall rate-limit rules** (section 6).
+- **A restore point and an approved run of migration `0012`** on the production database (separately authorised).
+- **A separate launch authorisation**, after which `REGULATION_SUITE_MEMBERSHIP_OPEN` is set for Production.
+  Until then production stays closed.
+
+(The `somatic-prod` Vercel project's Preview configuration was fixed on 26 Oct 2026: Clerk and Sanity variables,
 Next.js preset, `apps/web` root directory, and a separate Neon `Preview` branch for `DATABASE_URL`; its PR check
 passes.)
 
@@ -132,7 +198,7 @@ Clerk **development** instance, Stripe **test mode**, and a database that is not
 | Stripe test mode                     | `STRIPE_SECRET_KEY` (`sk_test_`)                                                                                                                                                                                                                                   | Server only.                                                                                                                                                                                       |
 | Stripe test mode                     | Two recurring GBP Prices, **no trial**: £5.99 per month, £59.99 per year. Set `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_ANNUAL`                                                                                                                                  | No Lifetime Price.                                                                                                                                                                                 |
 | Stripe test mode                     | Webhook endpoint `<test-origin>/api/webhooks/stripe` with events `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`; set `STRIPE_WEBHOOK_SECRET` (`whsec_`) | A Preview URL is behind Vercel deployment protection, so Stripe cannot reach it; use the Stripe CLI (`stripe listen --forward-to localhost:3000/api/webhooks/stripe`) against a local run instead. |
-| Stripe test mode                     | Billing Portal configuration: payment methods, invoice history, cancel at period end ON; plan switching and unsold products OFF. Set `STRIPE_PORTAL_CONFIGURATION_ID`                                                                                              | The default configuration has not been inspected.                                                                                                                                                  |
+| Stripe test mode                     | Billing Portal configuration: payment methods, invoice history, cancel at period end ON; plan switching, quantity changes, pausing, customer-information editing and unsold products OFF. Set `STRIPE_PORTAL_CONFIGURATION_ID`                                     | Sandbox configuration set and read back on 27 Oct 2026 (it is the Sandbox account's default configuration). **A separate live-mode configuration is still needed.**                                |
 | Test environment only                | `TRIAL_ELIGIBILITY_SECRET` (at least 32 chars; `openssl rand -base64 48`), `TRIAL_ELIGIBILITY_KEY_VERSION=1`                                                                                                                                                       | Use a **different** secret from production. Never reuse a test secret in production.                                                                                                               |
 | Test environment only                | `REGULATION_SUITE_MEMBERSHIP_OPEN=true`                                                                                                                                                                                                                            | Read at build time. Leave unset in Production.                                                                                                                                                     |
 | Vercel Firewall (Production project) | Add rate-limit rules (below)                                                                                                                                                                                                                                       | Currently no custom rules exist.                                                                                                                                                                   |
