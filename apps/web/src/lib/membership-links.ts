@@ -3,8 +3,10 @@
  *
  * Nothing here starts a trial or a payment. Both need an account, so the public
  * page sends a visitor to account creation and then straight to the membership
- * page (`/dashboard/billing`), where the server decides what is offered. This
- * only passes Clerk's standard `redirect_url`; the auth pages are untouched.
+ * page (`/dashboard/billing`), where the server decides what is offered. Links
+ * carry `redirect_url`; the sign-in and sign-up pages validate it against an
+ * allow-list (`parseAuthRedirect`) before giving it to Clerk, and fall back to
+ * `/dashboard` for anything else.
  */
 
 export const MEMBERSHIP_PAGE_PATH = '/dashboard/billing';
