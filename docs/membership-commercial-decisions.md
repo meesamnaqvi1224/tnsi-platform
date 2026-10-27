@@ -4,7 +4,7 @@
 business language, not engineering language — you should be able to read
 and answer it without understanding any code.
 
-**Status (updated 14 October 2026):** Section 0 is the current source of
+**Status (updated 27 October 2026):** Section 0 is the current source of
 truth: the owner-confirmed policy, what is implemented today, and what is
 planned but not yet built. Nothing is live — membership is closed, no real
 payment can happen, and no Stripe credentials are configured in the production
@@ -137,9 +137,12 @@ anywhere shared**. Membership remains closed. What exists:
 
 **How far this has been verified.** Logic and database behaviour (trial claims,
 concurrency, webhook ordering, Lifetime protection, outage rules) are tested
-against a real local PostgreSQL 17. Stripe and Clerk are **simulated**: nothing
-has been checked against live Stripe or Clerk, and no real payment has been
-made. That still has to be done in Stripe test mode (see 0.4).
+against a real local PostgreSQL 17. Until 27 October 2026 Stripe and Clerk were
+**simulated** in those tests. On 27 October a further local run used real Stripe
+**Sandbox** operations and a Clerk **development** instance (results and limits in
+0.5a and in `membership-release-runbook.md` section 3). The hosted Checkout page
+and `checkout.session.completed` have **not** been tested, no real payment has
+been made, and no production resource was touched.
 
 ### 0.2b Integration branch (24 October 2026)
 
@@ -164,7 +167,11 @@ collided). They were replaced by one regenerated migration, `0012`.
 
 - Review of the integration branch, and applying migration `0012` (which carries
   what the old `0010` and `0011` did) to production before any deploy.
-- Verification against real Stripe (test mode) and real Clerk accounts.
+- The verification still outstanding after the 27 October Sandbox run: the hosted
+  Checkout page, `checkout.session.completed`, success-page reconciliation, a
+  natural renewal cycle and the lapse at the end of a paid period (all **not
+  tested**), and the trial with an unverified primary email (**blocked** by
+  Clerk). See 0.5a.
 - A read-only check of production for legacy Lifetime rows (to be run, with
   approval, against an isolated copy).
 
@@ -175,7 +182,8 @@ Steps marked _planned_ are not yet done; the code for the rest is described in 0
 1. **Apply the database migration** before deploying the code: `0012` (adds
    `entitlements.payment_failed_at`, `practices.is_free`, the trial columns,
    `stripe_synced_at` and the `trial_claims` table with its two CHECK constraints;
-   purely additive; written, not yet applied anywhere shared).
+   purely additive; written, and applied only to disposable local databases, not
+   to anything shared or to production).
 2. **Stripe dashboard:** create the two recurring GBP Prices (£5.99/month,
    £59.99/year) with **no trial on either Price**; do **not** create a Lifetime
    Price; set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
@@ -188,7 +196,10 @@ Steps marked _planned_ are not yet done; the code for the rest is described in 0
    the free content is flagged would make it paid.
 4. **Test mode first:** trial with no card → trial expiry back to Free → a
    second trial attempt refused → explicit checkout → payment → payment failure
-   and grace → cancel _(planned)_.
+   and grace → cancel. _Partly done on 27 October 2026 (see 0.5a): the trial
+   claim and refusal, session creation, a substituted payment, failure and
+   grace, recovery and cancellation were exercised. Payment through the hosted
+   Checkout page is still to do._
 5. **Legacy Lifetime check:** confirm, read-only, that no legitimate Lifetime
    members exist, or identify them, before launch _(planned)_.
 6. **Launch:** set `REGULATION_SUITE_MEMBERSHIP_OPEN=true` in production and
@@ -231,38 +242,70 @@ committed version still describes the old Stripe-run trial.
 
 ### 0.5a Verification status and release blockers
 
-Kept deliberately separate so one is never mistaken for another. As of the date
-of the latest update to this section the branch is uncommitted and undeployed.
+Kept deliberately separate so one is never mistaken for another. Nothing is
+deployed. **The integration is not launch-ready**; production stays closed.
 
-| Statement                                                                                             | Owner-approved policy | Verified in code | Automated tests | Real PostgreSQL | Real Stripe/Clerk test service |
-| ----------------------------------------------------------------------------------------------------- | --------------------- | ---------------- | --------------- | --------------- | ------------------------------ |
-| £5.99/month, £59.99/year; no new Lifetime; existing Lifetime kept                                     | yes                   | yes              | yes             | yes             | no                             |
-| 30-day card-free app-managed trial; expiry returns to Free; no charge                                 | yes                   | yes              | yes             | yes             | no                             |
-| One trial per verified, normalised email; missing secret fails closed                                 | yes                   | yes              | yes             | yes             | no (Clerk email check pending) |
-| 7-day failed-payment grace; cancellation through paid-through date                                    | yes                   | yes              | yes             | partly          | no                             |
-| Stripe outage exception (max 7 days past a valid paid-through date, only after a real failed attempt) | yes                   | yes              | yes             | partly          | no                             |
-| One payable checkout per member; plan switch expires only the member's own unpaid, open session       | yes                   | yes              | yes             | yes             | no                             |
-| Completed checkout reconciled before a second purchase; return page verifies the session              | yes                   | yes              | yes             | yes             | no                             |
-| Duplicate live subscription: flagged, checkout paused, never auto-cancelled                           | yes                   | yes              | yes             | yes             | no                             |
-| 24-hour reconciliation lookback; ~30-minute abandoned-session expiry                                  | defaults only         | yes              | yes             | lookback only   | **no - to be confirmed**       |
+**What the 27 October 2026 run was.** A local run on one machine: the app from
+the integration branch with the launch gate open in that process only, a
+disposable local PostgreSQL 17 (migrations `0000`-`0012` applied), Stripe
+**Sandbox** (test-mode keys; Prices £5.99 per month and £59.99 per year, no
+trial), the Stripe CLI forwarding the five webhook events, and a Clerk
+**development** instance with throwaway users. **No production configuration was
+changed, and no production Stripe, Clerk or database resource was used.** The
+Sandbox customers and Clerk users created were deleted afterwards. Methods are
+labelled **live Sandbox** (a real Stripe operation producing a real signed
+webhook), **locally forged** (built by the test harness, not sent by Stripe) and
+**simulated** (a database or clock manipulation). Full table:
+`membership-release-runbook.md` section 3.
+
+| Statement                                                                                             | Owner-approved policy | Verified in code | Automated tests | Real PostgreSQL | Stripe Sandbox / Clerk development (27 Oct 2026)                                                                                                                                                                                                                                   |
+| ----------------------------------------------------------------------------------------------------- | --------------------- | ---------------- | --------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| £5.99/month, £59.99/year; no new Lifetime; existing Lifetime kept                                     | yes                   | yes              | yes             | yes             | Prices confirmed (live Sandbox read: monthly and annual, no trial). Lifetime refusal not re-run.                                                                                                                                                                                   |
+| 30-day card-free app-managed trial; expiry returns to Free; no charge                                 | yes                   | yes              | yes             | yes             | Yes (live Clerk): exactly 30 days, no Stripe object created, repeat claim refused.                                                                                                                                                                                                 |
+| One trial per verified, normalised email; missing secret fails closed                                 | yes                   | yes              | yes             | yes             | Partly. Live Clerk: repeat claim and a claim by a paid-plan account refused. Unverified primary email: **BLOCKED** (Clerk does not allow that state). Plus-tag, second-account and Clerk-failure cases not re-run.                                                                 |
+| 7-day failed-payment grace; cancellation through paid-through date                                    | yes                   | yes              | yes             | partly          | Partly. Live Sandbox: a failed renewal gave `past_due` and a grace ending exactly 7 days later; recovery; cancel at period end kept access. Grace expiry **simulated** (database). Lapse at the end of a paid period and a natural renewal **not tested**.                         |
+| Stripe outage exception (max 7 days past a valid paid-through date, only after a real failed attempt) | yes                   | yes              | yes             | partly          | No.                                                                                                                                                                                                                                                                                |
+| One payable checkout per member; plan switch expires only the member's own unpaid, open session       | yes                   | yes              | yes             | yes             | Partly. Live Sandbox: real Checkout Sessions created correctly, one per member. Plan-switch expiry and simultaneous requests not re-run.                                                                                                                                           |
+| Completed checkout reconciled before a second purchase; return page verifies the session              | yes                   | yes              | yes             | yes             | **No.** The hosted Checkout page, `checkout.session.completed` and success-page reconciliation were **not tested**; payment was substituted with an API-created subscription.                                                                                                      |
+| Duplicate live subscription: flagged, checkout paused, never auto-cancelled                           | yes                   | yes              | yes             | yes             | Yes (live Sandbox): flagged, entitlement unchanged, nothing cancelled or refunded, repeat checkout refused. Today this relies on a log line and a metadata flag only; owner, backup, alerting and an approved procedure are still required.                                        |
+| 24-hour reconciliation lookback; ~30-minute abandoned-session expiry                                  | defaults only         | yes              | yes             | lookback only   | Partly. Stripe accepted a 31-minute expiry; expiry itself, read-after-write behaviour and the lookback were not observed.                                                                                                                                                          |
+| Webhook signature checked first; replayed and out-of-order events converge on Stripe's current state  | yes                   | yes              | yes             | yes             | Yes. Six forged signatures rejected (**locally forged**); a real event body re-delivered 3 times and 8 at once left state identical, and an older event did not restore access (**locally forged re-delivery**). A Stripe-initiated resend was not tested.                         |
+| Entitlement follows Stripe (created, updated, deleted, payment failed)                                | yes                   | yes              | yes             | yes             | Yes (live Sandbox): 13 of 13 forwarded events returned 200 and synced; immediate cancellation ended access.                                                                                                                                                                        |
+| Billing Portal: payment methods, invoices, cancel at period end; no plan changes                      | yes                   | yes              | yes             | n/a             | Partly. Sandbox configuration read back (payment methods, invoices, cancel at period end on; plan switching, quantity, pausing and customer-information editing off) and a session created through the app. Portal screens not clicked through. No live-mode configuration exists. |
 
 **Outstanding assumptions and release blockers**
 
-- Live Stripe test-mode verification (procedure in the Stripe webhook README) and
-  live Clerk verification (verified primary email only; unverified or missing
-  email refused; normalisation as designed; a second account with the same
-  normalised email cannot get another trial) have not been done.
-- The ~30-minute abandoned-session expiry and read-after-write behaviour of
-  Stripe's session list are assumptions until confirmed in test mode.
+- **Not tested; do not treat as passed:** the hosted Checkout page; the
+  `checkout.session.completed` event from a hosted payment; success-page
+  reconciliation; a natural renewal cycle; the lapse at the end of a paid
+  period; grace expiry in real time (verified only as a database simulation);
+  a Stripe-initiated webhook resend; the interactive Billing Portal.
+- **Blocked:** the trial with an unverified primary email. Clerk refuses to
+  make an unverified address a primary email in the development instance, so
+  the account state cannot be created and the case is covered only by route
+  tests with a simulated provider.
+- **Duplicate-subscription manual review.** The behaviour is verified (flag,
+  never cancelled or refunded), but a flagged case reaches no one: it is one log
+  line and an entitlement metadata flag. Before launch it needs a **named owner
+  and backup**, an **alerting mechanism**, and an **approved procedure**
+  (runbook section 3.4).
+- **Live-mode Stripe configuration does not exist:** live Prices at £5.99 and
+  £59.99 (no trial, no Lifetime), a restricted live Billing Portal
+  configuration, a live webhook endpoint and signing secret, and production
+  `TRIAL_ELIGIBILITY_*` secrets. The Sandbox setup does not carry over.
 - Migration `0012` must be applied (by the migration runner, once) before
-  deploying; it must not be re-run by hand.
+  deploying; it must not be re-run by hand. It was applied only to disposable
+  local databases.
 - A read-only check for legacy Lifetime rows in production has not been run; it
   needs an approved isolated copy. Fields required: `tier`, `status`,
   `stripe_subscription_id`, `current_period_end` for rows with `tier = 'lifetime'`.
-- A named backup for duplicate-subscription review must be assigned.
 - `packages/db` has no test runner; its schema is covered by tests in `apps/web`
   and a migration check run against a throw-away database.
-- Nothing is approved for deployment. Membership stays closed.
+- Counsel's review of the "no refunds" wording and the privacy and cookie
+  wording, and a separate launch authorisation, are still required.
+- Nothing is approved for deployment. Membership stays closed. As of
+  27 October 2026 nothing from this verification work has been pushed, merged or
+  deployed.
 
 ### 0.6 Open questions
 
