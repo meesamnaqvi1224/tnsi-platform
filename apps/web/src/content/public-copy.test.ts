@@ -79,6 +79,10 @@ describe('claims withdrawn by owner decision (23 Oct 2026)', () => {
     ['"40+" source counts', /40\+ peer-reviewed/i],
     ['a longitudinal study', /longitudinal/i],
     [
+      'plan switching in the billing portal (not approved)',
+      /change your plan|switch (your )?plan/i,
+    ],
+    [
       '15 / 20 year biography durations',
       /fifteen years|twenty years|\b15 years|\b20\+ years|two decades/i,
     ],

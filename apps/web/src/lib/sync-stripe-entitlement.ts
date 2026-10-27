@@ -1,88 +1,123 @@
-import { db, entitlements, users } from '@tnsi/db';
-import { eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
+import { db, entitlements, type DB } from '@tnsi/db';
 import {
+  describeStripeFailure,
   getStripeClient,
   getStripeConfig,
   planForCheckoutSessionCompleted,
   planForInvoicePaymentFailed,
   planForSubscriptionEvent,
+  planForSubscriptionLifecycleEvent,
   type EntitlementSyncPlan,
+  type PaymentFailureUpdate,
 } from '@tnsi/integrations';
 import type Stripe from 'stripe';
 
-/** Entitlement states that count as a live membership. */
-const LIVE_STATUSES: ReadonlySet<string> = new Set(['active', 'trialing', 'past_due']);
-
 export interface SyncStripeEntitlementResult {
-  action: EntitlementSyncPlan['action'];
+  action: 'sync-subscription' | 'skip';
   detail: string;
 }
 
-/**
- * Extracts the plain values `packages/integrations`'s pure planners need
- * from a real Stripe event, builds the plan, then executes it — the
- * database write is the only side effect in this module; the decision of
- * *what* to write lives entirely in `@tnsi/integrations` (mirrors
- * apps/web/src/lib/sync-practice.ts's split for the Sanity webhook).
- *
- * Every branch below ends in a plain `UPDATE ... WHERE`, never an insert —
- * the `entitlements` row for a user always already exists (created on
- * `user.created`, see packages/auth/src/sync/user.ts's
- * `DEFAULT_ENTITLEMENTS`), so this only ever changes which values it
- * holds. That's what makes replaying the same Stripe event twice safe:
- * the second run just writes the same values again.
- */
-export async function syncStripeEvent(event: Stripe.Event): Promise<SyncStripeEntitlementResult> {
-  const { priceIds } = getStripeConfig();
+/** The one Stripe read this needs: a subscription's CURRENT state. Injectable so tests need no network. */
+export interface SubscriptionReader {
+  retrieveSubscription(subscriptionId: string): Promise<Stripe.Subscription>;
+}
 
+export type Executor = Parameters<Parameters<DB['transaction']>[0]>[0];
+type RunTransaction = <T>(fn: (trx: Executor) => Promise<T>) => Promise<T>;
+
+export interface SyncDeps {
+  reader: SubscriptionReader;
+  runTransaction?: RunTransaction;
+  now?: () => Date;
+}
+
+/** Webhook reads: patient (Stripe retries the delivery if this fails anyway). */
+export const webhookSubscriptionReader: SubscriptionReader = {
+  retrieveSubscription: (id) =>
+    getStripeClient().subscriptions.retrieve(id, undefined, {
+      timeout: 8000,
+      maxNetworkRetries: 1,
+    }),
+};
+
+/** Read-time reconciliation: a member is waiting, so fail fast - one attempt, short timeout. */
+export const readTimeSubscriptionReader: SubscriptionReader = {
+  retrieveSubscription: (id) =>
+    getStripeClient().subscriptions.retrieve(id, undefined, {
+      timeout: 4000,
+      maxNetworkRetries: 0,
+    }),
+};
+
+const defaultRun: RunTransaction = (fn) => db.transaction((trx) => fn(trx));
+
+/**
+ * Turns a verified Stripe event into entitlement changes.
+ *
+ * ## Why this is safe against duplicate, replayed and out-of-order delivery
+ * Stripe delivers at least once and in no guaranteed order, and an event's
+ * payload can already be stale on arrival. So the event is used ONLY to learn
+ * which subscription changed (see `refresh-subscription` in
+ * @tnsi/integrations). The subscription's CURRENT state is then read from
+ * Stripe - the source of truth - while this transaction holds the member's
+ * entitlement row lock (`SELECT ... FOR UPDATE`), and that state is what gets
+ * written. Consequently:
+ *  - a duplicate or replayed event rewrites the same values (idempotent);
+ *  - a stale event delivered late cannot overwrite newer state, because it never
+ *    contributes any state of its own;
+ *  - two events (or an event and a read-time refresh) for the same member are
+ *    serialised by the row lock, and each reads Stripe AFTER the previous one
+ *    committed, so the last writer always holds the newest state. No event
+ *    timestamp is used to order anything.
+ *
+ * A failure anywhere (Stripe unreachable, a database error) throws out of the
+ * transaction, which rolls back entirely; the route answers 500 and Stripe
+ * retries the delivery. Nothing is ever half-written.
+ */
+export async function syncStripeEvent(
+  event: Stripe.Event,
+  deps: SyncDeps = { reader: webhookSubscriptionReader },
+): Promise<SyncStripeEntitlementResult> {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
-      const priceId = await resolveCheckoutPriceId(session);
-      const plan = planForCheckoutSessionCompleted(
-        {
+      return applyPlan(
+        planForCheckoutSessionCompleted({
           mode: session.mode,
-          customerId: typeof session.customer === 'string' ? session.customer : null,
+          customerId: idOf(session.customer),
+          subscriptionId: idOf(session.subscription),
           userId: session.metadata?.userId ?? null,
-          paymentStatus: session.payment_status,
-          priceId,
-          sessionCreatedAt: toDate(session.created),
-        },
-        priceIds,
+        }),
+        deps,
       );
-      return applyPlan(plan);
     }
 
     case 'customer.subscription.created':
     case 'customer.subscription.updated':
     case 'customer.subscription.deleted': {
       const subscription = event.data.object as Stripe.Subscription;
-      const plan = planForSubscriptionEvent(
-        {
-          customerId: typeof subscription.customer === 'string' ? subscription.customer : null,
+      return applyPlan(
+        planForSubscriptionLifecycleEvent({
+          customerId: idOf(subscription.customer),
           subscriptionId: subscription.id,
-          status: subscription.status,
-          priceId: subscription.items.data[0]?.price?.id ?? null,
-          currentPeriodStart: toDate(subscription.current_period_start),
-          currentPeriodEnd: toDate(subscription.current_period_end),
-          cancelAtPeriodEnd: subscription.cancel_at_period_end,
-          canceledAt: toDate(subscription.canceled_at),
-        },
-        priceIds,
+          eventTime: new Date(event.created * 1000),
+          userId: subscription.metadata?.userId ?? null,
+        }),
+        deps,
       );
-      return applyPlan(plan);
     }
 
     case 'invoice.payment_failed': {
       const invoice = event.data.object as Stripe.Invoice;
-      const plan = planForInvoicePaymentFailed({
-        customerId: typeof invoice.customer === 'string' ? invoice.customer : null,
-        subscriptionId:
-          typeof invoice.subscription === 'string'
-            ? invoice.subscription
-            : (invoice.subscription?.id ?? null),
-      });
-      return applyPlan(plan);
+      return applyPlan(
+        planForInvoicePaymentFailed({
+          customerId: idOf(invoice.customer),
+          subscriptionId: idOf(invoice.subscription),
+          eventTime: new Date(event.created * 1000),
+        }),
+        deps,
+      );
     }
 
     default:
@@ -90,171 +125,246 @@ export async function syncStripeEvent(event: Stripe.Event): Promise<SyncStripeEn
   }
 }
 
+function idOf(value: string | { id: string } | null | undefined): string | null {
+  if (typeof value === 'string') return value;
+  return value?.id ?? null;
+}
+
 function toDate(unixSeconds: number | null | undefined): Date | null {
   return typeof unixSeconds === 'number' ? new Date(unixSeconds * 1000) : null;
 }
 
 /**
- * A `checkout.session.completed` webhook payload doesn't include line
- * items unless the Stripe webhook endpoint is specifically configured to
- * expand them. Only the one-time-payment (lifetime) path actually needs
- * the price id from this event — the subscription path gets its price
- * from the `customer.subscription.created` event instead, which always
- * carries it — so this only makes the extra Stripe API call when it's a
- * payment-mode session, never for every checkout completion.
+ * The grace-anchor write. `start` records the failure time only if none is
+ * recorded yet - `COALESCE` keeps the FIRST failure, so Stripe's repeated
+ * retries can never restart the 7-day grace clock. `clear` resets it once the
+ * subscription is healthy again; `keep` leaves it untouched. Stored as an ISO
+ * string cast to timestamptz so the value is identical whichever driver
+ * serialises it.
  */
-async function resolveCheckoutPriceId(session: Stripe.Checkout.Session): Promise<string | null> {
-  const inline = session.line_items?.data[0]?.price?.id;
-  if (inline) return inline;
-  if (session.mode !== 'payment') return null;
-
-  try {
-    const full = await getStripeClient().checkout.sessions.retrieve(session.id, {
-      expand: ['line_items'],
-    });
-    return full.line_items?.data[0]?.price?.id ?? null;
-  } catch (error) {
-    console.error('[stripe webhook] failed to retrieve checkout session line items:', error);
-    return null;
+function paymentFailedAtUpdate(update: PaymentFailureUpdate) {
+  switch (update.action) {
+    case 'start':
+      return {
+        paymentFailedAt: sql`COALESCE(${entitlements.paymentFailedAt}, ${update.at.toISOString()}::timestamptz)`,
+      };
+    case 'clear':
+      return { paymentFailedAt: null };
+    case 'keep':
+      return {};
   }
 }
 
-async function applyPlan(plan: EntitlementSyncPlan): Promise<SyncStripeEntitlementResult> {
+/** Subscription statuses in which Stripe still considers the subscription live (it may still bill or serve access). */
+const LIVE_STATUSES = new Set(['active', 'trialing', 'past_due', 'unpaid']);
+
+export type RefreshOutcome =
+  { status: 'synced'; detail: string } | { status: 'skipped'; detail: string };
+
+/**
+ * Reads one subscription from Stripe and applies its current state to the
+ * member's entitlement, inside one transaction holding the member's row lock.
+ * Used by the webhook (via `syncStripeEvent`) and by the read-time
+ * reconciliation, so both behave identically.
+ *
+ * Never writes a Lifetime row, never links a Stripe customer to the wrong
+ * member, never lets a second live subscription replace the first, and never
+ * guesses a tier for an unrecognised price.
+ *
+ * Throws (rolling everything back) if Stripe cannot be read, except for
+ * `resource_missing`, which is reported as a skip: that subscription does not
+ * exist at Stripe, and retrying will not change that.
+ */
+export async function refreshSubscription(
+  plan: Extract<EntitlementSyncPlan, { action: 'refresh-subscription' }>,
+  deps: SyncDeps,
+): Promise<RefreshOutcome> {
+  const run = deps.runTransaction ?? defaultRun;
+  return run((trx) => refreshSubscriptionInTransaction(trx, plan, deps));
+}
+
+/**
+ * The body of `refreshSubscription`, for a caller that ALREADY holds a
+ * transaction (and so the member's row lock) and must apply Stripe's current
+ * state inside it - e.g. checkout, which must not start a second payment while
+ * an earlier one has completed but not yet been recorded. Taking the lock again
+ * in the same transaction is a no-op, so nothing can deadlock against itself.
+ */
+export async function refreshSubscriptionInTransaction(
+  trx: Executor,
+  plan: Extract<EntitlementSyncPlan, { action: 'refresh-subscription' }>,
+  deps: Pick<SyncDeps, 'reader' | 'now'>,
+): Promise<RefreshOutcome> {
+  const now = deps.now ?? (() => new Date());
+  const { priceIds } = getStripeConfig();
+
+  return (async (): Promise<RefreshOutcome> => {
+    // 1. Find and LOCK the member's row. By Stripe customer first.
+    let [row] = await trx
+      .select()
+      .from(entitlements)
+      .where(eq(entitlements.stripeCustomerId, plan.stripeCustomerId))
+      .limit(1)
+      .for('update');
+
+    let linking = false;
+    if (!row && plan.userId) {
+      // Not linked yet (the event raced the checkout). The checkout metadata we
+      // set server-side names the member - but only link a member who has no
+      // Stripe customer yet; never move a member between customers.
+      const [candidate] = await trx
+        .select()
+        .from(entitlements)
+        .where(eq(entitlements.userId, plan.userId))
+        .limit(1)
+        .for('update');
+      if (candidate) {
+        if (candidate.stripeCustomerId && candidate.stripeCustomerId !== plan.stripeCustomerId) {
+          return {
+            status: 'skipped',
+            detail: 'member is already linked to a different Stripe customer',
+          };
+        }
+        row = candidate;
+        linking = true;
+      }
+    }
+    if (!row) {
+      return {
+        status: 'skipped',
+        detail: `no entitlement row is linked to Stripe customer ${plan.stripeCustomerId}`,
+      };
+    }
+
+    // 2. A legacy Lifetime membership is never touched by subscription sync.
+    if (row.tier === 'lifetime') {
+      return {
+        status: 'skipped',
+        detail: 'lifetime membership is protected from subscription sync',
+      };
+    }
+
+    // 3. Stripe's CURRENT state, read while holding the lock.
+    let subscription: Stripe.Subscription;
+    try {
+      subscription = await deps.reader.retrieveSubscription(plan.subscriptionId);
+    } catch (error) {
+      if ((error as { code?: unknown } | null)?.code === 'resource_missing') {
+        return { status: 'skipped', detail: 'subscription not found at Stripe' };
+      }
+      throw error;
+    }
+    if (idOf(subscription.customer) !== plan.stripeCustomerId) {
+      return { status: 'skipped', detail: 'subscription does not belong to that Stripe customer' };
+    }
+
+    // 4. A second live subscription must not replace the first.
+    if (row.stripeSubscriptionId && row.stripeSubscriptionId !== subscription.id) {
+      const existingIsLive = await isLiveAtStripe(row.stripeSubscriptionId, deps.reader);
+      if (existingIsLive) {
+        await trx
+          .update(entitlements)
+          .set({
+            metadata: sql`jsonb_set(COALESCE(${entitlements.metadata}, '{}'::jsonb), '{duplicateStripeSubscriptions}', COALESCE(${entitlements.metadata}->'duplicateStripeSubscriptions', '[]'::jsonb) || to_jsonb(${subscription.id}::text), true)`,
+            updatedAt: now(),
+          })
+          .where(eq(entitlements.userId, row.userId));
+        console.warn('[Stripe sync] duplicate live subscription ignored; manual review needed', {
+          duplicate: subscription.id,
+          existing: row.stripeSubscriptionId,
+        });
+        return {
+          status: 'skipped',
+          detail: 'a different live subscription already backs this membership',
+        };
+      }
+    }
+
+    // 5. Map the authoritative state to the row.
+    const mapped = planForSubscriptionEvent(
+      {
+        customerId: plan.stripeCustomerId,
+        subscriptionId: subscription.id,
+        status: subscription.status,
+        priceId: subscription.items.data[0]?.price?.id ?? null,
+        currentPeriodStart: toDate(subscription.current_period_start),
+        currentPeriodEnd: toDate(subscription.current_period_end),
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        canceledAt: toDate(subscription.canceled_at),
+        // Stripe's own time for the triggering event; with no triggering event
+        // (a read-time refresh) the only reliable time is when we observed it.
+        eventTime: plan.eventTime ?? now(),
+      },
+      priceIds,
+    );
+    if (mapped.action !== 'sync-subscription') {
+      return {
+        status: 'skipped',
+        detail: mapped.action === 'skip' ? mapped.reason : 'not applicable',
+      };
+    }
+
+    // 6. Write.
+    await trx
+      .update(entitlements)
+      .set({
+        ...(linking ? { stripeCustomerId: plan.stripeCustomerId } : {}),
+        tier: mapped.values.tier,
+        status: mapped.values.status,
+        stripeSubscriptionId: mapped.values.stripeSubscriptionId,
+        currentPeriodStart: mapped.values.currentPeriodStart,
+        currentPeriodEnd: mapped.values.currentPeriodEnd,
+        cancelAtPeriodEnd: mapped.values.cancelAtPeriodEnd,
+        canceledAt: mapped.values.canceledAt,
+        ...paymentFailedAtUpdate(mapped.values.paymentFailure),
+        stripeSyncedAt: now(),
+        updatedAt: now(),
+      })
+      .where(and(eq(entitlements.userId, row.userId)));
+
+    return {
+      status: 'synced',
+      detail: `synced subscription for customer ${plan.stripeCustomerId}`,
+    };
+  })();
+}
+
+async function isLiveAtStripe(
+  subscriptionId: string,
+  reader: SubscriptionReader,
+): Promise<boolean> {
+  try {
+    const existing = await reader.retrieveSubscription(subscriptionId);
+    return LIVE_STATUSES.has(existing.status);
+  } catch (error) {
+    // Cannot tell whether the existing subscription is live. Assume it is: never
+    // replace a possibly-live subscription on an unconfirmed answer. A missing
+    // subscription, though, is definitely not live.
+    return (error as { code?: unknown } | null)?.code !== 'resource_missing';
+  }
+}
+
+async function applyPlan(
+  plan: EntitlementSyncPlan,
+  deps: SyncDeps,
+): Promise<SyncStripeEntitlementResult> {
   switch (plan.action) {
     case 'skip':
       return { action: 'skip', detail: plan.reason };
 
-    case 'link-customer': {
-      const user = await db.select().from(users).where(eq(users.id, plan.userId)).limit(1);
-      if (!user[0]) {
-        return { action: 'skip', detail: `checkout session userId ${plan.userId} does not exist` };
-      }
-      await db
-        .update(entitlements)
-        .set({ stripeCustomerId: plan.stripeCustomerId, updatedAt: new Date() })
-        .where(eq(entitlements.userId, plan.userId));
-      return { action: 'link-customer', detail: `linked customer ${plan.stripeCustomerId}` };
-    }
-
-    case 'grant-lifetime': {
-      const user = await db.select().from(users).where(eq(users.id, plan.userId)).limit(1);
-      if (!user[0]) {
-        return { action: 'skip', detail: `checkout session userId ${plan.userId} does not exist` };
-      }
-      await db
-        .update(entitlements)
-        .set({
-          tier: 'lifetime',
-          status: 'active',
-          stripeCustomerId: plan.stripeCustomerId,
-          stripeSubscriptionId: null,
-          currentPeriodStart: null,
-          currentPeriodEnd: null,
-          cancelAtPeriodEnd: false,
-          canceledAt: null,
-          updatedAt: new Date(),
-        })
-        .where(eq(entitlements.userId, plan.userId));
-      return { action: 'grant-lifetime', detail: `granted lifetime to user ${plan.userId}` };
-    }
-
-    case 'sync-subscription': {
-      const current = await db
-        .select({
-          tier: entitlements.tier,
-          status: entitlements.status,
-          stripeSubscriptionId: entitlements.stripeSubscriptionId,
-        })
-        .from(entitlements)
-        .where(eq(entitlements.stripeCustomerId, plan.stripeCustomerId))
-        .limit(1);
-
-      // A legitimate legacy Lifetime entitlement is never overwritten or revoked
-      // by subscription events.
-      if (current[0]?.tier === 'lifetime') {
-        return {
-          action: 'skip',
-          detail: `legacy Lifetime entitlement preserved for customer ${plan.stripeCustomerId}`,
-        };
-      }
-
-      // A second, different live subscription must not take over the entitlement.
-      // It is left for manual review (never cancelled or refunded automatically).
-      const incomingLive = LIVE_STATUSES.has(plan.values.status);
-      const currentLive = current[0] ? LIVE_STATUSES.has(current[0].status) : false;
-      if (
-        current[0]?.stripeSubscriptionId &&
-        current[0].stripeSubscriptionId !== plan.values.stripeSubscriptionId &&
-        currentLive &&
-        incomingLive
-      ) {
-        console.warn('[stripe webhook] DUPLICATE_SUBSCRIPTION_REVIEW', {
-          customer: plan.stripeCustomerId,
-          existing: current[0].stripeSubscriptionId,
-          incoming: plan.values.stripeSubscriptionId,
-        });
-        return {
-          action: 'skip',
-          detail: `second live subscription for customer ${plan.stripeCustomerId} flagged for manual review`,
-        };
-      }
-
-      const result = await db
-        .update(entitlements)
-        .set({
-          tier: plan.values.tier,
-          status: plan.values.status,
-          stripeSubscriptionId: plan.values.stripeSubscriptionId,
-          currentPeriodStart: plan.values.currentPeriodStart,
-          currentPeriodEnd: plan.values.currentPeriodEnd,
-          cancelAtPeriodEnd: plan.values.cancelAtPeriodEnd,
-          canceledAt: plan.values.canceledAt,
-          updatedAt: new Date(),
-        })
-        .where(eq(entitlements.stripeCustomerId, plan.stripeCustomerId))
-        .returning({ userId: entitlements.userId });
-
-      if (result.length === 0) {
-        return {
-          action: 'skip',
-          detail: `no entitlement row is linked to Stripe customer ${plan.stripeCustomerId}`,
-        };
-      }
+    case 'refresh-subscription': {
+      const outcome = await refreshSubscription(plan, deps);
       return {
-        action: 'sync-subscription',
-        detail: `synced subscription for customer ${plan.stripeCustomerId}`,
+        action: outcome.status === 'synced' ? 'sync-subscription' : 'skip',
+        detail: outcome.detail,
       };
     }
 
-    case 'mark-past-due': {
-      const lifetime = await db
-        .select({ tier: entitlements.tier })
-        .from(entitlements)
-        .where(eq(entitlements.stripeCustomerId, plan.stripeCustomerId))
-        .limit(1);
-      if (lifetime[0]?.tier === 'lifetime') {
-        return {
-          action: 'skip',
-          detail: `legacy Lifetime entitlement preserved for customer ${plan.stripeCustomerId}`,
-        };
-      }
-
-      const result = await db
-        .update(entitlements)
-        .set({ status: 'past_due', updatedAt: new Date() })
-        .where(eq(entitlements.stripeCustomerId, plan.stripeCustomerId))
-        .returning({ userId: entitlements.userId });
-
-      if (result.length === 0) {
-        return {
-          action: 'skip',
-          detail: `no entitlement row is linked to Stripe customer ${plan.stripeCustomerId}`,
-        };
-      }
-      return {
-        action: 'mark-past-due',
-        detail: `marked customer ${plan.stripeCustomerId} past due`,
-      };
-    }
+    case 'sync-subscription':
+      // Produced only by `planForSubscriptionEvent`, which this module calls
+      // itself on authoritative state; an event never yields one directly.
+      return { action: 'skip', detail: 'unexpected plan' };
   }
 }
+
+export { describeStripeFailure };

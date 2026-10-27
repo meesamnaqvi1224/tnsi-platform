@@ -1,70 +1,106 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { NextRequest } from 'next/server';
 
 /**
- * The Stripe webhook only acts on events whose signature verifies. An unsigned,
- * badly signed or unconfigured request must never reach entitlement sync.
+ * The webhook route's own behaviour: nothing is processed unless the signature
+ * verifies, failures answer 500 so Stripe retries, and logs never carry raw
+ * error objects. Signature verification itself is tested with the real Stripe
+ * SDK in @tnsi/integrations (verify.test.ts); the sync logic in
+ * sync-stripe-entitlement tests and the PostgreSQL integration tests.
  */
-const verify = vi.fn();
-vi.mock('@tnsi/integrations', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@tnsi/integrations')>();
-  return { ...actual, verifyStripeWebhookEvent: (...a: unknown[]) => verify(...a) };
-});
 
+class ConfigError extends Error {}
+class VerificationError extends Error {}
+
+const verify = vi.fn();
 const syncStripeEvent = vi.fn();
+
+vi.mock('@tnsi/integrations', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tnsi/integrations')>()),
+  StripeConfigError: ConfigError,
+  StripeWebhookVerificationError: VerificationError,
+  verifyStripeWebhookEvent: (...args: unknown[]) => verify(...args),
+}));
 vi.mock('@/lib/sync-stripe-entitlement', () => ({
-  syncStripeEvent: (...a: unknown[]) => syncStripeEvent(...a),
+  syncStripeEvent: (...args: unknown[]) => syncStripeEvent(...args),
 }));
 
 const { POST } = await import('./route');
-const { StripeConfigError, StripeWebhookVerificationError } = await import('@tnsi/integrations');
 
-function request(signature: string | null) {
-  return new Request('http://x/api/webhooks/stripe', {
+const post = (body = '{"id":"evt_1"}', signature: string | null = 't=1,v1=abc') =>
+  new NextRequest('http://x/api/webhooks/stripe', {
     method: 'POST',
+    body,
     headers: signature ? { 'stripe-signature': signature } : {},
-    body: '{"id":"evt_placeholder"}',
-  }) as never;
-}
+  });
 
+let logged: string[];
 beforeEach(() => {
   verify.mockReset();
   syncStripeEvent.mockReset();
-  syncStripeEvent.mockResolvedValue({ action: 'skip' });
+  logged = [];
+  for (const level of ['error', 'warn', 'info', 'log'] as const) {
+    vi.spyOn(console, level).mockImplementation((...args: unknown[]) => {
+      logged.push(JSON.stringify(args));
+    });
+  }
 });
 
 describe('POST /api/webhooks/stripe', () => {
-  it('rejects a request whose signature does not verify, without syncing anything', async () => {
+  it('rejects an unverifiable request (400) and never looks at its contents', async () => {
     verify.mockImplementation(() => {
-      throw new StripeWebhookVerificationError('bad signature');
+      throw new VerificationError('No signatures found');
     });
-    const response = await POST(request('t=1,v1=bad'));
-    expect(response.status).toBe(400);
+    const res = await POST(post('{"type":"checkout.session.completed","evil":true}'));
+    expect(res.status).toBe(400);
     expect(syncStripeEvent).not.toHaveBeenCalled();
   });
 
-  it('rejects a request with no signature header', async () => {
+  it('passes the RAW body and the signature header to verification', async () => {
+    verify.mockReturnValue({ id: 'evt_1', type: 'x' });
+    syncStripeEvent.mockResolvedValue({ action: 'skip', detail: 'ok' });
+    await POST(post('{"raw":  "body"}', 't=1,v1=sig'));
+    expect(verify).toHaveBeenCalledWith('{"raw":  "body"}', 't=1,v1=sig');
+  });
+
+  it('answers 500 when the webhook is not configured, processing nothing', async () => {
     verify.mockImplementation(() => {
-      throw new StripeWebhookVerificationError('missing signature');
+      throw new ConfigError('not configured');
     });
-    const response = await POST(request(null));
-    expect(response.status).toBe(400);
+    expect((await POST(post())).status).toBe(500);
     expect(syncStripeEvent).not.toHaveBeenCalled();
   });
 
-  it('fails closed, revealing nothing, when the webhook secret is not configured', async () => {
-    verify.mockImplementation(() => {
-      throw new StripeConfigError('set STRIPE_WEBHOOK_SECRET');
-    });
-    const response = await POST(request('t=1,v1=x'));
-    expect(response.status).toBe(500);
-    expect(JSON.stringify(await response.json())).not.toMatch(/STRIPE_|whsec_/);
-    expect(syncStripeEvent).not.toHaveBeenCalled();
+  it('processes a verified event and acknowledges it', async () => {
+    const event = { id: 'evt_1', type: 'customer.subscription.updated' };
+    verify.mockReturnValue(event);
+    syncStripeEvent.mockResolvedValue({ action: 'sync-subscription', detail: 'synced' });
+    const res = await POST(post());
+    expect(res.status).toBe(200);
+    expect(syncStripeEvent).toHaveBeenCalledWith(event);
+    expect(await res.json()).toMatchObject({ received: true, action: 'sync-subscription' });
   });
 
-  it('syncs only an event that verified', async () => {
-    verify.mockReturnValue({ id: 'evt_placeholder', type: 'customer.subscription.updated' });
-    const response = await POST(request('t=1,v1=good'));
-    expect(response.status).toBe(200);
-    expect(syncStripeEvent).toHaveBeenCalledTimes(1);
+  it('answers 500 when processing fails, so Stripe redelivers (retry and recovery)', async () => {
+    verify.mockReturnValue({ id: 'evt_1', type: 'customer.subscription.updated' });
+    syncStripeEvent.mockRejectedValueOnce(new Error('database unavailable'));
+    expect((await POST(post())).status).toBe(500);
+
+    syncStripeEvent.mockResolvedValueOnce({ action: 'sync-subscription', detail: 'synced' });
+    expect((await POST(post())).status).toBe(200); // the redelivery succeeds
+  });
+
+  it('never logs a raw error: only its class, code, status and request id', async () => {
+    verify.mockReturnValue({ id: 'evt_1', type: 'customer.subscription.updated' });
+    syncStripeEvent.mockRejectedValue(
+      Object.assign(new Error('failed query: update ... params: cus_secret, member@example.com'), {
+        code: '57P01',
+      }),
+    );
+    await POST(post());
+    const text = logged.join('\n');
+    expect(text).toContain('57P01');
+    expect(text).not.toContain('cus_secret');
+    expect(text).not.toContain('member@example.com');
   });
 });

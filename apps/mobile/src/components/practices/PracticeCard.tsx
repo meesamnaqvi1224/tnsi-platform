@@ -21,6 +21,9 @@ export function PracticeCard({ practice }: PracticeCardProps) {
   const title = practice.title.trim();
   const meta = [capitalize(practice.contentType)];
   if (practice.durationSeconds) meta.push(formatDuration(practice.durationSeconds));
+  // Decided by the server (see Practice.locked): a paid-library practice the
+  // member can't open yet. Still tappable - the detail screen explains.
+  const locked = practice.locked === true;
 
   return (
     // The save toggle is a sibling of this Pressable, not nested inside it -
@@ -32,7 +35,7 @@ export function PracticeCard({ practice }: PracticeCardProps) {
       <Pressable
         onPress={() => router.push({ pathname: '/practices/[id]', params: { id: practice.id } })}
         accessibilityRole="button"
-        accessibilityLabel={`${title}, ${meta.join(', ')}`}
+        accessibilityLabel={`${title}, ${meta.join(', ')}${locked ? ', members only' : ''}`}
         style={({ pressed }) => pressed && styles.pressed}
       >
         <Card style={styles.card}>
@@ -59,7 +62,11 @@ export function PracticeCard({ practice }: PracticeCardProps) {
             <ThemedText variant="caption" color={colors.charcoal}>
               {meta.join(' · ')}
             </ThemedText>
-            {practice.category ? (
+            {locked ? (
+              <ThemedText variant="caption" color={colors.bronze}>
+                Members
+              </ThemedText>
+            ) : practice.category ? (
               <ThemedText variant="caption" color={colors.bronze}>
                 {practice.category}
               </ThemedText>
@@ -67,11 +74,13 @@ export function PracticeCard({ practice }: PracticeCardProps) {
           </View>
         </Card>
       </Pressable>
-      <SaveToggleButton
-        practiceId={practice.id}
-        initialSaved={practice.saved ?? false}
-        style={styles.saveButton}
-      />
+      {locked ? null : (
+        <SaveToggleButton
+          practiceId={practice.id}
+          initialSaved={practice.saved ?? false}
+          style={styles.saveButton}
+        />
+      )}
     </View>
   );
 }

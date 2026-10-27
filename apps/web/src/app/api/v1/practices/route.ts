@@ -11,6 +11,7 @@ import { db, practices, practiceCompletions, practiceSaves } from '@tnsi/db';
 import { eq, and, inArray, desc } from 'drizzle-orm';
 import { practiceContentType } from '@/lib/validation';
 import { success, badRequest } from '@/lib/api-response';
+import { contentAccessFor, withPracticeAccess } from '@/lib/membership';
 
 export const runtime = 'nodejs';
 
@@ -21,6 +22,11 @@ export async function GET(request: Request) {
   } catch (err) {
     return memberAccessErrorResponse(err);
   }
+
+  // Paid practices keep their title/description/thumbnail so the library can
+  // show what membership includes, but the server withholds `mediaUrl` (and
+  // the raw CMS document that also contains it) and marks them `locked`.
+  const access = contentAccessFor(user.entitlements);
 
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');
@@ -91,7 +97,7 @@ export async function GET(request: Request) {
   const practicesWithProgress = practiceList.map((practice) => {
     const completion = completionsMap.get(practice.id);
     return {
-      ...practice,
+      ...withPracticeAccess(practice, access),
       saved: savedIds.has(practice.id),
       progress: completion
         ? {

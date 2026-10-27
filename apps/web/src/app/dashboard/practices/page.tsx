@@ -18,6 +18,7 @@ import {
 } from '@tnsi/ui';
 import { SaveToggleButton } from '@/components/dashboard/save-toggle-button';
 import { requireMemberAccessOrRedirect } from '@/lib/auth-api';
+import { contentAccessFor } from '@/lib/membership';
 import {
   formatContentTypeLabel,
   formatPracticeDuration,
@@ -155,6 +156,7 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
     q: qParam,
   } = await searchParams;
   const allPractices = await getPublishedPractices();
+  const access = contentAccessFor(user.entitlements);
   const q = (qParam ?? '').trim().toLowerCase();
 
   // Filter option lists are derived from the real, currently-published
@@ -344,6 +346,7 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                 ) : (
                   <Grid cols="2" gap="lg">
                     {practiceList.map(({ practice, completion, saved }) => {
+                      const locked = !access.canOpen(practice);
                       const statusLabel = completion?.completed
                         ? 'Completed'
                         : completion && completion.progressPct > 0
@@ -370,6 +373,7 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                                 <Badge variant="outline">
                                   {formatContentTypeLabel(practice.contentType)}
                                 </Badge>
+                                {locked ? <Badge variant="secondary">Members</Badge> : null}
                                 {statusLabel ? (
                                   <Badge
                                     role="status"
@@ -380,7 +384,9 @@ export default async function PracticeLibraryPage({ searchParams }: PracticeLibr
                                   </Badge>
                                 ) : null}
                               </Stack>
-                              <SaveToggleButton practiceId={practice.id} initialSaved={saved} />
+                              {locked ? null : (
+                                <SaveToggleButton practiceId={practice.id} initialSaved={saved} />
+                              )}
                             </Stack>
                             <NextLink
                               href={`/dashboard/practices/${practice.id}`}

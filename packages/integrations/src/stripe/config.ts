@@ -27,7 +27,6 @@ function readPriceIds(): Record<PurchasableTier, string | undefined> {
   return {
     monthly: process.env.STRIPE_PRICE_ID_MONTHLY || undefined,
     annual: process.env.STRIPE_PRICE_ID_ANNUAL || undefined,
-    lifetime: process.env.STRIPE_PRICE_ID_LIFETIME || undefined,
   };
 }
 
@@ -49,10 +48,15 @@ export function getStripeConfig(): StripeConfig {
 }
 
 /**
- * Whether billing is fully configured for the approved plans: the secret key,
- * the webhook secret, and a Price for BOTH the monthly and annual plan. Reports
- * only yes/no - it never returns or logs a value. A missing piece means no
- * checkout may be offered.
+ * True only when everything a Regulation Suite™ self-serve checkout needs
+ * is configured: the Stripe secret key, the webhook signing secret (without
+ * which a successful payment could never grant access), and BOTH approved
+ * subscription Prices (monthly + annual). There is no Lifetime Price: Lifetime is
+ * closed to new purchases and no environment variable for it is read.
+ *
+ * Used to keep membership closed (no checkout buttons, no content locking)
+ * until billing is genuinely ready, rather than exposing a checkout that
+ * would fail. Reads the environment only; never throws.
  */
 export function isMembershipCheckoutConfigured(): boolean {
   const { secretKey, webhookSecret, priceIds } = getStripeConfig();
@@ -63,8 +67,9 @@ export function isMembershipCheckoutConfigured(): boolean {
  * Whether Regulation Suite membership is open for purchase: deliberately
  * launched (`REGULATION_SUITE_MEMBERSHIP_OPEN` is exactly the string "true" -
  * unset, empty, "TRUE", "1", " true" and anything else are closed) AND billing
- * fully configured. This is the single definition; `createCheckoutSession`
- * enforces it itself, so no caller can start a purchase while it is closed.
+ * fully configured. This is the single definition: the web app's `isMembershipOpen`
+ * re-exports it, and `createCheckoutSession` enforces it itself, so no caller can
+ * start a purchase while it is closed.
  */
 export function isMembershipOpen(): boolean {
   return (

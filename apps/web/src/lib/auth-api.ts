@@ -13,10 +13,16 @@ import {
 import { EntitlementRequiredError } from '@tnsi/auth/errors/auth';
 import { extractBearerToken, verifyToken } from '@tnsi/auth/verify/jwt';
 import { userSyncOps } from './user-sync-ops';
+import { reconcileMembership } from './reconcile-subscription';
 import { unauthorized, forbidden } from './api-response';
 
 export interface AuthUser extends User {
-  entitlements: Entitlement | null;
+  /**
+   * The member's entitlement row. `stripeUnreachable` is never stored: it is set
+   * on this copy only when a read-time refresh from Stripe was attempted and
+   * Stripe was genuinely unavailable (see `reconcileMembership`).
+   */
+  entitlements: (Entitlement & { stripeUnreachable?: boolean }) | null;
 }
 
 /**
@@ -82,9 +88,30 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     .where(eq(entitlements.userId, dbUser[0].id))
     .limit(1);
 
+  let entitlement: (Entitlement & { stripeUnreachable?: boolean }) | null =
+    userEntitlements[0] ?? null;
+
+  // A Stripe-backed membership whose paid period has ended but whose renewal is
+  // unconfirmed (a delayed webhook) is refreshed from Stripe BEFORE any access
+  // decision is made from it. Stripe's answer decides; only a genuine outage
+  // lets access be held, and only within the bounds in `resolveMembership`.
+  if (entitlement) {
+    const outcome = await reconcileMembership({ userId: dbUser[0].id, record: entitlement });
+    if (outcome.status === 'refreshed') {
+      const [fresh] = await db
+        .select()
+        .from(entitlements)
+        .where(eq(entitlements.userId, dbUser[0].id))
+        .limit(1);
+      entitlement = fresh ?? entitlement;
+    } else if (outcome.status === 'unreachable') {
+      entitlement = { ...entitlement, stripeUnreachable: true };
+    }
+  }
+
   return {
     ...dbUser[0],
-    entitlements: userEntitlements[0] ?? null,
+    entitlements: entitlement,
   };
 }
 
@@ -151,9 +178,9 @@ export async function requireEntitlement(requirement: EntitlementRequirement): P
 }
 
 /**
- * The single authoritative "does this authenticated user currently have
- * member access?" check (Today, Practices, Practice Detail, Saved
- * Practices, Practice History, My Journey, Daily Check-In) — Membership &
+ * The single authoritative "does this authenticated user have a member
+ * account?" check (Today, Practices, Practice Detail, Saved Practices,
+ * Practice History, My Journey, Daily Check-In) — Membership &
  * Entitlements v1. Every member-facing API route and dashboard page
  * should call this (or `requireMemberAccessOrRedirect` below for pages)
  * instead of independently re-implementing a membership check; that's
@@ -162,20 +189,16 @@ export async function requireEntitlement(requirement: EntitlementRequirement): P
  *
  * Same throw contract as `requireAuth()`: plain `Error('UNAUTHENTICATED')`
  * when there's no session (→ 401 via `memberAccessErrorResponse` below),
- * `EntitlementRequiredError` when the session is valid but the entitlement
- * isn't active/trialing (→ 403). The actual decision is
- * `assertMemberAccess` (`@tnsi/auth`), pure and unit-tested independently
- * of any database or Clerk call.
+ * `EntitlementRequiredError` when the session is valid but the user has no
+ * entitlement row at all (→ 403).
  *
- * Today this denies no existing user: every entitlement row defaults to
- * `status: 'active'` on account creation (`packages/auth/src/sync/user.ts`),
- * and nothing currently transitions a row away from that — the Stripe
- * sync that could exists but is unconfigured (no real
- * `STRIPE_SECRET_KEY`/price ids yet, see `packages/integrations/src/stripe`).
- * Wiring this in now, ahead of that integration, is exactly the point:
- * when a future billing integration starts marking real users
- * inactive/canceled/expired, every route already calling this function
- * enforces that correctly with no further route-level changes.
+ * Approved model: Free account → Paid membership → Membership ends → Free
+ * account. A user whose paid membership has ended (cancelled and the period
+ * over, expired, unpaid past the 7-day grace period) still has their free
+ * account, so they pass this check; what they lose is PAID access, which
+ * `contentAccessFor` / `resolveMembership` decide per piece of content.
+ * The actual decision is `assertMemberAccess` (`@tnsi/auth`), pure and
+ * unit-tested independently of any database or Clerk call.
  */
 export async function requireMemberAccess(): Promise<AuthUser> {
   const user = await requireAuth();
@@ -185,12 +208,11 @@ export async function requireMemberAccess(): Promise<AuthUser> {
 
 /**
  * Page-only variant of `requireMemberAccess()`, mirroring
- * `requireAuthOrRedirect`'s redirect-instead-of-throw shape. No dedicated
- * "membership required" page exists yet (nothing today can actually reach
- * that branch — see `requireMemberAccess`'s own comment), so a denial
- * redirects to `/dashboard/billing`, the existing account/billing page,
- * as a reasonable provisional destination; this should be revisited once
- * that state is actually reachable.
+ * `requireAuthOrRedirect`'s redirect-instead-of-throw shape. The only
+ * denial is a signed-in user with no entitlement row at all, which is sent
+ * to `/dashboard/billing` — a page that needs authentication only, so this
+ * can never redirect back on itself. An ended paid membership is NOT a
+ * denial: that user keeps the free account and stays where they are.
  */
 export async function requireMemberAccessOrRedirect(): Promise<AuthUser> {
   try {

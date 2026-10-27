@@ -201,7 +201,8 @@ export const POWER_DROPS_LIST_API_QUERY = groq`
       description,
       cardImage ${imageProjection},
       focus,
-      featured
+      featured,
+      "isFree": coalesce(freeAccess, false)
     },
     "total": count(*[
       _type == "powerDrop" && defined(slug.current) && status == "published"
@@ -224,7 +225,8 @@ export const POWER_DROP_API_BY_SLUG_QUERY = groq`
     focus,
     instructions,
     anchorStatement,
-    featured
+    featured,
+    "isFree": coalesce(freeAccess, false)
   }
 `;
 

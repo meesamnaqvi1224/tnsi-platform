@@ -1,5 +1,6 @@
 import { SignUp } from '@clerk/nextjs';
 import { Metadata } from 'next';
+import { parseAuthRedirect, signInUrlFor } from '@/lib/auth-redirect';
 
 export const metadata: Metadata = {
   title: 'Sign Up — The Nervous System Institute',
@@ -9,7 +10,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-export default function SignUpPage() {
+interface SignUpPageProps {
+  searchParams: Promise<{ redirect_url?: string | string[] }>;
+}
+
+export default async function SignUpPage({ searchParams }: SignUpPageProps) {
+  // A validated membership destination (see `parseAuthRedirect`), or undefined.
+  // Passed to Clerk explicitly because the component was not honouring the query
+  // value itself; with none, behaviour is exactly what it was.
+  const destination = parseAuthRedirect((await searchParams).redirect_url);
+
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
@@ -21,8 +31,9 @@ export default function SignUpPage() {
             },
           }}
           routing="hash"
-          signInUrl="/sign-in"
+          signInUrl={signInUrlFor(destination)}
           fallbackRedirectUrl="/dashboard"
+          forceRedirectUrl={destination}
         />
       </div>
     </main>

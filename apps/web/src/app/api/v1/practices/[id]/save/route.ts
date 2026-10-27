@@ -11,7 +11,8 @@ import { db } from '@tnsi/db';
 import { practices, practiceSaves } from '@tnsi/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { practiceIdParam } from '@/lib/validation';
-import { success, unauthorized, notFound } from '@/lib/api-response';
+import { success, unauthorized, notFound, membershipRequired } from '@/lib/api-response';
+import { contentAccessFor } from '@/lib/membership';
 
 export const runtime = 'nodejs';
 
@@ -48,13 +49,17 @@ export async function POST(_request: Request, { params }: RouteParams) {
   // an existing save is never revoked just because the practice later
   // becomes unpublished (see getSavedPractices's own comment).
   const practice = await db
-    .select({ id: practices.id })
+    .select({ id: practices.id, isFree: practices.isFree })
     .from(practices)
     .where(and(eq(practices.id, id), eq(practices.isPublished, true)))
     .limit(1);
 
   if (!practice[0]) {
     return notFound('Practice not found');
+  }
+
+  if (!contentAccessFor(user.entitlements).canOpen(practice[0])) {
+    return membershipRequired();
   }
 
   // The unique(userId, practiceId) constraint is the real source of

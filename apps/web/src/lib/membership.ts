@@ -1,36 +1,100 @@
+import { decideTrialEligibility } from '@tnsi/auth/trial/eligibility';
 import { isMembershipOpen } from '@tnsi/integrations';
+import {
+  canAccessContent,
+  resolveMembership,
+  type MembershipRecord,
+  type ResolvedMembership,
+} from '@tnsi/auth/authorize/entitlements';
 
 /**
- * Whether Regulation Suite membership is open for purchase. The single
- * definition lives in `@tnsi/integrations` (`isMembershipOpen`): open only when
- * `REGULATION_SUITE_MEMBERSHIP_OPEN` is exactly "true" AND Stripe is fully
- * configured (secret key, webhook secret, monthly and annual Prices). The safe
- * default - the variable unset - is closed.
+ * Regulation Suite™ free + paid membership — the web app's single place to
+ * ask "is membership open?" and "may this member open this content?".
+ * Every API route, Server Component and the mobile-facing entitlements
+ * endpoint goes through here, so the answer cannot differ between website
+ * and app. All decisions are server-side, from the entitlement row; nothing
+ * a client sends is ever consulted.
+ */
+
+/**
+ * Membership is OPEN only when it has been deliberately launched
+ * (`REGULATION_SUITE_MEMBERSHIP_OPEN=true`) AND billing is genuinely
+ * configured (Stripe key, webhook secret, and both plan Prices — see
+ * `isMembershipCheckoutConfigured`).
  *
- * Re-exported here so the web app has one import point for "is membership open?".
+ * While closed (today's state) the website keeps its "not yet open for
+ * enrolment" behaviour, no checkout is offered, and NO content is locked —
+ * nothing may be locked before the paid product can actually be bought.
+ * Missing either half keeps it closed, so a half-configured environment can
+ * never expose a broken checkout or lock members out of content.
  */
 export { isMembershipOpen };
 
-/** The slice of an entitlement row the duplicate-subscription check needs. */
-export interface MembershipEntitlement {
-  tier: 'free' | 'monthly' | 'annual' | 'lifetime';
-  status: 'active' | 'past_due' | 'canceled' | 'trialing' | 'expired';
+/** The slice of an entitlement row membership resolution needs (the real DB `Entitlement` row satisfies this). */
+export type MembershipEntitlement = (MembershipRecord & { cancelAtPeriodEnd?: boolean }) | null;
+
+export interface ContentAccess {
+  /** Whether free/paid locking is in force at all (membership is open). */
+  gatingActive: boolean;
+  membership: ResolvedMembership;
+  /** May this member open a piece of content that is (`isFree`) or isn't part of the free selection? */
+  canOpen(content: { isFree: boolean }): boolean;
 }
 
 /**
- * Whether this entitlement already holds paid membership: a paid or legacy
- * Lifetime tier that is active, in a trial, or in payment grace (past due). Such
- * a member must manage their plan in the billing portal, never start another
- * subscription. Free accounts, and ended (canceled/expired) memberships, may buy.
+ * Resolves what a member may open. `gatingActive` defaults to the live
+ * `isMembershipOpen()`; tests (and callers that already know) can pass it.
  */
-export function holdsPaidMembership(
-  entitlement: MembershipEntitlement | null | undefined,
+export function contentAccessFor(
+  entitlement: MembershipEntitlement,
+  options: { gatingActive?: boolean; now?: Date } = {},
+): ContentAccess {
+  const gatingActive = options.gatingActive ?? isMembershipOpen();
+  const now = options.now ?? new Date();
+  return {
+    gatingActive,
+    membership: resolveMembership(entitlement, now),
+    canOpen: (content) => canAccessContent(entitlement, content, gatingActive, now),
+  };
+}
+
+/**
+ * Practice fields that carry the paid content itself. For a practice the
+ * member cannot open, these are withheld by the server (not hidden by the
+ * client): the media file location and the raw CMS document, which also
+ * contains it. Title, description, thumbnail, duration and category stay,
+ * so the library can still show what is available with membership.
+ */
+export function withPracticeAccess<
+  T extends { isFree: boolean; mediaUrl: string | null; sanityData?: unknown },
+>(row: T, access: ContentAccess): T & { locked: boolean } {
+  if (access.canOpen(row)) return { ...row, locked: false };
+  const redacted: T & { locked: boolean } = { ...row, mediaUrl: null, locked: true };
+  if ('sanityData' in redacted) redacted.sanityData = {};
+  return redacted;
+}
+
+/**
+ * Whether to OFFER the free trial to this account right now - the single
+ * decision behind both `GET /api/v1/me/entitlements` (`membership.trialAvailable`,
+ * read by the mobile app) and the web membership page, so the two can never
+ * disagree and no client duplicates eligibility logic.
+ *
+ * It is `false` while membership is closed (nothing is offered before launch)
+ * and otherwise follows `decideTrialEligibility` on the account row alone. It
+ * makes no identity-provider call, so it can be optimistic: the trial endpoint
+ * (`POST /api/v1/billing/trial`) is the authority, and refuses with a reason if,
+ * for example, this email address has already had its one trial.
+ */
+export function trialAvailableFor(
+  entitlement: {
+    tier: 'free' | 'monthly' | 'annual' | 'lifetime';
+    stripeSubscriptionId: string | null;
+    trialStartedAt: Date | null;
+    trialEndsAt: Date | null;
+  } | null,
+  gatingActive: boolean,
 ): boolean {
-  if (!entitlement) return false;
-  if (entitlement.tier === 'free') return false;
-  return (
-    entitlement.status === 'active' ||
-    entitlement.status === 'trialing' ||
-    entitlement.status === 'past_due'
-  );
+  if (!gatingActive) return false;
+  return decideTrialEligibility({ entitlement, existingClaim: false }).eligible;
 }
