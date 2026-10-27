@@ -53,6 +53,11 @@ describe('sitemap', () => {
     expect(urls.some((u) => u.includes('/sign-in') || u.includes('/sign-up'))).toBe(false);
   });
 
+  it('keeps the unlaunched Return Path page out of the sitemap', async () => {
+    const urls = (await sitemap()).map((e) => e.url);
+    expect(urls.some((u) => u.includes('the-return-path'))).toBe(false);
+  });
+
   it('does not block the auth pages in robots.txt', () => {
     const rules = robots().rules as { disallow?: string[] };
     expect(rules.disallow).toEqual(['/api/']);

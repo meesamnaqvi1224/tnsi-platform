@@ -161,7 +161,7 @@ export const nervousSystemFrameworkPost: ArticlePost = {
     name: 'Caroline Reed',
     role: 'Founder of The Nervous System Institute',
     biography:
-      'Caroline Reed brings more than twenty years of clinical experience in trauma recovery and nervous system education. Her writing and teaching integrate neuroscience, psychology and practical implementation into frameworks used by practitioners and leaders internationally.',
+      'Caroline Reed brings more than 25 years of clinical experience in trauma recovery and nervous system education. Her writing and teaching integrate neuroscience, psychology and practical implementation into frameworks used by practitioners and leaders internationally.',
     imageSrc: '/images/shared/caroline-portrait-editorial.webp',
     imageAlt:
       'Portrait of Caroline Reed, founder of The Nervous System Institute, in warm natural light.',

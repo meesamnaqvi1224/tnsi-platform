@@ -18,8 +18,8 @@ export const accessibilityContent = {
       id: 'wcag',
       heading: 'WCAG Standards',
       paragraphs: [
-        'Our website is designed with perceivable, operable, understandable and robust content. We use semantic HTML, sufficient colour contrast, readable typography and meaningful alternative text for images.',
-        'We regularly review our pages against WCAG success criteria as part of our release process.',
+        'Our website is designed with perceivable, operable, understandable and robust content. We use semantic HTML, readable typography and meaningful alternative text for images.',
+        'Colour contrast is an area we are still improving: some secondary (muted grey) text is below the 4.5:1 ratio that WCAG 2.1 Level AA requires for normal-sized text. We have not yet completed a full audit against every success criterion.',
       ],
     },
     {
