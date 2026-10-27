@@ -3,7 +3,8 @@
 **Status (27 October 2026):** branch `feat/membership-trial-integration`. The integration was verified against
 Stripe **Sandbox**, a Clerk **development** instance and a **disposable local PostgreSQL** (section 3). Nothing has
 been run against production, nothing from this work has been pushed, merged or deployed, and membership stays
-**closed** until a separate, explicit launch authorisation. **The integration is NOT fully launch-ready:** section 3
+**closed** until a separate, explicit launch authorisation. Two owner-paid hosted Checkout payments and a
+delayed-webhook test followed the first run (section 3.2a). **The integration is NOT fully launch-ready:** section 3
 lists what is verified, and sections 3.3 and 5 list what is not.
 
 ## 1. Migration `0012_add_membership_trial_grace_and_free_content`
@@ -98,6 +99,10 @@ repository and is not committed.
   session tokens accepted by the app.
 - **Cleanup:** the Sandbox customers and Clerk users created were deleted afterwards; all local processes were stopped.
 
+- **Manual hosted-Checkout tests (3.2a):** two payments on Stripe's hosted Checkout page, made by the owner with
+  Stripe's test card `4242 4242 4242 4242` in Sandbox. For the second, the genuine Stripe webhook deliveries were
+  held by a local holding proxy that never touches signatures (3.2a).
+
 **Method labels** used in the table: **Live Sandbox** = a real Stripe Sandbox operation produced a real, signed
 webhook that the app processed. **Locally forged** = a request built by the test harness, not sent by Stripe.
 **Simulated** = a database or clock manipulation standing in for something that cannot be waited for.
@@ -107,7 +112,7 @@ webhook that the app processed. **Locally forged** = a request built by the test
 | Scenario                                  | Result                     | Method                                     | What was observed                                                                                                                                                                                                                                                                                                                                                               |
 | ----------------------------------------- | -------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Monthly checkout: session creation        | PASS                       | Live Sandbox                               | App created a real Checkout Session: monthly Price, 599 GBP, subscription mode, no trial, the app's own Stripe customer, user metadata, localhost return URL. Stripe accepted the roughly 31-minute `expires_at`.                                                                                                                                                               |
-| Monthly checkout: payment and entitlement | PASS (payment substituted) | Live Sandbox                               | The Checkout page was **not** used (3.3). The same customer was subscribed through the Stripe API with Stripe's test-card token. The real `customer.subscription.created` webhook (HTTP 200) moved the entitlement to monthly / active, paid through one month.                                                                                                                 |
+| Monthly checkout: payment and entitlement | PASS (payment substituted) | Live Sandbox                               | The hosted Checkout page was **not** used for this row; it was tested separately in 3.2a. The same customer was subscribed through the Stripe API with Stripe's test-card token. The real `customer.subscription.created` webhook (HTTP 200) moved the entitlement to monthly / active, paid through one month.                                                                 |
 | Annual checkout                           | PASS (payment substituted) | Live Sandbox                               | Session: annual Price, 5999 GBP, yearly, no trial. Same substituted payment. Entitlement annual / active, paid through 27 Oct 2027.                                                                                                                                                                                                                                             |
 | Invalid webhook signatures                | PASS                       | Locally forged                             | Six forged variants (no header, garbage, wrong signature, wrong secret, tampered body, 1-hour-old timestamp) all returned 400 and changed nothing. A correctly signed harmless event was accepted and skipped.                                                                                                                                                                  |
 | Webhook replay safety                     | PASS                       | Locally forged re-delivery of a real event | A real event body fetched from Stripe was re-signed by the harness and delivered 3 times in sequence and 8 at once: always 200, entitlement identical, one row, one subscription. This was **not** a Stripe-initiated resend.                                                                                                                                                   |
@@ -123,25 +128,64 @@ webhook that the app processed. **Locally forged** = a request built by the test
 | Card-free trial (live Clerk)              | PASS                       | Live Clerk, disposable database            | A verified member claimed a trial: 201, exactly 30 days, no Stripe customer or subscription created. A second claim and a claim by an account holding a paid plan both returned 409 `TRIAL_NOT_AVAILABLE`.                                                                                                                                                                      |
 | Trial: unverified primary email           | **BLOCKED**                | n/a                                        | Clerk refuses to make an unverified address a primary email in this instance (`breaks_instance_invariant`), so the account state cannot be created and the case cannot be reproduced live. It is covered only by route tests with a simulated provider.                                                                                                                         |
 
+### 3.2a Hosted Checkout and delayed-webhook tests (manual, owner-paid)
+
+Two payments were made by the owner on **Stripe's hosted Checkout page** (Sandbox, test card), each for a fresh test
+user and a Checkout Session created through the normal `POST /api/v1/billing/checkout` route. All Stripe events were
+real and non-live. The test harness and logs live outside the repository, and **no secret was written to a log**.
+
+**Test 1: normal order** (the webhook is processed within seconds of payment). **Test 2: delayed webhook.** The Stripe
+CLI forwarder is not a registered endpoint, so **Stripe does not retry deliveries for it**; Stripe keeps the events in
+its event log (30 days). To delay processing without touching verification, the CLI forwarded to a small local
+**holding proxy** that stored each genuine delivery (original body and original `Stripe-Signature`, untouched) and
+replayed it unchanged to the app on command. **Signature verification in the app was never disabled or changed**, and
+production configuration was never touched. Stripe's 300-second timestamp tolerance still applied; the held
+deliveries were released at 112-115 seconds of signature age.
+
+| Check                                                                            | Result                                                        | Method                                  | What was observed                                                                                                                                                                                                                                                                                                                                                                                        |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hosted Checkout page shows the correct price                                     | PASS on Stripe data; **not independently confirmed visually** | Live Sandbox                            | The Checkout Session and its line item are "Regulation Suite - Monthly Membership", £5.99 GBP, the configured monthly Price. No screenshot of the hosted page was captured.                                                                                                                                                                                                                              |
+| Genuine `checkout.session.completed`                                             | PASS                                                          | Live Sandbox                            | Delivered by Stripe in both payments, together with `customer.subscription.created` and `customer.subscription.updated`.                                                                                                                                                                                                                                                                                 |
+| Webhook signature valid and handler accepted                                     | PASS                                                          | Live Sandbox                            | HTTP 200 for all three deliveries in each test; no 400.                                                                                                                                                                                                                                                                                                                                                  |
+| Subscription and entitlement synchronized (test 1)                               | PASS                                                          | Live Sandbox                            | One active subscription on the monthly Price, entitlement monthly / active, paid-through date identical in Stripe and the app (27 Nov 2026).                                                                                                                                                                                                                                                             |
+| Success page reconciled, webhook already processed (test 1)                      | PASS (see the redirect limitation)                            | Live Sandbox                            | The page showed "Active Membership", Monthly £5.99 per month, Active, next billing 27 November 2026, matching Stripe and the database.                                                                                                                                                                                                                                                                   |
+| Replay of the real `checkout.session.completed` (test 1)                         | PASS                                                          | Locally forged re-delivery              | The real event body was re-signed by the harness and delivered 3 times in sequence and 8 at once: always 200, entitlement identical, one row, one subscription, one invoice. This was not a Stripe-initiated resend.                                                                                                                                                                                     |
+| **Success page recorded the subscription while the webhooks were held (test 2)** | **PASS**                                                      | Live Sandbox                            | The three genuine deliveries were held from 09:31:19. When the success page loaded 109 seconds after payment, the entitlement went from free to **monthly / active** with the subscription recorded, while **zero webhooks had been processed by the app**.                                                                                                                                              |
+| Held genuine webhooks released unchanged (test 2)                                | PASS                                                          | Live Sandbox (delivery delayed locally) | Three genuine deliveries released unaltered: signature ages 112-115 s, all HTTP 200 (`sync-subscription`), valid signatures.                                                                                                                                                                                                                                                                             |
+| Consistency and no duplicate side effects after release (test 2)                 | PASS                                                          | Live Sandbox                            | The entitlement was identical before and after release apart from its sync timestamps. Final state: **one Stripe subscription, one entitlement row (one row referencing the subscription), one paid invoice.**                                                                                                                                                                                           |
+| Stripe-to-localhost browser redirect after payment                               | **NOT VERIFIED**                                              | n/a                                     | After the first payment the owner's browser showed Clerk's sign-in form (it is not known whether that browser had been signed in). After the second, the in-app browser, **signed in beforehand**, also returned to Clerk's sign-in page instead of the success page. It looks like a Clerk **development-mode** cross-site session issue; it was **not** checked with a production Clerk configuration. |
+
+**What this does and does not show.** The success page was then tested by signing in again and loading the exact
+success URL (109 seconds after payment in test 2). So the **reconciliation logic passed**, including the case where
+the webhook is late, but the **complete Stripe-to-localhost browser redirect remains unverified**, and its behaviour
+under a production Clerk configuration is unknown. If a member did land on sign-in, they would sign in and the
+webhook would still record the subscription.
+
 ### 3.3 Not verified: do not treat as passed
 
-- **Hosted Checkout page and `checkout.session.completed`.** No card details were entered into Stripe's hosted page,
-  so the real payment path, the `checkout.session.completed` handler and the success-page reconciliation
-  (`?success=true&session_id=...`) have **not** been exercised live. Session creation was; payment was substituted
-  with an API-created subscription. One manual Sandbox checkout (test card `4242 4242 4242 4242`) is still needed.
+- **The Stripe-to-localhost browser redirect.** After payment the browser returned to Clerk's sign-in page instead of
+  the success page in both manual payments (3.2a). The success page was tested by loading the exact URL after signing
+  in again, so the reconciliation logic passed but the complete redirect is **unverified**, and it has **not** been
+  verified with a production Clerk configuration.
+- **The visible price on the hosted Checkout page.** Stripe's session and line-item data confirm £5.99, but the page
+  itself was not independently confirmed from a screenshot.
 - **Lapse at the end of a paid period.** A subscription cancelled at period end was not observed running out; the
   Sandbox cannot advance time for customers the app creates (the app has no test-clock hook).
 - **A real renewal cycle.** The failure above was forced by resetting the billing cycle; a natural renewal, and the
   period-boundary behaviour around it, were not tested.
 - **Grace expiry in real time** (simulated only), and Stripe's own retry and dunning schedule.
+- **The trial with an unverified primary email.** **BLOCKED** (3.2): Clerk's development instance does not allow that
+  account state. Covered only by route tests with a simulated provider.
+- **Duplicate-subscription escalation** is verified only as a flag (3.4); the owner, backup, alerting and approved
+  procedure it needs do not exist yet.
+- **A Stripe-initiated webhook resend**, and a **registered Dashboard endpoint** (retries, the live account's API
+  version). The CLI delivered events (API version 2023-10-16). The app re-reads state from the Stripe API, which
+  limits the risk.
 - **Not re-run in this cycle** (covered earlier only by tests that simulate Stripe): two different-plan requests at
   once leaving one payable session; a Lifetime request returning 400; a plus-tag address receiving its own trial; a
   second account with the same email; Clerk failure failing closed.
 - **Abandoned-session expiry.** Stripe accepted a 31-minute `expires_at`, but expiry at 31 minutes and the session
   list's read-after-write behaviour were not observed.
-- **Events from a live endpoint.** The Stripe CLI delivered events (API version 2023-10-16); a registered
-  Dashboard endpoint, and the API version of the live account, were not tested. The app re-reads state from the
-  Stripe API, which limits the risk.
 - **Interactive Billing Portal.** Only the configuration and session creation were checked.
 
 ### 3.4 Duplicate-subscription manual review: required before launch
@@ -170,7 +214,8 @@ unmerged PowerDrop artwork work and is a separate follow-up. A web-only launch i
 
 **Not launch-ready.** Verified: see section 3.2. Outstanding release requirements:
 
-- **Untested paths** listed in section 3.3, above all a manual Sandbox checkout through the hosted page.
+- **Untested paths** listed in section 3.3, above all the Stripe-to-localhost browser redirect under a production
+  Clerk configuration, a natural renewal cycle and the lapse at the end of a paid period.
 - **Live-mode Stripe configuration** (none exists or has been touched): live Prices at **£5.99 per month** and
   **£59.99 per year** with no trial and no Lifetime Price, a restricted live Billing Portal configuration like the
   Sandbox one, a live webhook endpoint with its own signing secret, and a retry schedule that covers the 7-day grace.

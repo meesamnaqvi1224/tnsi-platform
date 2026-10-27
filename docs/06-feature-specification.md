@@ -128,16 +128,24 @@ test results are in `membership-release-runbook.md`.
 
 - **Verified on 27 October 2026**, in a local run against Stripe **Sandbox**, a
   Clerk **development** instance and a disposable PostgreSQL, with no production
-  configuration changed: checkout session creation, subscription sync, duplicate-
-  subscription flagging, cancellation at period end and immediately, a failed
-  payment with its grace period and recovery, webhook signature rejection and
-  replay safety (the last two with locally forged requests), and the card-free
-  trial through live Clerk. Grace expiry was verified only as a database
-  simulation.
-- **Not tested:** the hosted Checkout page and `checkout.session.completed`,
-  success-page reconciliation, a natural renewal cycle, and the lapse at the end
-  of a paid period. The trial with an unverified primary email is **blocked**,
-  because Clerk does not allow that account state in the development instance.
+  configuration changed: checkout session creation, two owner-paid payments on
+  the hosted Checkout page (genuine `checkout.session.completed`, valid
+  signatures, one subscription, one entitlement row and one invoice each time),
+  the success page recording the subscription **while the genuine webhooks were
+  held** (zero webhooks processed by the app; signature verification was never
+  disabled), with the held deliveries then released unchanged and processed safely, duplicate-subscription
+  flagging, cancellation at period end and immediately, a failed payment with its
+  grace period and recovery, webhook signature rejection and replay safety (the
+  last two with locally forged requests), and the card-free trial through live
+  Clerk. Grace expiry was verified only as a database simulation.
+- **Unverified or not tested:** the Stripe-to-localhost browser redirect after
+  payment (the browser returned to Clerk's sign-in page; the success page passed
+  when its exact URL was loaded after signing in again, and the redirect has not
+  been checked with a production Clerk configuration), the visible price on the
+  hosted page (Stripe's data confirms £5.99; no screenshot), a natural renewal
+  cycle, and the lapse at the end of a paid period. The trial with an unverified
+  primary email is **blocked**, because Clerk does not allow that account state in
+  the development instance.
 - **Required before launch:** live-mode Stripe configuration (it does not exist),
   a named owner and backup, an alerting mechanism and an approved procedure for
   flagged duplicate subscriptions (today only a log line and a metadata flag),

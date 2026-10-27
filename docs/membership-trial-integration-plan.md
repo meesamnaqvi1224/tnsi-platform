@@ -143,27 +143,36 @@ open in that process only, a disposable local PostgreSQL 17 (migrations
 `0000`-`0012` applied), Stripe **Sandbox**, the Stripe CLI forwarding the five
 webhook events, and a Clerk **development** instance with throwaway users.
 **No production configuration was changed and no production resource was used.**
-The Sandbox customers and Clerk users created were deleted afterwards. The full
-results table is in `membership-release-runbook.md` section 3.
+The full results table is in `membership-release-runbook.md` section 3 (and 3.2a
+for the hosted-Checkout tests).
 
 **Live Sandbox** (a real Stripe operation producing a real signed webhook):
 monthly and annual Checkout Session creation (correct Price, amount, no trial);
-subscription payment and entitlement sync, where the payment was **substituted**
-by subscribing the customer through the Stripe API with Stripe's test-card token;
-duplicate-subscription flagging (entitlement unchanged, nothing cancelled or
-refunded, repeat checkout refused); cancellation at period end (access continued
-and resuming synced back); immediate cancellation (access ended at once); a
-failed renewal (`past_due`, grace ending exactly 7 days later, access intact);
-recovery after paying the failed invoice; Billing Portal session creation, with
-the Sandbox portal configuration read back (payment methods, invoices and cancel
-at period end on; plan switching, quantity, pausing and customer-information
-editing off). 13 of 13 forwarded events returned HTTP 200. The card-free trial
-was claimed through **live Clerk** (30.0 days, no Stripe object; repeat and
-paid-plan claims refused).
+subscription sync; duplicate-subscription flagging (entitlement unchanged,
+nothing cancelled or refunded, repeat checkout refused); cancellation at period
+end and immediately; a failed renewal (`past_due`, grace ending exactly 7 days
+later, access intact) and recovery; Billing Portal session creation, with the
+Sandbox portal configuration read back (payment methods, invoices and cancel at
+period end on; plan switching, quantity, pausing and customer-information
+editing off); and the card-free trial through **live Clerk** (30.0 days, no
+Stripe object; repeat and paid-plan claims refused). Some of these used a
+subscription created through the Stripe API in place of a hosted payment.
+
+**Hosted Checkout, paid by the owner** (Sandbox test card, two payments): Stripe
+delivered a genuine `checkout.session.completed` with the subscription events;
+every delivery returned HTTP 200 with a valid signature; the final state each
+time was one Stripe subscription, one entitlement row and one paid invoice,
+consistent with Stripe. In the **second** payment the three genuine deliveries
+were held by a local holding proxy (original body and signature untouched;
+signature verification was never disabled). The success page, loaded 109 seconds
+after payment, **recorded the active monthly entitlement while zero webhooks had
+been processed by the app**. The held deliveries were then released unchanged
+(signature ages 112-115 s, inside Stripe's 300 s tolerance): all HTTP 200, no
+duplicate side effects, entitlement identical apart from sync timestamps.
 
 **Locally forged** (built by the test harness, not sent by Stripe): six invalid
 webhook signatures, all rejected with 400; a real event body re-signed and
-re-delivered 3 times and 8 at once, leaving state identical; an older event
+re-delivered (3 times and 8 at once) leaving state identical; an older event
 re-delivered after cancellation, which did not restore access.
 
 **Simulated:** grace expiry, by backdating the failure time in the disposable
@@ -174,13 +183,23 @@ instance refuses to make an unverified address primary, so the account state
 cannot be created; the case is covered only by route tests with a simulated
 provider.
 
-**Not tested; do not treat as passed:** the hosted Checkout page and
-`checkout.session.completed` from a hosted payment; success-page reconciliation;
-a natural renewal cycle; the lapse at the end of a paid period (Sandbox time
-cannot be advanced for app-created customers); a Stripe-initiated webhook
-resend; the interactive Billing Portal; and the cases not re-run in this cycle
-(simultaneous different-plan requests, a Lifetime request, a plus-tag address,
-a second account with the same email, Clerk failure failing closed).
+**Limitations that remain:**
+
+- **The Stripe-to-localhost browser redirect is unverified.** After each hosted
+  payment the browser returned to Clerk's sign-in page rather than the success
+  page (the second time after being signed in). It looks like a Clerk
+  development-mode cross-site issue and has **not** been verified with a
+  production Clerk configuration. The success page was then tested by signing in
+  again and loading the exact success URL, so the reconciliation logic passed but
+  the complete redirect did not.
+- The visible price on the hosted Checkout page was not confirmed from a
+  screenshot; Stripe's session and line-item data confirm £5.99.
+- A natural renewal cycle and the lapse at the end of a paid period are **not
+  tested**; grace expiry in real time (simulated only), a Stripe-initiated
+  webhook resend and the interactive Billing Portal likewise.
+- The cases not re-run (simultaneous different-plan requests, a Lifetime request,
+  a plus-tag address, a second account with the same email, Clerk failure failing
+  closed) rest on earlier simulated tests.
 
 **Operational requirement.** Duplicate-subscription handling currently relies on
 a server log line and an entitlement metadata flag. A named owner and backup, an
