@@ -19,17 +19,17 @@ export const MEMBERSHIP_TRIAL_DAYS = 30;
 /** The two approved self-serve subscription plans (the only ones offered in the UI). */
 export const MEMBERSHIP_PLANS = {
   monthly: { tier: 'monthly', label: 'Monthly', price: '£5.99', interval: 'month' },
-  annual: { tier: 'annual', label: 'Annual', price: '£59', interval: 'year' },
+  annual: { tier: 'annual', label: 'Annual', price: '£59.99', interval: 'year' },
 } as const;
 
 export type MembershipPlanTier = keyof typeof MEMBERSHIP_PLANS;
 
 /**
- * Display copy for the approved annual saving ("approximately 18%"):
- * £5.99 x 12 = £71.88 against £59 is a 17.9% saving. Kept next to the prices
+ * Display copy for the annual saving ("approximately 17%"):
+ * £5.99 x 12 = £71.88 against £59.99 is a 16.5% saving, shown as 17%. Kept next to the prices
  * so the two cannot drift apart (a test recomputes it from `MEMBERSHIP_PLANS`).
  */
-export const MEMBERSHIP_ANNUAL_SAVING_PERCENT = 18;
+export const MEMBERSHIP_ANNUAL_SAVING_PERCENT = 17;
 
 /**
  * The approved number of PowerDrops™ a free account can open. Which three is

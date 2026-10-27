@@ -11,7 +11,7 @@ const amount = (price: string) => Number(price.replace(/[^0-9.]/g, ''));
 describe('Regulation Suite™ commercial constants (Membership & Commercial Model v1)', () => {
   it('matches the approved prices, trial and free PowerDrops™ count', () => {
     expect(MEMBERSHIP_PLANS.monthly.price).toBe('£5.99');
-    expect(MEMBERSHIP_PLANS.annual.price).toBe('£59');
+    expect(MEMBERSHIP_PLANS.annual.price).toBe('£59.99');
     expect(MEMBERSHIP_TRIAL_DAYS).toBe(30);
     expect(MEMBERSHIP_FREE_POWERDROPS).toBe(3);
   });

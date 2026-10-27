@@ -61,7 +61,7 @@ export interface MembershipPlanOption {
   label: string;
   /** "£5.99 / month" */
   price: string;
-  /** Optional second line, e.g. "Save approximately 18%". */
+  /** Optional second line, e.g. "Save approximately 17%". */
   note?: string;
 }
 

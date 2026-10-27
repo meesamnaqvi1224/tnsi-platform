@@ -156,7 +156,7 @@ describe('MembershipPage — membership not open (today)', () => {
     // The call to action exists but cannot be used, and says why.
     expect(html).toMatch(/<button[^>]*\sdisabled=""[^>]*>[^<]*Start Membership/);
     expect(t).toContain('£5.99 / month');
-    expect(t).toContain('£59 / year');
+    expect(t).toContain('£59.99 / year');
   });
 
   it('never offers Lifetime: no Lifetime plan, price or choice - only a note that it is unavailable', async () => {
@@ -205,8 +205,8 @@ describe('MembershipPage — free member (membership open)', () => {
     const t = text(await render(billing({})));
     expect(t).toContain('Explore Full Membership');
     expect(t).toContain('£5.99 / month');
-    expect(t).toContain('£59 / year');
-    expect(t).toContain('Save approximately 18%');
+    expect(t).toContain('£59.99 / year');
+    expect(t).toContain('Save approximately 17%');
     expect(t).toContain('Start Membership');
     expect(t).toContain('Choose Annual');
     expect(t).toContain('Paid membership begins when you choose a plan and complete checkout');
@@ -303,7 +303,7 @@ describe('MembershipPage — free trial (app-managed)', () => {
     const t = text(await render(trialing(20)));
     expect(t).toContain('Start Membership');
     expect(t).toContain('£5.99 / month');
-    expect(t).toContain('£59 / year');
+    expect(t).toContain('£59.99 / year');
     expect(t).not.toContain('Try it free'); // the trial is already running
   });
 
@@ -358,7 +358,7 @@ describe('MembershipPage — active paid member', () => {
   it('monthly and annual: plan, billing status, next billing date, inclusions and Manage Membership', async () => {
     for (const [tier, plan] of [
       ['monthly', 'Monthly · £5.99/month'],
-      ['annual', 'Annual · £59/year'],
+      ['annual', 'Annual · £59.99/year'],
     ] as const) {
       const t = text(
         await render(

@@ -58,7 +58,7 @@ describe('Regulation Suite page — membership closed (today)', () => {
     // Owner-approved terms may be described, but only as a future state - never offered.
     expect(text).toContain('When membership opens');
     expect(text).toContain('£5.99 per month');
-    expect(text).toContain('£59 per year');
+    expect(text).toContain('£59.99 per year');
     expect(text).not.toMatch(/start your|create your account|try the full|available now/i);
     expect(html).not.toContain('/sign-up');
   });
@@ -86,7 +86,7 @@ describe('Regulation Suite page — membership open', () => {
   it('states the approved prices and that paid membership is separate', () => {
     const { text } = render();
     expect(text).toContain('£5.99 per month');
-    expect(text).toContain('£59 per year');
+    expect(text).toContain('£59.99 per year');
     expect(text).toContain('Paid membership is');
   });
 

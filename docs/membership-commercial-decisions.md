@@ -25,7 +25,7 @@ things so none is mistaken for another: **0.1** what the owner has decided,
 | Decision                 | Confirmed                                                                                                                                                               |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Model                    | Free + paid membership, self-serve (no discovery call)                                                                                                                  |
-| Monthly / annual         | £5.99 per month / £59 per year (about an 18% saving)                                                                                                                    |
+| Monthly / annual         | £5.99 per month / £59.99 per year (about a 17% saving)                                                                                                                  |
 | Trial                    | 30 days with **full paid-feature access**                                                                                                                               |
 | Card for the trial       | **None.** No payment card is required to start a trial                                                                                                                  |
 | When the trial ends      | The account **returns to Free automatically**. No charge and no automatic conversion to paid                                                                            |
@@ -43,6 +43,14 @@ things so none is mistaken for another: **0.1** what the owner has decided,
 first subscription only" and the open question "Is a payment method required to
 start the trial? Currently yes"; and "Lifetime tier: not part of the approved
 model (price intentionally unset)".
+
+**Annual price changed — 27 October 2026 (owner decision, final).** The annual
+plan is **£59.99 per year** (it was £59). The monthly price is unchanged at £5.99.
+The annual saving is therefore £71.88 − £59.99 = £11.89, or 16.5%, shown to
+members as "about 17%" (it was "about 18%" at £59). The display constants, page
+copy, tests and the Stripe Sandbox Price all use £59.99; the live Price must be
+created at £59.99 too. Where older text in this document says £59 or 18%, this
+note wins.
 
 ### 0.2 Baseline behaviour (carried forward from the committed code)
 
@@ -62,7 +70,7 @@ model (price intentionally unset)".
   enforces the paid-through date itself (see 0.2a).
 - **Entitlements from Stripe.** Webhook events update the member's entitlement;
   a repeated event simply rewrites the same values.
-- **Display prices.** £5.99 and £59 and the 18% saving are display constants in
+- **Display prices.** £5.99 and £59.99 and the 17% saving are display constants in
   `packages/integrations/src/stripe/plans.ts` (a test recomputes the saving).
   The amount actually charged comes from Stripe Prices that have not been
   created yet.
@@ -95,7 +103,7 @@ anywhere shared**. Membership remains closed. What exists:
   The ledger (`trial_claims`) survives account deletion; a claim is made in one
   database transaction under a row lock, so simultaneous attempts cannot both
   succeed. Key rotation is supported by key version.
-- **Checkout without a trial.** Subscriptions only (monthly £5.99, annual £59),
+- **Checkout without a trial.** Subscriptions only (monthly £5.99, annual £59.99),
   never a trial. A member currently on the app-managed trial may buy. At most
   one payable checkout exists per member at a time: the server checks Stripe
   while holding the member's row lock, hands back the open session when the
@@ -169,7 +177,7 @@ Steps marked _planned_ are not yet done; the code for the rest is described in 0
    `stripe_synced_at` and the `trial_claims` table with its two CHECK constraints;
    purely additive; written, not yet applied anywhere shared).
 2. **Stripe dashboard:** create the two recurring GBP Prices (£5.99/month,
-   £59/year) with **no trial on either Price**; do **not** create a Lifetime
+   £59.99/year) with **no trial on either Price**; do **not** create a Lifetime
    Price; set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
    `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_ANNUAL`; register the webhook;
    set the customer portal to cancel _at end of billing period_; align the
@@ -228,7 +236,7 @@ of the latest update to this section the branch is uncommitted and undeployed.
 
 | Statement                                                                                             | Owner-approved policy | Verified in code | Automated tests | Real PostgreSQL | Real Stripe/Clerk test service |
 | ----------------------------------------------------------------------------------------------------- | --------------------- | ---------------- | --------------- | --------------- | ------------------------------ |
-| £5.99/month, £59/year; no new Lifetime; existing Lifetime kept                                        | yes                   | yes              | yes             | yes             | no                             |
+| £5.99/month, £59.99/year; no new Lifetime; existing Lifetime kept                                     | yes                   | yes              | yes             | yes             | no                             |
 | 30-day card-free app-managed trial; expiry returns to Free; no charge                                 | yes                   | yes              | yes             | yes             | no                             |
 | One trial per verified, normalised email; missing secret fails closed                                 | yes                   | yes              | yes             | yes             | no (Clerk email check pending) |
 | 7-day failed-payment grace; cancellation through paid-through date                                    | yes                   | yes              | yes             | partly          | no                             |

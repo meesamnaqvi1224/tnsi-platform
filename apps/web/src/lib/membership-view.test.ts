@@ -154,7 +154,7 @@ describe('buildMembershipView — the six states', () => {
       billingStatus: 'Active',
     });
     expect(v.nextBillingDate).toEqual(at(100));
-    expect(v.plan).toEqual({ label: 'Annual', price: '£59/year' });
+    expect(v.plan).toEqual({ label: 'Annual', price: '£59.99/year' });
   });
 
   it('cancelled but still active: ending, with the access end date and still paid access', () => {
