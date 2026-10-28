@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useApiClient } from './useApiClient';
-import { humanizeApiError } from '@/lib/api-errors';
+import { humanizeApiError, isMembershipRequiredError } from '@/lib/api-errors';
 import { ApiRequestError } from '@/api/types';
 import type { PowerDrop, PowerDropUsageResult } from '@/api/types';
 
 export type PowerDropDetailState =
   | { status: 'loading' }
   | { status: 'not-found' }
+  | { status: 'locked' }
   | { status: 'success'; powerDrop: PowerDrop }
   | { status: 'error'; message: string };
 
 /**
- * Fetches GET /api/v1/powerdrops/[slug] once per screen visit. Also owns
+ * Fetches GET /api/v1/powerdrops/[slug] once per screen visit. A PowerDrop in
+ * the paid library that the member can't open resolves to `locked`, not `error`. Also owns
  * POST .../usage, since only this screen records a use - repeated use is
  * always allowed, so this never mutates local state to disable the
  * action afterward (mirrors usePracticeDetail's ownership of its own
@@ -29,6 +31,9 @@ export function usePowerDropDetail(slug: string) {
     } catch (err) {
       if (err instanceof ApiRequestError && err.status === 404) {
         setState({ status: 'not-found' });
+      } else if (isMembershipRequiredError(err)) {
+        // The server withheld a paid-library PowerDrop (403 MEMBERSHIP_REQUIRED).
+        setState({ status: 'locked' });
       } else {
         setState({ status: 'error', message: humanizeApiError(err) });
       }

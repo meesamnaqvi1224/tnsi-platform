@@ -14,6 +14,8 @@ interface PowerDropCardProps {
 export function PowerDropCard({ powerDrop }: PowerDropCardProps) {
   const router = useRouter();
   const title = powerDrop.title.trim();
+  // Decided by the server (see PowerDropSummary.locked). Still tappable - the detail screen explains.
+  const locked = powerDrop.locked === true;
 
   return (
     <Pressable
@@ -21,7 +23,7 @@ export function PowerDropCard({ powerDrop }: PowerDropCardProps) {
         router.push({ pathname: '/practices/powerdrops/[slug]', params: { slug: powerDrop.slug } })
       }
       accessibilityRole="button"
-      accessibilityLabel={`${title}, ${powerDrop.focus}`}
+      accessibilityLabel={`${title}, ${powerDrop.focus}${locked ? ', members only' : ''}`}
       style={({ pressed }) => pressed && styles.pressed}
     >
       <Card style={styles.card}>
@@ -46,7 +48,11 @@ export function PowerDropCard({ powerDrop }: PowerDropCardProps) {
           <ThemedText variant="caption" color={colors.bronze}>
             {powerDrop.focus}
           </ThemedText>
-          {powerDrop.category ? (
+          {locked ? (
+            <ThemedText variant="caption" color={colors.bronze}>
+              Members
+            </ThemedText>
+          ) : powerDrop.category ? (
             <ThemedText variant="caption" color={colors.charcoal}>
               {powerDrop.category}
             </ThemedText>
