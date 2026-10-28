@@ -5,6 +5,7 @@ import { LockedPracticeNotice } from '@/components/dashboard/locked-practice-not
 import { PracticeExperience } from '@/components/dashboard/practice-experience';
 import { ReturnPathPractice } from '@/components/return-path/return-path-practice';
 import { getReturnPathContent } from '@/content/cms/loaders';
+import { MEMBER_RETURN_PATH_LEVELS, RETURN_PATH_KEY } from '@tnsi/core';
 import { SaveToggleButton } from '@/components/dashboard/save-toggle-button';
 import { requireMemberAccessOrRedirect } from '@/lib/auth-api';
 import { contentAccessFor } from '@/lib/membership';
@@ -53,8 +54,6 @@ const VIDEO_CONTENT_TYPES = new Set(['video', 'movement']);
  * the existing all-or-nothing member check above. An interactive practice
  * with an unknown key falls through to the "isn't available yet" notice.
  */
-const RETURN_PATH_KEY = 'the-return-path';
-const MEMBER_RETURN_PATH_LEVELS: (1 | 2 | 3)[] = [1, 2, 3];
 
 export default async function PracticeDetailPage({ params }: PracticeDetailPageProps) {
   const user = await requireMemberAccessOrRedirect();

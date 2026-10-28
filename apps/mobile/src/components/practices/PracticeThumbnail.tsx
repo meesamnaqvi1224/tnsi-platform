@@ -11,6 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemedText } from '@/components/ThemedText';
 import { capitalize } from '@/lib/format';
+import { LabyrinthThumb } from '@/components/return-path/LabyrinthThumb';
 import { colors, radius } from '@/theme';
 import type { PracticeContentType } from '@/api/types';
 
@@ -32,7 +33,10 @@ interface PracticeThumbnailProps {
  * and needs attribution wherever image credits are shown; the rest are
  * Unsplash License (no attribution required).
  */
-const CONTENT_TYPE_STOCK_IMAGES: Record<PracticeContentType, ImageSourcePropType> = {
+const CONTENT_TYPE_STOCK_IMAGES: Record<
+  Exclude<PracticeContentType, 'interactive'>,
+  ImageSourcePropType
+> = {
   meditation: require('../../../assets/images/content-meditation.jpg'),
   movement: require('../../../assets/images/content-movement.jpg'),
   journal: require('../../../assets/images/content-journal.jpg'),
@@ -66,6 +70,19 @@ export function PracticeThumbnail({
     );
   }
 
+  // An interactive practice has no recording and no stock photo: show its own
+  // labyrinth (drawn from the shared geometry) rather than an unrelated image.
+  if (contentType === 'interactive') {
+    return (
+      <View style={[styles.interactiveSurface, { height }, style]}>
+        <LabyrinthThumb level={2} size={Math.round(height * 0.78)} />
+        <ThemedText variant="label" color={colors.charcoal} style={styles.interactiveLabel}>
+          {capitalize(contentType)}
+        </ThemedText>
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.surface, { height }, style]}>
       <Image
@@ -94,6 +111,21 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     backgroundColor: colors.navy,
     overflow: 'hidden',
+  },
+  interactiveSurface: {
+    width: '100%',
+    borderRadius: radius.lg,
+    backgroundColor: colors.creamMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  interactiveLabel: {
+    position: 'absolute',
+    left: 12,
+    bottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   stockImage: {
     position: 'absolute',

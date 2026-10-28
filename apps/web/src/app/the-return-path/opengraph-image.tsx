@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { geometryFor } from '@/components/return-path/geometry';
+import { geometryFor } from '@tnsi/core';
 
 /**
  * Open Graph image for /the-return-path: the Seven Circuits labyrinth,

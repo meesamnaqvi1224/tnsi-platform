@@ -21,7 +21,7 @@ import {
   type LabyrinthGeometry,
   type LevelId,
   type Point,
-} from './geometry';
+} from '@tnsi/core';
 import styles from './return-path.module.css';
 
 /**
