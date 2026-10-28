@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { ScreenContainer, ErrorNotice, ThemedText, PrimaryButton } from '@/components';
+import { MembershipLockedNotice } from '@/components/membership/MembershipLockedNotice';
 import { PowerDropThumbnail } from '@/components/powerdrops/PowerDropThumbnail';
 import { PowerDropsSkeleton } from '@/components/powerdrops/PowerDropsSkeleton';
 import { usePowerDropDetail } from '@/hooks/usePowerDropDetail';
@@ -53,6 +54,15 @@ export default function PowerDropDetailScreen() {
         <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
         </ThemedText>
+      </ScreenContainer>
+    );
+  }
+
+  if (state.status === 'locked') {
+    return (
+      <ScreenContainer>
+        <ThemedText variant="heading">This PowerDrop is for members.</ThemedText>
+        <MembershipLockedNotice message="This PowerDrop is part of the full PowerDrops™ library, available with a membership." />
       </ScreenContainer>
     );
   }
