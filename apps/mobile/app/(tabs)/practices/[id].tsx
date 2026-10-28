@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { RETURN_PATH_KEY } from '@tnsi/core';
 import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
 import { PracticeThumbnail } from '@/components/practices/PracticeThumbnail';
 import { PracticeDetailSkeleton } from '@/components/practices/PracticeDetailSkeleton';
@@ -10,6 +11,7 @@ import { ExternalMediaNotice } from '@/components/practices/ExternalMediaNotice'
 import { MediaUnavailableNotice } from '@/components/practices/MediaUnavailableNotice';
 import { MarkCompleteButton } from '@/components/practices/CompletionSection';
 import { MembershipLockedNotice } from '@/components/membership/MembershipLockedNotice';
+import { ReturnPathSection } from '@/components/return-path/ReturnPathSection';
 import { PostPracticeReflection } from '@/components/practices/PostPracticeReflection';
 import { SaveToggleButton } from '@/components/practices/SaveToggleButton';
 import { usePracticeDetail } from '@/hooks/usePracticeDetail';
@@ -126,6 +128,10 @@ export default function PracticeDetailScreen() {
   // one Sanity practice actually does), that's a real content gap worth
   // saying out loud rather than leaving a silent empty space.
   const expectsMedia = practice.contentType !== 'journal';
+  // An interactive practice is its own native experience, chosen by its key;
+  // it has no recording and saves its own completion.
+  const isReturnPath =
+    practice.contentType === 'interactive' && practice.interactiveKey === RETURN_PATH_KEY;
 
   return (
     <ScreenContainer scroll>
@@ -181,7 +187,14 @@ export default function PracticeDetailScreen() {
       {!locked && mediaKind === 'external' && practice.mediaUrl ? (
         <ExternalMediaNotice mediaUrl={practice.mediaUrl} />
       ) : null}
-      {!locked && mediaKind === 'none' && expectsMedia ? <MediaUnavailableNotice /> : null}
+      {!locked && isReturnPath ? (
+        <ReturnPathSection
+          onComplete={() => submitCompletion({ completed: true, progressPct: 1 })}
+        />
+      ) : null}
+      {!locked && !isReturnPath && mediaKind === 'none' && expectsMedia ? (
+        <MediaUnavailableNotice />
+      ) : null}
 
       <View style={styles.completionArea}>
         {locked ? null : completed && practice.progress?.id ? (
@@ -190,7 +203,7 @@ export default function PracticeDetailScreen() {
             initialReflection={practice.reflection}
             onSubmit={submitReflection}
           />
-        ) : mediaKind === 'audio' || mediaKind === 'video' ? null : (
+        ) : isReturnPath || mediaKind === 'audio' || mediaKind === 'video' ? null : (
           <MarkCompleteButton submitting={submitting} onPress={handleMarkComplete} />
         )}
       </View>

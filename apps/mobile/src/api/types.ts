@@ -96,7 +96,7 @@ export interface CheckInsListResponse {
 
 /** Mirrors packages/db/src/schema/practices.ts's `practices` row shape (fields this app uses). */
 export type PracticeContentType =
-  'audio' | 'video' | 'meditation' | 'breathwork' | 'movement' | 'journal';
+  'audio' | 'video' | 'meditation' | 'breathwork' | 'movement' | 'journal' | 'interactive';
 
 /**
  * This member's *current* relationship with a practice - the most
@@ -140,6 +140,8 @@ export interface Practice {
   title: string;
   description: string | null;
   contentType: PracticeContentType;
+  /** Set only when `contentType` is `interactive`: which native experience the practice screen renders (The Return Path is `the-return-path`). */
+  interactiveKey?: string | null;
   mediaUrl: string | null;
   thumbnailUrl: string | null;
   durationSeconds: number | null;
@@ -666,4 +668,80 @@ export interface SomaticCardDetail {
   whatToNotice: SomaticWhatToNoticeItem[];
   supportingImages: SomaticSupportingImage[];
   demonstrationSequence: SomaticDemonstrationFrame[];
+}
+
+/**
+ * The Return Path (interactive labyrinth practice). Mirrors
+ * apps/web/src/components/return-path/content.ts's `ReturnPathContent` minus
+ * its public-web-only `email` group, which GET /api/v1/return-path omits.
+ * Hand-kept like the other API mirrors in this file; the copy and timings
+ * come from the server (Sanity), never from the app. The labyrinth geometry
+ * is generated on the device from `@tnsi/core`.
+ */
+export interface ReturnPathContent {
+  intro: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    instructions: string[];
+    beginLabel: string;
+    safetyNote: string;
+  };
+  settings: {
+    gentlePauseLabel: string;
+    gentlePauseHelp: string;
+    noBreathLabel: string;
+    noBreathHelp: string;
+  };
+  choose: {
+    heading: string;
+    /** `{level}` is replaced with the level's name. */
+    lockedMessage: string;
+    lockedLinkLabel: string;
+  };
+  practice: {
+    firstHint: string;
+    startHint: string;
+    tracingHint: string;
+    guideHint: string;
+    guideFollowHint: string;
+    centreLine: string;
+    returnHint: string;
+  };
+  checkpoints: {
+    breathLines: string[];
+    noBreathLines: string[];
+    cueIn: string;
+    cuePause: string;
+    cueOut: string;
+    noBreathCue: string;
+    continueLabel: string;
+  };
+  ending: {
+    eyebrow: string;
+    heading: string;
+    line: string;
+    assessmentLabel: string;
+    practiseAgainLabel: string;
+    memberSavedLabel: string;
+    memberSaveFailedLabel: string;
+    tryAnotherLabel: string;
+    backToDashboardLabel: string;
+  };
+  timings: {
+    inhaleSeconds: number;
+    pauseSeconds: number;
+    exhaleSeconds: number;
+    centreCycles: number;
+    noBreathMarkerSeconds: number;
+    noBreathCentreSeconds: number;
+  };
+}
+
+/** Response shape of GET /api/v1/return-path, per that route. */
+export interface ReturnPathResponse {
+  practiceId: string;
+  /** Levels this member may start (1 spiral, 2 seven circuits, 3 eleven circuits). */
+  allowedLevels: (1 | 2 | 3)[];
+  content: ReturnPathContent;
 }
