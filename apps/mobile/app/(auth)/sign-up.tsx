@@ -2,13 +2,21 @@ import { useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { useSignUp } from '@clerk/clerk-expo';
 import { Link, useRouter } from 'expo-router';
-import { PrimaryButton, ScreenContainer, TextField, ThemedText } from '@/components';
+import {
+  GoogleSignInButton,
+  PrimaryButton,
+  ScreenContainer,
+  TextField,
+  ThemedText,
+} from '@/components';
 import { extractClerkErrorMessage } from '@/lib/clerk-errors';
+import { useWarmUpBrowser } from '@/hooks/useWarmUpBrowser';
 import { colors, spacing } from '@/theme';
 
 const logoMark = require('../../assets/images/logo-mark.png');
 
 export default function SignUpScreen() {
+  useWarmUpBrowser();
   const { signUp, setActive, isLoaded } = useSignUp();
   const router = useRouter();
 
@@ -85,6 +93,16 @@ export default function SignUpScreen() {
           </>
         ) : (
           <>
+            <GoogleSignInButton onError={setErrorMessage} />
+
+            <View style={styles.dividerRow}>
+              <View style={styles.dividerLine} />
+              <ThemedText variant="caption" color={colors.charcoal} style={styles.dividerLabel}>
+                or
+              </ThemedText>
+              <View style={styles.dividerLine} />
+            </View>
+
             <TextField
               label="Email"
               value={email}
@@ -139,6 +157,19 @@ const styles = StyleSheet.create({
   subtitle: {
     marginTop: spacing.sm,
     textAlign: 'center',
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: spacing.lg,
+  },
+  dividerLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.border,
+  },
+  dividerLabel: {
+    marginHorizontal: spacing.sm,
   },
   footer: {
     flexDirection: 'row',
