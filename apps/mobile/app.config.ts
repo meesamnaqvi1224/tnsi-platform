@@ -8,6 +8,7 @@ import type { ExpoConfig } from 'expo/config';
 const config: ExpoConfig = {
   name: 'TNSI',
   slug: 'tnsi-mobile',
+  owner: 'carolinereeds-team',
   scheme: 'tnsi',
   version: '0.1.0',
   orientation: 'portrait',
@@ -51,6 +52,9 @@ const config: ExpoConfig = {
   },
   extra: {
     router: {},
+    eas: {
+      projectId: 'd9ce255d-f07d-4ff5-afa4-0efe4518489a',
+    },
   },
 };
 
