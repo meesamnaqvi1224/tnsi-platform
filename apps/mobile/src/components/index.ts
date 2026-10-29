@@ -1,6 +1,7 @@
 export { ScreenContainer } from './ScreenContainer';
 export { ThemedText } from './ThemedText';
 export { PrimaryButton } from './PrimaryButton';
+export { GoogleSignInButton } from './GoogleSignInButton';
 export { Card } from './Card';
 export { SectionLabel } from './SectionLabel';
 export { PageHeader } from './PageHeader';
