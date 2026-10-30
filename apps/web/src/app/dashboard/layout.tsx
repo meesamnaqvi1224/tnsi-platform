@@ -14,7 +14,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const firstName = user.fullName?.trim().split(/\s+/)[0] || null;
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    // `overflow-clip`, not `overflow-hidden`: hidden boxes can still be scrolled
+    // programmatically (Next's scroll-into-view on navigation), which dragged the
+    // whole shell — sidebar included — up and left blank space below.
+    <div className="flex h-screen overflow-clip">
       <DashboardSidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
         <DashboardTopbar firstName={firstName} />
