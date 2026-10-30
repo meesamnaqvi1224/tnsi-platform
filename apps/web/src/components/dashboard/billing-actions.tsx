@@ -100,34 +100,37 @@ export function MembershipCheckout({
     <Stack gap="lg">
       <fieldset className="m-0 border-0 p-0" disabled={unavailable}>
         <legend className="sr-only">Choose a plan</legend>
-        <div className="border-foreground/15 divide-foreground/15 divide-y border-y">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {plans.map((plan) => {
             const selected = plan.tier === tier;
+            const highlighted = plan.tier === 'annual';
             return (
               <label
                 key={plan.tier}
                 className={cn(
-                  'interaction-colors flex cursor-pointer items-baseline gap-4 py-4',
+                  'interaction-colors flex cursor-pointer flex-col gap-3 rounded-xl border p-5',
+                  highlighted
+                    ? 'border-(--membership-bronze) bg-(--m-sand-bg)'
+                    : 'border-foreground/15 bg-(--m-sand-bg)/60',
+                  selected && 'ring-2 ring-(--membership-bronze) ring-offset-2',
                   unavailable && 'cursor-not-allowed opacity-60',
                 )}
               >
-                <input
-                  type="radio"
-                  name="membership-plan"
-                  value={plan.tier}
-                  checked={selected}
-                  onChange={() => setTier(plan.tier)}
-                  className="accent-foreground size-4 shrink-0 translate-y-0.5"
-                />
-                <span className="flex flex-1 flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-                  <span className="font-heading text-2xl leading-none font-semibold tracking-tight">
-                    {plan.price}
-                  </span>
-                  <span className="text-muted-foreground text-sm">
-                    {plan.label}
-                    {plan.note ? ` · ${plan.note}` : ''}
-                  </span>
+                <span className="flex items-center justify-between gap-3">
+                  <span className="text-foreground/70 text-sm">{plan.label}</span>
+                  <input
+                    type="radio"
+                    name="membership-plan"
+                    value={plan.tier}
+                    checked={selected}
+                    onChange={() => setTier(plan.tier)}
+                    className="accent-foreground size-4 shrink-0"
+                  />
                 </span>
+                <span className="font-heading text-3xl leading-none font-semibold tracking-tight">
+                  {plan.price}
+                </span>
+                {plan.note ? <span className="text-foreground/80 text-sm">{plan.note}</span> : null}
               </label>
             );
           })}

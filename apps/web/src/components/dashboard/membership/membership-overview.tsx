@@ -1,6 +1,6 @@
 import * as React from 'react';
 import NextLink from 'next/link';
-import { Alert, cn } from '@tnsi/ui';
+import { Alert, buttonVariants, cn } from '@tnsi/ui';
 import {
   MEMBERSHIP_ANNUAL_SAVING_PERCENT,
   MEMBERSHIP_FREE_POWERDROPS,
@@ -13,7 +13,15 @@ import {
   StartTrialButton,
   type MembershipPlanOption,
 } from '@/components/dashboard/billing-actions';
+import type { MembershipHighlights } from '@/lib/membership-highlights';
 import type { MembershipView } from '@/lib/membership-view';
+import {
+  IncludeGroups,
+  StarterCards,
+  StatTile,
+  TrialRing,
+  tintStyle,
+} from '@/components/dashboard/membership/membership-visuals';
 
 /**
  * The member's Regulation Suite™ membership page — the body of
@@ -26,13 +34,16 @@ import type { MembershipView } from '@/lib/membership-view';
  * Stripe checkout / portal endpoints.
  */
 
-const eyebrowClass = 'text-muted-foreground font-mono text-xs tracking-[0.25em] uppercase';
+const eyebrowClass = 'text-foreground/70 font-mono text-xs tracking-[0.25em] uppercase';
 const sectionHeadingClass = eyebrowClass;
-const bodyClass = 'text-muted-foreground max-w-[60ch] text-base leading-[1.8]';
+const bodyClass = 'text-foreground/70 max-w-[60ch] text-base leading-[1.8]';
 
 /** A restrained bronze, derived from the brand's bronze accent the way the site's other editorial bands derive theirs. */
-const bronzeStyle = {
+const pageStyle = {
   '--membership-bronze': 'color-mix(in oklch, var(--accent-bronze) 80%, var(--neutral-700))',
+  // The same bronze, lifted so it reads on the dark status card.
+  '--membership-gold': 'color-mix(in oklch, var(--accent-bronze) 65%, white)',
+  ...tintStyle,
 } as React.CSSProperties;
 
 interface AccessItem {
@@ -147,11 +158,11 @@ function ItemList({
 function Details({ rows }: { rows: { term: string; value: string }[] }) {
   if (rows.length === 0) return null;
   return (
-    <dl className="border-foreground/15 m-0 border-t">
+    <dl className="m-0 rounded-xl border border-(--m-sand-bd) bg-(--m-sand-bg) px-5">
       {rows.map((row) => (
         <div
           key={row.term}
-          className="border-foreground/15 grid grid-cols-1 gap-x-8 gap-y-1 border-b py-3.5 sm:grid-cols-[11rem_1fr]"
+          className="border-foreground/15 grid grid-cols-1 gap-x-8 gap-y-1 border-b py-3.5 last:border-b-0 sm:grid-cols-[11rem_1fr]"
         >
           <dt className={cn(eyebrowClass, 'sm:pt-1')}>{row.term}</dt>
           <dd className="m-0 text-base">{row.value}</dd>
@@ -284,14 +295,14 @@ function ManageSection({ view }: { view: MembershipView }) {
       {view.canManageBilling ? (
         <div className="flex flex-col gap-4">
           <ManageBillingButton label={label} variant="primary" />
-          <p className="text-muted-foreground max-w-[60ch] text-sm leading-relaxed">
+          <p className="text-foreground/70 max-w-[60ch] text-sm leading-relaxed">
             Billing is handled securely by Stripe. Update your payment method, view your invoices
             and billing history, or cancel from the billing portal. If you cancel, your access
             continues until the end of the period you have paid for.
           </p>
         </div>
       ) : (
-        <p className="text-muted-foreground max-w-[60ch] text-sm leading-relaxed">
+        <p className="text-foreground/70 max-w-[60ch] text-sm leading-relaxed">
           This membership isn&apos;t billed through Stripe, so there is nothing to manage here. To
           make a change,{' '}
           <NextLink href="/contact" className="interaction-text-link-underline">
@@ -341,12 +352,15 @@ function UpgradeSection({
         </p>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <h3 id="unlock-heading" className={sectionHeadingClass}>
-          Membership includes
-        </h3>
-        <ItemList labelledBy="unlock-heading" items={PAID_INCLUDES.map((label) => ({ label }))} />
-      </div>
+      {/* A member in their trial already sees what is included above; do not list it twice. */}
+      {view.hasPaidAccess ? null : (
+        <div className="flex flex-col gap-4">
+          <h3 id="unlock-heading" className={sectionHeadingClass}>
+            Membership includes
+          </h3>
+          <IncludeGroups labelledBy="unlock-heading" />
+        </div>
+      )}
 
       {offerTrial ? (
         <div className="flex flex-col gap-4">
@@ -373,7 +387,7 @@ function UpgradeSection({
               : 'Regulation Suite™ membership is not open for enrolment yet.'
           }
         />
-        <p className="text-muted-foreground max-w-[60ch] text-sm leading-relaxed">
+        <p className="text-foreground/70 max-w-[60ch] text-sm leading-relaxed">
           Paid membership begins when you choose a plan and complete checkout. If you cancel, your
           access continues until the end of the period you have paid for. Lifetime membership is
           unavailable for new purchases.
@@ -459,6 +473,8 @@ export interface MembershipOverviewProps {
   checkoutCanceled?: boolean;
   /** Which plan starts selected (from `?plan=`, already validated). Selecting is not purchasing: checkout still needs the button. */
   defaultPlan?: MembershipPlanOption['tier'];
+  /** The member's own counts and real practices to begin with. Only passed for a member with full access. */
+  highlights?: MembershipHighlights;
 }
 
 export function MembershipOverview({
@@ -468,6 +484,7 @@ export function MembershipOverview({
   checkoutOutcome,
   checkoutCanceled = false,
   defaultPlan,
+  highlights,
 }: MembershipOverviewProps) {
   const rows = detailRows(view);
   const isPaidState = view.hasPaidAccess;
@@ -476,22 +493,66 @@ export function MembershipOverview({
   const inTrial = view.kind === 'trialing' && view.plan === null;
   const showUpgrade = view.kind === 'free' || view.kind === 'ended' || inTrial;
   const actionFirst = view.kind === 'ending' || view.kind === 'payment_issue';
+  // Which day of the trial this is, from the server's own days-remaining count (day 1 on the day it starts).
+  const trialDay =
+    view.kind === 'trialing' && view.trialDaysRemaining !== null
+      ? Math.min(
+          Math.max(MEMBERSHIP_TRIAL_DAYS - view.trialDaysRemaining + 1, 1),
+          MEMBERSHIP_TRIAL_DAYS,
+        )
+      : null;
 
   return (
-    <div style={bronzeStyle} className="flex flex-col gap-(--space-3xl)">
-      <header className="flex flex-col gap-6">
-        <p className={eyebrowClass}>Regulation Suite™</p>
-        <h1 className="font-heading text-[2.5rem] leading-[1.02] font-semibold tracking-tight text-balance sm:text-6xl">
-          {view.statusLabel}
-        </h1>
-        <Rule />
-        <Summary view={view} />
+    <div style={pageStyle} className="flex flex-col gap-(--space-3xl)">
+      <header className="dark bg-background text-foreground flex flex-col gap-8 rounded-2xl p-6 sm:flex-row sm:items-center sm:justify-between sm:p-10">
+        <div className="flex min-w-0 flex-col gap-6">
+          <p className={eyebrowClass}>Regulation Suite™</p>
+          <h1 className="font-heading text-[2.5rem] leading-[1.02] font-semibold tracking-tight text-balance sm:text-6xl">
+            {view.statusLabel}
+          </h1>
+          <Rule />
+          <Summary view={view} />
+          {highlights && highlights.starters[0] ? (
+            <NextLink
+              href={`/dashboard/practices/${highlights.starters[0].id}`}
+              className={cn(buttonVariants({ variant: 'primary', size: 'lg' }), 'w-fit')}
+            >
+              {highlights.completed === 0 && highlights.inProgress === 0
+                ? 'Start your first practice'
+                : 'Continue practising'}
+            </NextLink>
+          ) : null}
+        </div>
+        {trialDay !== null ? <TrialRing day={trialDay} total={MEMBERSHIP_TRIAL_DAYS} /> : null}
       </header>
 
       {checkoutSuccess ? <CheckoutReturnNotice outcome={checkoutOutcome} view={view} /> : null}
       {checkoutCanceled ? <Alert>Checkout was canceled — you have not been charged.</Alert> : null}
 
       {rows.length > 0 ? <Details rows={rows} /> : null}
+
+      {isPaidState && highlights ? (
+        <>
+          {highlights.starters.length > 0 ? (
+            <section aria-labelledby="begin-heading" className="flex flex-col gap-4">
+              <h2 id="begin-heading" className={sectionHeadingClass}>
+                {trialDay !== null && trialDay <= 7 ? 'Your First Week' : 'Places To Begin'}
+              </h2>
+              <StarterCards practices={highlights.starters} />
+            </section>
+          ) : null}
+          <section aria-labelledby="progress-heading" className="flex flex-col gap-4">
+            <h2 id="progress-heading" className={sectionHeadingClass}>
+              Your Practice
+            </h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <StatTile tint="sage" label="Practices completed" value={highlights.completed} />
+              <StatTile tint="dusk" label="In progress" value={highlights.inProgress} />
+              <StatTile tint="sand" label="Saved" value={highlights.saved} />
+            </div>
+          </section>
+        </>
+      ) : null}
 
       {/* A cancelled renewal or a payment problem is the thing the member came to act on,
           so its action sits straight under the details instead of below the long list. */}
@@ -520,10 +581,7 @@ export function MembershipOverview({
           <h2 id="includes-heading" className={sectionHeadingClass}>
             Your Membership Includes
           </h2>
-          <ItemList
-            labelledBy="includes-heading"
-            items={PAID_INCLUDES.map((label) => ({ label }))}
-          />
+          <IncludeGroups labelledBy="includes-heading" />
         </section>
       ) : null}
 

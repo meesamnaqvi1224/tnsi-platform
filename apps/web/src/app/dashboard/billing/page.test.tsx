@@ -23,6 +23,11 @@ vi.mock('@/lib/billing', () => ({
   getBillingState: () => mockGetBillingState(),
 }));
 
+const mockGetHighlights = vi.fn();
+vi.mock('@/lib/membership-highlights', () => ({
+  getMembershipHighlights: () => mockGetHighlights(),
+}));
+
 const mockReconcile = vi.fn();
 vi.mock('@/lib/reconcile-checkout-session', () => ({
   reconcileCheckoutReturn: (...args: unknown[]) => mockReconcile(...args),
@@ -122,6 +127,14 @@ function openMembership() {
 beforeEach(() => {
   vi.clearAllMocks();
   for (const k of KEYS) delete process.env[k];
+  mockGetHighlights.mockResolvedValue({
+    completed: 0,
+    inProgress: 0,
+    saved: 0,
+    starters: [
+      { id: 'p1', title: 'The Return Path', contentType: 'interactive', typeLabel: 'Interactive' },
+    ],
+  });
 });
 afterEach(() => {
   for (const k of KEYS) {
@@ -291,6 +304,48 @@ describe('MembershipPage — free trial (app-managed)', () => {
     expect(t).toContain('Your Membership Includes');
     expect(t).not.toContain('continues on the');
     expect(t).not.toContain('first payment');
+  });
+
+  it('shows which day of the trial it is, from the days left', async () => {
+    expect(await render(trialing(20))).toContain('aria-label="Day 11 of 30"');
+    expect(await render(trialing(30))).toContain('aria-label="Day 1 of 30"');
+  });
+
+  it("shows the member's own counts, real practices to begin with, and every approved inclusion once", async () => {
+    mockGetHighlights.mockResolvedValue({
+      completed: 3,
+      inProgress: 1,
+      saved: 2,
+      starters: [
+        {
+          id: 'p1',
+          title: 'The Return Path',
+          contentType: 'interactive',
+          typeLabel: 'Interactive',
+        },
+      ],
+    });
+    const html = await render(trialing(20));
+    const t = text(html);
+    expect(t).toContain('Practices completed 3');
+    expect(t).toContain('In progress 1');
+    expect(t).toContain('Saved 2');
+    expect(t).toContain('The Return Path');
+    expect(html).toContain('href="/dashboard/practices/p1"');
+    expect(t).toContain('Continue practising');
+    for (const label of PAID_INCLUDES) {
+      expect(t.split(label).length - 1, label).toBe(1);
+    }
+  });
+
+  it('a member who has not started yet is invited to start their first practice', async () => {
+    expect(text(await render(trialing(20)))).toContain('Start your first practice');
+  });
+
+  it('a free member gets no practice counts and the page never reads them', async () => {
+    const t = text(await render(billing({})));
+    expect(t).not.toContain('Practices completed');
+    expect(mockGetHighlights).not.toHaveBeenCalled();
   });
 
   it('has no billing to manage (no Stripe customer, no plan) and shows no Manage Membership', async () => {

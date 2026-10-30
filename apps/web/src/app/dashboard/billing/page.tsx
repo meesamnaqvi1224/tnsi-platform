@@ -4,6 +4,7 @@ import { requireAuthOrRedirect } from '@/lib/auth-api';
 import { getBillingState } from '@/lib/billing';
 import { reconcileCheckoutReturn } from '@/lib/reconcile-checkout-session';
 import { isMembershipOpen } from '@/lib/membership';
+import { getMembershipHighlights } from '@/lib/membership-highlights';
 import { parsePreselectedPlan } from '@/lib/membership-links';
 import { buildMembershipView } from '@/lib/membership-view';
 import { createPageMetadata } from '@/lib/seo';
@@ -41,6 +42,9 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
       ? await reconcileCheckoutReturn({ userId: user.id, sessionId })
       : undefined;
   const billing = await getBillingState(user.id);
+  const view = buildMembershipView(billing);
+  // The member's own counts and a few real practices, only for someone who can open them.
+  const highlights = view.hasPaidAccess ? await getMembershipHighlights(user.id) : undefined;
 
   return (
     <main id="main-content">
@@ -48,7 +52,8 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
         <Container size="xl">
           <div className="mx-auto max-w-3xl">
             <MembershipOverview
-              view={buildMembershipView(billing)}
+              view={view}
+              highlights={highlights}
               membershipOpen={isMembershipOpen()}
               checkoutSuccess={Boolean(success)}
               checkoutOutcome={checkoutReturn?.status}
