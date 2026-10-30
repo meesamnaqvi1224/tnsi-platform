@@ -60,7 +60,7 @@ function ScaleField({
               <label
                 htmlFor={id}
                 aria-label={`${n} - ${valueLabels[n - 1]}`}
-                className="peer-checked:border-foreground peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:ring-ring border-border text-muted-foreground duration-base ease-standard flex size-11 min-w-11 cursor-pointer items-center justify-center rounded-full border text-sm font-medium transition-colors peer-checked:border-2 peer-checked:font-semibold peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+                className="peer-checked:border-foreground peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:ring-ring border-foreground/30 bg-background/70 text-foreground/80 duration-base ease-standard flex size-11 min-w-11 cursor-pointer items-center justify-center rounded-full border text-sm font-medium transition-colors peer-checked:border-2 peer-checked:font-semibold peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
               >
                 {n}
               </label>
@@ -84,6 +84,8 @@ export function CheckInForm() {
   const [mood, setMood] = React.useState<number | null>(null);
   const [capacity, setCapacity] = React.useState<number | null>(null);
   const [notes, setNotes] = React.useState('');
+  // The note is optional, so it starts folded away; it opens on request (or stays open once it has text).
+  const [noteOpen, setNoteOpen] = React.useState(false);
   const [status, setStatus] = React.useState<Status>('idle');
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
@@ -156,7 +158,7 @@ export function CheckInForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate={false}>
-      <Stack gap="xl">
+      <Stack gap="lg">
         {status === 'error' && errorMessage ? (
           <Alert variant="destructive">{errorMessage}</Alert>
         ) : null}
@@ -182,19 +184,29 @@ export function CheckInForm() {
           disabled={submitting}
         />
 
-        <Stack gap="sm">
-          <Label htmlFor="check-in-notes">Anything you&rsquo;d like to note (optional)</Label>
-          <Textarea
-            id="check-in-notes"
-            name="notes"
-            rows={3}
-            maxLength={2000}
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-            disabled={submitting}
-            className="border-border/80 bg-background rounded-sm"
-          />
-        </Stack>
+        {noteOpen || notes ? (
+          <Stack gap="sm">
+            <Label htmlFor="check-in-notes">Anything you&rsquo;d like to note (optional)</Label>
+            <Textarea
+              id="check-in-notes"
+              name="notes"
+              rows={3}
+              maxLength={2000}
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
+              disabled={submitting}
+              className="border-border/80 bg-background rounded-sm"
+            />
+          </Stack>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setNoteOpen(true)}
+            className="interaction-text-link-underline text-foreground/80 w-fit text-sm underline underline-offset-4"
+          >
+            Add a note
+          </button>
+        )}
 
         <Stack gap="xs">
           {mood === null || capacity === null ? (

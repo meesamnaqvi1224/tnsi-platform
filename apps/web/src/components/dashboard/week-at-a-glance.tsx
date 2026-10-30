@@ -1,14 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Divider,
-  Eyebrow,
-  Stack,
-  Text,
-  cn,
-} from '@tnsi/ui';
+import { Divider, Eyebrow, Stack, Text, cn } from '@tnsi/ui';
 import type { CheckIn } from '@tnsi/db/schema';
 
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -55,52 +45,51 @@ export function WeekAtAGlance({ recentCheckIns }: WeekAtAGlanceProps) {
 
   return (
     <section aria-labelledby="week-heading">
-      <Card>
-        <CardHeader>
-          <Eyebrow>This Week</Eyebrow>
-          <CardTitle
-            id="week-heading"
-            className="font-heading text-foreground text-2xl font-semibold tracking-tight"
-          >
-            Your week at a glance
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Stack gap="lg">
-            <div className="flex justify-between">
-              {days.map((d, i) => {
-                const checked = checkedDates.has(isoDate(d));
-                return (
-                  <div key={i} className="flex flex-col items-center gap-(--space-xs)">
-                    <Text tone="muted" size="xs">
-                      {DAY_LABELS[d.getDay() === 0 ? 6 : d.getDay() - 1]}
-                    </Text>
-                    <span
-                      role="img"
-                      aria-label={`${d.toLocaleDateString('en-GB', { weekday: 'long' })}${checked ? ', checked in' : ', no check-in'}`}
-                      className={cn(
-                        'size-7 rounded-full border',
-                        checked
-                          ? 'bg-foreground border-foreground'
-                          : 'border-border bg-transparent',
-                      )}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-
-            <Text tone="muted" size="sm">
-              {count} check-in{count === 1 ? '' : 's'} this week.
-            </Text>
-            <Divider />
-            <Text className="font-heading text-center text-lg leading-relaxed italic">
-              &ldquo;Consistency isn&rsquo;t about perfection. It&rsquo;s about coming back to
-              yourself.&rdquo;
-            </Text>
+      {/* Tinted with the page's own custom properties (set by the dashboard page). */}
+      <div className="rounded-xl border border-(--m-sage-bd) bg-(--m-sage-bg) p-5">
+        <Stack gap="lg">
+          <Stack gap="sm">
+            <Eyebrow>This Week</Eyebrow>
+            <h2
+              id="week-heading"
+              className="font-heading text-foreground text-2xl font-semibold tracking-tight"
+            >
+              Your week at a glance
+            </h2>
           </Stack>
-        </CardContent>
-      </Card>
+          <div className="flex justify-between">
+            {days.map((d, i) => {
+              const checked = checkedDates.has(isoDate(d));
+              return (
+                <div key={i} className="flex flex-col items-center gap-(--space-xs)">
+                  <Text tone="muted" size="xs">
+                    {DAY_LABELS[d.getDay() === 0 ? 6 : d.getDay() - 1]}
+                  </Text>
+                  <span
+                    role="img"
+                    aria-label={`${d.toLocaleDateString('en-GB', { weekday: 'long' })}${checked ? ', checked in' : ', no check-in'}`}
+                    className={cn(
+                      'size-7 rounded-full border',
+                      checked
+                        ? 'border-(--m-sage-ink) bg-(--m-sage-ink)'
+                        : 'border-(--m-sage-ink)/40 bg-transparent',
+                    )}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          <Text tone="muted" size="sm">
+            {count} check-in{count === 1 ? '' : 's'} this week.
+          </Text>
+          <Divider />
+          <Text className="font-heading text-center text-lg leading-relaxed italic">
+            &ldquo;Consistency isn&rsquo;t about perfection. It&rsquo;s about coming back to
+            yourself.&rdquo;
+          </Text>
+        </Stack>
+      </div>
     </section>
   );
 }

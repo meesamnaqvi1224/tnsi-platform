@@ -136,4 +136,56 @@ describe('DashboardPage — Your Access follows the resolved membership', () => 
     expect(html).toContain('Annual Member');
     expect(html).not.toContain('paid membership has ended');
   });
+
+  it('a member in their free trial is a Trial Membership, not a Free Member', async () => {
+    const DAY = 24 * 60 * 60 * 1000;
+    mockRequireMemberAccessOrRedirect.mockResolvedValue(
+      user({
+        tier: 'free',
+        status: 'active',
+        programs: [],
+        certifications: [],
+        features: [],
+        trialStartedAt: new Date(Date.now() - 3 * DAY),
+        trialEndsAt: new Date(Date.now() + 27 * DAY),
+      }),
+    );
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).toContain('Trial · Day 4 of 30');
+    expect(html).toContain('Your free trial ends on');
+    expect(html).not.toContain('Free Member');
+  });
+});
+
+describe('DashboardPage — one clear next step', () => {
+  it('offers the check-in first when the member has not checked in today', async () => {
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).toContain('Check in today');
+    expect(html).toContain('href="#check-in"');
+  });
+
+  it('once checked in, points at today’s practice instead', async () => {
+    mockGetTodayCheckIn.mockResolvedValue({ id: 'c1' });
+    mockGetTodayPractice.mockResolvedValue({
+      practice: {
+        id: 'p1',
+        title: 'Future Self Integration',
+        description: null,
+        contentType: 'audio',
+        durationSeconds: 600,
+        category: null,
+        difficulty: 1,
+      },
+      completed: false,
+    });
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).not.toContain('Check in today');
+    expect(html).toContain('Begin practice');
+    expect(html).toContain('href="/dashboard/practices/p1"');
+  });
+
+  it('no longer carries the placeholder Account block', async () => {
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).not.toContain('Manage your account details');
+  });
 });

@@ -18,7 +18,7 @@ export type Tint = 'sage' | 'dusk' | 'sand' | 'clay';
  * live on the page wrapper as `--m-*` custom properties (see `tintStyle`).
  * Class names are written out in full so Tailwind can see them.
  */
-const TINT_CLASSES: Record<Tint, { card: string; chip: string; tag: string }> = {
+export const TINT_CLASSES: Record<Tint, { card: string; chip: string; tag: string }> = {
   sage: {
     card: 'bg-(--m-sage-bg) border-(--m-sage-bd)',
     chip: 'bg-(--m-sage-bd) text-(--m-sage-ink)',
@@ -111,10 +111,15 @@ export function StatTile({ tint, label, value }: { tint: Tint; label: string; va
 }
 
 /** Abstract artwork in the brand's own shapes. Used until a practice has an approved thumbnail; never a stand-in for real content. */
-function PracticeArt({ contentType }: { contentType: string }) {
+export function PracticeArt({ contentType }: { contentType: string }) {
   if (contentType === 'interactive') {
     return (
-      <svg viewBox="0 0 160 84" aria-hidden className="block w-full">
+      <svg
+        viewBox="0 0 160 84"
+        preserveAspectRatio="xMidYMax slice"
+        aria-hidden
+        className="block h-28 w-full"
+      >
         <rect width="160" height="84" fill="oklch(0.33 0.05 185)" />
         <g fill="none" stroke="oklch(0.78 0.1 80)" strokeWidth="1.2">
           <circle cx="80" cy="42" r="10" />
@@ -127,7 +132,12 @@ function PracticeArt({ contentType }: { contentType: string }) {
   }
   if (contentType === 'audio') {
     return (
-      <svg viewBox="0 0 160 84" aria-hidden className="block w-full">
+      <svg
+        viewBox="0 0 160 84"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden
+        className="block h-28 w-full"
+      >
         <rect width="160" height="84" fill="oklch(0.32 0.07 295)" />
         <g fill="none" stroke="oklch(0.9 0.03 85)" strokeWidth="1.4">
           <path d="M0 52 Q20 36 40 52 T80 52 T120 52 T160 52" />
@@ -138,7 +148,12 @@ function PracticeArt({ contentType }: { contentType: string }) {
     );
   }
   return (
-    <svg viewBox="0 0 160 84" aria-hidden className="block w-full">
+    <svg
+      viewBox="0 0 160 84"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+      className="block h-28 w-full"
+    >
       <rect width="160" height="84" fill="oklch(0.84 0.05 85)" />
       <circle cx="80" cy="34" r="16" fill="oklch(0.6 0.09 70)" />
       <rect y="56" width="160" height="28" fill="oklch(0.33 0.05 185)" />
