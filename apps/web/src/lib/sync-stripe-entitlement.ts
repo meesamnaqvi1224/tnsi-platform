@@ -12,6 +12,8 @@ import {
   type PaymentFailureUpdate,
 } from '@tnsi/integrations';
 import type Stripe from 'stripe';
+import { attemptNow } from './crm-outbox';
+import { enqueueMembershipChange } from './crm-membership-sync';
 
 export interface SyncStripeEntitlementResult {
   action: 'sync-subscription' | 'skip';
@@ -159,7 +161,13 @@ function paymentFailedAtUpdate(update: PaymentFailureUpdate) {
 const LIVE_STATUSES = new Set(['active', 'trialing', 'past_due', 'unpaid']);
 
 export type RefreshOutcome =
-  { status: 'synced'; detail: string } | { status: 'skipped'; detail: string };
+  | {
+      status: 'synced';
+      detail: string;
+      /** The CRM update queued by this change, if any, for the caller to send once the transaction has committed. */
+      crmOutboxId?: string | null;
+    }
+  | { status: 'skipped'; detail: string };
 
 /**
  * Reads one subscription from Stripe and applies its current state to the
@@ -180,7 +188,13 @@ export async function refreshSubscription(
   deps: SyncDeps,
 ): Promise<RefreshOutcome> {
   const run = deps.runTransaction ?? defaultRun;
-  return run((trx) => refreshSubscriptionInTransaction(trx, plan, deps));
+  const outcome = await run((trx) => refreshSubscriptionInTransaction(trx, plan, deps));
+  // The CRM update was queued inside the transaction; now that it has committed,
+  // try to send it straight away. Best effort: the worker retries it otherwise.
+  if (outcome.status === 'synced' && outcome.crmOutboxId) {
+    await attemptNow(outcome.crmOutboxId).catch(() => undefined);
+  }
+  return outcome;
 }
 
 /**
@@ -322,9 +336,34 @@ export async function refreshSubscriptionInTransaction(
       })
       .where(and(eq(entitlements.userId, row.userId)));
 
+    // 7. Tell the CRM, if what a member would call their membership has changed
+    //    (see crm-membership.ts). Queued inside this transaction so it is never
+    //    lost; it can never fail the sync (see crm-membership-sync.ts).
+    const failure = mapped.values.paymentFailure;
+    const crmOutboxId = await enqueueMembershipChange(trx, {
+      userId: row.userId,
+      before: row,
+      after: {
+        ...row,
+        tier: mapped.values.tier,
+        status: mapped.values.status,
+        stripeSubscriptionId: mapped.values.stripeSubscriptionId,
+        currentPeriodEnd: mapped.values.currentPeriodEnd,
+        cancelAtPeriodEnd: mapped.values.cancelAtPeriodEnd,
+        paymentFailedAt:
+          failure.action === 'start'
+            ? (row.paymentFailedAt ?? failure.at)
+            : failure.action === 'clear'
+              ? null
+              : row.paymentFailedAt,
+      },
+      now: now(),
+    });
+
     return {
       status: 'synced',
       detail: `synced subscription for customer ${plan.stripeCustomerId}`,
+      crmOutboxId,
     };
   })();
 }

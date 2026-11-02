@@ -3,7 +3,11 @@ import { error as apiError, success, unauthorized, internalError } from '@/lib/a
 import { isMembershipOpen } from '@/lib/membership';
 import { runTrialTransaction } from '@/lib/trial';
 import { fetchProviderUserEmails, ProviderLookupError } from '@tnsi/auth/verify/email';
-import { TrialKeyConfigError, UnverifiedEmailError } from '@tnsi/auth/trial/email';
+import {
+  requireVerifiedPrimaryEmail,
+  TrialKeyConfigError,
+  UnverifiedEmailError,
+} from '@tnsi/auth/trial/email';
 import {
   claimTrialForUser,
   decideTrialEligibility,
@@ -89,6 +93,23 @@ export async function POST() {
     });
 
     if (result.status === 'refused') return refusal(result.reason);
+
+    // Tell the CRM so the trial's service emails can start. The trial is already
+    // started, so nothing here can change the response: it is queued durably and
+    // retried by the worker if Flowi is slow. Loaded on demand so the route has no
+    // CRM dependency until a trial has actually started.
+    try {
+      const { notifyTrialStarted } = await import('@/lib/crm-membership-sync');
+      await notifyTrialStarted({
+        userId: user.id,
+        email: requireVerifiedPrimaryEmail(providerUser),
+        fullName: user.fullName,
+        trialStartedAt: result.trialStartedAt,
+        trialEndsAt: result.trialEndsAt,
+      });
+    } catch (failure) {
+      console.error('[trial] CRM update not queued:', describeFailure(failure));
+    }
 
     return success({ trialStartedAt: result.trialStartedAt, trialEndsAt: result.trialEndsAt }, 201);
   } catch (failure) {

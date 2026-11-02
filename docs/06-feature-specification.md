@@ -244,7 +244,40 @@ outage, slow response or missing credential can never lose a submission.
 - **Not done yet:** applying the `crm_outbox` migration to production (before this
   code is deployed), adding `CRON_SECRET`, verification of the custom-field payload
   against the live Flowi account with a throw-away contact, and an admin view of
-  failed rows. Membership state is not mirrored into Flowi (separate project).
+  failed rows.
+
+### Membership and app sign-up events (same outbox)
+
+New kinds `app_signup` and `membership` use the same queue (`kind` is plain text, so
+no migration). Sent: email, first/last name (from the account), one tag, and four
+"TNSI" custom fields - Membership State, Plan, Trial Ends, Paid Through. **Nothing
+else**: no activity, no practice or journey data, nothing health-related.
+
+- **State is not recomputed.** It is read from `resolveMembership` (`@tnsi/auth`),
+  the same decision behind every access check, then translated to the wording of the
+  Flowi dropdown (`apps/web/src/lib/crm-membership.ts`). Only a CHANGE of state
+  sends anything, so duplicate or replayed Stripe events send nothing.
+- **Events and tags:** sign-up `TNSI App Signup` (once, when the account's entitlement
+  row is first created); trial start `TNSI Trial Started`; paying `TNSI Member`;
+  cancelling `TNSI Membership Cancelling`; failed payment `TNSI Payment Issue`;
+  trial over `TNSI Trial Ended` (found by the daily worker run, once per account,
+  marked in `entitlements.metadata.crmTrialEndedQueuedAt`); membership over
+  `TNSI Membership Ended`. A move back to Member (payment recovered, cancellation
+  undone) updates the fields only.
+- **Tags are only ever added.** Flowi workflows remove their entry tag when they start,
+  so the same tag can trigger them again later.
+- **Never blocks the member.** Each queueing step runs in its own savepoint; a failure
+  is logged by error class only and the sign-up, trial or Stripe sync carries on.
+  Stripe-driven updates are queued in the same transaction as the entitlement change.
+- **Timing:** sign-up and Stripe updates are sent right after the response/commit
+  (`after()` / `attemptNow`); the daily worker retries anything left. "Trial ended"
+  can therefore be up to a day late (Hobby cron).
+- **Prerequisite in Flowi:** the "TNSI Plan" dropdown option must read `Annual`
+  (it currently reads `Anuual`), and all seven tags above must exist. Legacy Lifetime
+  members are never touched.
+- **Service messages only:** these tags drive account messages (welcome, trial,
+  payment). They are not marketing consent; see the newsletter and Return Path forms
+  for that.
 
 ## Notification System
 

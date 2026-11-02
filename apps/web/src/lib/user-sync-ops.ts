@@ -8,6 +8,7 @@ import {
   DEFAULT_ENTITLEMENTS,
 } from '@tnsi/auth/sync/user';
 import { getClerkUser } from '@tnsi/auth/client/server';
+import { enqueueAppSignup } from './crm-membership-sync';
 
 /**
  * Database operations backing Clerk user sync. Shared by the webhook route
@@ -87,10 +88,18 @@ export const userSyncOps: UserSyncOperations = {
 
     if (existing.length > 0) return;
 
-    await db.insert(entitlements).values({
-      userId,
-      ...DEFAULT_ENTITLEMENTS,
-    });
+    // Only the call that actually creates the row tells the CRM about the new
+    // account, so a repeated Clerk delivery or a racing session cannot queue a
+    // second sign-up. Queueing never fails the sign-up (see crm-membership-sync.ts).
+    const created = await db
+      .insert(entitlements)
+      .values({
+        userId,
+        ...DEFAULT_ENTITLEMENTS,
+      })
+      .onConflictDoNothing()
+      .returning({ userId: entitlements.userId });
+    if (created.length > 0) await enqueueAppSignup(db, userId);
   },
 
   async getOrCreateUser(clerkUserId: string): Promise<DbUser> {
