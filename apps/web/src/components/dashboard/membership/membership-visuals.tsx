@@ -10,7 +10,7 @@ import { cn } from '@tnsi/ui';
  * from the published library) and these only draw them.
  */
 
-export type Tint = 'sage' | 'dusk' | 'sand' | 'clay';
+export type Tint = 'sage' | 'dusk' | 'sand' | 'clay' | 'mist';
 
 /**
  * One soft colour per kind of content, used the same way everywhere on the
@@ -39,6 +39,11 @@ export const TINT_CLASSES: Record<Tint, { card: string; chip: string; tag: strin
     chip: 'bg-(--m-clay-bd) text-(--m-clay-ink)',
     tag: 'bg-(--m-clay-bd) text-(--m-clay-ink)',
   },
+  mist: {
+    card: 'bg-(--m-mist-bg) border-(--m-mist-bd)',
+    chip: 'bg-(--m-mist-bd) text-(--m-mist-ink)',
+    tag: 'bg-(--m-mist-bd) text-(--m-mist-ink)',
+  },
 };
 
 /** The tint custom properties, set once on the page wrapper. Muted, low-chroma tones that sit with the bronze accent. */
@@ -55,6 +60,9 @@ export const tintStyle = {
   '--m-clay-bg': 'oklch(0.9 0.03 50)',
   '--m-clay-bd': 'oklch(0.84 0.05 50)',
   '--m-clay-ink': 'oklch(0.35 0.07 45)',
+  '--m-mist-bg': 'oklch(0.93 0.015 235)',
+  '--m-mist-bd': 'oklch(0.86 0.03 235)',
+  '--m-mist-ink': 'oklch(0.32 0.05 240)',
 } as React.CSSProperties;
 
 /** Tint cards for a content type; anything unknown falls back to sand. */
@@ -110,54 +118,67 @@ export function StatTile({ tint, label, value }: { tint: Tint; label: string; va
   );
 }
 
+/** A ground colour with a line motif centred on it, never cropped: the motif is always whole, whatever the card's width. */
+function ArtFrame({
+  ground,
+  compact,
+  children,
+}: {
+  ground: string;
+  compact: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      aria-hidden
+      className={compact ? 'h-20 w-full' : 'h-28 w-full'}
+      style={{ background: ground }}
+    >
+      <svg viewBox="0 0 160 84" preserveAspectRatio="xMidYMid meet" className="block h-full w-full">
+        {children}
+      </svg>
+    </div>
+  );
+}
+
 /** Abstract artwork in the brand's own shapes. Used until a practice has an approved thumbnail; never a stand-in for real content. */
-export function PracticeArt({ contentType }: { contentType: string }) {
+export function PracticeArt({
+  contentType,
+  compact = false,
+}: {
+  contentType: string;
+  compact?: boolean;
+}) {
   if (contentType === 'interactive') {
     return (
-      <svg
-        viewBox="0 0 160 84"
-        preserveAspectRatio="xMidYMax slice"
-        aria-hidden
-        className="block h-28 w-full"
-      >
-        <rect width="160" height="84" fill="oklch(0.33 0.05 185)" />
+      <ArtFrame ground="oklch(0.33 0.05 185)" compact={compact}>
         <g fill="none" stroke="oklch(0.78 0.1 80)" strokeWidth="1.2">
           <circle cx="80" cy="42" r="10" />
           <circle cx="80" cy="42" r="20" />
           <circle cx="80" cy="42" r="30" />
           <circle cx="80" cy="42" r="40" strokeDasharray="6 5" />
         </g>
-      </svg>
+      </ArtFrame>
     );
   }
   if (contentType === 'audio') {
     return (
-      <svg
-        viewBox="0 0 160 84"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden
-        className="block h-28 w-full"
-      >
-        <rect width="160" height="84" fill="oklch(0.32 0.07 295)" />
+      <ArtFrame ground="oklch(0.32 0.07 295)" compact={compact}>
         <g fill="none" stroke="oklch(0.9 0.03 85)" strokeWidth="1.4">
           <path d="M0 52 Q20 36 40 52 T80 52 T120 52 T160 52" />
           <path d="M0 62 Q20 46 40 62 T80 62 T120 62 T160 62" opacity=".6" />
           <path d="M0 72 Q20 56 40 72 T80 72 T120 72 T160 72" opacity=".35" />
         </g>
-      </svg>
+      </ArtFrame>
     );
   }
   return (
-    <svg
-      viewBox="0 0 160 84"
-      preserveAspectRatio="xMidYMid slice"
-      aria-hidden
-      className="block h-28 w-full"
+    <ArtFrame
+      ground="linear-gradient(oklch(0.84 0.05 85) 66.6%, oklch(0.33 0.05 185) 66.6%)"
+      compact={compact}
     >
-      <rect width="160" height="84" fill="oklch(0.84 0.05 85)" />
       <circle cx="80" cy="34" r="16" fill="oklch(0.6 0.09 70)" />
-      <rect y="56" width="160" height="28" fill="oklch(0.33 0.05 185)" />
-    </svg>
+    </ArtFrame>
   );
 }
 
@@ -283,5 +304,71 @@ export function IncludeGroups({ labelledBy }: { labelledBy: string }) {
         </section>
       ))}
     </div>
+  );
+}
+
+/** Deep ground colour and a simple line motif for each tint, so a practice's artwork follows its condition. */
+const CARD_ART: Record<Tint, { ground: string; motif: React.ReactNode }> = {
+  sage: {
+    ground: 'oklch(0.33 0.05 185)',
+    motif: (
+      <g fill="none" stroke="oklch(0.78 0.1 80)" strokeWidth="1.3">
+        <path d="M20 62 H140" />
+        <path d="M40 62 Q80 10 120 62" />
+        <path d="M58 62 Q80 30 102 62" />
+      </g>
+    ),
+  },
+  dusk: {
+    ground: 'oklch(0.32 0.07 295)',
+    motif: (
+      <g fill="none" stroke="oklch(0.9 0.03 85)" strokeWidth="1.3">
+        <path d="M10 64 L60 22 L84 42 L110 16 L150 64 Z" />
+      </g>
+    ),
+  },
+  sand: {
+    ground: 'oklch(0.38 0.06 80)',
+    motif: (
+      <g fill="none" stroke="oklch(0.88 0.06 85)" strokeWidth="1.3">
+        <path d="M30 66 L30 26 M30 36 L22 28 M30 44 L38 36" />
+        <path d="M80 66 L80 18 M80 32 L70 22 M80 42 L90 32" />
+        <path d="M130 66 L130 28 M130 38 L122 30 M130 46 L138 38" />
+      </g>
+    ),
+  },
+  clay: {
+    ground: 'oklch(0.4 0.08 45)',
+    motif: (
+      <g fill="none" stroke="oklch(0.85 0.07 60)" strokeWidth="1.3">
+        <path d="M80 64 L80 30" />
+        <path d="M80 42 Q64 36 58 24" />
+        <path d="M80 38 Q96 32 104 20" />
+        <circle cx="80" cy="20" r="5" />
+      </g>
+    ),
+  },
+  mist: {
+    ground: 'oklch(0.34 0.05 240)',
+    motif: (
+      <g fill="none" stroke="oklch(0.88 0.04 235)" strokeWidth="1.3">
+        <circle cx="80" cy="36" r="8" />
+        <circle cx="80" cy="36" r="17" />
+        <circle cx="80" cy="36" r="26" />
+      </g>
+    ),
+  },
+};
+
+/** The artwork band on a practice card: interactive practices keep their rings, others follow their condition's tint. */
+export function CardArt({ contentType, tint }: { contentType: string; tint: Tint | null }) {
+  if (contentType === 'interactive' || tint === null) {
+    return <PracticeArt contentType={contentType} compact />;
+  }
+  const { ground, motif } = CARD_ART[tint];
+  return (
+    <ArtFrame ground={ground} compact>
+      {motif}
+    </ArtFrame>
   );
 }
