@@ -372,3 +372,61 @@ export function CardArt({ contentType, tint }: { contentType: string; tint: Tint
     </ArtFrame>
   );
 }
+
+/** A small square of artwork for a timeline entry: a practice follows its type, a check-in is a soft sand tile. */
+export function ThumbArt({ kind }: { kind: string }) {
+  const frame = 'size-16 shrink-0 overflow-hidden rounded-[0.65rem] sm:size-[4.25rem]';
+  if (kind === 'check_in') {
+    return (
+      <div aria-hidden className={frame} style={{ background: 'oklch(0.86 0.06 85)' }}>
+        <svg viewBox="0 0 68 68" className="block size-full">
+          <g fill="none" stroke="oklch(0.5 0.08 75)" strokeWidth="1.4">
+            <circle cx="34" cy="34" r="6" />
+            <circle cx="34" cy="34" r="13" opacity=".7" />
+            <circle cx="34" cy="34" r="20" opacity=".4" />
+          </g>
+        </svg>
+      </div>
+    );
+  }
+  if (kind === 'interactive') {
+    return (
+      <div aria-hidden className={frame} style={{ background: 'oklch(0.33 0.05 185)' }}>
+        <svg viewBox="0 0 68 68" className="block size-full">
+          <g fill="none" stroke="oklch(0.78 0.1 80)" strokeWidth="1.2">
+            <circle cx="34" cy="34" r="6" />
+            <circle cx="34" cy="34" r="12" />
+            <circle cx="34" cy="34" r="18" />
+            <circle cx="34" cy="34" r="25" strokeDasharray="4 3" />
+          </g>
+        </svg>
+      </div>
+    );
+  }
+  if (kind === 'audio') {
+    return (
+      <div aria-hidden className={frame} style={{ background: 'oklch(0.32 0.07 295)' }}>
+        <svg viewBox="0 0 68 68" className="block size-full">
+          <g fill="none" stroke="oklch(0.9 0.03 85)" strokeWidth="1.4">
+            <path d="M0 30 Q9 20 17 30 T34 30 T51 30 T68 30" />
+            <path d="M0 40 Q9 30 17 40 T34 40 T51 40 T68 40" opacity=".6" />
+            <path d="M0 50 Q9 40 17 50 T34 50 T51 50 T68 50" opacity=".35" />
+          </g>
+        </svg>
+      </div>
+    );
+  }
+  return (
+    <div
+      aria-hidden
+      className={frame}
+      style={{
+        background: 'linear-gradient(oklch(0.84 0.05 85) 62%, oklch(0.33 0.05 185) 62%)',
+      }}
+    >
+      <svg viewBox="0 0 68 68" className="block size-full">
+        <circle cx="34" cy="28" r="12" fill="oklch(0.6 0.09 70)" />
+      </svg>
+    </div>
+  );
+}
