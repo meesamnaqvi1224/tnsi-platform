@@ -10,6 +10,11 @@ vi.mock('@/lib/crm-outbox', () => ({
   failedByCategory: (...a: unknown[]) => failedByCategory(...a),
 }));
 
+const enqueueEndedTrials = vi.fn();
+vi.mock('@/lib/crm-membership-sync', () => ({
+  enqueueEndedTrials: (...a: unknown[]) => enqueueEndedTrials(...a),
+}));
+
 const { GET, POST } = await import('./route');
 const saved = process.env.CRON_SECRET;
 const call = (method: 'GET' | 'POST', auth?: string) =>
@@ -29,6 +34,7 @@ beforeEach(() => {
     purged: 0,
     stoppedForTime: false,
   });
+  enqueueEndedTrials.mockReset().mockResolvedValue(0);
   countFailed.mockReset().mockResolvedValue(0);
   failedByCategory.mockReset().mockResolvedValue({});
   process.env.CRON_SECRET = 's3cret-value-for-tests';
@@ -68,11 +74,29 @@ describe('CRM outbox worker route', () => {
         failed: 0,
         purged: 0,
         stoppedForTime: false,
+        trialsQueued: 0,
         failedRows: 0,
         failedBy: {},
       });
     }
     expect(processOutbox).toHaveBeenCalledTimes(2);
+  });
+
+  it('queues the "trial ended" updates before it sends, and reports how many', async () => {
+    enqueueEndedTrials.mockResolvedValue(4);
+    const body = await (await call('GET', 'Bearer s3cret-value-for-tests')).json();
+    expect(body.trialsQueued).toBe(4);
+    expect(enqueueEndedTrials.mock.invocationCallOrder[0]).toBeLessThan(
+      processOutbox.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it('still sends everything due when finding ended trials fails', async () => {
+    enqueueEndedTrials.mockRejectedValue(new Error('db down'));
+    const res = await call('GET', 'Bearer s3cret-value-for-tests');
+    expect(res.status).toBe(200);
+    expect((await res.json()).trialsQueued).toBe(0);
+    expect(processOutbox).toHaveBeenCalledTimes(1);
   });
 
   it('accepts the request exactly as Vercel Cron makes it: GET, bearer secret, vercel-cron user agent', async () => {

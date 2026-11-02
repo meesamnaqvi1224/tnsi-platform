@@ -4,8 +4,11 @@
  * Verifies webhook signatures and syncs to PostgreSQL.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
 import { syncClerkUser } from '@tnsi/auth/sync/user';
+
+/** Room for the after-response CRM send below (a few seconds of Flowi calls). */
+export const maxDuration = 30;
 
 /**
  * POST /api/webhooks/clerk
@@ -36,6 +39,21 @@ export async function POST(request: NextRequest) {
       action: result.action,
       userId: result.userId,
     });
+
+    // A new account has just been queued for the CRM (see user-sync-ops.ts). Send it
+    // once the response has gone, so the welcome email follows sign-up within a minute
+    // or two instead of waiting for the daily worker. Best effort: anything that does
+    // not go is retried by the worker.
+    if (result.action === 'user.created') {
+      after(async () => {
+        try {
+          const { processOutbox } = await import('@/lib/crm-outbox');
+          await processOutbox({ budgetMs: 8000 });
+        } catch {
+          console.error('[Clerk Webhook] CRM send failed');
+        }
+      });
+    }
 
     return NextResponse.json({ success: true, action: result.action });
   } catch (error) {

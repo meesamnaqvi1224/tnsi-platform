@@ -19,7 +19,8 @@ import {
  * flows back.
  */
 
-export type CrmEventKind = 'contact_form' | 'newsletter' | 'assessment';
+export type CrmEventKind =
+  'contact_form' | 'newsletter' | 'assessment' | 'app_signup' | 'membership';
 
 type Executor = Pick<DB, 'insert'>;
 
