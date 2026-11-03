@@ -66,6 +66,14 @@ export default function PracticesLayout() {
         options={{ headerShown: false, gestureEnabled: false }}
       />
       <Stack.Screen name="breathing/complete" options={{ headerShown: false }} />
+      {/* The two standalone guided audio practices draw their own chrome (see
+          each screen), so the stack header stays off for all six screens. */}
+      <Stack.Screen name="90-second-reset/index" options={{ headerShown: false }} />
+      <Stack.Screen name="90-second-reset/session" options={{ headerShown: false }} />
+      <Stack.Screen name="90-second-reset/complete" options={{ headerShown: false }} />
+      <Stack.Screen name="the-empty-chair/index" options={{ headerShown: false }} />
+      <Stack.Screen name="the-empty-chair/session" options={{ headerShown: false }} />
+      <Stack.Screen name="the-empty-chair/complete" options={{ headerShown: false }} />
     </Stack>
   );
 }

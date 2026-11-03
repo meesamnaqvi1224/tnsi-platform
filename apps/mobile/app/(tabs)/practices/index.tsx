@@ -5,9 +5,11 @@ import { ScreenContainer, ErrorNotice, PageHeader, ThemedText } from '@/componen
 import { PracticeCard } from '@/components/practices/PracticeCard';
 import { PracticeFilterBar } from '@/components/practices/PracticeFilterBar';
 import { PracticesSkeleton } from '@/components/practices/PracticesSkeleton';
+import { GuidedPracticeCard } from '@/components/guided-practice/GuidedPracticeCard';
 import { PowerDropsEntryCard } from '@/components/powerdrops/PowerDropsEntryCard';
 import { SomaticCardsEntryCard } from '@/components/somatic-cards/SomaticCardsEntryCard';
 import { usePractices } from '@/hooks/usePractices';
+import { NINETY_SECOND_RESET, THE_EMPTY_CHAIR } from '@/lib/guided-practices';
 import { colors, spacing } from '@/theme';
 import type { PracticeContentType } from '@/api/types';
 
@@ -70,6 +72,9 @@ export default function PracticesScreen() {
 
       <PowerDropsEntryCard />
       <SomaticCardsEntryCard />
+
+      <GuidedPracticeCard practice={NINETY_SECOND_RESET} />
+      <GuidedPracticeCard practice={THE_EMPTY_CHAIR} />
 
       {state.status === 'loading' && <PracticesSkeleton />}
 
