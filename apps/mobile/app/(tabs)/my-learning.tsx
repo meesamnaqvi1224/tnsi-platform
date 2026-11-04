@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { ScreenContainer, ErrorNotice, PageHeader } from '@/components';
 import { CompletedView } from '@/components/learning/CompletedView';
 import { InProgressView } from '@/components/learning/InProgressView';
@@ -48,6 +48,29 @@ export default function MyLearningScreen() {
   const practicesState = usePractices();
   const historyState = usePracticeHistory();
   const savedState = useSavedPractices();
+
+  // Coming back to this tab (after practising, saving or finishing a practice) shows what the server
+  // says now. The first focus is skipped: the hooks already fetch on mount. The API client changes
+  // identity on every render (see useApiClient), so the refresh functions live in a ref and the focus
+  // callback stays stable.
+  const refreshAll = useRef(() => {});
+  useEffect(() => {
+    refreshAll.current = () => {
+      practicesState.refresh();
+      historyState.refresh();
+      savedState.refresh();
+    };
+  });
+  const firstFocus = useRef(true);
+  useFocusEffect(
+    useCallback(() => {
+      if (firstFocus.current) {
+        firstFocus.current = false;
+        return;
+      }
+      refreshAll.current();
+    }, []),
+  );
 
   const api = useApiClient();
   const removal = useSavedRemoval({
