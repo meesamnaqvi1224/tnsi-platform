@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { ScreenContainer, ErrorNotice, ThemedText, PrimaryButton } from '@/components';
 import { MembershipLockedNotice } from '@/components/membership/MembershipLockedNotice';
-import { PowerDropThumbnail } from '@/components/powerdrops/PowerDropThumbnail';
+import { PowerDropDetailContent } from '@/components/powerdrops/PowerDropDetailContent';
 import { PowerDropsSkeleton } from '@/components/powerdrops/PowerDropsSkeleton';
 import { usePowerDropDetail } from '@/hooks/usePowerDropDetail';
 import { colors, spacing } from '@/theme';
@@ -58,6 +58,9 @@ export default function PowerDropDetailScreen() {
     );
   }
 
+  // A locked PowerDrop (e.g. opened from a deep link): the server sent none of its
+  // content. Same destination as tapping a locked library card; the member chooses to
+  // go there, so there is no automatic redirect.
   if (state.status === 'locked') {
     return (
       <ScreenContainer underHeader inTabs>
@@ -76,54 +79,10 @@ export default function PowerDropDetailScreen() {
   }
 
   const { powerDrop } = state;
-  const title = powerDrop.title.trim();
-  const meta = [powerDrop.focus];
-  if (powerDrop.duration) meta.push(powerDrop.duration);
-  if (powerDrop.category) meta.push(powerDrop.category);
 
   return (
     <ScreenContainer scroll underHeader inTabs>
-      <PowerDropThumbnail
-        title={title}
-        cardImage={powerDrop.cardImage}
-        height={260}
-        style={styles.hero}
-      />
-
-      <ThemedText variant="display" style={styles.title}>
-        {title}
-      </ThemedText>
-      <ThemedText variant="caption" color={colors.charcoal} style={styles.meta}>
-        {meta.join(' · ')}
-      </ThemedText>
-
-      <ThemedText variant="body" style={styles.description}>
-        {powerDrop.description}
-      </ThemedText>
-
-      {powerDrop.instructions.length > 0 ? (
-        <View style={styles.instructions}>
-          <ThemedText variant="label" color={colors.bronze} style={styles.instructionsLabel}>
-            How to
-          </ThemedText>
-          {powerDrop.instructions.map((step, index) => (
-            <View key={`${index}-${step}`} style={styles.instructionRow}>
-              <ThemedText variant="body" color={colors.bronze} style={styles.instructionNumber}>
-                {index + 1}
-              </ThemedText>
-              <ThemedText variant="body" style={styles.instructionText}>
-                {step}
-              </ThemedText>
-            </View>
-          ))}
-        </View>
-      ) : null}
-
-      <View style={styles.anchorCard}>
-        <ThemedText variant="heading" color={colors.navy} style={styles.anchorText}>
-          “{powerDrop.anchorStatement}”
-        </ThemedText>
-      </View>
+      <PowerDropDetailContent powerDrop={powerDrop} />
 
       {justCompleted && !inUse ? (
         <ThemedText variant="body" color={colors.success} style={styles.completedNote}>
@@ -150,46 +109,6 @@ export default function PowerDropDetailScreen() {
 const styles = StyleSheet.create({
   notFoundBody: {
     marginTop: spacing.sm,
-  },
-  hero: {
-    marginBottom: spacing.lg,
-  },
-  title: {
-    marginBottom: spacing.xs,
-  },
-  meta: {
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-    marginBottom: spacing.lg,
-  },
-  description: {
-    marginBottom: spacing.lg,
-  },
-  instructions: {
-    marginBottom: spacing.lg,
-  },
-  instructionsLabel: {
-    textTransform: 'uppercase',
-    marginBottom: spacing.sm,
-  },
-  instructionRow: {
-    flexDirection: 'row',
-    marginBottom: spacing.sm,
-  },
-  instructionNumber: {
-    width: 24,
-  },
-  instructionText: {
-    flex: 1,
-  },
-  anchorCard: {
-    borderLeftWidth: 3,
-    borderLeftColor: colors.bronzeMuted,
-    paddingLeft: spacing.md,
-    marginBottom: spacing.xl,
-  },
-  anchorText: {
-    fontStyle: 'italic',
   },
   completedNote: {
     marginBottom: spacing.md,
