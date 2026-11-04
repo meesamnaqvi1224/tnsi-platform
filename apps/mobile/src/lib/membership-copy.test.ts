@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { Entitlements, MembershipSummary } from '@/api/types';
-import { formatDay, membershipDetailLines } from './membership-copy';
+import {
+  formatDay,
+  membershipActionLabel,
+  membershipDetailLines,
+  membershipStateLabel,
+  membershipSummaryLine,
+  tierLabel,
+} from './membership-copy';
 
 function entitlements(
   membership: Partial<MembershipSummary> & Pick<MembershipSummary, 'state'>,
@@ -198,5 +205,62 @@ describe('ended, paid and cancelling members', () => {
       membership: undefined,
     } as Entitlements;
     expect(text(e)).toBe('Renews 5 December 2026.');
+  });
+});
+
+describe('shared membership labels', () => {
+  const free = entitlements({ state: 'free' });
+  const trial = entitlements(
+    { state: 'trialing', hasPaidAccess: true, trialEndsAt: '2026-11-14T00:00:00.000Z' },
+    {},
+  );
+  const active = entitlements(
+    { state: 'active', hasPaidAccess: true, paidThrough: '2027-01-05T00:00:00.000Z' },
+    { tier: 'annual', currentPeriodEnd: '2027-01-05T00:00:00.000Z' },
+  );
+  const grace = entitlements(
+    { state: 'grace', hasPaidAccess: true, graceEndsAt: '2026-11-10T00:00:00.000Z' },
+    { tier: 'monthly', status: 'past_due' },
+  );
+  const inactive = entitlements({ state: 'inactive' }, { tier: 'monthly', status: 'canceled' });
+
+  it('names the tier', () => {
+    expect(tierLabel(free)).toBe('Free Member');
+    expect(tierLabel(active)).toBe('Annual Member');
+  });
+
+  it('names every state the same way on both screens', () => {
+    expect([free, trial, active, grace, inactive].map(membershipStateLabel)).toEqual([
+      'Free account',
+      'Free trial',
+      'Active',
+      'Payment needs attention',
+      'Membership ended',
+    ]);
+  });
+
+  it('falls back to the raw status for a server without membership', () => {
+    const old = { ...active, membership: undefined } as Entitlements;
+    expect(membershipStateLabel(old)).toBe('Active');
+  });
+
+  it('gives a summary line only where there is a real date to show', () => {
+    expect(membershipSummaryLine(free)).toBeNull();
+    expect(membershipSummaryLine(inactive)).toBeNull();
+    expect(membershipSummaryLine(trial)).toBe('Until 14 November 2026');
+    expect(membershipSummaryLine(active)).toBe('Renews 5 January 2027');
+    expect(membershipSummaryLine(grace)).toBe('Access continues until 10 November 2026');
+    expect(membershipSummaryLine({ ...active, cancelAtPeriodEnd: true })).toBe(
+      'Access until 5 January 2027',
+    );
+    expect(membershipSummaryLine(entitlements({ state: 'trialing' }))).toBeNull();
+  });
+
+  it('labels the website button for the state and never offers a purchase in the app', () => {
+    expect(membershipActionLabel(free)).toBe('View membership on the website');
+    expect(membershipActionLabel(inactive)).toBe('View membership on the website');
+    expect(membershipActionLabel(grace)).toBe('Update payment on the website');
+    expect(membershipActionLabel(active)).toBe('Manage membership on the website');
+    expect(membershipActionLabel(trial)).toBe('View membership on the website');
   });
 });
