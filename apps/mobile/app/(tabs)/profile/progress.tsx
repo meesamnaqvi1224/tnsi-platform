@@ -28,7 +28,7 @@ export default function ProgressScreen() {
   const { state: practicesState } = usePractices();
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
         Progress
       </ThemedText>

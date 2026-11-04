@@ -79,8 +79,8 @@ export function EditableAvatar({ imageUrl, hasImage, initials, size = 72 }: Edit
 const styles = StyleSheet.create({
   badge: {
     position: 'absolute',
-    bottom: -4,
-    right: -4,
+    bottom: -8,
+    right: -14,
     backgroundColor: colors.navy,
     borderRadius: 10,
     paddingHorizontal: 8,

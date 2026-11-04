@@ -41,7 +41,7 @@ export default function PowerDropDetailScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll>
+      <ScreenContainer scroll underHeader inTabs>
         <PowerDropsSkeleton />
       </ScreenContainer>
     );
@@ -49,7 +49,7 @@ export default function PowerDropDetailScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ThemedText variant="heading">This PowerDrop isn&apos;t available.</ThemedText>
         <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
@@ -60,7 +60,7 @@ export default function PowerDropDetailScreen() {
 
   if (state.status === 'locked') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ThemedText variant="heading">This PowerDrop is for members.</ThemedText>
         <MembershipLockedNotice message="This PowerDrop is part of the full PowerDrops™ library, available with a membership." />
       </ScreenContainer>
@@ -69,7 +69,7 @@ export default function PowerDropDetailScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -82,7 +82,7 @@ export default function PowerDropDetailScreen() {
   if (powerDrop.category) meta.push(powerDrop.category);
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <PowerDropThumbnail
         title={title}
         cardImage={powerDrop.cardImage}

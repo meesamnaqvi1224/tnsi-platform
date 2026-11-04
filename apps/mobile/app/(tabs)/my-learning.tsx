@@ -1,183 +1,183 @@
-import { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { ScreenContainer, ErrorNotice, ThemedText, PrimaryButton, PageHeader } from '@/components';
-import { PracticeCard } from '@/components/practices/PracticeCard';
+import { useCallback, useMemo, useState } from 'react';
+import { View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { ScreenContainer, ErrorNotice, PageHeader } from '@/components';
+import { CompletedView } from '@/components/learning/CompletedView';
+import { InProgressView } from '@/components/learning/InProgressView';
+import { LearningTabs } from '@/components/learning/LearningTabs';
+import { SavedView } from '@/components/learning/SavedView';
+import { UndoBar } from '@/components/learning/UndoBar';
 import { PracticesSkeleton } from '@/components/practices/PracticesSkeleton';
+import { useApiClient } from '@/hooks/useApiClient';
+import { usePracticeHistory } from '@/hooks/usePracticeHistory';
 import { usePractices } from '@/hooks/usePractices';
-import { colors, spacing } from '@/theme';
-import type { Practice } from '@/api/types';
-
-/** "2026-06-12T09:00:00.000Z" -> "12 Jun 2026". Local to this screen - no other screen needs a day-level date yet. */
-function formatCompletedDate(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-}
+import { useSavedPractices } from '@/hooks/useSavedPractices';
+import { useSavedRemoval } from '@/hooks/useSavedRemoval';
+import {
+  buildLearningIndex,
+  completedEver,
+  inProgressPractices,
+  parseLearningView,
+  type LearningView,
+} from '@/lib/my-learning';
+import { SAVED_REMOVAL_MESSAGES, visibleSaved } from '@/lib/saved-removal';
 
 /**
- * My Learning: two views onto the same GET /api/v1/practices data Practices
- * already fetches - practices in progress, and practices completed. There is
- * no programme/module/lesson model anywhere in the system (see PHASE_8.1
- * audit), so this deliberately stays a practice-progress view rather than a
- * course tracker - no course/programme/module/lesson/certification language,
- * no invented metrics.
+ * My Learning: the member's relationship with the practice library in three views.
+ *
+ * - In Progress: practices whose latest session is unfinished (GET /api/v1/practices, which
+ *   attaches each practice's latest session).
+ * - Completed: practices completed at least once. The list cannot say this for a practice that was
+ *   restarted, so it comes from Practice History (one entry per completed session, paged), shown one
+ *   entry per practice; the history is only ever loaded a page at a time, by the member's own tap.
+ * - Saved: bookmarked practices (GET /api/v1/practices/saved), whatever their completion state.
+ *
+ * Removing a practice from Saved waits for the server, then offers a brief Undo (see
+ * src/lib/saved-removal.ts); it never changes a practice's In Progress or Completed state.
+ *
+ * The three are independent facts, so one practice can be in all of them; each row shows the other
+ * states it is in. The full record (every session, reflections, check-ins) stays in Practice History
+ * and My Journey, linked from Completed. See src/lib/my-learning.ts for the definitions.
+ *
+ * `?view=saved` (or `completed`) opens a view directly.
  */
 export default function MyLearningScreen() {
-  const router = useRouter();
-  const { state, reload } = usePractices();
+  const params = useLocalSearchParams<{ view?: string }>();
+  const [view, setView] = useState<LearningView>(() => parseLearningView(params.view));
 
-  const practices = useMemo(() => (state.status === 'success' ? state.practices : []), [state]);
+  const practicesState = usePractices();
+  const historyState = usePracticeHistory();
+  const savedState = useSavedPractices();
 
-  // Mirrors apps/web/src/lib/practices.ts's getInProgressPractices: not
-  // completed, some real progress recorded, most recently played first.
-  const continuePractices = useMemo(
+  const api = useApiClient();
+  const removal = useSavedRemoval({
+    unsave: useCallback((id: string) => api.delete(`/api/v1/practices/${id}/save`), [api]),
+    save: useCallback((id: string) => api.post(`/api/v1/practices/${id}/save`), [api]),
+  });
+
+  const practices = useMemo(
+    () => (practicesState.state.status === 'success' ? practicesState.state.practices : []),
+    [practicesState.state],
+  );
+  const history = useMemo(
+    () => (historyState.state.status === 'success' ? historyState.state.history : []),
+    [historyState.state],
+  );
+  // What is still saved: the loaded list less anything removed this visit. Removing a practice from
+  // Saved changes nothing about its In Progress or Completed state.
+  const saved = useMemo(
     () =>
-      practices
-        .filter((p) => {
-          const pct = p.progress?.progressPct ?? 0;
-          return !p.progress?.completed && pct > 0 && pct < 1;
-        })
-        .sort((a, b) => lastPlayedTime(b) - lastPlayedTime(a)),
-    [practices],
+      visibleSaved(
+        savedState.state.status === 'success' ? savedState.state.practices : [],
+        removal.state,
+      ),
+    [savedState.state, removal.state],
+  );
+  const undoTitle = useMemo(() => {
+    if (!removal.state.undoId || savedState.state.status !== 'success') return null;
+    return (
+      savedState.state.practices.find((p) => p.id === removal.state.undoId)?.title.trim() ?? null
+    );
+  }, [removal.state.undoId, savedState.state]);
+
+  const inProgress = useMemo(() => inProgressPractices(practices), [practices]);
+  const completed = useMemo(() => completedEver(history, practices), [history, practices]);
+  const index = useMemo(
+    () =>
+      buildLearningIndex({
+        practices,
+        completed,
+        savedIds: new Set(saved.map((practice) => practice.id)),
+      }),
+    [practices, completed, saved],
   );
 
-  // Mirrors apps/web/src/lib/practices.ts's getRecentCompletions: completed,
-  // most recently completed first.
-  const completedPractices = useMemo(
-    () =>
-      practices
-        .filter((p) => p.progress?.completed === true)
-        .sort((a, b) => completedTime(b) - completedTime(a)),
-    [practices],
-  );
+  // A count is shown only when it is known. Completed is paged, so its count is exact only once
+  // every page has been loaded.
+  const completedCountKnown =
+    historyState.state.status === 'success' && !historyState.state.hasMore;
+  const counts = {
+    ...(practicesState.state.status === 'success' ? { 'in-progress': inProgress.length } : {}),
+    ...(completedCountKnown ? { completed: completed.length } : {}),
+    ...(savedState.state.status === 'success' ? { saved: saved.length } : {}),
+  };
 
   return (
-    <ScreenContainer scroll>
-      <PageHeader
-        eyebrow="My Learning"
-        title="Return to what you've been practising."
-        description="Continue practices you've started or revisit practices you've completed."
-      />
+    <View style={{ flex: 1 }}>
+      <ScreenContainer scroll underHeader inTabs>
+        <PageHeader
+          variant="plain"
+          eyebrow="My Learning"
+          title="Return to what you've been practising."
+          description="Continue practices you've started or revisit practices you've completed."
+        />
 
-      {state.status === 'loading' && <PracticesSkeleton />}
+        <LearningTabs
+          selected={view}
+          onSelect={(next) => {
+            removal.clearError();
+            setView(next);
+          }}
+          counts={counts}
+        />
 
-      {state.status === 'error' && <ErrorNotice message={state.message} onRetry={reload} />}
-
-      {state.status === 'success' && (
-        <>
-          <View style={styles.section}>
-            <View accessibilityRole="header" accessible>
-              <ThemedText variant="heading" style={styles.sectionTitle}>
-                Continue
-              </ThemedText>
-            </View>
-
-            {continuePractices.length === 0 ? (
-              <View>
-                <ThemedText variant="body" style={styles.emptyTitle}>
-                  Nothing in progress yet.
-                </ThemedText>
-                <ThemedText variant="body" color={colors.charcoal}>
-                  Practices you begin will appear here so you can return when you&apos;re ready.
-                </ThemedText>
-              </View>
-            ) : (
-              continuePractices.map((practice) => (
-                <View key={practice.id} style={styles.item}>
-                  <ThemedText variant="caption" color={colors.bronze} style={styles.itemLabel}>
-                    {Math.round((practice.progress?.progressPct ?? 0) * 100)}% complete
-                  </ThemedText>
-                  <PracticeCard practice={practice} />
-                </View>
-              ))
+        {view === 'in-progress' && (
+          <>
+            {practicesState.state.status === 'loading' && <PracticesSkeleton />}
+            {practicesState.state.status === 'error' && (
+              <ErrorNotice message={practicesState.state.message} onRetry={practicesState.reload} />
             )}
-          </View>
-
-          <View style={styles.section}>
-            <View accessibilityRole="header" accessible>
-              <ThemedText variant="heading" style={styles.sectionTitle}>
-                Recently Completed
-              </ThemedText>
-            </View>
-
-            {completedPractices.length === 0 ? (
-              <View>
-                <ThemedText variant="body" style={styles.emptyTitle}>
-                  Nothing completed yet.
-                </ThemedText>
-                <ThemedText variant="body" color={colors.charcoal}>
-                  Completed practices will appear here as you build your practice library.
-                </ThemedText>
-              </View>
-            ) : (
-              completedPractices.map((practice) => {
-                const completedAt = practice.progress?.completedAt;
-                return (
-                  <View key={practice.id} style={styles.item}>
-                    {completedAt ? (
-                      <ThemedText variant="caption" color={colors.bronze} style={styles.itemLabel}>
-                        Completed {formatCompletedDate(completedAt)}
-                      </ThemedText>
-                    ) : null}
-                    <PracticeCard practice={practice} />
-                  </View>
-                );
-              })
+            {practicesState.state.status === 'success' && (
+              <InProgressView practices={inProgress} index={index} />
             )}
-          </View>
+          </>
+        )}
 
-          <View style={styles.browseSection}>
-            <ThemedText variant="body" color={colors.charcoal} style={styles.browseText}>
-              Browse the full practice library.
-            </ThemedText>
-            <PrimaryButton
-              label="Explore Practices"
-              variant="secondary"
-              onPress={() => router.push('/practices')}
-            />
-          </View>
-        </>
-      )}
-    </ScreenContainer>
+        {view === 'completed' && (
+          <>
+            {historyState.state.status === 'loading' && <PracticesSkeleton />}
+            {historyState.state.status === 'error' && (
+              <ErrorNotice message={historyState.state.message} onRetry={historyState.reload} />
+            )}
+            {historyState.state.status === 'success' && (
+              <CompletedView
+                items={completed}
+                index={index}
+                hasMore={historyState.state.hasMore}
+                loadingMore={historyState.state.loadingMore}
+                onLoadMore={historyState.loadMore}
+              />
+            )}
+          </>
+        )}
+
+        {view === 'saved' && (
+          <>
+            {savedState.state.status === 'loading' && <PracticesSkeleton />}
+            {savedState.state.status === 'error' && (
+              <ErrorNotice message={savedState.state.message} onRetry={savedState.reload} />
+            )}
+            {savedState.state.status === 'success' && (
+              <SavedView
+                practices={saved}
+                index={index}
+                pendingId={removal.state.pendingId}
+                onRemove={(practice) => void removal.remove(practice.id)}
+                errorMessage={
+                  removal.state.error ? SAVED_REMOVAL_MESSAGES[removal.state.error] : null
+                }
+              />
+            )}
+          </>
+        )}
+      </ScreenContainer>
+      {removal.state.undoId ? (
+        <UndoBar
+          message={undoTitle ? `Removed “${undoTitle}” from Saved.` : 'Removed from Saved.'}
+          pending={removal.state.pendingId !== null}
+          onUndo={() => void removal.undo()}
+        />
+      ) : null}
+    </View>
   );
 }
-
-function lastPlayedTime(practice: Practice): number {
-  const iso = practice.progress?.lastPlayedAt;
-  if (!iso) return 0;
-  const time = new Date(iso).getTime();
-  return Number.isNaN(time) ? 0 : time;
-}
-
-function completedTime(practice: Practice): number {
-  const iso = practice.progress?.completedAt;
-  if (!iso) return 0;
-  const time = new Date(iso).getTime();
-  return Number.isNaN(time) ? 0 : time;
-}
-
-const styles = StyleSheet.create({
-  section: {
-    marginBottom: spacing.xl,
-  },
-  sectionTitle: {
-    marginBottom: spacing.md,
-  },
-  emptyTitle: {
-    marginBottom: spacing.xs,
-  },
-  item: {
-    marginBottom: spacing.xs,
-  },
-  itemLabel: {
-    textTransform: 'uppercase',
-    marginBottom: spacing.xs,
-  },
-  browseSection: {
-    marginBottom: spacing.xl,
-  },
-  browseText: {
-    marginBottom: spacing.md,
-  },
-});

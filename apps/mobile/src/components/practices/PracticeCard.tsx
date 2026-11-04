@@ -109,9 +109,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  // Inside the thumbnail (the card's padding plus a small inset), not straddling its corner.
   saveButton: {
     position: 'absolute',
-    top: spacing.sm,
-    right: spacing.sm,
+    top: spacing.lg + spacing.sm,
+    right: spacing.lg + spacing.sm,
   },
 });

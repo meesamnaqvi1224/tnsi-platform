@@ -29,14 +29,14 @@ export function LifeBeyondTraumaCard() {
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
     >
       <Image source={thumbnail} style={styles.thumbnail} />
-      <View style={styles.textColumn}>
-        <ThemedText variant="body" color={colors.charcoal}>
-          The Life Beyond Trauma Method™ — the Institute's flagship pathway.
+      <ThemedText variant="body" color={colors.charcoal} style={styles.text}>
+        The Life Beyond Trauma Method™ — the Institute's flagship pathway.
+      </ThemedText>
+      <View style={styles.arrow}>
+        <ThemedText variant="label" color={colors.bronze}>
+          →
         </ThemedText>
       </View>
-      <ThemedText variant="label" color={colors.bronze}>
-        →
-      </ThemedText>
     </Pressable>
   );
 }
@@ -59,7 +59,13 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: radius.md,
   },
-  textColumn: {
+  // A fixed-width slot, so the text column's width does not depend on the arrow glyph's own measured width.
+  arrow: {
+    width: 20,
+    alignItems: 'flex-end',
+  },
+  // The text is itself the row's flexible child, so it takes exactly the width left beside the thumbnail and the arrow.
+  text: {
     flex: 1,
   },
 });

@@ -19,6 +19,8 @@ interface PracticeThumbnailProps {
   thumbnailUrl: string | null;
   contentType: PracticeContentType;
   height?: number;
+  /** The content-type word drawn on the image. Hide it on small thumbnails, where it cannot fit and wraps. */
+  showLabel?: boolean;
   /** Only layout-affecting properties (margin, etc.) are expected here - shared across the <Image>/<View> fallback. */
   style?: StyleProp<ViewStyle>;
 }
@@ -54,6 +56,7 @@ export function PracticeThumbnail({
   thumbnailUrl,
   contentType,
   height = 160,
+  showLabel = true,
   style,
 }: PracticeThumbnailProps) {
   const [failed, setFailed] = useState(false);
@@ -76,9 +79,11 @@ export function PracticeThumbnail({
     return (
       <View style={[styles.interactiveSurface, { height }, style]}>
         <LabyrinthThumb level={2} size={Math.round(height * 0.78)} />
-        <ThemedText variant="label" color={colors.charcoal} style={styles.interactiveLabel}>
-          {capitalize(contentType)}
-        </ThemedText>
+        {showLabel ? (
+          <ThemedText variant="label" color={colors.charcoal} style={styles.interactiveLabel}>
+            {capitalize(contentType)}
+          </ThemedText>
+        ) : null}
       </View>
     );
   }
@@ -92,9 +97,11 @@ export function PracticeThumbnail({
         accessible={false}
       />
       <LinearGradient colors={['transparent', 'rgba(11,21,38,0.75)']} style={styles.gradient}>
-        <ThemedText variant="label" color={colors.cream} style={styles.surfaceLabel}>
-          {capitalize(contentType)}
-        </ThemedText>
+        {showLabel ? (
+          <ThemedText variant="label" color={colors.cream} style={styles.surfaceLabel}>
+            {capitalize(contentType)}
+          </ThemedText>
+        ) : null}
       </LinearGradient>
     </View>
   );

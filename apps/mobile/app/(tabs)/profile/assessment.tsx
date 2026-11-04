@@ -87,7 +87,7 @@ export default function CapacityAssessmentScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll>
+      <ScreenContainer scroll underHeader inTabs>
         <AssessmentSkeleton />
       </ScreenContainer>
     );
@@ -95,7 +95,7 @@ export default function CapacityAssessmentScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ThemedText variant="heading">This assessment isn&apos;t available.</ThemedText>
         <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
@@ -112,7 +112,7 @@ export default function CapacityAssessmentScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -128,7 +128,7 @@ export default function CapacityAssessmentScreen() {
   const submitting = submission.status === 'submitting';
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ThemedText variant="display" style={styles.title}>
           {assessment.title}
@@ -259,7 +259,7 @@ function AssessmentResultView({
   const router = useRouter();
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <ThemedText variant="label" color={colors.bronze} style={styles.resultEyebrow}>
         {title.toUpperCase()} — YOUR RESULT
       </ThemedText>

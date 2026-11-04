@@ -19,7 +19,7 @@ export default function PracticeHistoryScreen() {
   const { state, reload, loadMore } = usePracticeHistory();
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <PageHeader
         eyebrow="Practice History"
         title="Every practice you've completed, most recent first."

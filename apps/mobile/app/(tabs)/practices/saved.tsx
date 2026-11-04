@@ -20,7 +20,7 @@ export default function SavedPracticesScreen() {
   const { state, reload } = useSavedPractices();
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <PageHeader eyebrow="Saved Practices" title="Practices you've chosen to keep close." />
 
       {state.status === 'loading' && <PracticesSkeleton />}

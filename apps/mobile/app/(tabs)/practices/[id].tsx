@@ -88,7 +88,7 @@ export default function PracticeDetailScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll>
+      <ScreenContainer scroll underHeader inTabs>
         <PracticeDetailSkeleton />
       </ScreenContainer>
     );
@@ -96,7 +96,7 @@ export default function PracticeDetailScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ThemedText variant="heading">This practice isn&apos;t available.</ThemedText>
         <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
@@ -107,7 +107,7 @@ export default function PracticeDetailScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -134,7 +134,7 @@ export default function PracticeDetailScreen() {
     practice.contentType === 'interactive' && practice.interactiveKey === RETURN_PATH_KEY;
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       {practice.thumbnailUrl ? (
         <PracticeThumbnail
           thumbnailUrl={practice.thumbnailUrl}

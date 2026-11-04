@@ -44,7 +44,7 @@ export default function SomaticCardDetailScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll>
+      <ScreenContainer scroll underHeader inTabs>
         <SomaticCardsSkeleton />
       </ScreenContainer>
     );
@@ -52,7 +52,7 @@ export default function SomaticCardDetailScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ThemedText variant="heading">This card isn&apos;t available.</ThemedText>
         <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
@@ -63,7 +63,7 @@ export default function SomaticCardDetailScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -73,7 +73,7 @@ export default function SomaticCardDetailScreen() {
   const title = card.title.trim();
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <Pressable
         onPress={() =>
           router.push({

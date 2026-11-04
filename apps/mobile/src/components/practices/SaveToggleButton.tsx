@@ -50,6 +50,8 @@ export function SaveToggleButton({ practiceId, initialSaved, style }: SaveToggle
       accessibilityRole="button"
       accessibilityLabel={saved ? 'Remove practice from saved' : 'Save practice'}
       accessibilityState={{ disabled: pending, selected: saved }}
+      // The pill is 32 dp tall; this grows its touch area to 48 dp (the Android minimum) without changing how it looks.
+      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       style={({ pressed }) => [
         styles.base,
         saved ? styles.saved : styles.notSaved,

@@ -87,7 +87,7 @@ export default function HomeScreen() {
   }, [state, todayPractice?.id]);
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll inTabs>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <WelcomeHeader firstName={user?.firstName} />
 
