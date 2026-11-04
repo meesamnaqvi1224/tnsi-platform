@@ -61,17 +61,22 @@ export function savedRemovalReducer(
     case 'undoStart':
       if (!state.undoId || state.pendingId) return state;
       return { ...state, pendingId: state.undoId, error: null };
-    case 'undoSuccess':
+    case 'undoSuccess': {
+      // The practice being restored is the one in flight, not whatever undoId says now.
+      const restoredId = state.pendingId ?? state.undoId;
       return {
         ...state,
         pendingId: null,
-        removedIds: state.removedIds.filter((id) => id !== state.undoId),
+        removedIds: state.removedIds.filter((id) => id !== restoredId),
         undoId: null,
       };
+    }
     case 'undoFailure':
       // The practice stays removed and the Undo stays on offer until it lapses, so it can be retried.
       return { ...state, pendingId: null, error: 'restore' };
     case 'dismissUndo':
+      // While the Undo request is in flight the offer cannot lapse: its outcome must still land on this practice.
+      if (state.pendingId !== null && state.pendingId === state.undoId) return state;
       return { ...state, undoId: null };
     case 'clearError':
       return { ...state, error: null };

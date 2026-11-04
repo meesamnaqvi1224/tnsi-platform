@@ -100,4 +100,55 @@ describe('Saved removal', () => {
   it('does nothing on Undo when there is nothing to undo', () => {
     expect(reduce(initialSavedRemoval, { type: 'undoStart' })).toBe(initialSavedRemoval);
   });
+
+  describe('Undo still pending when the six-second window ends', () => {
+    const pendingUndo = () =>
+      run([
+        { type: 'unsaveStart', id: 'b' },
+        { type: 'unsaveSuccess', id: 'b' },
+        { type: 'undoStart' },
+      ]);
+
+    it('ignores the timer lapse while the Undo request is in flight', () => {
+      const lapsed = reduce(pendingUndo(), { type: 'dismissUndo' });
+      expect(lapsed.undoId).toBe('b');
+      expect(lapsed.pendingId).toBe('b');
+      expect(lapsed.removedIds).toEqual(['b']);
+    });
+
+    it('restores the practice to its original position when the late Undo succeeds', () => {
+      const done = run([{ type: 'dismissUndo' }, { type: 'undoSuccess' }], pendingUndo());
+      expect(done.removedIds).toEqual([]);
+      expect(done.pendingId).toBeNull();
+      expect(done.undoId).toBeNull();
+      expect(visibleSaved(list, done).map((i) => i.id)).toEqual(['a', 'b', 'c']);
+    });
+
+    it('keeps the practice removed, shows the error and keeps the Undo on offer when the late Undo fails', () => {
+      const failed = run([{ type: 'dismissUndo' }, { type: 'undoFailure' }], pendingUndo());
+      expect(failed.error).toBe('restore');
+      expect(failed.pendingId).toBeNull();
+      expect(failed.undoId).toBe('b');
+      expect(visibleSaved(list, failed).map((i) => i.id)).toEqual(['a', 'c']);
+      // With nothing in flight the offer can now lapse normally.
+      expect(reduce(failed, { type: 'dismissUndo' }).undoId).toBeNull();
+    });
+
+    it('restores the right practice even if undoId was cleared before the success arrived', () => {
+      const forced = { ...pendingUndo(), undoId: null };
+      const done = reduce(forced, { type: 'undoSuccess' });
+      expect(done.removedIds).toEqual([]);
+    });
+
+    it('still lets the offer lapse while only an unsave of another practice is in flight', () => {
+      const s = run([
+        { type: 'unsaveStart', id: 'b' },
+        { type: 'unsaveSuccess', id: 'b' },
+        { type: 'unsaveStart', id: 'c' },
+        { type: 'dismissUndo' },
+      ]);
+      expect(s.undoId).toBeNull();
+      expect(s.pendingId).toBe('c');
+    });
+  });
 });

@@ -22,11 +22,12 @@ export function useSavedRemoval({ unsave, save }: SavedRemovalRequests) {
   const [state, dispatch] = useReducer(savedRemovalReducer, initialSavedRemoval);
 
   // The Undo is offered briefly, then lapses; the removal itself is already final.
+  // No timer runs while a request is in flight; a failed Undo gets a fresh window so it can be retried.
   useEffect(() => {
-    if (!state.undoId) return;
+    if (!state.undoId || state.pendingId) return;
     const timer = setTimeout(() => dispatch({ type: 'dismissUndo' }), UNDO_WINDOW_MS);
     return () => clearTimeout(timer);
-  }, [state.undoId]);
+  }, [state.undoId, state.pendingId]);
 
   const remove = useCallback(
     async (practiceId: string) => {
