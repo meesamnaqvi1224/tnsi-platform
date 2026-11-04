@@ -67,7 +67,7 @@ export default function MembershipScreen() {
   const { state, reload } = useEntitlements();
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <ThemedText variant="display" style={styles.heading}>
         Membership & Access
       </ThemedText>

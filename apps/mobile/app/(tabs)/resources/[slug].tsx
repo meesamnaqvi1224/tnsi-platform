@@ -25,7 +25,7 @@ export default function ArticleDetailScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll>
+      <ScreenContainer scroll underHeader inTabs>
         <ArticleDetailSkeleton />
       </ScreenContainer>
     );
@@ -33,7 +33,7 @@ export default function ArticleDetailScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ThemedText variant="heading">This article isn&apos;t available.</ThemedText>
         <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
@@ -50,7 +50,7 @@ export default function ArticleDetailScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -64,7 +64,7 @@ export default function ArticleDetailScreen() {
   ].filter((part): part is string => Boolean(part));
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       {article.category ? (
         <ThemedText variant="label" color={colors.bronze} style={styles.category}>
           {article.category.title.toUpperCase()}

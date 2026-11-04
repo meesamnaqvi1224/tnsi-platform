@@ -1,10 +1,14 @@
 import type { PropsWithChildren } from 'react';
 import { ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import { colors, spacing } from '@/theme';
 
 interface ScreenContainerProps extends PropsWithChildren {
   scroll?: boolean;
+  /** Set when a navigation header already sits above this screen, so the top safe-area inset is not added a second time. */
+  underHeader?: boolean;
+  /** Set when the tab bar already sits below this screen, so the bottom safe-area inset is not added a second time. */
+  inTabs?: boolean;
   style?: ViewStyle;
 }
 
@@ -12,9 +16,19 @@ interface ScreenContainerProps extends PropsWithChildren {
  * Standard screen chrome: cream background, safe-area aware, consistent
  * horizontal padding. Every Phase 1 screen wraps its content in this.
  */
-export function ScreenContainer({ children, scroll = false, style }: ScreenContainerProps) {
+export function ScreenContainer({
+  children,
+  scroll = false,
+  underHeader = false,
+  inTabs = false,
+  style,
+}: ScreenContainerProps) {
+  const edges: Edge[] = ['left', 'right'];
+  if (!underHeader) edges.push('top');
+  if (!inTabs) edges.push('bottom');
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={edges}>
       {scroll ? (
         <ScrollView contentContainerStyle={[styles.content, style]}>{children}</ScrollView>
       ) : (

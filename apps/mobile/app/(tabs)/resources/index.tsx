@@ -62,8 +62,9 @@ export default function ResourcesScreen() {
     : listSource;
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <PageHeader
+        variant="plain"
         eyebrow="Resources"
         title="Evidence-informed articles, guides, research and educational resources to deepen your understanding of the nervous system."
       />

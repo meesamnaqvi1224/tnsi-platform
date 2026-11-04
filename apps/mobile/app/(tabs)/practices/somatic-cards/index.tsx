@@ -14,7 +14,7 @@ export default function SomaticCardsScreen() {
   const { state, reload } = useSomaticSeriesList();
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <PageHeader
         eyebrow="Somatic Cards"
         title="A library of somatic practice cards from The Nervous System Institute."

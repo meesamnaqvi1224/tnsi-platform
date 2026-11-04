@@ -34,8 +34,9 @@ export default function PracticesScreen() {
   const filtered = filter ? practices.filter((p) => p.contentType === filter) : practices;
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <PageHeader
+        variant="plain"
         eyebrow="Practices"
         title="A library of practices to support your nervous system."
       />

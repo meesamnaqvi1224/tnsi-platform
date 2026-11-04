@@ -20,7 +20,7 @@ export default function SomaticSeriesDetailScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll>
+      <ScreenContainer scroll underHeader inTabs>
         <SomaticCardsSkeleton />
       </ScreenContainer>
     );
@@ -28,7 +28,7 @@ export default function SomaticSeriesDetailScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ThemedText variant="heading">This series isn&apos;t available.</ThemedText>
         <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
@@ -39,7 +39,7 @@ export default function SomaticSeriesDetailScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -48,7 +48,7 @@ export default function SomaticSeriesDetailScreen() {
   const { series } = state;
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <PageHeader
         eyebrow={`Series ${series.seriesNumber}`}
         title={series.title}

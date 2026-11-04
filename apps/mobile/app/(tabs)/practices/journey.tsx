@@ -20,7 +20,7 @@ export default function JourneyScreen() {
   const groups = state.status === 'success' ? groupJourneyEntriesByDate(state.entries) : [];
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <PageHeader
         eyebrow="My Journey"
         title="A record of the practices and moments you've chosen to spend time with."

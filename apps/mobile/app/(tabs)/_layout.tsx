@@ -73,7 +73,7 @@ export default function TabsLayout() {
           headerTintColor: colors.navy,
           headerTitleStyle: { fontFamily: typography.heading.fontFamily },
           headerShadowVisible: false,
-          headerLeft: () => <HomeHeaderButton />,
+          headerLeft: () => <HomeHeaderButton inset />,
         }}
       />
       <Tabs.Screen

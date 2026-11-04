@@ -53,8 +53,9 @@ export default function MyLearningScreen() {
   );
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <PageHeader
+        variant="plain"
         eyebrow="My Learning"
         title="Return to what you've been practising."
         description="Continue practices you've started or revisit practices you've completed."

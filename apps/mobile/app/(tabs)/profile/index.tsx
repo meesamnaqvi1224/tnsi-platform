@@ -79,8 +79,12 @@ export default function ProfileScreen() {
   const initials = initialsFor(user?.firstName ?? null, user?.lastName ?? null, email);
 
   return (
-    <ScreenContainer scroll>
-      <PageHeader eyebrow="Profile" title="Your account, membership and progress." />
+    <ScreenContainer scroll underHeader inTabs>
+      <PageHeader
+        variant="plain"
+        eyebrow="Profile"
+        title="Your account, membership and progress."
+      />
 
       <View style={styles.identityRow}>
         <EditableAvatar
@@ -222,8 +226,9 @@ function LinkRow({ label, path, last }: { label: string; path: string; last?: bo
 function MembershipSummary({ entitlements }: { entitlements: import('@/api/types').Entitlements }) {
   // The server's resolved membership wins: an app-managed free trial is a Free
   // account with status `active`, so only `membership.state` can say "trial".
-  const statusNote =
-    entitlements.membership?.state === 'trialing' ? 'Free trial' : STATUS_NOTE[entitlements.status];
+  const isTrial = entitlements.membership?.state === 'trialing';
+  // A trial is good news, not a problem: only the genuine status problems (payment issues and the like) are drawn in the error colour.
+  const statusNote = isTrial ? 'Free trial' : STATUS_NOTE[entitlements.status];
   const hasPrograms = entitlements.programs.length > 0;
   const hasCertifications = entitlements.certifications.length > 0;
   const showRenewal =
@@ -235,7 +240,11 @@ function MembershipSummary({ entitlements }: { entitlements: import('@/api/types
     <View>
       <ThemedText variant="body">{TIER_LABEL[entitlements.tier]}</ThemedText>
       {statusNote ? (
-        <ThemedText variant="caption" color={colors.error} style={styles.statusNote}>
+        <ThemedText
+          variant="caption"
+          color={isTrial ? colors.charcoal : colors.error}
+          style={styles.statusNote}
+        >
           {statusNote}
         </ThemedText>
       ) : null}

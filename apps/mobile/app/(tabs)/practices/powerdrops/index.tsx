@@ -36,7 +36,7 @@ export default function PowerDropsLibraryScreen() {
   const filtered = category ? browsable.filter((p) => p.category === category) : browsable;
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll underHeader inTabs>
       <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
         POWERDROPS™
       </ThemedText>
