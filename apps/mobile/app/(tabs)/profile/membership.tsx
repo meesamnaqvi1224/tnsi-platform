@@ -1,70 +1,22 @@
-import { Linking, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { useAuth } from '@clerk/clerk-expo';
 import { Card, ErrorNotice, PrimaryButton, ScreenContainer, ThemedText } from '@/components';
 import { MembershipSkeleton } from '@/components/profile/MembershipSkeleton';
 import { useEntitlements } from '@/hooks/useEntitlements';
-import { membershipDetailLines } from '@/lib/membership-copy';
-import { env } from '@/lib/env';
+import {
+  membershipActionLabel,
+  membershipDetailLines,
+  membershipStateLabel,
+  tierLabel,
+} from '@/lib/membership-copy';
+import { openTnsiPage } from '@/lib/open-web';
 import { colors, spacing } from '@/theme';
-import type {
-  Entitlements,
-  EntitlementStatus,
-  EntitlementTier,
-  MembershipState,
-} from '@/api/types';
-
-const TIER_LABEL: Record<EntitlementTier, string> = {
-  free: 'Free Member',
-  monthly: 'Monthly Member',
-  annual: 'Annual Member',
-  lifetime: 'Lifetime Member',
-};
-
-/**
- * Every status shown explicitly on this detailed screen (unlike Profile's
- * compact summary, which hides the unremarkable 'active' case) - "more
- * context than the compact Profile summary" is the whole point of this
- * screen existing.
- */
-const STATUS_LABEL: Record<EntitlementStatus, string> = {
-  active: 'Active',
-  trialing: 'Trial',
-  past_due: 'Payment overdue',
-  canceled: 'Canceled',
-  expired: 'Expired',
-};
-
-/**
- * Preferred over `STATUS_LABEL` whenever the server sends its resolved
- * `membership` — this is the server's own answer to "where does this member
- * stand?", so what the app says always matches what the server enforces
- * (e.g. a payment-failed member inside the 7-day grace period is still
- * entitled, which the raw `past_due` status alone doesn't say).
- */
-const MEMBERSHIP_STATE_LABEL: Record<MembershipState, string> = {
-  free: 'Free account',
-  trialing: 'Free trial',
-  active: 'Active',
-  grace: 'Payment needs attention',
-  inactive: 'Membership ended',
-};
-
-function statusLabelFor(entitlements: Entitlements): string {
-  return entitlements.membership
-    ? MEMBERSHIP_STATE_LABEL[entitlements.membership.state]
-    : STATUS_LABEL[entitlements.status];
-}
-
-/**
- * The real, already-existing web billing page - not invented. Same
- * destination for every state: it already shows either the member's
- * current plan + "Manage billing" (via the existing Stripe Customer
- * Portal, web-only) or the subscribe options, depending on their real
- * account state once they're signed in there.
- */
-const MEMBERSHIP_WEB_PATH = '/dashboard/billing';
+import type { Entitlements } from '@/api/types';
 
 export default function MembershipScreen() {
   const { state, reload } = useEntitlements();
+  const { signOut } = useAuth();
 
   return (
     <ScreenContainer scroll underHeader inTabs>
@@ -74,7 +26,13 @@ export default function MembershipScreen() {
 
       {state.status === 'loading' ? <MembershipSkeleton /> : null}
 
-      {state.status === 'error' ? <ErrorNotice message={state.message} onRetry={reload} /> : null}
+      {state.status === 'error' ? (
+        <ErrorNotice
+          message={state.message}
+          onRetry={reload}
+          onSignInAgain={state.sessionExpired ? () => void signOut() : undefined}
+        />
+      ) : null}
 
       {state.status === 'success' ? (
         <MembershipContent entitlements={state.entitlements} onRefresh={reload} />
@@ -90,7 +48,7 @@ function MembershipContent({
   entitlements: Entitlements;
   onRefresh: () => void;
 }) {
-  const isPaidRelationship = entitlements.tier !== 'free';
+  const [opening, setOpening] = useState(false);
   const hasPrograms = entitlements.programs.length > 0;
   const hasCertifications = entitlements.certifications.length > 0;
 
@@ -100,11 +58,11 @@ function MembershipContent({
       <Card style={styles.card}>
         <View
           accessible
-          accessibilityLabel={`Membership: ${TIER_LABEL[entitlements.tier]}. Status: ${statusLabelFor(entitlements)}`}
+          accessibilityLabel={`Membership: ${tierLabel(entitlements)}. Status: ${membershipStateLabel(entitlements)}`}
         >
-          <ThemedText variant="heading">{TIER_LABEL[entitlements.tier]}</ThemedText>
+          <ThemedText variant="heading">{tierLabel(entitlements)}</ThemedText>
           <ThemedText variant="body" color={colors.charcoal} style={styles.statusLine}>
-            Status: {statusLabelFor(entitlements)}
+            Status: {membershipStateLabel(entitlements)}
           </ThemedText>
         </View>
 
@@ -150,14 +108,24 @@ function MembershipContent({
       <SectionLabel>Manage</SectionLabel>
       <Card style={styles.card}>
         <PrimaryButton
-          label={isPaidRelationship ? 'Manage Membership' : 'Visit TNSI Website'}
+          label={membershipActionLabel(entitlements)}
           variant="secondary"
-          onPress={() => Linking.openURL(`${env.apiBaseUrl}${MEMBERSHIP_WEB_PATH}`)}
+          loading={opening}
+          onPress={async () => {
+            setOpening(true);
+            try {
+              await openTnsiPage('billing');
+            } finally {
+              setOpening(false);
+              // The member may have changed their plan on the website: show what the server now says.
+              onRefresh();
+            }
+          }}
           style={styles.manageButton}
         />
         <ThemedText variant="caption" color={colors.charcoal} style={styles.manageNote}>
-          This opens the TNSI website in your browser, where membership and billing are managed
-          securely.
+          This opens the TNSI website in a secure browser window, where membership and billing are
+          managed.
         </ThemedText>
 
         <View style={styles.refreshDivider} />

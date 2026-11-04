@@ -93,3 +93,83 @@ export function membershipDetailLines(entitlements: Entitlements): string[] {
   }
   return [];
 }
+
+const TIER_LABEL: Record<Entitlements['tier'], string> = {
+  free: 'Free Member',
+  monthly: 'Monthly Member',
+  annual: 'Annual Member',
+  lifetime: 'Lifetime Member',
+};
+
+const STATUS_LABEL: Record<Entitlements['status'], string> = {
+  active: 'Active',
+  trialing: 'Trial',
+  past_due: 'Payment overdue',
+  canceled: 'Canceled',
+  expired: 'Expired',
+};
+
+const STATE_LABEL: Record<NonNullable<Entitlements['membership']>['state'], string> = {
+  free: 'Free account',
+  trialing: 'Free trial',
+  active: 'Active',
+  grace: 'Payment needs attention',
+  inactive: 'Membership ended',
+};
+
+/** "Free Member", "Annual Member" ... the one place a tier gets its display name. */
+export function tierLabel(entitlements: Entitlements): string {
+  return TIER_LABEL[entitlements.tier];
+}
+
+/**
+ * The membership state in words. The server's resolved `membership.state` wins
+ * (it is what the server enforces); an older server without it falls back to the raw status.
+ * Profile and Membership & Access both use this, so they can never disagree.
+ */
+export function membershipStateLabel(entitlements: Entitlements): string {
+  return entitlements.membership
+    ? STATE_LABEL[entitlements.membership.state]
+    : STATUS_LABEL[entitlements.status];
+}
+
+/** A short, factual second line for Profile's summary; null when there is nothing more to say. */
+export function membershipSummaryLine(entitlements: Entitlements): string | null {
+  const { membership } = entitlements;
+  if (membership?.state === 'trialing') {
+    const end = formatDay(membership.trialEndsAt ?? entitlements.currentPeriodEnd ?? '');
+    return end ? `Until ${end}` : null;
+  }
+  if (membership?.state === 'grace') {
+    const until = membership.graceEndsAt ? formatDay(membership.graceEndsAt) : '';
+    return until ? `Access continues until ${until}` : null;
+  }
+  if (membership?.state === 'free' || membership?.state === 'inactive') return null;
+  if (entitlements.tier === 'free') return null;
+  const end = formatDay(membership?.paidThrough ?? entitlements.currentPeriodEnd ?? '');
+  if (!end) return null;
+  if (entitlements.cancelAtPeriodEnd) return `Access until ${end}`;
+  return entitlements.status === 'active' ? `Renews ${end}` : null;
+}
+
+/**
+ * The label for the one website button on Membership & Access. Membership is
+ * never bought or started in the app, so every label names the website.
+ */
+export function membershipActionLabel(entitlements: Entitlements): string {
+  switch (entitlements.membership?.state) {
+    case 'grace':
+      return 'Update payment on the website';
+    case 'free':
+    case 'trialing':
+    case 'inactive':
+      // A trial is started and ended by the app, not billed: there is nothing to "manage" yet.
+      return 'View membership on the website';
+    case undefined:
+      return entitlements.tier === 'free'
+        ? 'View membership on the website'
+        : 'Manage membership on the website';
+    default:
+      return 'Manage membership on the website';
+  }
+}

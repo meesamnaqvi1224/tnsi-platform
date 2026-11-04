@@ -1,30 +1,18 @@
-import { useMemo, useState } from 'react';
-import { Alert, Linking, Pressable, StyleSheet, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Card, PrimaryButton, ScreenContainer, ThemedText, PageHeader } from '@/components';
 import { EditableAvatar } from '@/components/profile/EditableAvatar';
 import { useEntitlements } from '@/hooks/useEntitlements';
 import { usePractices } from '@/hooks/usePractices';
-import { formatArticleDate } from '@/lib/format';
-import { env } from '@/lib/env';
+import { membershipStateLabel, membershipSummaryLine, tierLabel } from '@/lib/membership-copy';
+import { describeWhen } from '@/lib/my-learning';
+import { openTnsiPage } from '@/lib/open-web';
+import { hasActivity, profileActivity } from '@/lib/profile-activity';
+import type { TnsiPage } from '@/lib/web-links';
 import { colors, spacing } from '@/theme';
-import type { EntitlementStatus, EntitlementTier } from '@/api/types';
-
-const TIER_LABEL: Record<EntitlementTier, string> = {
-  free: 'Free Member',
-  monthly: 'Monthly Member',
-  annual: 'Annual Member',
-  lifetime: 'Lifetime Member',
-};
-
-/** Only statuses worth calling out - 'active' is the unremarkable default and isn't shown as a separate line. */
-const STATUS_NOTE: Partial<Record<EntitlementStatus, string>> = {
-  past_due: 'Payment past due',
-  canceled: 'Membership canceled',
-  trialing: 'Trial period',
-  expired: 'Membership expired',
-};
+import type { Entitlements } from '@/api/types';
 
 function initialsFor(
   firstName: string | null,
@@ -47,13 +35,37 @@ export default function ProfileScreen() {
   const entitlementsState = useEntitlements();
   const practicesState = usePractices();
 
-  const completedCount = useMemo(() => {
-    if (practicesState.state.status !== 'success') return null;
-    const practices = practicesState.state.practices;
-    if (practices.length === 0) return null;
-    const completed = practices.filter((p) => p.progress?.completed).length;
-    return { completed, total: practices.length };
-  }, [practicesState.state]);
+  // Coming back to Profile (from the website, Membership & Access or a practice) shows what the
+  // server says now. The first focus is skipped: the hooks already fetch on mount. The API client
+  // changes identity on every render (see useApiClient), so the latest refresh functions are kept
+  // in a ref and the focus callback itself stays stable - otherwise it would re-fire every render.
+  const { refresh: refreshEntitlements } = entitlementsState;
+  const { refresh: refreshPractices } = practicesState;
+  const refreshAll = useRef(() => {});
+  useEffect(() => {
+    refreshAll.current = () => {
+      refreshEntitlements();
+      refreshPractices();
+    };
+  });
+  const firstFocus = useRef(true);
+  useFocusEffect(
+    useCallback(() => {
+      if (firstFocus.current) {
+        firstFocus.current = false;
+        return;
+      }
+      refreshAll.current();
+    }, []),
+  );
+
+  const activity = useMemo(
+    () =>
+      practicesState.state.status === 'success'
+        ? profileActivity(practicesState.state.practices)
+        : null,
+    [practicesState.state],
+  );
 
   function confirmSignOut() {
     if (signingOut) return;
@@ -69,6 +81,8 @@ export default function ProfileScreen() {
       // Clears the Clerk session; RootLayout's AuthGate then redirects to
       // (auth) automatically once `isSignedIn` flips to false.
       await signOut();
+    } catch {
+      Alert.alert('Sign Out', "We couldn't sign you out. Please try again.");
     } finally {
       setSigningOut(false);
     }
@@ -77,6 +91,7 @@ export default function ProfileScreen() {
   const email = user?.primaryEmailAddress?.emailAddress ?? null;
   const fullName = user?.fullName ?? null;
   const initials = initialsFor(user?.firstName ?? null, user?.lastName ?? null, email);
+  const entitlementsStatus = entitlementsState.state;
 
   return (
     <ScreenContainer scroll underHeader inTabs>
@@ -106,82 +121,56 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      <SectionLabel>Account</SectionLabel>
+      <SectionLabel>Membership</SectionLabel>
       <Card style={styles.card}>
-        {entitlementsState.state.status === 'success' ? (
-          <MembershipSummary entitlements={entitlementsState.state.entitlements} />
-        ) : entitlementsState.state.status === 'loading' ? (
+        {entitlementsStatus.status === 'success' ? (
+          <MembershipSummary entitlements={entitlementsStatus.entitlements} />
+        ) : entitlementsStatus.status === 'loading' ? (
           <ThemedText variant="body" color={colors.charcoal}>
             Loading membership details…
           </ThemedText>
         ) : (
-          // Entitlements are optional context, not identity - a failed
-          // fetch never blocks the rest of the profile screen. A quiet
-          // inline retry is enough; no full-screen error state.
+          // Entitlements are optional context, not identity - a failed fetch never blocks
+          // the rest of the profile. A quiet inline retry (or, if the session has ended,
+          // a way to sign in again) is enough; no full-screen error state.
           <Pressable
             onPress={entitlementsState.reload}
             accessibilityRole="button"
             accessibilityLabel="Retry loading membership details"
           >
             <ThemedText variant="body" color={colors.charcoal}>
-              Membership details couldn&apos;t be loaded. Tap to retry.
+              {entitlementsStatus.sessionExpired
+                ? entitlementsStatus.message
+                : `${entitlementsStatus.message} Tap to retry.`}
             </ThemedText>
           </Pressable>
         )}
+        <Divider />
+        <NavRow label="Membership & Access" onPress={() => router.push('/profile/membership')} />
+      </Card>
 
-        {completedCount ? (
-          <View style={styles.activityRow}>
-            <ThemedText variant="caption" color={colors.charcoal}>
-              {completedCount.completed} of {completedCount.total} practices completed
-            </ThemedText>
-          </View>
-        ) : null}
-
-        <View style={styles.assessmentDivider} />
-        <Pressable
-          onPress={() => router.push('/profile/progress')}
-          accessibilityRole="button"
-          accessibilityLabel="Progress"
-          style={styles.linkRow}
-        >
-          <ThemedText variant="body">Progress</ThemedText>
-          <ThemedText variant="body" color={colors.charcoal}>
-            ›
-          </ThemedText>
-        </Pressable>
-        <View style={styles.divider} />
-        <Pressable
-          onPress={() => router.push('/profile/membership')}
-          accessibilityRole="button"
-          accessibilityLabel="Membership & Access"
-          style={styles.linkRow}
-        >
-          <ThemedText variant="body">Membership & Access</ThemedText>
-          <ThemedText variant="body" color={colors.charcoal}>
-            ›
-          </ThemedText>
-        </Pressable>
-        <View style={styles.divider} />
-        <Pressable
-          onPress={() => router.push('/profile/assessment')}
-          accessibilityRole="button"
-          accessibilityLabel="Capacity Assessment"
-          style={styles.linkRow}
-        >
-          <ThemedText variant="body">Capacity Assessment</ThemedText>
-          <ThemedText variant="body" color={colors.charcoal}>
-            ›
-          </ThemedText>
-        </Pressable>
+      <SectionLabel>Practice</SectionLabel>
+      <Card style={styles.card}>
+        <ActivitySummary
+          activity={activity}
+          failed={practicesState.state.status === 'error'}
+          onRetry={practicesState.reload}
+        />
+        <Divider />
+        <NavRow label="My Learning" onPress={() => router.push('/my-learning')} />
+        <Divider />
+        <NavRow label="Progress" onPress={() => router.push('/profile/progress')} />
+        <Divider />
+        <NavRow label="Capacity Assessment" onPress={() => router.push('/profile/assessment')} />
       </Card>
 
       <SectionLabel>Support</SectionLabel>
       <Card style={styles.card}>
-        <LinkRow label="Contact" path="/contact" />
+        <WebRow label="Contact" page="contact" />
         <Divider />
-        <LinkRow label="Privacy Policy" path="/privacy" />
+        <WebRow label="Privacy Policy" page="privacy" />
         <Divider />
-        <LinkRow label="Terms of Service" path="/terms" last />
+        <WebRow label="Terms of Service" page="terms" />
       </Card>
 
       <PrimaryButton
@@ -207,13 +196,13 @@ function Divider() {
   return <View style={styles.divider} />;
 }
 
-function LinkRow({ label, path, last }: { label: string; path: string; last?: boolean }) {
+function NavRow({ label, onPress }: { label: string; onPress: () => void }) {
   return (
     <Pressable
-      onPress={() => Linking.openURL(`${env.apiBaseUrl}${path}`)}
-      accessibilityRole="link"
-      accessibilityLabel={`${label}, opens in browser`}
-      style={[styles.linkRow, last && styles.linkRowLast]}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={styles.linkRow}
     >
       <ThemedText variant="body">{label}</ThemedText>
       <ThemedText variant="body" color={colors.charcoal}>
@@ -223,39 +212,47 @@ function LinkRow({ label, path, last }: { label: string; path: string; last?: bo
   );
 }
 
-function MembershipSummary({ entitlements }: { entitlements: import('@/api/types').Entitlements }) {
-  // The server's resolved membership wins: an app-managed free trial is a Free
-  // account with status `active`, so only `membership.state` can say "trial".
-  const isTrial = entitlements.membership?.state === 'trialing';
-  // A trial is good news, not a problem: only the genuine status problems (payment issues and the like) are drawn in the error colour.
-  const statusNote = isTrial ? 'Free trial' : STATUS_NOTE[entitlements.status];
+/** An official TNSI page, opened in the native in-app browser. */
+function WebRow({ label, page }: { label: string; page: TnsiPage }) {
+  return (
+    <Pressable
+      onPress={() => void openTnsiPage(page)}
+      accessibilityRole="link"
+      accessibilityLabel={`${label}, opens in a browser window`}
+      style={styles.linkRow}
+    >
+      <ThemedText variant="body">{label}</ThemedText>
+      <ThemedText variant="body" color={colors.charcoal}>
+        ›
+      </ThemedText>
+    </Pressable>
+  );
+}
+
+function MembershipSummary({ entitlements }: { entitlements: Entitlements }) {
+  const detail = membershipSummaryLine(entitlements);
+  const needsAttention = entitlements.membership?.state === 'grace';
   const hasPrograms = entitlements.programs.length > 0;
   const hasCertifications = entitlements.certifications.length > 0;
-  const showRenewal =
-    entitlements.tier !== 'free' &&
-    entitlements.status === 'active' &&
-    entitlements.currentPeriodEnd;
 
   return (
     <View>
-      <ThemedText variant="body">{TIER_LABEL[entitlements.tier]}</ThemedText>
-      {statusNote ? (
-        <ThemedText
-          variant="caption"
-          color={isTrial ? colors.charcoal : colors.error}
-          style={styles.statusNote}
-        >
-          {statusNote}
-        </ThemedText>
-      ) : null}
-      {showRenewal ? (
+      <ThemedText variant="body">{tierLabel(entitlements)}</ThemedText>
+      <ThemedText
+        variant="caption"
+        color={needsAttention ? colors.error : colors.charcoal}
+        style={styles.statusNote}
+      >
+        {membershipStateLabel(entitlements)}
+      </ThemedText>
+      {detail ? (
         <ThemedText variant="caption" color={colors.charcoal} style={styles.statusNote}>
-          Renews {formatArticleDate(entitlements.currentPeriodEnd as string)}
+          {detail}
         </ThemedText>
       ) : null}
       {hasPrograms ? (
         <ThemedText variant="caption" color={colors.charcoal} style={styles.statusNote}>
-          Programs: {entitlements.programs.join(', ')}
+          Programmes: {entitlements.programs.join(', ')}
         </ThemedText>
       ) : null}
       {hasCertifications ? (
@@ -263,6 +260,62 @@ function MembershipSummary({ entitlements }: { entitlements: import('@/api/types
           Certifications: {entitlements.certifications.join(', ')}
         </ThemedText>
       ) : null}
+    </View>
+  );
+}
+
+/** Real practice activity only: what the practices endpoint says, or an honest "nothing yet". */
+function ActivitySummary({
+  activity,
+  failed,
+  onRetry,
+}: {
+  activity: ReturnType<typeof profileActivity> | null;
+  failed: boolean;
+  onRetry: () => void;
+}) {
+  if (failed) {
+    return (
+      <Pressable
+        onPress={onRetry}
+        accessibilityRole="button"
+        accessibilityLabel="Retry loading practice activity"
+      >
+        <ThemedText variant="body" color={colors.charcoal}>
+          Practice activity couldn&apos;t be loaded. Tap to retry.
+        </ThemedText>
+      </Pressable>
+    );
+  }
+  if (!activity) {
+    return (
+      <ThemedText variant="body" color={colors.charcoal}>
+        Loading practice activity…
+      </ThemedText>
+    );
+  }
+  if (!hasActivity(activity)) {
+    return (
+      <ThemedText variant="body" color={colors.charcoal}>
+        You haven&apos;t practised yet. Your activity will appear here once you do.
+      </ThemedText>
+    );
+  }
+  const lines = [
+    `${activity.practised} ${activity.practised === 1 ? 'practice' : 'practices'} practised`,
+    activity.inProgress > 0 ? `${activity.inProgress} in progress` : null,
+    activity.lastPlayedAt
+      ? `Last practised ${describeWhen(activity.lastPlayedAt).toLowerCase()}`
+      : null,
+  ].filter((line): line is string => line !== null);
+  return (
+    <View accessible accessibilityLabel={lines.join('. ')}>
+      <ThemedText variant="body">{lines[0]}</ThemedText>
+      {lines.slice(1).map((line) => (
+        <ThemedText key={line} variant="caption" color={colors.charcoal} style={styles.statusNote}>
+          {line}
+        </ThemedText>
+      ))}
     </View>
   );
 }
@@ -284,12 +337,6 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: spacing.xl,
   },
-  activityRow: {
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
-  },
   statusNote: {
     marginTop: spacing.xs,
   },
@@ -299,18 +346,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     minHeight: 44,
   },
-  linkRowLast: {
-    marginBottom: 0,
-  },
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.border,
-  },
-  assessmentDivider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.border,
-    marginTop: spacing.md,
-    marginBottom: spacing.md,
+    marginVertical: spacing.md,
   },
   signOut: {
     marginBottom: spacing.xl,
