@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useApiClient } from './useApiClient';
-import { humanizeApiError, isMembershipRequiredError } from '@/lib/api-errors';
-import { ApiRequestError } from '@/api/types';
+import {
+  classifyPowerDropDetailError,
+  type PowerDropDetailFailure,
+} from '@/lib/powerdrop-detail-error';
 import type { PowerDrop, PowerDropUsageResult } from '@/api/types';
 
 export type PowerDropDetailState =
-  | { status: 'loading' }
-  | { status: 'not-found' }
-  | { status: 'locked' }
-  | { status: 'success'; powerDrop: PowerDrop }
-  | { status: 'error'; message: string };
+  { status: 'loading' } | { status: 'success'; powerDrop: PowerDrop } | PowerDropDetailFailure;
 
 /**
  * Fetches GET /api/v1/powerdrops/[slug] once per screen visit. A PowerDrop in
@@ -29,14 +27,7 @@ export function usePowerDropDetail(slug: string) {
       const powerDrop = await api.get<PowerDrop>(`/api/v1/powerdrops/${slug}`);
       setState({ status: 'success', powerDrop });
     } catch (err) {
-      if (err instanceof ApiRequestError && err.status === 404) {
-        setState({ status: 'not-found' });
-      } else if (isMembershipRequiredError(err)) {
-        // The server withheld a paid-library PowerDrop (403 MEMBERSHIP_REQUIRED).
-        setState({ status: 'locked' });
-      } else {
-        setState({ status: 'error', message: humanizeApiError(err) });
-      }
+      setState(classifyPowerDropDetailError(err));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `api` intentionally excluded, see useApiClient.ts
   }, [slug]);

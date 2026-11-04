@@ -1,8 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
-import { PowerDropThumbnail } from './PowerDropThumbnail';
+import { PowerDropArtwork } from './PowerDropArtwork';
 import { colors, spacing } from '@/theme';
 import type { PowerDropSummary } from '@/api/types';
 
@@ -10,12 +9,22 @@ interface PowerDropCardProps {
   powerDrop: PowerDropSummary;
 }
 
-/** One library entry: artwork, title, focus, short description. No duration/streak/popularity - only real fields. */
+/**
+ * One library entry: the standalone visual, whole, then category and title.
+ * No card chrome — the artwork sits directly on the page with a hairline
+ * rule beneath, like the Core Series list. No duration/streak/popularity —
+ * only real fields. (Kept under its original name so its callers are
+ * unchanged.)
+ */
 export function PowerDropCard({ powerDrop }: PowerDropCardProps) {
   const router = useRouter();
   const title = powerDrop.title.trim();
   // Decided by the server (see PowerDropSummary.locked). Still tappable - the detail screen explains.
   const locked = powerDrop.locked === true;
+  const eyebrow = powerDrop.category ?? powerDrop.focus;
+  // The Purpose is worth showing when it adds something beyond the category.
+  const purpose = powerDrop.focus !== eyebrow ? powerDrop.focus : null;
+  const meta = [purpose, locked ? 'Members' : null].filter(Boolean).join(' · ');
 
   return (
     <Pressable
@@ -23,65 +32,58 @@ export function PowerDropCard({ powerDrop }: PowerDropCardProps) {
         router.push({ pathname: '/practices/powerdrops/[slug]', params: { slug: powerDrop.slug } })
       }
       accessibilityRole="button"
-      accessibilityLabel={`${title}, ${powerDrop.focus}${locked ? ', members only' : ''}`}
-      style={({ pressed }) => pressed && styles.pressed}
+      accessibilityLabel={
+        locked
+          ? `${title}, ${powerDrop.focus}, members only. Opens membership details`
+          : `${title}, ${powerDrop.focus}`
+      }
+      style={({ pressed }) => [styles.item, pressed && styles.pressed]}
     >
-      <Card style={styles.card}>
-        <PowerDropThumbnail
-          title={title}
-          cardImage={powerDrop.cardImage}
-          height={140}
-          style={styles.thumbnail}
-        />
+      <PowerDropArtwork
+        title={title}
+        cardImage={powerDrop.cardImage}
+        variant="library"
+        style={styles.artwork}
+      />
+      <View>
+        <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
+          {eyebrow}
+        </ThemedText>
         <ThemedText variant="heading" style={styles.title}>
           {title}
         </ThemedText>
-        <ThemedText
-          variant="body"
-          color={colors.charcoal}
-          numberOfLines={2}
-          style={styles.description}
-        >
-          {powerDrop.description}
-        </ThemedText>
-        <View style={styles.metaRow}>
-          <ThemedText variant="caption" color={colors.bronze}>
-            {powerDrop.focus}
+        {meta ? (
+          <ThemedText variant="caption" color={colors.charcoal} style={styles.meta}>
+            {meta}
           </ThemedText>
-          {locked ? (
-            <ThemedText variant="caption" color={colors.bronze}>
-              Members
-            </ThemedText>
-          ) : powerDrop.category ? (
-            <ThemedText variant="caption" color={colors.charcoal}>
-              {powerDrop.category}
-            </ThemedText>
-          ) : null}
-        </View>
-      </Card>
+        ) : null}
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  item: {
+    paddingBottom: spacing.lg,
+    marginBottom: spacing.lg,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
   pressed: {
     opacity: 0.85,
   },
-  card: {
-    marginBottom: spacing.lg,
-  },
-  thumbnail: {
+  artwork: {
     marginBottom: spacing.md,
+  },
+  eyebrow: {
+    textTransform: 'uppercase',
+    marginBottom: spacing.xs,
   },
   title: {
     marginBottom: spacing.xs,
   },
-  description: {
-    marginBottom: spacing.sm,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  meta: {
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
   },
 });

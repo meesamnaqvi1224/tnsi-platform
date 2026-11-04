@@ -13,7 +13,7 @@ import type { SomaticImage as SomaticImageType } from '@/api/types';
 
 interface SomaticImageBlockProps {
   image: SomaticImageType | null;
-  /** Fallback label shown when there's no image (or it fails to load) - never a broken-image icon, never invented stock art. Mirrors PowerDropThumbnail. */
+  /** Fallback label shown when there's no image (or it fails to load) - never a broken-image icon, never invented stock art. Same fallback treatment as PowerDropArtwork. */
   fallbackLabel: string;
   /** Width/height ratio - 9/16 for card artwork, 16/9 for a landscape hero. Lets the container's width drive its height so the real image is never awkwardly cropped. */
   aspectRatio: number;
@@ -26,7 +26,7 @@ interface SomaticImageBlockProps {
  * demonstrationSequence item) - real accessible alt text from the API is
  * always attached, never invented when the API has none. Reuses plain
  * React Native `Image` (the existing convention throughout this app -
- * see PowerDropThumbnail.tsx - no new image library needed).
+ * see PowerDropArtwork.tsx - no new image library needed).
  */
 export function SomaticImageBlock({
   image,
