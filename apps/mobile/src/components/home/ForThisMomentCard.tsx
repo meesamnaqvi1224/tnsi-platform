@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
-import { PracticeThumbnail } from '@/components/practices/PracticeThumbnail';
+import { stockImageFor } from '@/components/practices/PracticeThumbnail';
 import { formatDuration } from '@/lib/format';
 import { categoryLabel } from '@/lib/practice-library';
 import { fontFamily, linkHitSlop, spacing } from '@/theme';
@@ -97,11 +97,15 @@ export function ForThisMomentCard({ practice, hasCheckedInToday }: ForThisMoment
         style={({ pressed }) => [styles.card, pressed && styles.pressed]}
       >
         <View style={styles.imageWrap}>
-          <PracticeThumbnail
-            thumbnailUrl={practice.thumbnailUrl}
-            contentType={practice.contentType}
-            height={CARD_IMAGE_HEIGHT}
-            showLabel={false}
+          <Image
+            source={
+              practice.thumbnailUrl
+                ? { uri: practice.thumbnailUrl }
+                : (stockImageFor(practice.contentType) ?? momentImage)
+            }
+            style={styles.image}
+            resizeMode="cover"
+            accessibilityIgnoresInvertColors
           />
         </View>
         <View style={styles.body}>
