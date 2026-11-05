@@ -33,3 +33,9 @@ export const imageHeight = {
   secondary: 220,
   tertiary: 170,
 } as const;
+
+/**
+ * Extra touch area for inline text links ("My Journey →", "View History"), which are drawn about
+ * 20 dp tall. Grows the tappable area to roughly 48 dp without changing how the link looks.
+ */
+export const linkHitSlop = { top: 14, bottom: 14, left: 8, right: 8 } as const;

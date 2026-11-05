@@ -30,7 +30,7 @@ import {
   resultSummary,
   type LibraryFilters,
 } from '@/lib/practice-library';
-import { colors, spacing } from '@/theme';
+import { colors, spacing, linkHitSlop } from '@/theme';
 import type { PracticeContentType } from '@/api/types';
 
 const GUIDED_PRACTICES = [NINETY_SECOND_RESET, THE_EMPTY_CHAIR];
@@ -110,6 +110,7 @@ export default function PracticesScreen() {
         <Pressable
           onPress={() => router.push('/practices/saved')}
           accessibilityRole="link"
+          hitSlop={linkHitSlop}
           accessibilityLabel="View Saved Practices"
         >
           <ThemedText variant="label" color={colors.bronze}>
@@ -119,6 +120,7 @@ export default function PracticesScreen() {
         <Pressable
           onPress={() => router.push('/practices/journey')}
           accessibilityRole="link"
+          hitSlop={linkHitSlop}
           accessibilityLabel="View My Journey"
         >
           <ThemedText variant="label" color={colors.bronze}>
@@ -128,6 +130,7 @@ export default function PracticesScreen() {
         <Pressable
           onPress={() => router.push('/practices/history')}
           accessibilityRole="link"
+          hitSlop={linkHitSlop}
           accessibilityLabel="View Practice History"
         >
           <ThemedText variant="label" color={colors.bronze}>

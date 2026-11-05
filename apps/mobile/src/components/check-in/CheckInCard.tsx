@@ -7,7 +7,7 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { CapacityOptionList, capacityOptionLabel } from './CapacityOptionList';
 import { useApiClient } from '@/hooks/useApiClient';
 import { humanizeApiError } from '@/lib/api-errors';
-import { colors, spacing } from '@/theme';
+import { colors, spacing, linkHitSlop } from '@/theme';
 import { ApiRequestError, type CheckIn } from '@/api/types';
 
 type Phase =
@@ -122,6 +122,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
         <Pressable
           onPress={() => router.push('/profile/progress')}
           accessibilityRole="link"
+          hitSlop={linkHitSlop}
           accessibilityLabel="View check-in history"
           style={styles.historyLink}
         >
@@ -167,6 +168,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
         <Pressable
           onPress={() => router.push('/profile/progress')}
           accessibilityRole="link"
+          hitSlop={linkHitSlop}
           accessibilityLabel="View check-in history"
         >
           <ThemedText variant="label" color={colors.bronze}>

@@ -17,7 +17,7 @@ import { CheckInCard } from '@/components/check-in/CheckInCard';
 import { LifeBeyondTraumaCard } from '@/components/home/LifeBeyondTraumaCard';
 import { BookConsultationCard } from '@/components/home/BookConsultationCard';
 import { useToday } from '@/hooks/useToday';
-import { colors, spacing } from '@/theme';
+import { colors, spacing, linkHitSlop } from '@/theme';
 import type { CheckIn, Practice } from '@/api/types';
 
 /**
@@ -93,6 +93,7 @@ export default function HomeScreen() {
         <Pressable
           onPress={() => router.push('/practices/journey')}
           accessibilityRole="link"
+          hitSlop={linkHitSlop}
           accessibilityLabel="View My Journey"
           style={styles.journeyLink}
         >

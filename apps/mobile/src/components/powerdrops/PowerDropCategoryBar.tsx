@@ -21,6 +21,8 @@ export function PowerDropCategoryBar({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
+      // Do not grow to fill spare height when the screen below is short.
+      style={styles.scroller}
       contentContainerStyle={styles.row}
     >
       <Chip label="All" active={selected === null} onPress={() => onSelect(null)} />
@@ -57,13 +59,16 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
 }
 
 const styles = StyleSheet.create({
+  scroller: {
+    flexGrow: 0,
+  },
   row: {
     gap: spacing.sm,
     paddingBottom: spacing.lg,
   },
   chip: {
     paddingHorizontal: spacing.md,
-    minHeight: 44,
+    minHeight: 48,
     borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
