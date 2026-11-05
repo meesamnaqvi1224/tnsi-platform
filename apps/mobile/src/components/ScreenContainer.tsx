@@ -11,13 +11,13 @@ interface ScreenContainerProps extends PropsWithChildren {
   underHeader?: boolean;
   /** Set when the tab bar already sits below this screen, so the bottom safe-area inset is not added a second time. */
   inTabs?: boolean;
-  /** Page colour; defaults to the app's cream. */
+  /** Page colour; defaults to white. */
   background?: string;
   style?: ViewStyle;
 }
 
 /**
- * Standard screen chrome: cream background, safe-area aware, consistent
+ * Standard screen chrome: white background, safe-area aware, consistent
  * horizontal padding. Every Phase 1 screen wraps its content in this.
  */
 export function ScreenContainer({

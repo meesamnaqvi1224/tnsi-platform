@@ -21,7 +21,7 @@ interface ThemedTextProps extends PropsWithChildren {
 export function ThemedText({
   children,
   variant = 'body',
-  color = colors.charcoal,
+  color = variant === 'display' || variant === 'heading' ? colors.navy : colors.charcoal,
   style,
   numberOfLines,
   accessibilityLiveRegion,
