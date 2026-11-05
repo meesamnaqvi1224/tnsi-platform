@@ -17,6 +17,7 @@ import { LifeBeyondTraumaCard } from '@/components/home/LifeBeyondTraumaCard';
 import { BookConsultationCard } from '@/components/home/BookConsultationCard';
 import { ResourcesOnWebsiteCard } from '@/components/home/ResourcesOnWebsiteCard';
 import { useToday } from '@/hooks/useToday';
+import { practiceForToday } from '@/lib/check-in-day';
 import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { colors, spacing } from '@/theme';
 import type { CheckIn, Practice } from '@/api/types';
@@ -78,7 +79,11 @@ export default function HomeScreen() {
     }, []),
   );
 
-  const todayPractice = state.status === 'success' ? state.data.todayPractice : null;
+  // The recommendation belongs to a check-in made today (see src/lib/check-in-day.ts).
+  const todayPractice =
+    state.status === 'success'
+      ? practiceForToday(state.data.checkIn, state.data.todayPractice)
+      : null;
   const continueCandidate = useMemo(() => {
     if (state.status !== 'success') return null;
     return findContinueCandidate(state.data.practices, todayPractice?.id);

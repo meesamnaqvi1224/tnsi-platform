@@ -2,7 +2,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, radius, spacing } from '@/theme';
+import { home } from '@/components/home/homeTheme';
+import { radius, spacing } from '@/theme';
 
 /**
  * The five capacity-oriented options a check-in can report, in low-to-high
@@ -108,15 +109,11 @@ function CapacityOption({ option, selected, disabled, onPress }: CapacityOptionP
         ]}
       >
         <View style={[styles.iconBadge, selected && styles.iconBadgeSelected]}>
-          <Ionicons
-            name={option.icon}
-            size={20}
-            color={selected ? colors.cream : colors.bronzeMuted}
-          />
+          <Ionicons name={option.icon} size={20} color={selected ? '#FFFFFF' : home.bronze} />
         </View>
         <ThemedText
           variant="body"
-          color={selected ? colors.navy : colors.charcoal}
+          color={home.navy}
           style={selected ? styles.labelSelected : undefined}
         >
           {option.label}
@@ -125,7 +122,7 @@ function CapacityOption({ option, selected, disabled, onPress }: CapacityOptionP
           <Ionicons
             name="checkmark-circle"
             size={20}
-            color={colors.bronze}
+            color={home.bronze}
             style={styles.checkmark}
           />
         ) : null}
@@ -141,23 +138,19 @@ const styles = StyleSheet.create({
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.sm + 2,
     paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.lg,
+    paddingHorizontal: spacing.sm + 2,
+    borderRadius: radius.lg - 2,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.cream,
+    borderColor: home.border,
+    backgroundColor: home.page,
     minHeight: 56,
   },
+  // Selected: a bronze border and a faint bronze wash, with no shadow.
   optionSelected: {
-    borderColor: colors.bronze,
-    backgroundColor: colors.creamMuted,
-    shadowColor: colors.bronze,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.16,
-    shadowRadius: 8,
-    elevation: 3,
+    borderColor: home.bronze,
+    backgroundColor: home.bronzeTint,
   },
   optionPressed: {
     opacity: 0.85,
@@ -171,10 +164,10 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.creamMuted,
+    backgroundColor: home.bronzeTint,
   },
   iconBadgeSelected: {
-    backgroundColor: colors.bronze,
+    backgroundColor: home.bronze,
   },
   labelSelected: {
     fontWeight: '600',
