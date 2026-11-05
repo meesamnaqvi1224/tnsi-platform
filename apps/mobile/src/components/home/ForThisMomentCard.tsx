@@ -3,11 +3,14 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
+import { PracticeThumbnail } from '@/components/practices/PracticeThumbnail';
 import { formatDuration } from '@/lib/format';
 import { categoryLabel } from '@/lib/practice-library';
 import { fontFamily, linkHitSlop, spacing } from '@/theme';
 import { home } from './homeTheme';
 import type { Practice } from '@/api/types';
+
+const CARD_IMAGE_HEIGHT = 150;
 
 const momentImage = require('../../../assets/images/practice-moment.jpg');
 
@@ -55,21 +58,24 @@ export function ForThisMomentCard({ practice, hasCheckedInToday }: ForThisMoment
     return (
       <View style={styles.section}>
         {header}
-        <View style={styles.empty}>
-          <ThemedText variant="body" color={home.ink}>
-            {hasCheckedInToday
-              ? 'No practice is available today.'
-              : "Complete today's check-in above to see a practice for this moment."}
-          </ThemedText>
-          {hasCheckedInToday ? (
-            // A way forward instead of a dead end: the library is always available.
+        <View style={styles.card}>
+          <Image source={momentImage} style={styles.image} accessibilityIgnoresInvertColors />
+          <View style={styles.body}>
+            <ThemedText variant="heading" color={home.navy} style={styles.title}>
+              {hasCheckedInToday ? 'Nothing matched today' : 'Check in first'}
+            </ThemedText>
+            <ThemedText variant="caption" color={home.ink} style={styles.description}>
+              {hasCheckedInToday
+                ? 'No practice is available today.'
+                : "Complete today's check-in above to see a practice for this moment."}
+            </ThemedText>
             <PrimaryButton
               label="Browse practices"
               variant="secondary"
               onPress={() => router.push('/practices')}
               style={styles.emptyButton}
             />
-          ) : null}
+          </View>
         </View>
       </View>
     );
@@ -90,11 +96,14 @@ export function ForThisMomentCard({ practice, hasCheckedInToday }: ForThisMoment
         accessibilityLabel={`${practice.title.trim()}${duration ? `, ${duration}` : ''}${locked ? ', members only' : ''}. Recommended for you. Opens the practice.`}
         style={({ pressed }) => [styles.card, pressed && styles.pressed]}
       >
-        <Image
-          source={practice.thumbnailUrl ? { uri: practice.thumbnailUrl } : momentImage}
-          style={styles.image}
-          accessibilityIgnoresInvertColors
-        />
+        <View style={styles.imageWrap}>
+          <PracticeThumbnail
+            thumbnailUrl={practice.thumbnailUrl}
+            contentType={practice.contentType}
+            height={CARD_IMAGE_HEIGHT}
+            showLabel={false}
+          />
+        </View>
         <View style={styles.body}>
           <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
             Recommended for you{eyebrow ? ` · ${eyebrow}` : ''}
@@ -166,8 +175,12 @@ const styles = StyleSheet.create({
   },
   image: {
     width: 118,
-    alignSelf: 'stretch',
-    minHeight: 132,
+    height: CARD_IMAGE_HEIGHT,
+  },
+  imageWrap: {
+    width: 118,
+    height: CARD_IMAGE_HEIGHT,
+    overflow: 'hidden',
   },
   body: {
     flex: 1,
@@ -202,15 +215,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: spacing.md,
   },
-  empty: {
-    borderWidth: 1,
-    borderColor: home.border,
-    borderRadius: 14,
-    padding: spacing.lg,
-  },
   emptyButton: {
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
     alignSelf: 'flex-start',
-    paddingHorizontal: spacing.xl,
+    minHeight: 44,
+    paddingHorizontal: spacing.md,
   },
 });

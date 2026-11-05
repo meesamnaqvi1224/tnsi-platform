@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, ImageBackground, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
@@ -50,7 +50,12 @@ export function WelcomeHeader({ firstName }: WelcomeHeaderProps) {
         </View>
       </View>
 
-      <View style={styles.hero}>
+      <ImageBackground
+        source={heroImage}
+        resizeMode="cover"
+        style={styles.hero}
+        accessibilityIgnoresInvertColors
+      >
         <View style={styles.heroText}>
           <ThemedText variant="heading" color={home.bronze} style={styles.welcome}>
             {name ? `Welcome back, ${name}` : 'Welcome back'}
@@ -60,8 +65,7 @@ export function WelcomeHeader({ firstName }: WelcomeHeaderProps) {
           </ThemedText>
           <View style={styles.statementRule} />
         </View>
-        <Image source={heroImage} style={styles.photo} accessibilityIgnoresInvertColors />
-      </View>
+      </ImageBackground>
     </View>
   );
 }
@@ -107,14 +111,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // The photograph fills the whole hero band edge to edge; its left side is a pale wall, so the
+  // navy text sits directly on it.
   hero: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
+    marginHorizontal: -spacing.lg,
+    height: 250,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    backgroundColor: '#EFEDEA',
   },
   heroText: {
-    flex: 1,
-    justifyContent: 'center',
+    width: '52%',
+    paddingLeft: spacing.lg,
   },
   welcome: {
     fontStyle: 'italic',
@@ -122,21 +130,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   statement: {
-    fontSize: 24,
-    lineHeight: 29,
+    fontSize: 25,
+    lineHeight: 30,
   },
   statementRule: {
     width: 40,
     height: 2,
     backgroundColor: home.bronze,
     marginTop: spacing.md,
-  },
-  photo: {
-    // The photograph's own edges are near-white, so it sits on the page without a frame and runs
-    // off the right edge, as in the approved reference.
-    width: '58%',
-    aspectRatio: 832 / 464,
-    marginRight: -spacing.lg,
-    resizeMode: 'cover',
   },
 });
