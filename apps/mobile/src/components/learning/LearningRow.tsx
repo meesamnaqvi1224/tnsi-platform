@@ -3,7 +3,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { PracticeThumbnail } from '@/components/practices/PracticeThumbnail';
 import { capitalize, formatDuration } from '@/lib/format';
-import { colors, radius, spacing } from '@/theme';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
+import { radius, spacing } from '@/theme';
 import type { PracticeContentType } from '@/api/types';
 
 const THUMB = 84;
@@ -24,8 +25,8 @@ interface LearningRowProps {
 }
 
 /**
- * One practice as an editorial list row: a small image, the title in the heading face and a
- * quiet line or two of status, divided from the next row by a hairline. No card, no shadow.
+ * One practice as a bordered card: a small image, the format and length in bronze, the title in the
+ * serif face, a quiet line or two of status and a thin progress bar when there is progress.
  */
 export function LearningRow({
   title,
@@ -59,12 +60,14 @@ export function LearningRow({
           />
         </View>
         <View style={styles.text}>
-          <ThemedText variant="heading">{title.trim()}</ThemedText>
-          <ThemedText variant="caption" color={colors.charcoal} style={styles.meta}>
+          <ThemedText variant="label" color={home.bronze} style={styles.meta}>
             {meta}
           </ThemedText>
+          <ThemedText variant="heading" color={home.navy} style={styles.title}>
+            {title.trim()}
+          </ThemedText>
           {lines.map((line) => (
-            <ThemedText key={line} variant="caption" color={colors.charcoal} style={styles.line}>
+            <ThemedText key={line} variant="caption" color={home.ink} style={styles.line}>
               {line}
             </ThemedText>
           ))}
@@ -82,9 +85,10 @@ export function LearningRow({
 
 const styles = StyleSheet.create({
   item: {
-    paddingVertical: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
+    ...homeCardStyle,
+    backgroundColor: home.page,
+    padding: spacing.md,
+    marginBottom: spacing.md,
   },
   row: {
     flexDirection: 'row',
@@ -106,7 +110,15 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   meta: {
-    marginTop: spacing.xs,
+    textTransform: 'uppercase',
+    fontSize: 10,
+    letterSpacing: 1.2,
+    marginBottom: 2,
+  },
+  title: {
+    fontSize: 17,
+    lineHeight: 22,
+    marginBottom: 2,
   },
   line: {
     marginTop: 2,
@@ -115,12 +127,12 @@ const styles = StyleSheet.create({
     height: 3,
     marginTop: spacing.sm,
     borderRadius: 2,
-    backgroundColor: colors.border,
+    backgroundColor: '#E6E9ED',
     overflow: 'hidden',
   },
   fill: {
     height: 3,
-    backgroundColor: colors.bronze,
+    backgroundColor: home.bronze,
   },
   action: {
     // Lines up with the text column: the image width plus the gap beside it.

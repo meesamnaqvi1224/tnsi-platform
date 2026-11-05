@@ -69,7 +69,9 @@ export default function TabsLayout() {
           // opted back in here specifically so it can carry the same
           // Home button the other three tab roots now have.
           headerShown: true,
-          headerStyle: { backgroundColor: colors.cream },
+          // The page title is drawn in the screen itself, so the bar carries only the Home button.
+          headerTitle: '',
+          headerStyle: { backgroundColor: '#FFFFFF' },
           headerTintColor: colors.navy,
           headerTitleStyle: { fontFamily: typography.heading.fontFamily },
           headerShadowVisible: false,
