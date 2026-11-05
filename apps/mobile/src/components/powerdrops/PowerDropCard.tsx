@@ -2,8 +2,9 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { PowerDropArtwork } from './PowerDropArtwork';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
 import type { PowerDropSummary } from '@/api/types';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 
 interface PowerDropCardProps {
   powerDrop: PowerDropSummary;
@@ -46,14 +47,14 @@ export function PowerDropCard({ powerDrop }: PowerDropCardProps) {
         style={styles.artwork}
       />
       <View>
-        <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
+        <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
           {eyebrow}
         </ThemedText>
-        <ThemedText variant="heading" style={styles.title}>
+        <ThemedText variant="heading" color={home.navy} style={styles.title}>
           {title}
         </ThemedText>
         {meta ? (
-          <ThemedText variant="caption" color={colors.charcoal} style={styles.meta}>
+          <ThemedText variant="caption" color={home.ink} style={styles.meta}>
             {meta}
           </ThemedText>
         ) : null}
@@ -64,10 +65,10 @@ export function PowerDropCard({ powerDrop }: PowerDropCardProps) {
 
 const styles = StyleSheet.create({
   item: {
-    paddingBottom: spacing.lg,
-    marginBottom: spacing.lg,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
+    ...homeCardStyle,
+    backgroundColor: home.page,
+    padding: spacing.md,
+    marginBottom: spacing.md,
   },
   pressed: {
     opacity: 0.85,

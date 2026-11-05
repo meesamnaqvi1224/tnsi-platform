@@ -2,11 +2,14 @@ import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
+import { PageTitle } from '@/components/PageTitle';
+import { SectionHeading } from '@/components/SectionHeading';
 import { PowerDropCard } from '@/components/powerdrops/PowerDropCard';
 import { PowerDropCategoryBar } from '@/components/powerdrops/PowerDropCategoryBar';
 import { PowerDropsSkeleton } from '@/components/powerdrops/PowerDropsSkeleton';
 import { usePowerDrops } from '@/hooks/usePowerDrops';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
+import { home } from '@/components/home/homeTheme';
 
 /**
  * The PowerDrops™ library: small interventions for the moment you're in -
@@ -36,13 +39,8 @@ export default function PowerDropsLibraryScreen() {
   const filtered = category ? browsable.filter((p) => p.category === category) : browsable;
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
-      <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
-        POWERDROPS™
-      </ThemedText>
-      <ThemedText variant="display" style={styles.heading}>
-        Small practices for real moments.
-      </ThemedText>
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PageTitle title="PowerDrops™" subtitle="Small practices for real moments." />
 
       {state.status === 'loading' && <PowerDropsSkeleton />}
 
@@ -52,18 +50,14 @@ export default function PowerDropsLibraryScreen() {
         <>
           {featured ? (
             <View style={styles.section}>
-              <ThemedText variant="heading" style={styles.sectionTitle}>
-                Featured
-              </ThemedText>
+              <SectionHeading>Featured</SectionHeading>
               <PowerDropCard powerDrop={featured} />
             </View>
           ) : null}
 
           {availableCategories.length > 1 ? (
             <View style={styles.section}>
-              <ThemedText variant="heading" style={styles.sectionTitle}>
-                Browse by category
-              </ThemedText>
+              <SectionHeading>Browse by category</SectionHeading>
               <PowerDropCategoryBar
                 availableCategories={availableCategories}
                 selected={category}
@@ -72,11 +66,9 @@ export default function PowerDropsLibraryScreen() {
             </View>
           ) : null}
 
-          <ThemedText variant="heading" style={styles.sectionTitle}>
-            All PowerDrops
-          </ThemedText>
+          <SectionHeading>All PowerDrops</SectionHeading>
           {filtered.length === 0 ? (
-            <ThemedText variant="body" color={colors.charcoal}>
+            <ThemedText variant="body" color={home.ink}>
               {powerDrops.length === 0
                 ? 'No PowerDrops are available yet.'
                 : 'No PowerDrops match this category.'}

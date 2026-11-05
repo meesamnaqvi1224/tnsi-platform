@@ -9,13 +9,14 @@ import { WhatToNoticeList } from '@/components/somatic-cards/WhatToNoticeList';
 import { SupportingImagesGallery } from '@/components/somatic-cards/SupportingImagesGallery';
 import { DemonstrationSequenceGallery } from '@/components/somatic-cards/DemonstrationSequenceGallery';
 import { useSomaticCardDetail } from '@/hooks/useSomaticCardDetail';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
 import type { SomaticCardDetail } from '@/api/types';
+import { home } from '@/components/home/homeTheme';
 
 function Section({ heading, children }: PropsWithChildren<{ heading: string }>) {
   return (
     <View style={styles.section}>
-      <ThemedText variant="label" color={colors.bronze} style={styles.sectionHeading}>
+      <ThemedText variant="label" color={home.bronze} style={styles.sectionHeading}>
         {heading.toUpperCase()}
       </ThemedText>
       {children}
@@ -44,7 +45,7 @@ export default function SomaticCardDetailScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll underHeader inTabs>
+      <ScreenContainer scroll underHeader inTabs background={home.page}>
         <SomaticCardsSkeleton />
       </ScreenContainer>
     );
@@ -52,9 +53,9 @@ export default function SomaticCardDetailScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer underHeader inTabs>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ThemedText variant="heading">This card isn&apos;t available.</ThemedText>
-        <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
+        <ThemedText variant="body" color={home.ink} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
         </ThemedText>
       </ScreenContainer>
@@ -63,7 +64,7 @@ export default function SomaticCardDetailScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer underHeader inTabs>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -73,7 +74,7 @@ export default function SomaticCardDetailScreen() {
   const title = card.title.trim();
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
       <Pressable
         onPress={() =>
           router.push({
@@ -85,12 +86,12 @@ export default function SomaticCardDetailScreen() {
         accessibilityLabel={`Back to ${card.series.title}`}
         style={styles.seriesLink}
       >
-        <ThemedText variant="label" color={colors.bronze}>
+        <ThemedText variant="label" color={home.bronze}>
           ← {card.series.title}
         </ThemedText>
       </Pressable>
 
-      <ThemedText variant="label" color={colors.bronze} style={styles.cardNumber}>
+      <ThemedText variant="label" color={home.bronze} style={styles.cardNumber}>
         CARD {card.cardNumber}
       </ThemedText>
       <ThemedText variant="display" style={styles.title}>
@@ -129,7 +130,7 @@ export default function SomaticCardDetailScreen() {
 
       {card.description ? (
         <Section heading="Description">
-          <ThemedText variant="body" color={colors.charcoal}>
+          <ThemedText variant="body" color={home.ink}>
             {card.description}
           </ThemedText>
         </Section>
@@ -137,7 +138,7 @@ export default function SomaticCardDetailScreen() {
 
       {card.orientation ? (
         <Section heading="Orientation">
-          <ThemedText variant="caption" color={colors.charcoal}>
+          <ThemedText variant="caption" color={home.ink}>
             {card.orientation}
           </ThemedText>
         </Section>

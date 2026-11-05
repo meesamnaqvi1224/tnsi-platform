@@ -2,8 +2,9 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { SomaticImageBlock } from './SomaticImageBlock';
 import { sortByOrder } from '@/lib/somatic-card-order';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
 import type { SomaticSupportingImage } from '@/api/types';
+import { home } from '@/components/home/homeTheme';
 
 interface SupportingImagesGalleryProps {
   images: SomaticSupportingImage[];
@@ -25,7 +26,7 @@ export function SupportingImagesGallery({ images, cardTitle }: SupportingImagesG
             aspectRatio={1}
           />
           {img.caption ? (
-            <ThemedText variant="caption" color={colors.charcoal} style={styles.caption}>
+            <ThemedText variant="caption" color={home.ink} style={styles.caption}>
               {img.caption}
             </ThemedText>
           ) : null}

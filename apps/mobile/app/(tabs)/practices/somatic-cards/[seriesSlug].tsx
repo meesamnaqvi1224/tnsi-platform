@@ -1,10 +1,12 @@
 import { StyleSheet, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { ScreenContainer, ErrorNotice, PageHeader, ThemedText } from '@/components';
+import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
+import { PageTitle } from '@/components/PageTitle';
 import { SomaticCardListItem } from '@/components/somatic-cards/SomaticCardListItem';
 import { SomaticCardsSkeleton } from '@/components/somatic-cards/SomaticCardsSkeleton';
 import { useSomaticSeriesDetail } from '@/hooks/useSomaticSeriesDetail';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
+import { home } from '@/components/home/homeTheme';
 
 /**
  * A single Somatic Series: metadata plus its ordered published Cards (as
@@ -20,7 +22,7 @@ export default function SomaticSeriesDetailScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll underHeader inTabs>
+      <ScreenContainer scroll underHeader inTabs background={home.page}>
         <SomaticCardsSkeleton />
       </ScreenContainer>
     );
@@ -28,9 +30,9 @@ export default function SomaticSeriesDetailScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer underHeader inTabs>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ThemedText variant="heading">This series isn&apos;t available.</ThemedText>
-        <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
+        <ThemedText variant="body" color={home.ink} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
         </ThemedText>
       </ScreenContainer>
@@ -39,7 +41,7 @@ export default function SomaticSeriesDetailScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer underHeader inTabs>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -48,22 +50,22 @@ export default function SomaticSeriesDetailScreen() {
   const { series } = state;
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
-      <PageHeader
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PageTitle
         eyebrow={`Series ${series.seriesNumber}`}
         title={series.title}
-        description={series.description ?? undefined}
+        subtitle={series.description ?? undefined}
       />
 
       {series.coreQuestion ? (
-        <ThemedText variant="body" color={colors.navy} style={styles.coreQuestion}>
+        <ThemedText variant="body" color={home.navy} style={styles.coreQuestion}>
           {series.coreQuestion}
         </ThemedText>
       ) : null}
 
       {series.cards.length === 0 ? (
         <View style={styles.emptyNotice}>
-          <ThemedText variant="body" color={colors.charcoal}>
+          <ThemedText variant="body" color={home.ink}>
             This series doesn&apos;t have any cards available yet.
           </ThemedText>
         </View>
@@ -84,7 +86,7 @@ const styles = StyleSheet.create({
   },
   emptyNotice: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    borderColor: home.border,
     borderRadius: 8,
     padding: spacing.lg,
   },

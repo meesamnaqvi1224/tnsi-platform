@@ -10,6 +10,7 @@ import {
 import { ThemedText } from '@/components/ThemedText';
 import { colors, radius } from '@/theme';
 import type { SomaticImage as SomaticImageType } from '@/api/types';
+import { home } from '@/components/home/homeTheme';
 
 interface SomaticImageBlockProps {
   image: SomaticImageType | null;
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
   surface: {
     width: '100%',
     borderRadius: radius.md,
-    backgroundColor: colors.navy,
+    backgroundColor: home.navy,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 12,

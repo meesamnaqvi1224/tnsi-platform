@@ -1,8 +1,9 @@
-import { ScreenContainer, ErrorNotice, PageHeader, ThemedText } from '@/components';
+import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
+import { PageTitle } from '@/components/PageTitle';
 import { SomaticSeriesCard } from '@/components/somatic-cards/SomaticSeriesCard';
 import { SomaticCardsSkeleton } from '@/components/somatic-cards/SomaticCardsSkeleton';
 import { useSomaticSeriesList } from '@/hooks/useSomaticSeriesList';
-import { colors } from '@/theme';
+import { home } from '@/components/home/homeTheme';
 
 /**
  * Somatic Card Series library - the native mobile counterpart to
@@ -14,10 +15,10 @@ export default function SomaticCardsScreen() {
   const { state, reload } = useSomaticSeriesList();
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
-      <PageHeader
-        eyebrow="Somatic Cards"
-        title="A library of somatic practice cards from The Nervous System Institute."
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PageTitle
+        title="Somatic Cards"
+        subtitle="A library of somatic practice cards from The Nervous System Institute."
       />
 
       {state.status === 'loading' && <SomaticCardsSkeleton />}
@@ -26,7 +27,7 @@ export default function SomaticCardsScreen() {
 
       {state.status === 'success' &&
         (state.series.length === 0 ? (
-          <ThemedText variant="body" color={colors.charcoal}>
+          <ThemedText variant="body" color={home.ink}>
             There are currently no published Somatic Card series available.
           </ThemedText>
         ) : (
