@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import { Card } from '@/components/Card';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 
 /**
  * Shown in place of a player when the server reports a practice as
@@ -22,8 +23,8 @@ export function MembershipLockedNotice({
   const router = useRouter();
 
   return (
-    <Card style={styles.card}>
-      <ThemedText variant="body" color={colors.charcoal} style={styles.body}>
+    <Card style={{ ...styles.card, ...homeCardStyle }}>
+      <ThemedText variant="body" color={home.ink} style={styles.body}>
         {message}
       </ThemedText>
       <PrimaryButton
