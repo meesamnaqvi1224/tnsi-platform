@@ -50,6 +50,15 @@ export function ForThisMomentCard({ practice, hasCheckedInToday }: ForThisMoment
             ? 'No practice is available today.'
             : "Complete today's check-in above to see a practice for this moment."}
         </ThemedText>
+        {hasCheckedInToday ? (
+          // A way forward instead of a dead end: the library is always available.
+          <PrimaryButton
+            label="Browse practices"
+            variant="secondary"
+            onPress={() => router.push('/practices')}
+            style={styles.emptyButton}
+          />
+        ) : null}
       </View>
     );
   }
@@ -91,6 +100,11 @@ export function ForThisMomentCard({ practice, hasCheckedInToday }: ForThisMoment
 }
 
 const styles = StyleSheet.create({
+  emptyButton: {
+    marginTop: spacing.md,
+    alignSelf: 'flex-start',
+    paddingHorizontal: spacing.xl,
+  },
   section: {
     marginBottom: spacing.xl,
   },

@@ -1,16 +1,14 @@
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet } from 'react-native';
 import { useUser } from '@clerk/clerk-expo';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { ScreenContainer, ErrorNotice, ThemedText, Card } from '@/components';
 import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import { ForThisMomentCard } from '@/components/home/ForThisMomentCard';
 import { ContinuePractiseCard } from '@/components/home/ContinuePractiseCard';
 import { WeekAtAGlance } from '@/components/home/WeekAtAGlance';
-import { QuickPracticeRow } from '@/components/home/QuickPracticeRow';
-import { RecentlyPractisedCard } from '@/components/home/RecentlyPractisedCard';
-import { ExploreTiles } from '@/components/home/ExploreTiles';
+import { ExploreList } from '@/components/home/ExploreList';
 import { LatestInsightCard } from '@/components/home/LatestInsightCard';
 import { QuoteBlock } from '@/components/home/QuoteBlock';
 import { ClosingStatementCard } from '@/components/home/ClosingStatementCard';
@@ -30,13 +28,12 @@ import type { CheckIn, Practice } from '@/api/types';
  * `useArticles` inside LatestInsightCard). No fabricated content, no
  * gamification, no aggregate "progress" score, no new APIs.
  *
- * "Continue" and "Recently practised" are both derived client-side from
- * the same `/api/v1/today` response already fetched (that endpoint
- * returns up to ten published practices with this member's own progress
- * attached) - no second practices fetch. Same definitions already used by
- * profile/progress.tsx and my-learning.tsx: in-progress is not completed
- * with progressPct strictly between 0 and 1; completed is progress.completed
- * === true, newest completedAt first.
+ * "Continue" is derived client-side from the same `/api/v1/today` response
+ * already fetched (that endpoint returns up to ten published practices with
+ * this member's own progress attached) - no second practices fetch. Same
+ * in-progress definition as my-learning.tsx: not completed, progressPct
+ * strictly between 0 and 1. Completed and saved practices live in My Learning,
+ * not here; "Explore" is a single list of ways into each library.
  */
 function findContinueCandidate(practices: Practice[], excludeId: string | undefined) {
   const candidates = practices.filter((p) => {
@@ -49,18 +46,6 @@ function findContinueCandidate(practices: Practice[], excludeId: string | undefi
     (a, b) =>
       new Date(b.progress!.lastPlayedAt!).getTime() - new Date(a.progress!.lastPlayedAt!).getTime(),
   )[0];
-}
-
-function completedTime(practice: Practice): number {
-  const iso = practice.progress?.completedAt;
-  return iso ? new Date(iso).getTime() : 0;
-}
-
-function findRecentlyCompleted(practices: Practice[], excludeId: string | undefined): Practice[] {
-  return practices
-    .filter((p) => p.id !== excludeId && p.progress?.completed === true)
-    .sort((a, b) => completedTime(b) - completedTime(a))
-    .slice(0, 2);
 }
 
 export default function HomeScreen() {
@@ -76,14 +61,28 @@ export default function HomeScreen() {
     void refresh();
   }
 
+  // Coming back to Home (after practising, saving or checking in elsewhere) shows what the
+  // server says now. The first focus is skipped because the hook already fetches on mount, and
+  // the refresh lives in a ref because the API client changes identity every render.
+  const refreshToday = useRef(() => {});
+  useEffect(() => {
+    refreshToday.current = () => void refresh();
+  });
+  const firstFocus = useRef(true);
+  useFocusEffect(
+    useCallback(() => {
+      if (firstFocus.current) {
+        firstFocus.current = false;
+        return;
+      }
+      refreshToday.current();
+    }, []),
+  );
+
   const todayPractice = state.status === 'success' ? state.data.todayPractice : null;
   const continueCandidate = useMemo(() => {
     if (state.status !== 'success') return null;
     return findContinueCandidate(state.data.practices, todayPractice?.id);
-  }, [state, todayPractice?.id]);
-  const recentlyCompleted = useMemo(() => {
-    if (state.status !== 'success') return [];
-    return findRecentlyCompleted(state.data.practices, todayPractice?.id);
   }, [state, todayPractice?.id]);
 
   return (
@@ -123,11 +122,7 @@ export default function HomeScreen() {
 
         <WeekAtAGlance />
 
-        <QuickPracticeRow />
-
-        <RecentlyPractisedCard practices={recentlyCompleted} />
-
-        <ExploreTiles />
+        <ExploreList />
 
         <LatestInsightCard />
 
