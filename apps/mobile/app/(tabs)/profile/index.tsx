@@ -2,7 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useAuth, useUser } from '@clerk/clerk-expo';
-import { Card, PrimaryButton, ScreenContainer, ThemedText, PageHeader } from '@/components';
+import { Ionicons } from '@expo/vector-icons';
+import { Card, PrimaryButton, ScreenContainer, ThemedText } from '@/components';
+import { PageTitle } from '@/components/PageTitle';
+import { SectionHeading } from '@/components/SectionHeading';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { EditableAvatar } from '@/components/profile/EditableAvatar';
 import { useEntitlements } from '@/hooks/useEntitlements';
 import { usePractices } from '@/hooks/usePractices';
@@ -94,39 +98,39 @@ export default function ProfileScreen() {
   const entitlementsStatus = entitlementsState.state;
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
-      <PageHeader
-        variant="plain"
-        eyebrow="Profile"
-        title="Your account, membership and progress."
-      />
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PageTitle title="Profile" subtitle="Your account, membership and progress." />
 
-      <View style={styles.identityRow}>
-        <EditableAvatar
-          imageUrl={user?.imageUrl ?? null}
-          hasImage={user?.hasImage ?? false}
-          initials={initials}
-        />
-        <View
-          style={styles.identityText}
-          accessible
-          accessibilityLabel={[fullName, email].filter(Boolean).join(', ')}
-        >
-          <ThemedText variant="heading">{fullName ?? 'Member'}</ThemedText>
-          {email ? (
-            <ThemedText variant="body" color={colors.charcoal}>
-              {email}
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
+        <View style={styles.identityRow}>
+          <EditableAvatar
+            imageUrl={user?.imageUrl ?? null}
+            hasImage={user?.hasImage ?? false}
+            initials={initials}
+          />
+          <View
+            style={styles.identityText}
+            accessible
+            accessibilityLabel={[fullName, email].filter(Boolean).join(', ')}
+          >
+            <ThemedText variant="heading" color={home.navy}>
+              {fullName ?? 'Member'}
             </ThemedText>
-          ) : null}
+            {email ? (
+              <ThemedText variant="body" color={home.ink} numberOfLines={1} style={styles.email}>
+                {email}
+              </ThemedText>
+            ) : null}
+          </View>
         </View>
-      </View>
+      </Card>
 
-      <SectionLabel>Membership</SectionLabel>
-      <Card style={styles.card}>
+      <SectionHeading>Membership</SectionHeading>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
         {entitlementsStatus.status === 'success' ? (
           <MembershipSummary entitlements={entitlementsStatus.entitlements} />
         ) : entitlementsStatus.status === 'loading' ? (
-          <ThemedText variant="body" color={colors.charcoal}>
+          <ThemedText variant="body" color={home.ink}>
             Loading membership details…
           </ThemedText>
         ) : (
@@ -138,7 +142,7 @@ export default function ProfileScreen() {
             accessibilityRole="button"
             accessibilityLabel="Retry loading membership details"
           >
-            <ThemedText variant="body" color={colors.charcoal}>
+            <ThemedText variant="body" color={home.ink}>
               {entitlementsStatus.sessionExpired
                 ? entitlementsStatus.message
                 : `${entitlementsStatus.message} Tap to retry.`}
@@ -149,8 +153,8 @@ export default function ProfileScreen() {
         <NavRow label="Membership & Access" onPress={() => router.push('/profile/membership')} />
       </Card>
 
-      <SectionLabel>Practice</SectionLabel>
-      <Card style={styles.card}>
+      <SectionHeading>Practice</SectionHeading>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
         <ActivitySummary
           activity={activity}
           failed={practicesState.state.status === 'error'}
@@ -164,8 +168,8 @@ export default function ProfileScreen() {
         <NavRow label="Capacity Assessment" onPress={() => router.push('/profile/assessment')} />
       </Card>
 
-      <SectionLabel>Support</SectionLabel>
-      <Card style={styles.card}>
+      <SectionHeading>Support</SectionHeading>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
         <WebRow label="Articles and Resources" page="resources" />
         <Divider />
         <WebRow label="Contact" page="contact" />
@@ -186,11 +190,11 @@ export default function ProfileScreen() {
   );
 }
 
-function SectionLabel({ children }: { children: string }) {
+function Chevron() {
   return (
-    <ThemedText variant="label" color={colors.bronze} style={styles.sectionLabel}>
-      {children.toUpperCase()}
-    </ThemedText>
+    <View style={styles.chevron} accessibilityElementsHidden importantForAccessibility="no">
+      <Ionicons name="chevron-forward" size={14} color={home.bronze} />
+    </View>
   );
 }
 
@@ -206,10 +210,10 @@ function NavRow({ label, onPress }: { label: string; onPress: () => void }) {
       accessibilityLabel={label}
       style={styles.linkRow}
     >
-      <ThemedText variant="body">{label}</ThemedText>
-      <ThemedText variant="body" color={colors.charcoal}>
-        ›
+      <ThemedText variant="body" color={home.navy}>
+        {label}
       </ThemedText>
+      <Chevron />
     </Pressable>
   );
 }
@@ -223,10 +227,10 @@ function WebRow({ label, page }: { label: string; page: TnsiPage }) {
       accessibilityLabel={`${label}, opens in a browser window`}
       style={styles.linkRow}
     >
-      <ThemedText variant="body">{label}</ThemedText>
-      <ThemedText variant="body" color={colors.charcoal}>
-        ›
+      <ThemedText variant="body" color={home.navy}>
+        {label}
       </ThemedText>
+      <Chevron />
     </Pressable>
   );
 }
@@ -239,26 +243,28 @@ function MembershipSummary({ entitlements }: { entitlements: Entitlements }) {
 
   return (
     <View>
-      <ThemedText variant="body">{tierLabel(entitlements)}</ThemedText>
+      <ThemedText variant="heading" color={home.navy}>
+        {tierLabel(entitlements)}
+      </ThemedText>
       <ThemedText
         variant="caption"
-        color={needsAttention ? colors.error : colors.charcoal}
+        color={needsAttention ? colors.error : home.ink}
         style={styles.statusNote}
       >
         {membershipStateLabel(entitlements)}
       </ThemedText>
       {detail ? (
-        <ThemedText variant="caption" color={colors.charcoal} style={styles.statusNote}>
+        <ThemedText variant="caption" color={home.ink} style={styles.statusNote}>
           {detail}
         </ThemedText>
       ) : null}
       {hasPrograms ? (
-        <ThemedText variant="caption" color={colors.charcoal} style={styles.statusNote}>
+        <ThemedText variant="caption" color={home.ink} style={styles.statusNote}>
           Programmes: {entitlements.programs.join(', ')}
         </ThemedText>
       ) : null}
       {hasCertifications ? (
-        <ThemedText variant="caption" color={colors.charcoal} style={styles.statusNote}>
+        <ThemedText variant="caption" color={home.ink} style={styles.statusNote}>
           Certifications: {entitlements.certifications.join(', ')}
         </ThemedText>
       ) : null}
@@ -283,7 +289,7 @@ function ActivitySummary({
         accessibilityRole="button"
         accessibilityLabel="Retry loading practice activity"
       >
-        <ThemedText variant="body" color={colors.charcoal}>
+        <ThemedText variant="body" color={home.ink}>
           Practice activity couldn&apos;t be loaded. Tap to retry.
         </ThemedText>
       </Pressable>
@@ -291,14 +297,14 @@ function ActivitySummary({
   }
   if (!activity) {
     return (
-      <ThemedText variant="body" color={colors.charcoal}>
+      <ThemedText variant="body" color={home.ink}>
         Loading practice activity…
       </ThemedText>
     );
   }
   if (!hasActivity(activity)) {
     return (
-      <ThemedText variant="body" color={colors.charcoal}>
+      <ThemedText variant="body" color={home.ink}>
         You haven&apos;t practised yet. Your activity will appear here once you do.
       </ThemedText>
     );
@@ -312,9 +318,11 @@ function ActivitySummary({
   ].filter((line): line is string => line !== null);
   return (
     <View accessible accessibilityLabel={lines.join('. ')}>
-      <ThemedText variant="body">{lines[0]}</ThemedText>
+      <ThemedText variant="body" color={home.navy}>
+        {lines[0]}
+      </ThemedText>
       {lines.slice(1).map((line) => (
-        <ThemedText key={line} variant="caption" color={colors.charcoal} style={styles.statusNote}>
+        <ThemedText key={line} variant="caption" color={home.ink} style={styles.statusNote}>
           {line}
         </ThemedText>
       ))}
@@ -326,15 +334,14 @@ const styles = StyleSheet.create({
   identityRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: 0,
+  },
+  email: {
+    fontSize: 14,
   },
   identityText: {
-    marginLeft: spacing.lg,
+    marginLeft: spacing.md,
     flexShrink: 1,
-  },
-  sectionLabel: {
-    marginBottom: spacing.sm,
-    letterSpacing: 1,
   },
   card: {
     marginBottom: spacing.xl,
@@ -350,8 +357,16 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.border,
+    backgroundColor: home.border,
     marginVertical: spacing.md,
+  },
+  chevron: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: home.bronzeTint,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   signOut: {
     marginBottom: spacing.xl,

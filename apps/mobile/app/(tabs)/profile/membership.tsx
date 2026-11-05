@@ -11,7 +11,10 @@ import {
   tierLabel,
 } from '@/lib/membership-copy';
 import { openTnsiPage } from '@/lib/open-web';
-import { colors, spacing } from '@/theme';
+import { PageTitle } from '@/components/PageTitle';
+import { SectionHeading } from '@/components/SectionHeading';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
+import { spacing } from '@/theme';
 import type { Entitlements } from '@/api/types';
 
 export default function MembershipScreen() {
@@ -19,10 +22,8 @@ export default function MembershipScreen() {
   const { signOut } = useAuth();
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
-      <ThemedText variant="display" style={styles.heading}>
-        Membership & Access
-      </ThemedText>
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PageTitle title="Membership & Access" subtitle="Your current access and how to manage it." />
 
       {state.status === 'loading' ? <MembershipSkeleton /> : null}
 
@@ -54,14 +55,16 @@ function MembershipContent({
 
   return (
     <View>
-      <SectionLabel>Current Access</SectionLabel>
-      <Card style={styles.card}>
+      <SectionHeading>Current Access</SectionHeading>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
         <View
           accessible
           accessibilityLabel={`Membership: ${tierLabel(entitlements)}. Status: ${membershipStateLabel(entitlements)}`}
         >
-          <ThemedText variant="heading">{tierLabel(entitlements)}</ThemedText>
-          <ThemedText variant="body" color={colors.charcoal} style={styles.statusLine}>
+          <ThemedText variant="heading" color={home.navy}>
+            {tierLabel(entitlements)}
+          </ThemedText>
+          <ThemedText variant="body" color={home.ink} style={styles.statusLine}>
             Status: {membershipStateLabel(entitlements)}
           </ThemedText>
         </View>
@@ -71,13 +74,13 @@ function MembershipContent({
 
       {hasPrograms ? (
         <>
-          <SectionLabel>Programmes</SectionLabel>
-          <Card style={styles.card}>
+          <SectionHeading>Programmes</SectionHeading>
+          <Card style={{ ...styles.card, ...homeCardStyle }}>
             {entitlements.programs.map((program, index) => (
               <ThemedText
                 key={program}
                 variant="body"
-                color={colors.charcoal}
+                color={home.ink}
                 style={index > 0 ? styles.listItem : undefined}
               >
                 {program}
@@ -89,13 +92,13 @@ function MembershipContent({
 
       {hasCertifications ? (
         <>
-          <SectionLabel>Certifications</SectionLabel>
-          <Card style={styles.card}>
+          <SectionHeading>Certifications</SectionHeading>
+          <Card style={{ ...styles.card, ...homeCardStyle }}>
             {entitlements.certifications.map((certification, index) => (
               <ThemedText
                 key={certification}
                 variant="body"
-                color={colors.charcoal}
+                color={home.ink}
                 style={index > 0 ? styles.listItem : undefined}
               >
                 {certification}
@@ -105,8 +108,8 @@ function MembershipContent({
         </>
       ) : null}
 
-      <SectionLabel>Manage</SectionLabel>
-      <Card style={styles.card}>
+      <SectionHeading>Manage</SectionHeading>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
         <PrimaryButton
           label={membershipActionLabel(entitlements)}
           variant="secondary"
@@ -123,7 +126,7 @@ function MembershipContent({
           }}
           style={styles.manageButton}
         />
-        <ThemedText variant="caption" color={colors.charcoal} style={styles.manageNote}>
+        <ThemedText variant="caption" color={home.ink} style={styles.manageNote}>
           This opens the TNSI website in a secure browser window, where membership and billing are
           managed.
         </ThemedText>
@@ -142,7 +145,7 @@ function MembershipContent({
 
 function DetailLine({ children }: { children: string }) {
   return (
-    <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
+    <ThemedText variant="body" color={home.ink} style={styles.detailLine}>
       {children}
     </ThemedText>
   );
@@ -162,22 +165,7 @@ function AccessDetail({ entitlements }: { entitlements: Entitlements }) {
   );
 }
 
-function SectionLabel({ children }: { children: string }) {
-  return (
-    <ThemedText variant="label" color={colors.bronze} style={styles.sectionLabel}>
-      {children.toUpperCase()}
-    </ThemedText>
-  );
-}
-
 const styles = StyleSheet.create({
-  heading: {
-    marginBottom: spacing.xl,
-  },
-  sectionLabel: {
-    marginBottom: spacing.sm,
-    letterSpacing: 1,
-  },
   card: {
     marginBottom: spacing.xl,
   },
@@ -188,7 +176,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingTop: spacing.md,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
+    borderTopColor: home.border,
   },
   listItem: {
     marginTop: spacing.sm,
@@ -201,7 +189,7 @@ const styles = StyleSheet.create({
   },
   refreshDivider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.border,
+    backgroundColor: home.border,
     marginBottom: spacing.md,
   },
   refreshButton: {

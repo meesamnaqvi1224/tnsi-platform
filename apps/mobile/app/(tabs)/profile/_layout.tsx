@@ -15,10 +15,19 @@ export default function ProfileLayout() {
     >
       <Stack.Screen
         name="index"
-        options={{ title: 'Profile', headerLeft: () => <HomeHeaderButton /> }}
+        options={{
+          title: 'Profile',
+          // The page title is drawn in the screen itself; the title text stays for back labels.
+          headerTitle: '',
+          headerStyle: { backgroundColor: '#FFFFFF' },
+          headerLeft: () => <HomeHeaderButton />,
+        }}
       />
       <Stack.Screen name="progress" options={{ title: '' }} />
-      <Stack.Screen name="membership" options={{ title: '' }} />
+      <Stack.Screen
+        name="membership"
+        options={{ title: '', headerStyle: { backgroundColor: '#FFFFFF' } }}
+      />
       {/*
        * `headerBackButtonMenuEnabled: false` disables iOS's long-press-back-
        * button menu, which can pop multiple screens at once outside the
