@@ -1,15 +1,21 @@
 import { useCallback, useMemo, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ScreenContainer, ErrorNotice, ThemedText, PageHeader } from '@/components';
+import { ScreenContainer, ErrorNotice, ThemedText, PageHeader, PrimaryButton } from '@/components';
+import { PracticeSearchField } from '@/components/practices/PracticeSearchField';
 import { ArticleCard, type ArticleCardSummary } from '@/components/resources/ArticleCard';
-import {
-  ArticleFilterBar,
-  type ArticleCategoryOption,
-} from '@/components/resources/ArticleFilterBar';
+import { ArticleFilterBar } from '@/components/resources/ArticleFilterBar';
 import { FeaturedArticle } from '@/components/resources/FeaturedArticle';
 import { ResourcesSkeleton } from '@/components/resources/ResourcesSkeleton';
 import { useArticles } from '@/hooks/useArticles';
-import { colors } from '@/theme';
+import {
+  NO_ARTICLE_FILTERS,
+  articleCategories,
+  filterArticles,
+  hasArticleFilters,
+  type ArticleFilters,
+} from '@/lib/article-library';
+import { colors, spacing } from '@/theme';
 
 /**
  * The Resources library - the mobile presentation of the TNSI Article
@@ -24,7 +30,7 @@ import { colors } from '@/theme';
 export default function ResourcesScreen() {
   const router = useRouter();
   const { state, reload } = useArticles();
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [filters, setFilters] = useState<ArticleFilters>(NO_ARTICLE_FILTERS);
 
   const openArticle = useCallback(
     (article: ArticleCardSummary) => {
@@ -44,25 +50,21 @@ export default function ResourcesScreen() {
     [articles, featured],
   );
 
-  const categories = useMemo(() => {
-    const seen = new Map<string, ArticleCategoryOption>();
-    for (const article of listSource) {
-      if (article.category?.slug && !seen.has(article.category.slug)) {
-        seen.set(article.category.slug, {
-          slug: article.category.slug,
-          title: article.category.title,
-        });
-      }
-    }
-    return Array.from(seen.values());
-  }, [listSource]);
-
-  const filtered = categoryFilter
-    ? listSource.filter((article) => article.category?.slug === categoryFilter)
-    : listSource;
+  // With the default view the featured article has its own slot and is left out of the list. Once
+  // the member searches or filters, the whole loaded catalogue is searched (so the featured
+  // article can be found too) and the featured slot gives way to the results.
+  const narrowed = hasArticleFilters(filters);
+  const categories = useMemo(
+    () => articleCategories(narrowed ? articles : listSource),
+    [articles, listSource, narrowed],
+  );
+  const filtered = useMemo(
+    () => filterArticles(narrowed ? articles : listSource, filters),
+    [articles, listSource, filters, narrowed],
+  );
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
+    <ScreenContainer scroll underHeader inTabs keyboardPersistTaps>
       <PageHeader
         variant="plain"
         eyebrow="Resources"
@@ -75,20 +77,53 @@ export default function ResourcesScreen() {
 
       {state.status === 'success' && (
         <>
-          {featured ? <FeaturedArticle article={featured} onPress={openArticle} /> : null}
+          {articles.length > 0 ? (
+            <PracticeSearchField
+              label="Search resources"
+              value={filters.query}
+              onChangeText={(query) => setFilters((current) => ({ ...current, query }))}
+            />
+          ) : null}
+
+          {featured && !narrowed ? (
+            <FeaturedArticle article={featured} onPress={openArticle} />
+          ) : null}
 
           <ArticleFilterBar
             categories={categories}
-            selected={categoryFilter}
-            onSelect={setCategoryFilter}
+            selected={filters.category}
+            onSelect={(category) => setFilters((current) => ({ ...current, category }))}
           />
 
-          {filtered.length === 0 ? (
-            <ThemedText variant="body" color={colors.charcoal}>
-              {articles.length === 0
-                ? 'No resources are available yet.'
-                : 'No resources found in this category.'}
+          {narrowed && articles.length > 0 ? (
+            <ThemedText
+              variant="caption"
+              color={colors.charcoal}
+              accessibilityLiveRegion="polite"
+              style={styles.summary}
+            >
+              {`${filtered.length} of ${articles.length} resources`}
             </ThemedText>
+          ) : null}
+
+          {filtered.length === 0 ? (
+            <View>
+              <ThemedText variant="body" color={colors.charcoal}>
+                {articles.length === 0
+                  ? 'No resources are available yet.'
+                  : filters.query.trim()
+                    ? `No resources match “${filters.query.trim()}”${filters.category ? ' in this category' : ''}.`
+                    : 'No resources found in this category.'}
+              </ThemedText>
+              {articles.length > 0 ? (
+                <PrimaryButton
+                  label="Clear search and filters"
+                  variant="secondary"
+                  onPress={() => setFilters(NO_ARTICLE_FILTERS)}
+                  style={styles.clear}
+                />
+              ) : null}
+            </View>
           ) : (
             filtered.map((article) => (
               <ArticleCard key={article.id} article={article} onPress={openArticle} />
@@ -99,3 +134,8 @@ export default function ResourcesScreen() {
     </ScreenContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  summary: { marginBottom: spacing.md },
+  clear: { marginTop: spacing.md },
+});
