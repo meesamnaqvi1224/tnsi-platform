@@ -5,25 +5,47 @@ import { ThemedText } from '@/components/ThemedText';
 import { PracticeThumbnail } from './PracticeThumbnail';
 import { SaveToggleButton } from './SaveToggleButton';
 import { capitalize, formatDuration } from '@/lib/format';
+import { inProgressPractices, percentLabel } from '@/lib/my-learning';
+import { categoryLabel } from '@/lib/practice-library';
 import { colors, spacing } from '@/theme';
 import type { Practice } from '@/api/types';
 
 interface PracticeCardProps {
   practice: Practice;
+  /** Reports a save/unsave so the list keeps it if this card is filtered away and back. */
+  onSavedChange?: (saved: boolean) => void;
 }
 
 /**
- * One library entry: title, short description, content type · duration,
- * category. No popularity/ratings/streaks/"trending" - only real fields.
+ * One library entry, in the order a member scans it: the focus it belongs to (category), the
+ * title, a short description, then format · duration and, when they have started it, how far
+ * they got. Only real fields: no popularity, ratings, streaks or "trending".
+ *
+ * The progress line uses the same rule as My Learning's In Progress view, so the two agree.
  */
-export function PracticeCard({ practice }: PracticeCardProps) {
+export function PracticeCard({ practice, onSavedChange }: PracticeCardProps) {
   const router = useRouter();
   const title = practice.title.trim();
+  const category = practice.category?.trim() ? categoryLabel(practice.category) : null;
   const meta = [capitalize(practice.contentType)];
   if (practice.durationSeconds) meta.push(formatDuration(practice.durationSeconds));
   // Decided by the server (see Practice.locked): a paid-library practice the
   // member can't open yet. Still tappable - the detail screen explains.
   const locked = practice.locked === true;
+  const startedPct =
+    inProgressPractices([practice]).length > 0 && practice.progress?.progressPct != null
+      ? percentLabel(practice.progress.progressPct)
+      : null;
+
+  const label = [
+    title,
+    category,
+    meta.join(', '),
+    startedPct ? `${startedPct} complete` : null,
+    locked ? 'members only' : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
 
   return (
     // The save toggle is a sibling of this Pressable, not nested inside it -
@@ -35,7 +57,7 @@ export function PracticeCard({ practice }: PracticeCardProps) {
       <Pressable
         onPress={() => router.push({ pathname: '/practices/[id]', params: { id: practice.id } })}
         accessibilityRole="button"
-        accessibilityLabel={`${title}, ${meta.join(', ')}${locked ? ', members only' : ''}`}
+        accessibilityLabel={label}
         style={({ pressed }) => pressed && styles.pressed}
       >
         <Card style={styles.card}>
@@ -45,6 +67,18 @@ export function PracticeCard({ practice }: PracticeCardProps) {
             height={140}
             style={styles.thumbnail}
           />
+          {category || locked ? (
+            <View style={styles.eyebrowRow}>
+              <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
+                {category ?? ''}
+              </ThemedText>
+              {locked ? (
+                <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
+                  Members
+                </ThemedText>
+              ) : null}
+            </View>
+          ) : null}
           <ThemedText variant="heading" style={styles.title}>
             {title}
           </ThemedText>
@@ -62,13 +96,9 @@ export function PracticeCard({ practice }: PracticeCardProps) {
             <ThemedText variant="caption" color={colors.charcoal}>
               {meta.join(' · ')}
             </ThemedText>
-            {locked ? (
+            {startedPct ? (
               <ThemedText variant="caption" color={colors.bronze}>
-                Members
-              </ThemedText>
-            ) : practice.category ? (
-              <ThemedText variant="caption" color={colors.bronze}>
-                {practice.category}
+                {startedPct} complete
               </ThemedText>
             ) : null}
           </View>
@@ -78,6 +108,7 @@ export function PracticeCard({ practice }: PracticeCardProps) {
         <SaveToggleButton
           practiceId={practice.id}
           initialSaved={practice.saved ?? false}
+          onSavedChange={onSavedChange}
           style={styles.saveButton}
         />
       )}
@@ -97,6 +128,16 @@ const styles = StyleSheet.create({
   },
   thumbnail: {
     marginBottom: spacing.md,
+  },
+  eyebrowRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  eyebrow: {
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   title: {
     marginBottom: spacing.xs,

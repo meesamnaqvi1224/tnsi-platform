@@ -5,6 +5,8 @@ import { colors, spacing } from '@/theme';
 
 interface ScreenContainerProps extends PropsWithChildren {
   scroll?: boolean;
+  /** Taps on buttons and chips work while the keyboard is open (instead of the first tap only closing it). For screens with a search field. */
+  keyboardPersistTaps?: boolean;
   /** Set when a navigation header already sits above this screen, so the top safe-area inset is not added a second time. */
   underHeader?: boolean;
   /** Set when the tab bar already sits below this screen, so the bottom safe-area inset is not added a second time. */
@@ -19,6 +21,7 @@ interface ScreenContainerProps extends PropsWithChildren {
 export function ScreenContainer({
   children,
   scroll = false,
+  keyboardPersistTaps = false,
   underHeader = false,
   inTabs = false,
   style,
@@ -30,7 +33,12 @@ export function ScreenContainer({
   return (
     <SafeAreaView style={styles.safeArea} edges={edges}>
       {scroll ? (
-        <ScrollView contentContainerStyle={[styles.content, style]}>{children}</ScrollView>
+        <ScrollView
+          contentContainerStyle={[styles.content, style]}
+          keyboardShouldPersistTaps={keyboardPersistTaps ? 'handled' : 'never'}
+        >
+          {children}
+        </ScrollView>
       ) : (
         <View style={[styles.content, style]}>{children}</View>
       )}

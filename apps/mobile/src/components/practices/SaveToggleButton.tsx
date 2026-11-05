@@ -8,6 +8,8 @@ import type { SavePracticeResult } from '@/api/types';
 interface SaveToggleButtonProps {
   practiceId: string;
   initialSaved: boolean;
+  /** Told the new state when it flips (and again if the request fails and it flips back), so a list can remember it. */
+  onSavedChange?: (saved: boolean) => void;
   style?: ViewStyle;
 }
 
@@ -19,7 +21,12 @@ interface SaveToggleButtonProps {
  * app - saving is trivially reversible with no data-loss consequence, so
  * instant feedback is worth the small risk of a rare revert.
  */
-export function SaveToggleButton({ practiceId, initialSaved, style }: SaveToggleButtonProps) {
+export function SaveToggleButton({
+  practiceId,
+  initialSaved,
+  onSavedChange,
+  style,
+}: SaveToggleButtonProps) {
   const api = useApiClient();
   const [saved, setSaved] = useState(initialSaved);
   const [pending, setPending] = useState(false);
@@ -28,6 +35,7 @@ export function SaveToggleButton({ practiceId, initialSaved, style }: SaveToggle
     if (pending) return;
     const next = !saved;
     setSaved(next);
+    onSavedChange?.(next);
     setPending(true);
 
     try {
@@ -38,6 +46,7 @@ export function SaveToggleButton({ practiceId, initialSaved, style }: SaveToggle
       }
     } catch {
       setSaved(!next);
+      onSavedChange?.(!next);
     } finally {
       setPending(false);
     }
