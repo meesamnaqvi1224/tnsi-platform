@@ -5,7 +5,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { useCheckInHistory } from '@/hooks/useCheckInHistory';
-import { colors, spacing } from '@/theme';
+import { colors, spacing, linkHitSlop } from '@/theme';
 
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
@@ -62,6 +62,7 @@ export function WeekAtAGlance() {
         <Pressable
           onPress={() => router.push('/profile/progress')}
           accessibilityRole="link"
+          hitSlop={linkHitSlop}
           accessibilityLabel="View Progress"
         >
           <ThemedText variant="label" color={colors.bronze}>
