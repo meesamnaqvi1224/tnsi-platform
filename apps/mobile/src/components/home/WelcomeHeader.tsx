@@ -1,116 +1,139 @@
-import { Image, ImageBackground, StyleSheet, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, imageHeight, spacing } from '@/theme';
+import { fontFamily, spacing } from '@/theme';
+import { home } from './homeTheme';
 
-const logoMark = require('../../../assets/images/logo-mark.png');
 const heroImage = require('../../../assets/images/home-hero.jpg');
 
 interface WelcomeHeaderProps {
   firstName?: string | null;
 }
 
-/** "Tuesday, 9 September" - the real current date, for orientation only (never a fabricated read on how the member is doing). */
-function todayLabel(): string {
-  return new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-}
-
-/** "Good morning"/"Good afternoon"/"Good evening" from the device's own clock. */
-function timeOfDayGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 18) return 'Good afternoon';
-  return 'Good evening';
-}
-
 /**
- * Restrained greeting - first name and today's date only, no streaks/stats/
- * badges. The photo behind it is a placeholder (not real TNSI photography,
- * which doesn't exist yet) explicitly approved for now to give Home visual
- * warmth instead of a flat color block - swap `assets/images/home-hero.jpg`
- * for real brand photography whenever Caroline supplies it. The tagline is
- * drawn directly from Caroline's own reference mockup, not invented copy.
- * The gradient exists purely so text stays legible over the image.
+ * Home's masthead: the TNSI name centred above a short bronze rule, the profile button at the right,
+ * then a welcome line and the Institute's own statement beside a photograph. The photograph is an
+ * existing approved asset (it is swapped for real brand photography later); the greeting still uses
+ * the member's first name.
  */
 export function WelcomeHeader({ firstName }: WelcomeHeaderProps) {
-  return (
-    <View style={styles.bleed}>
-      <ImageBackground source={heroImage} style={styles.hero} imageStyle={styles.heroImage}>
-        <LinearGradient
-          colors={['rgba(11,21,38,0.05)', 'rgba(11,21,38,0.55)', 'rgba(11,21,38,0.92)']}
-          style={styles.gradient}
-        >
-          <View style={styles.brandRow}>
-            <Image source={logoMark} style={styles.logo} resizeMode="contain" />
-            <ThemedText variant="caption" color={colors.cream} style={styles.brandName}>
-              THE NERVOUS SYSTEM INSTITUTE
-            </ThemedText>
-          </View>
+  const router = useRouter();
+  const name = firstName?.trim();
 
-          <ThemedText variant="label" color={colors.bronzeMuted} style={styles.date}>
-            {todayLabel()}
+  return (
+    <View style={styles.wrap}>
+      <View style={styles.brandRow}>
+        <View style={styles.side} />
+        <View style={styles.brand} accessibilityRole="header">
+          <ThemedText variant="display" color={home.navy} style={styles.wordmark}>
+            TNSI
           </ThemedText>
-          <ThemedText variant="display" color={colors.cream} style={styles.heading}>
-            {firstName ? `${timeOfDayGreeting()}, ${firstName}.` : `${timeOfDayGreeting()}.`}
+          <ThemedText variant="caption" color={home.navy} style={styles.tagline}>
+            THE NERVOUS SYSTEM INSTITUTE
           </ThemedText>
-          <View style={styles.taglineRule} />
-          <ThemedText variant="body" color={colors.creamMuted} style={styles.tagline}>
-            A calmer you creates a more human future.
+          <View style={styles.rule} />
+        </View>
+        <View style={styles.side}>
+          <Pressable
+            onPress={() => router.push('/profile')}
+            accessibilityRole="button"
+            accessibilityLabel="Profile"
+            hitSlop={6}
+            style={styles.profile}
+          >
+            <Ionicons name="person-outline" size={22} color={home.navy} />
+          </Pressable>
+        </View>
+      </View>
+
+      <View style={styles.hero}>
+        <View style={styles.heroText}>
+          <ThemedText variant="heading" color={home.bronze} style={styles.welcome}>
+            {name ? `Welcome back, ${name}` : 'Welcome back'}
           </ThemedText>
-        </LinearGradient>
-      </ImageBackground>
+          <ThemedText variant="display" color={home.navy} style={styles.statement}>
+            A space to regulate, restore and reconnect.
+          </ThemedText>
+          <View style={styles.statementRule} />
+        </View>
+        <Image source={heroImage} style={styles.photo} accessibilityIgnoresInvertColors />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  bleed: {
-    marginHorizontal: -spacing.lg,
-    marginTop: -spacing.lg,
-    marginBottom: spacing.xl,
-  },
-  hero: {
-    width: '100%',
-    minHeight: imageHeight.hero,
-  },
-  heroImage: {
-    resizeMode: 'cover',
-  },
-  gradient: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xxl,
-    paddingBottom: spacing.xl,
+  wrap: {
+    marginBottom: spacing.lg,
   },
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
   },
-  logo: {
-    width: 34,
-    height: 29,
+  side: {
+    width: 48,
+    alignItems: 'flex-end',
   },
-  brandName: {
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+  brand: {
+    flex: 1,
+    alignItems: 'center',
   },
-  date: {
-    textTransform: 'uppercase',
-    marginBottom: spacing.sm,
-  },
-  heading: {
+  wordmark: {
     fontSize: 38,
-    lineHeight: 44,
-    marginBottom: spacing.md,
-  },
-  taglineRule: {
-    width: 32,
-    height: 2,
-    backgroundColor: colors.bronze,
-    marginBottom: spacing.sm,
+    lineHeight: 42,
+    letterSpacing: 1,
+    fontFamily: fontFamily.serif,
   },
   tagline: {
-    maxWidth: 280,
+    letterSpacing: 2.2,
+    fontSize: 9,
+    marginTop: 2,
+  },
+  rule: {
+    width: 36,
+    height: 2,
+    backgroundColor: home.bronze,
+    marginTop: spacing.sm,
+  },
+  profile: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: home.navy,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  hero: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  heroText: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  welcome: {
+    fontStyle: 'italic',
+    fontSize: 17,
+    marginBottom: spacing.sm,
+  },
+  statement: {
+    fontSize: 27,
+    lineHeight: 32,
+  },
+  statementRule: {
+    width: 40,
+    height: 2,
+    backgroundColor: home.bronze,
+    marginTop: spacing.md,
+  },
+  photo: {
+    width: '42%',
+    height: 200,
+    borderRadius: 14,
+    resizeMode: 'cover',
   },
 });

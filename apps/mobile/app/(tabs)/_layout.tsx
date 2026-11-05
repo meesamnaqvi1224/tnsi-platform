@@ -36,8 +36,8 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.navy,
-        tabBarInactiveTintColor: colors.charcoal + '80',
+        tabBarActiveTintColor: '#A87942',
+        tabBarInactiveTintColor: '#4B5563',
         // `display: 'none'` rather than unmounting anything - the tab bar
         // is still the same persistent React Navigation component, just
         // not drawn while the session route is active, so nothing about
@@ -46,7 +46,7 @@ export default function TabsLayout() {
         // again (leaving the session, e.g. via End or natural completion).
         tabBarStyle: hideTabBar
           ? { display: 'none' }
-          : { backgroundColor: colors.cream, borderTopColor: colors.border },
+          : { backgroundColor: '#FFFFFF', borderTopColor: '#DDE1E5' },
         tabBarLabelStyle: { fontFamily: typography.caption.fontFamily, fontSize: 11 },
       }}
     >

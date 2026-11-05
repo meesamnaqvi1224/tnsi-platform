@@ -5,7 +5,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
 import { capitalize, formatDuration } from '@/lib/format';
-import { colors, imageHeight, imageOverlayGradient, radius, spacing } from '@/theme';
+import { colors, imageHeight, imageOverlayGradient, spacing } from '@/theme';
+import { homeCardStyle } from './homeTheme';
 import type { Practice } from '@/api/types';
 
 const journeyImage = require('../../../assets/images/journey-dock.jpg');
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
   },
   card: {
     height: imageHeight.secondary,
-    borderRadius: radius.lg,
+    ...homeCardStyle,
     overflow: 'hidden',
   },
   image: {

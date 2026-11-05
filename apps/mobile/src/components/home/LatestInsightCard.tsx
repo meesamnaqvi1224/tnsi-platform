@@ -7,6 +7,7 @@ import { ArticleThumbnail } from '@/components/resources/ArticleThumbnail';
 import { useArticles } from '@/hooks/useArticles';
 import { formatArticleDate } from '@/lib/format';
 import { colors, spacing } from '@/theme';
+import { homeCardStyle } from './homeTheme';
 
 /**
  * A single real article surfaced on Home - reuses `useArticles()` (the
@@ -38,7 +39,7 @@ export function LatestInsightCard() {
         accessibilityLabel={`Read ${article.title}`}
         style={({ pressed }) => pressed && styles.pressed}
       >
-        <Card style={styles.card}>
+        <Card style={{ ...styles.card, ...homeCardStyle }}>
           <ArticleThumbnail
             coverImage={article.coverImage}
             fallbackLabel={article.category?.title ?? 'Resource'}
