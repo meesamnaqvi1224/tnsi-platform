@@ -8,7 +8,7 @@ interface PlaceholderScreenProps {
   message: string;
 }
 
-/** Shared shell for the Phase 1 tab placeholders (Practices, My Learning, Resources). */
+/** Shared shell for the Phase 1 tab placeholders (Practices, My Learning). */
 export function PlaceholderScreen({ title, message }: PlaceholderScreenProps) {
   return (
     <ScreenContainer>

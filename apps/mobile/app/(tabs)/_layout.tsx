@@ -64,7 +64,7 @@ export default function TabsLayout() {
           title: 'My Learning',
           tabBarIcon: tabIcon('school-outline', 'school'),
           // The only tab with no nested Stack of its own (a single flat
-          // screen), so unlike Practices/Resources/Profile it never had a
+          // screen), so unlike Practices/Profile it never had a
           // header at all under the shared `headerShown: false` above -
           // opted back in here specifically so it can carry the same
           // Home button the other three tab roots now have.
@@ -77,10 +77,6 @@ export default function TabsLayout() {
           headerShadowVisible: false,
           headerLeft: () => <HomeHeaderButton inset />,
         }}
-      />
-      <Tabs.Screen
-        name="resources"
-        options={{ title: 'Resources', tabBarIcon: tabIcon('book-outline', 'book') }}
       />
       <Tabs.Screen
         name="profile"

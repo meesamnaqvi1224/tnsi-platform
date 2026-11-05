@@ -6,7 +6,7 @@ import { colors, radius, spacing, typography } from '@/theme';
 interface PracticeSearchFieldProps {
   value: string;
   onChangeText: (text: string) => void;
-  /** Defaults to the Practices wording; Resources passes its own. */
+  /** Defaults to the Practices wording. */
   label?: string;
 }
 

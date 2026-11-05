@@ -14,8 +14,8 @@ interface Destination {
 }
 
 /**
- * Six ways into the app, once each: the practice library, the two collections, My Learning, Resources
- * and My Journey. Each tile uses an existing approved photograph. Static: nothing is fetched and
+ * Five ways into the app, once each: the practice library, the two collections, My Learning and My
+ * Journey. Each tile uses an existing approved photograph. Static: nothing is fetched and
  * nothing is recommended, so Home does not repeat the library screens, it only points to them.
  */
 const GAP = 10;
@@ -50,13 +50,6 @@ const DESTINATIONS: Destination[] = [
     label: 'My Learning, your in progress, completed and saved practices',
   },
   {
-    title: 'Resources',
-    description: 'Articles, insights and guidance',
-    href: '/resources',
-    image: require('../../../assets/images/quick-ground.jpg'),
-    label: 'Resources, articles, insights and guidance',
-  },
-  {
     title: 'My Journey',
     description: 'Your check-ins and practice history',
     href: '/practices/journey',
@@ -68,10 +61,16 @@ const DESTINATIONS: Destination[] = [
 export function ExploreGrid() {
   const router = useRouter();
   const { fontScale, width } = useWindowDimensions();
-  // Large text sizes: two columns instead of three, so titles and descriptions keep room to read.
-  const columns = fontScale >= 1.3 ? 2 : 3;
-  // Home's content is inset by spacing.lg on each side; tiles share what is left, minus the gaps.
-  const tileWidth = Math.floor((width - spacing.lg * 2 - GAP * (columns - 1)) / columns);
+  // Five tiles: a row of three and a row of two (two, two and one at large text sizes, so titles
+  // and descriptions keep room to read). Home's content is inset by spacing.lg on each side; the
+  // tiles in a row share what is left, minus the gaps.
+  const rows = fontScale >= 1.3 ? [2, 2, 1] : [3, 2];
+  const widths = rows.flatMap((count) =>
+    Array<number>(count).fill(Math.floor((width - spacing.lg * 2 - GAP * (count - 1)) / count)),
+  );
+
+  // Wider tiles get taller photographs, so every tile fills its card.
+  const imageHeights = rows.flatMap((count) => Array<number>(count).fill(count === 3 ? 84 : 132));
 
   return (
     <View style={styles.section}>
@@ -79,17 +78,21 @@ export function ExploreGrid() {
         Explore
       </ThemedText>
       <View style={styles.grid}>
-        {DESTINATIONS.map((destination) => (
+        {DESTINATIONS.map((destination, index) => (
           <Pressable
             key={destination.title}
             onPress={() => router.push(destination.href)}
             accessibilityRole="button"
             accessibilityLabel={destination.label}
-            style={({ pressed }) => [styles.tile, { width: tileWidth }, pressed && styles.pressed]}
+            style={({ pressed }) => [
+              styles.tile,
+              { width: widths[index] },
+              pressed && styles.pressed,
+            ]}
           >
             <Image
               source={destination.image}
-              style={styles.image}
+              style={[styles.image, { height: imageHeights[index] }]}
               accessibilityIgnoresInvertColors
             />
             <View style={styles.body}>
@@ -140,7 +143,6 @@ const styles = StyleSheet.create({
     gap: GAP,
   },
   tile: {
-    height: 232,
     backgroundColor: home.page,
     borderWidth: 1,
     borderColor: home.border,
