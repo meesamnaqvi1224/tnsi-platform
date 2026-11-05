@@ -1,10 +1,12 @@
 import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ScreenContainer, ErrorNotice, PageHeader, PrimaryButton, ThemedText } from '@/components';
+import { ScreenContainer, ErrorNotice, PrimaryButton, ThemedText } from '@/components';
+import { PageTitle } from '@/components/PageTitle';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { PracticeCard } from '@/components/practices/PracticeCard';
 import { PracticesSkeleton } from '@/components/practices/PracticesSkeleton';
 import { useSavedPractices } from '@/hooks/useSavedPractices';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
 import type { Practice } from '@/api/types';
 
 /**
@@ -20,8 +22,8 @@ export default function SavedPracticesScreen() {
   const { state, reload } = useSavedPractices();
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
-      <PageHeader eyebrow="Saved Practices" title="Practices you've chosen to keep close." />
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PageTitle title="Saved Practices" subtitle="Practices you've chosen to keep close." />
 
       {state.status === 'loading' && <PracticesSkeleton />}
 
@@ -32,7 +34,7 @@ export default function SavedPracticesScreen() {
           <ThemedText variant="body" style={styles.emptyTitle}>
             No saved practices yet
           </ThemedText>
-          <ThemedText variant="body" color={colors.charcoal} style={styles.emptyDescription}>
+          <ThemedText variant="body" color={home.ink} style={styles.emptyDescription}>
             Save practices you want to come back to later.
           </ThemedText>
           <PrimaryButton
@@ -69,7 +71,10 @@ export default function SavedPracticesScreen() {
 
 const styles = StyleSheet.create({
   emptyState: {
-    marginTop: spacing.lg,
+    ...homeCardStyle,
+    backgroundColor: home.page,
+    padding: spacing.lg,
+    marginTop: spacing.sm,
   },
   emptyTitle: {
     marginBottom: spacing.xs,

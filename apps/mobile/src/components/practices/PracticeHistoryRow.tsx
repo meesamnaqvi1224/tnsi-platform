@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { capitalize, formatDuration } from '@/lib/format';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 import type { PostPracticeResponse, PracticeHistoryEntry } from '@/api/types';
 
 const RESPONSE_LABELS: Record<PostPracticeResponse, string> = {
@@ -46,19 +47,19 @@ export function PracticeHistoryRow({ entry }: PracticeHistoryRowProps) {
       accessibilityRole="button"
       accessibilityLabel={`${entry.title}, completed ${formatSessionDate(entry.completedAt)}`}
     >
-      <Card style={styles.card}>
-        <ThemedText variant="label" color={colors.bronze} style={styles.date}>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
+        <ThemedText variant="label" color={home.bronze} style={styles.date}>
           {formatSessionDate(entry.completedAt).toUpperCase()}
         </ThemedText>
-        <ThemedText variant="heading" style={styles.title}>
+        <ThemedText variant="heading" color={home.navy} style={styles.title}>
           {entry.title}
         </ThemedText>
-        <ThemedText variant="caption" color={colors.charcoal}>
+        <ThemedText variant="caption" color={home.ink}>
           Completed · {meta.join(' · ')}
         </ThemedText>
         {reflectionText ? (
           <View style={styles.reflectionRow}>
-            <ThemedText variant="body" color={colors.charcoal} style={styles.reflectionText}>
+            <ThemedText variant="body" color={home.ink} style={styles.reflectionText}>
               &ldquo;{reflectionText}&rdquo;
             </ThemedText>
           </View>
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     paddingTop: spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
+    borderTopColor: home.border,
   },
   reflectionText: {
     fontStyle: 'italic',

@@ -1,7 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 import type { CheckInSummary } from '@/api/types';
 
 /** "2026-06-12" -> "12 June 2026". Local to this screen - no other screen needs a day-level date yet. */
@@ -27,22 +28,22 @@ export function CheckInEntry({ checkIn }: CheckInEntryProps) {
   const dateLabel = formatCheckInDate(checkIn.completedDate);
 
   return (
-    <Card style={styles.card}>
+    <Card style={{ ...styles.card, ...homeCardStyle }}>
       <View
         accessible
         accessibilityLabel={`Check-in for ${dateLabel}. Mood ${checkIn.moodScore} out of 5. Capacity ${checkIn.capacityScore} out of 5.`}
       >
-        <ThemedText variant="heading" style={styles.date}>
+        <ThemedText variant="heading" color={home.navy} style={styles.date}>
           {dateLabel}
         </ThemedText>
         <View style={styles.scoreRow}>
-          <ThemedText variant="body" color={colors.charcoal}>
+          <ThemedText variant="body" color={home.ink}>
             Mood
           </ThemedText>
           <ThemedText variant="body">{checkIn.moodScore} / 5</ThemedText>
         </View>
         <View style={styles.scoreRow}>
-          <ThemedText variant="body" color={colors.charcoal}>
+          <ThemedText variant="body" color={home.ink}>
             Capacity
           </ThemedText>
           <ThemedText variant="body">{checkIn.capacityScore} / 5</ThemedText>
@@ -50,7 +51,7 @@ export function CheckInEntry({ checkIn }: CheckInEntryProps) {
       </View>
 
       {checkIn.notes ? (
-        <ThemedText variant="body" color={colors.charcoal} style={styles.notes}>
+        <ThemedText variant="body" color={home.ink} style={styles.notes}>
           {checkIn.notes}
         </ThemedText>
       ) : null}
@@ -74,6 +75,6 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     paddingTop: spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
+    borderTopColor: home.border,
   },
 });

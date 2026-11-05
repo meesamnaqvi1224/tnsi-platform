@@ -49,9 +49,9 @@ export default function PracticesLayout() {
         }}
       />
       <Stack.Screen name="[id]" options={{ title: '' }} />
-      <Stack.Screen name="history" options={{ title: 'Practice History' }} />
-      <Stack.Screen name="journey" options={{ title: 'My Journey' }} />
-      <Stack.Screen name="saved" options={{ title: 'Saved Practices' }} />
+      <Stack.Screen name="history" options={{ title: 'Practice History', headerTitle: '' }} />
+      <Stack.Screen name="journey" options={{ title: 'My Journey', headerTitle: '' }} />
+      <Stack.Screen name="saved" options={{ title: 'Saved Practices', headerTitle: '' }} />
       <Stack.Screen
         name="powerdrops/index"
         options={{
