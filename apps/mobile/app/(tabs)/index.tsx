@@ -15,6 +15,7 @@ import { HomeSkeleton } from '@/components/home/HomeSkeleton';
 import { CheckInCard } from '@/components/check-in/CheckInCard';
 import { LifeBeyondTraumaCard } from '@/components/home/LifeBeyondTraumaCard';
 import { BookConsultationCard } from '@/components/home/BookConsultationCard';
+import { ResourcesOnWebsiteCard } from '@/components/home/ResourcesOnWebsiteCard';
 import { useToday } from '@/hooks/useToday';
 import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { colors, spacing } from '@/theme';
@@ -125,6 +126,7 @@ export default function HomeScreen() {
           <Card style={{ ...styles.instituteCard, ...homeCardStyle }}>
             <LifeBeyondTraumaCard />
             <BookConsultationCard />
+            <ResourcesOnWebsiteCard />
           </Card>
         </Animated.View>
       </KeyboardAvoidingView>
