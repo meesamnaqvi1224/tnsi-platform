@@ -2,10 +2,11 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
-import { fontFamily, spacing } from '@/theme';
+import { spacing } from '@/theme';
 import { home } from './homeTheme';
 
-const heroImage = require('../../../assets/images/home-hero.jpg');
+const heroImage = require('../../../assets/images/home-hero-reference.jpg');
+const logoMark = require('../../../assets/images/logo-mark.png');
 
 interface WelcomeHeaderProps {
   firstName?: string | null;
@@ -25,10 +26,12 @@ export function WelcomeHeader({ firstName }: WelcomeHeaderProps) {
     <View style={styles.wrap}>
       <View style={styles.brandRow}>
         <View style={styles.side} />
-        <View style={styles.brand} accessibilityRole="header">
-          <ThemedText variant="display" color={home.navy} style={styles.wordmark}>
-            TNSI
-          </ThemedText>
+        <View
+          style={styles.brand}
+          accessibilityRole="header"
+          accessibilityLabel="The Nervous System Institute"
+        >
+          <Image source={logoMark} style={styles.logo} resizeMode="contain" />
           <ThemedText variant="caption" color={home.navy} style={styles.tagline}>
             THE NERVOUS SYSTEM INSTITUTE
           </ThemedText>
@@ -80,16 +83,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  wordmark: {
-    fontSize: 38,
-    lineHeight: 42,
-    letterSpacing: 1,
-    fontFamily: fontFamily.serif,
+  logo: {
+    width: 64,
+    height: 64,
   },
   tagline: {
     letterSpacing: 2.2,
     fontSize: 9,
-    marginTop: 2,
+    marginTop: 4,
   },
   rule: {
     width: 36,
@@ -121,8 +122,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   statement: {
-    fontSize: 27,
-    lineHeight: 32,
+    fontSize: 24,
+    lineHeight: 29,
   },
   statementRule: {
     width: 40,
@@ -131,9 +132,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   photo: {
-    width: '42%',
-    height: 200,
-    borderRadius: 14,
+    // The photograph's own edges are near-white, so it sits on the page without a frame and runs
+    // off the right edge, as in the approved reference.
+    width: '58%',
+    aspectRatio: 832 / 464,
+    marginRight: -spacing.lg,
     resizeMode: 'cover',
   },
 });
