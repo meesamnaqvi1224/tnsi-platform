@@ -23,7 +23,12 @@ export function WelcomeHeader({ firstName }: WelcomeHeaderProps) {
   const name = firstName?.trim();
 
   return (
-    <View style={styles.wrap}>
+    <ImageBackground
+      source={heroImage}
+      resizeMode="cover"
+      style={styles.masthead}
+      accessibilityIgnoresInvertColors
+    >
       <View style={styles.brandRow}>
         <View style={styles.side} />
         <View
@@ -50,12 +55,7 @@ export function WelcomeHeader({ firstName }: WelcomeHeaderProps) {
         </View>
       </View>
 
-      <ImageBackground
-        source={heroImage}
-        resizeMode="cover"
-        style={styles.hero}
-        accessibilityIgnoresInvertColors
-      >
+      <View style={styles.hero}>
         <View style={styles.heroText}>
           <ThemedText variant="heading" color={home.bronze} style={styles.welcome}>
             {name ? `Welcome back, ${name}` : 'Welcome back'}
@@ -65,14 +65,19 @@ export function WelcomeHeader({ firstName }: WelcomeHeaderProps) {
           </ThemedText>
           <View style={styles.statementRule} />
         </View>
-      </ImageBackground>
-    </View>
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    marginBottom: spacing.lg,
+  // One composition: the logo, the welcome text and the photograph share a single image whose left, top
+  // and bottom edges fade into the white page, so there is no visible frame.
+  masthead: {
+    marginHorizontal: -spacing.lg,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    minHeight: 330,
   },
   brandRow: {
     flexDirection: 'row',
@@ -114,19 +119,14 @@ const styles = StyleSheet.create({
   // The photograph fills the whole hero band edge to edge; its left side is a pale wall, so the
   // navy text sits directly on it.
   hero: {
-    marginHorizontal: -spacing.lg,
-    height: 250,
-    overflow: 'hidden',
-    justifyContent: 'center',
-    backgroundColor: '#EFEDEA',
+    paddingTop: spacing.sm,
   },
   heroText: {
-    width: '52%',
-    paddingLeft: spacing.lg,
+    width: '47%',
   },
   welcome: {
     fontStyle: 'italic',
-    fontSize: 17,
+    fontSize: 15,
     marginBottom: spacing.sm,
   },
   statement: {
