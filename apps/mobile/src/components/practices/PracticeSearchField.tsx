@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
+import { home } from '@/components/home/homeTheme';
 import { colors, radius, spacing, typography } from '@/theme';
 
 interface PracticeSearchFieldProps {
@@ -57,15 +58,15 @@ const styles = StyleSheet.create({
   input: {
     minHeight: 52,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
+    borderColor: home.border,
+    borderRadius: radius.md + 2,
     paddingLeft: spacing.md,
     // Room for the Clear control, so typed text never runs under it.
     paddingRight: 80,
     paddingVertical: spacing.sm,
     fontSize: typography.body.fontSize,
-    color: colors.charcoal,
-    backgroundColor: colors.white,
+    color: home.navy,
+    backgroundColor: home.page,
   },
   clear: {
     position: 'absolute',

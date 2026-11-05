@@ -40,7 +40,13 @@ export default function PracticesLayout() {
     >
       <Stack.Screen
         name="index"
-        options={{ title: 'Practices', headerLeft: () => <HomeHeaderButton /> }}
+        options={{
+          title: 'Practices',
+          // The page title is drawn in the screen itself; the title text stays for back labels.
+          headerTitle: '',
+          headerStyle: { backgroundColor: '#FFFFFF' },
+          headerLeft: () => <HomeHeaderButton />,
+        }}
       />
       <Stack.Screen name="[id]" options={{ title: '' }} />
       <Stack.Screen name="history" options={{ title: 'Practice History' }} />

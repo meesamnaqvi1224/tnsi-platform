@@ -1,6 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, radius, spacing } from '@/theme';
+import { home } from '@/components/home/homeTheme';
+import { radius, spacing } from '@/theme';
 
 export interface FilterOption {
   /** The value the screen filters by. */
@@ -24,7 +25,7 @@ export function PracticeFilterBar({ label, options, selected, onSelect }: Practi
 
   return (
     <View style={styles.group}>
-      <ThemedText variant="label" color={colors.charcoal} style={styles.heading}>
+      <ThemedText variant="label" color={home.ink} style={styles.heading}>
         {label}
       </ThemedText>
       <ScrollView
@@ -72,7 +73,7 @@ function Chip({
         pressed && styles.chipPressed,
       ]}
     >
-      <ThemedText variant="label" color={active ? colors.cream : colors.charcoal}>
+      <ThemedText variant="label" color={active ? '#FFFFFF' : home.navy}>
         {label}
       </ThemedText>
     </Pressable>
@@ -100,12 +101,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   chipActive: {
-    backgroundColor: colors.navy,
-    borderColor: colors.navy,
+    backgroundColor: home.navy,
+    borderColor: home.navy,
   },
   chipInactive: {
-    backgroundColor: colors.white,
-    borderColor: colors.border,
+    backgroundColor: home.page,
+    borderColor: home.border,
   },
   chipPressed: {
     opacity: 0.85,

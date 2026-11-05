@@ -14,6 +14,8 @@ interface ThemedTextProps extends PropsWithChildren {
    * "Inhale" to "Exhale") to VoiceOver/TalkBack without a bespoke
    * accessibility wrapper. */
   accessibilityLiveRegion?: 'none' | 'polite' | 'assertive';
+  /** Passed straight through, e.g. "header" for a title. */
+  accessibilityRole?: 'header';
 }
 
 export function ThemedText({
@@ -23,6 +25,7 @@ export function ThemedText({
   style,
   numberOfLines,
   accessibilityLiveRegion,
+  accessibilityRole,
 }: ThemedTextProps) {
   const variantStyle = typography[variant];
   // RN auto-scales fontSize for Dynamic Type but never the numeric
@@ -44,6 +47,7 @@ export function ThemedText({
       ]}
       numberOfLines={numberOfLines}
       accessibilityLiveRegion={accessibilityLiveRegion}
+      accessibilityRole={accessibilityRole}
     >
       {children}
     </Text>
