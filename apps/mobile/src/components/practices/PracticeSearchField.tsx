@@ -5,6 +5,8 @@ import { colors, radius, spacing, typography } from '@/theme';
 interface PracticeSearchFieldProps {
   value: string;
   onChangeText: (text: string) => void;
+  /** Defaults to the Practices wording; Resources passes its own. */
+  label?: string;
 }
 
 /**
@@ -12,15 +14,19 @@ interface PracticeSearchFieldProps {
  * Nothing is sent anywhere, so it filters as the member types. The Clear control is a real
  * 48 dp target and only appears once there is something to clear.
  */
-export function PracticeSearchField({ value, onChangeText }: PracticeSearchFieldProps) {
+export function PracticeSearchField({
+  value,
+  onChangeText,
+  label = 'Search practices',
+}: PracticeSearchFieldProps) {
   return (
     <View style={styles.container}>
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        placeholder="Search practices"
+        placeholder={label}
         placeholderTextColor={colors.charcoal + '80'}
-        accessibilityLabel="Search practices"
+        accessibilityLabel={label}
         returnKeyType="search"
         autoCapitalize="none"
         autoCorrect={false}
