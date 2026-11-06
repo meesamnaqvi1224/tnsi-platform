@@ -4,11 +4,12 @@ import { ThemedText } from '@/components/ThemedText';
 import { PowerDropArtwork } from './PowerDropArtwork';
 import { colors, spacing } from '@/theme';
 import type { PowerDrop } from '@/api/types';
+import { home } from '@/components/home/homeTheme';
 
 function Section({ heading, children }: PropsWithChildren<{ heading: string }>) {
   return (
     <View style={styles.section}>
-      <ThemedText variant="label" color={colors.bronze} style={styles.sectionHeading}>
+      <ThemedText variant="label" color={home.bronze} style={styles.sectionHeading}>
         {heading.toUpperCase()}
       </ThemedText>
       {children}
@@ -41,7 +42,7 @@ export function PowerDropDetailContent({ powerDrop }: { powerDrop: PowerDrop }) 
         style={styles.artwork}
       />
 
-      <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
+      <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
         {eyebrow}
       </ThemedText>
       <ThemedText
@@ -51,7 +52,7 @@ export function PowerDropDetailContent({ powerDrop }: { powerDrop: PowerDrop }) 
         {title}
       </ThemedText>
       {meta ? (
-        <ThemedText variant="caption" color={colors.charcoal} style={styles.meta}>
+        <ThemedText variant="caption" color={home.ink} style={styles.meta}>
           {meta}
         </ThemedText>
       ) : null}
@@ -64,7 +65,7 @@ export function PowerDropDetailContent({ powerDrop }: { powerDrop: PowerDrop }) 
 
       {powerDrop.description ? (
         <Section heading="Description">
-          <ThemedText variant="body" color={colors.charcoal}>
+          <ThemedText variant="body" color={home.ink}>
             {powerDrop.description}
           </ThemedText>
         </Section>
@@ -75,7 +76,7 @@ export function PowerDropDetailContent({ powerDrop }: { powerDrop: PowerDrop }) 
           <View accessibilityRole="list">
             {powerDrop.instructions.map((step, index) => (
               <View key={`${index}-${step}`} style={styles.stepRow}>
-                <ThemedText variant="body" color={colors.bronze} style={styles.stepNumber}>
+                <ThemedText variant="body" color={home.bronze} style={styles.stepNumber}>
                   {index + 1}
                 </ThemedText>
                 <ThemedText variant="body" style={styles.stepText}>
@@ -90,7 +91,7 @@ export function PowerDropDetailContent({ powerDrop }: { powerDrop: PowerDrop }) 
       {powerDrop.anchorStatement ? (
         <Section heading="Anchor Statement">
           <View style={styles.anchor}>
-            <ThemedText variant="heading" color={colors.navy} style={styles.anchorText}>
+            <ThemedText variant="heading" color={home.navy} style={styles.anchorText}>
               “{powerDrop.anchorStatement}”
             </ThemedText>
           </View>

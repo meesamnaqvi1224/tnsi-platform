@@ -1,6 +1,7 @@
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { colors, radius, spacing } from '@/theme';
+import { home } from '@/components/home/homeTheme';
 
 interface PowerDropCategoryBarProps {
   /** Only the category values actually present in the fetched PowerDrops - never the full taxonomy, so no filter ever leads to a guaranteed-empty result. */
@@ -51,7 +52,7 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
         pressed && styles.chipPressed,
       ]}
     >
-      <ThemedText variant="label" color={active ? colors.cream : colors.charcoal}>
+      <ThemedText variant="label" color={active ? colors.cream : home.ink}>
         {label}
       </ThemedText>
     </Pressable>
@@ -75,12 +76,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   chipActive: {
-    backgroundColor: colors.navy,
-    borderColor: colors.navy,
+    backgroundColor: home.navy,
+    borderColor: home.navy,
   },
   chipInactive: {
     backgroundColor: colors.white,
-    borderColor: colors.border,
+    borderColor: home.border,
   },
   chipPressed: {
     opacity: 0.85,

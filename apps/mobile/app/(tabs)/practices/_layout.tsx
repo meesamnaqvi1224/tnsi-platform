@@ -32,7 +32,7 @@ export default function PracticesLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: colors.cream },
+        headerStyle: { backgroundColor: '#FFFFFF' },
         headerTintColor: colors.navy,
         headerTitleStyle: { fontFamily: typography.heading.fontFamily },
         headerShadowVisible: false,
@@ -54,10 +54,17 @@ export default function PracticesLayout() {
       <Stack.Screen name="saved" options={{ title: 'Saved Practices' }} />
       <Stack.Screen
         name="powerdrops/index"
-        options={{ title: 'PowerDrops', headerLeft: () => <BackToPracticesButton /> }}
+        options={{
+          title: 'PowerDrops',
+          headerTitle: '',
+          headerLeft: () => <BackToPracticesButton />,
+        }}
       />
       <Stack.Screen name="powerdrops/[slug]" options={{ title: '' }} />
-      <Stack.Screen name="somatic-cards/index" options={{ title: 'Somatic Cards' }} />
+      <Stack.Screen
+        name="somatic-cards/index"
+        options={{ title: 'Somatic Cards', headerTitle: '' }}
+      />
       <Stack.Screen name="somatic-cards/[seriesSlug]" options={{ title: '' }} />
       <Stack.Screen name="somatic-cards/card/[cardSlug]" options={{ title: '' }} />
       {/* The breathing flow builds its own header/close controls to match

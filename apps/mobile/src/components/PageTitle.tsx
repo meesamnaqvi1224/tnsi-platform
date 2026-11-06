@@ -5,6 +5,8 @@ import { fontFamily, spacing } from '@/theme';
 
 interface PageTitleProps {
   title: string;
+  /** A small bronze label above the title (for example "Series 2"). */
+  eyebrow?: string;
   /** One short supporting sentence. Smaller and lighter than the title. */
   subtitle?: string;
 }
@@ -13,9 +15,14 @@ interface PageTitleProps {
  * The title block at the top of a redesigned screen: the page name large in serif navy, a short
  * bronze rule, then one quiet supporting line. The page name is always the biggest text in the header.
  */
-export function PageTitle({ title, subtitle }: PageTitleProps) {
+export function PageTitle({ title, subtitle, eyebrow }: PageTitleProps) {
   return (
     <View style={styles.wrap}>
+      {eyebrow ? (
+        <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
+          {eyebrow}
+        </ThemedText>
+      ) : null}
       <ThemedText
         variant="display"
         color={home.navy}
@@ -37,6 +44,11 @@ export function PageTitle({ title, subtitle }: PageTitleProps) {
 const styles = StyleSheet.create({
   wrap: {
     marginBottom: spacing.lg,
+  },
+  eyebrow: {
+    textTransform: 'uppercase',
+    letterSpacing: 1.4,
+    marginBottom: spacing.xs,
   },
   title: {
     fontFamily: fontFamily.serif,

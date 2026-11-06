@@ -2,8 +2,9 @@ import { Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
 import type { SomaticSeriesListItem } from '@/api/types';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 
 interface SomaticSeriesCardProps {
   series: SomaticSeriesListItem;
@@ -32,27 +33,22 @@ export function SomaticSeriesCard({ series }: SomaticSeriesCardProps) {
       accessibilityLabel={`Series ${series.seriesNumber}, ${title}`}
       style={({ pressed }) => pressed && styles.pressed}
     >
-      <Card style={styles.card}>
-        <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
+        <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
           SERIES {series.seriesNumber}
         </ThemedText>
-        <ThemedText variant="heading" style={styles.title}>
+        <ThemedText variant="heading" color={home.navy} style={styles.title}>
           {title}
         </ThemedText>
         {series.description ? (
-          <ThemedText
-            variant="body"
-            color={colors.charcoal}
-            numberOfLines={3}
-            style={styles.description}
-          >
+          <ThemedText variant="body" color={home.ink} numberOfLines={3} style={styles.description}>
             {series.description}
           </ThemedText>
         ) : null}
         {series.coreQuestion ? (
           <ThemedText
             variant="body"
-            color={colors.navy}
+            color={home.navy}
             numberOfLines={2}
             style={styles.coreQuestion}
           >

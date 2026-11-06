@@ -7,6 +7,7 @@ import { PowerDropDetailContent } from '@/components/powerdrops/PowerDropDetailC
 import { PowerDropsSkeleton } from '@/components/powerdrops/PowerDropsSkeleton';
 import { usePowerDropDetail } from '@/hooks/usePowerDropDetail';
 import { colors, spacing } from '@/theme';
+import { home } from '@/components/home/homeTheme';
 
 /**
  * A single PowerDrop: read the card, use it, return to life. V1 has no
@@ -41,7 +42,7 @@ export default function PowerDropDetailScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll underHeader inTabs>
+      <ScreenContainer scroll underHeader inTabs background={home.page}>
         <PowerDropsSkeleton />
       </ScreenContainer>
     );
@@ -49,9 +50,9 @@ export default function PowerDropDetailScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer underHeader inTabs>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ThemedText variant="heading">This PowerDrop isn&apos;t available.</ThemedText>
-        <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
+        <ThemedText variant="body" color={home.ink} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
         </ThemedText>
       </ScreenContainer>
@@ -63,7 +64,7 @@ export default function PowerDropDetailScreen() {
   // go there, so there is no automatic redirect.
   if (state.status === 'locked') {
     return (
-      <ScreenContainer underHeader inTabs>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ThemedText variant="heading">This PowerDrop is for members.</ThemedText>
         <MembershipLockedNotice message="This PowerDrop is part of the full PowerDrops™ library, available with a membership." />
       </ScreenContainer>
@@ -72,7 +73,7 @@ export default function PowerDropDetailScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer underHeader inTabs>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -81,7 +82,7 @@ export default function PowerDropDetailScreen() {
   const { powerDrop } = state;
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
       <PowerDropDetailContent powerDrop={powerDrop} />
 
       {justCompleted && !inUse ? (
