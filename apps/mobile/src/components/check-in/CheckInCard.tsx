@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Card } from '@/components/Card';
+import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { CapacityOptionList, capacityOptionLabel } from './CapacityOptionList';
 import { useApiClient } from '@/hooks/useApiClient';
 import { humanizeApiError } from '@/lib/api-errors';
-import { colors, spacing, linkHitSlop } from '@/theme';
+import { home } from '@/components/home/homeTheme';
+import { colors, fontFamily, spacing, linkHitSlop } from '@/theme';
 import { ApiRequestError, type CheckIn } from '@/api/types';
 
 type Phase =
@@ -40,9 +41,17 @@ interface CheckInCardProps {
  * NOT NULL columns), so the one answer is submitted as both; only
  * `capacityScore` is what `getRecommendedPractice` actually reads.
  */
+/** The card surface: white, a 1 px visible border and a very light shadow, so it stands apart from the page without becoming a heavy panel. */
+function Surface({ children }: { children: ReactNode }) {
+  return <View style={styles.surface}>{children}</View>;
+}
+
 export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
   const api = useApiClient();
   const router = useRouter();
+  // The question and the "Check in now" button come first; the answer list opens on tap, so Home
+  // stays calm. Opening it changes nothing about the saved state or the submit flow.
+  const [open, setOpen] = useState(false);
   const [phase, setPhase] = useState<Phase>(() =>
     initialCheckIn
       ? { kind: 'recorded', checkIn: initialCheckIn, justSubmitted: false }
@@ -86,11 +95,9 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
 
   if (phase.kind === 'recorded') {
     return (
-      <Card variant="warm" style={styles.card}>
-        <ThemedText variant="label" color={colors.bronze} style={styles.label}>
-          Daily Check-In
-        </ThemedText>
-        <ThemedText variant="heading">
+      <Surface>
+        <Eyebrow />
+        <ThemedText variant="heading" color={home.navy} style={styles.title}>
           {phase.justSubmitted ? 'Check-in complete.' : "Today's check-in is recorded."}
         </ThemedText>
         {phase.checkIn.moodScore === phase.checkIn.capacityScore &&
@@ -98,7 +105,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
           // From this single-question flow: mood and capacity were
           // submitted as the same value, so show the one answer the
           // member actually gave rather than two identical numbers.
-          <ThemedText variant="body" color={colors.charcoal} style={styles.recordedRow}>
+          <ThemedText variant="body" color={home.ink} style={styles.recordedRow}>
             {capacityOptionLabel(phase.checkIn.capacityScore)}
           </ThemedText>
         ) : (
@@ -106,10 +113,10 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
           // mood and capacity could genuinely differ - shown as recorded,
           // not collapsed into one answer.
           <View style={styles.recordedRow}>
-            <ThemedText variant="body" color={colors.charcoal}>
+            <ThemedText variant="body" color={home.ink}>
               Mood: {phase.checkIn.moodScore} of 5
             </ThemedText>
-            <ThemedText variant="body" color={colors.charcoal}>
+            <ThemedText variant="body" color={home.ink}>
               Capacity: {phase.checkIn.capacityScore} of 5
             </ThemedText>
           </View>
@@ -126,69 +133,144 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
           accessibilityLabel="View check-in history"
           style={styles.historyLink}
         >
-          <ThemedText variant="label" color={colors.bronze}>
+          <ThemedText variant="label" color={home.bronze}>
             View History →
           </ThemedText>
         </Pressable>
-      </Card>
+      </Surface>
     );
   }
 
   const canSubmit = phase.capacity !== null && !phase.submitting;
 
   return (
-    <Card variant="warm" style={styles.card}>
-      <ThemedText variant="label" color={colors.bronze} style={styles.label}>
-        Daily Check-In
-      </ThemedText>
-      <ThemedText variant="display" style={styles.prompt}>
-        How are you arriving today?
-      </ThemedText>
-
-      <CapacityOptionList
-        value={phase.capacity}
-        onChange={(capacity) => setPhase({ ...phase, capacity })}
-        disabled={phase.submitting}
-      />
-
-      {phase.error ? (
-        <ThemedText variant="body" color={colors.error} style={styles.errorText}>
-          {phase.error}
-        </ThemedText>
-      ) : null}
-
-      <View style={styles.actionsRow}>
-        <PrimaryButton
-          label="Save Check-In"
-          onPress={handleSubmit}
-          loading={phase.submitting}
-          disabled={!canSubmit}
-          style={styles.saveButton}
-        />
-        <Pressable
-          onPress={() => router.push('/profile/progress')}
-          accessibilityRole="link"
-          hitSlop={linkHitSlop}
-          accessibilityLabel="View check-in history"
-        >
-          <ThemedText variant="label" color={colors.bronze}>
-            View History
+    <Surface>
+      <View style={styles.promptRow}>
+        <View style={styles.ring} accessibilityElementsHidden importantForAccessibility="no">
+          <Ionicons name="checkmark" size={20} color={home.bronze} />
+        </View>
+        <View style={styles.promptText}>
+          <Eyebrow />
+          <ThemedText variant="heading" color={home.navy} style={styles.title}>
+            How are you feeling right now?
           </ThemedText>
-        </Pressable>
+        </View>
       </View>
-    </Card>
+      <ThemedText variant="body" color={home.ink} style={styles.support}>
+        A quick check-in helps us offer practices that meet you where you are.
+      </ThemedText>
+
+      {open ? (
+        <>
+          <CapacityOptionList
+            value={phase.capacity}
+            onChange={(capacity) => setPhase({ ...phase, capacity })}
+            disabled={phase.submitting}
+          />
+
+          {phase.error ? (
+            <ThemedText variant="body" color={colors.error} style={styles.errorText}>
+              {phase.error}
+            </ThemedText>
+          ) : null}
+
+          <View style={styles.actionsRow}>
+            <PrimaryButton
+              label="Save Check-In"
+              onPress={handleSubmit}
+              loading={phase.submitting}
+              disabled={!canSubmit}
+              style={styles.saveButton}
+            />
+            <Pressable
+              onPress={() => router.push('/profile/progress')}
+              accessibilityRole="link"
+              hitSlop={linkHitSlop}
+              accessibilityLabel="View check-in history"
+            >
+              <ThemedText variant="label" color={home.bronze}>
+                View History
+              </ThemedText>
+            </Pressable>
+          </View>
+        </>
+      ) : (
+        <View style={styles.actionsRow}>
+          <PrimaryButton
+            label="Check in now"
+            onPress={() => setOpen(true)}
+            style={styles.saveButton}
+          />
+          <Pressable
+            onPress={() => router.push('/profile/progress')}
+            accessibilityRole="link"
+            hitSlop={linkHitSlop}
+            accessibilityLabel="View check-in history"
+          >
+            <ThemedText variant="label" color={home.bronze}>
+              View History
+            </ThemedText>
+          </Pressable>
+        </View>
+      )}
+    </Surface>
+  );
+}
+
+function Eyebrow() {
+  return (
+    <ThemedText variant="label" color={home.bronze} style={styles.label}>
+      Daily Check-In
+    </ThemedText>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    marginBottom: spacing.lg,
+  surface: {
+    backgroundColor: home.page,
+    borderWidth: 1,
+    borderColor: home.border,
+    borderRadius: 14,
+    padding: spacing.lg,
+    marginBottom: spacing.xl,
+    shadowColor: home.navy,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 1,
+  },
+  promptRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  ring: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: home.bronze,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  promptText: {
+    flex: 1,
   },
   label: {
     textTransform: 'uppercase',
-    marginBottom: spacing.sm,
+    letterSpacing: 2,
+    fontSize: 11,
+    marginBottom: 2,
   },
-  prompt: {
+  title: {
+    fontFamily: fontFamily.serif,
+    fontSize: 21,
+    lineHeight: 27,
+  },
+  support: {
+    fontSize: 14,
+    lineHeight: 20,
     marginBottom: spacing.md,
   },
   errorText: {

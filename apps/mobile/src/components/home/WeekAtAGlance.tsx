@@ -6,6 +6,7 @@ import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { useCheckInHistory } from '@/hooks/useCheckInHistory';
 import { colors, spacing, linkHitSlop } from '@/theme';
+import { homeCardStyle } from './homeTheme';
 
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
@@ -71,7 +72,7 @@ export function WeekAtAGlance() {
         </Pressable>
       </View>
 
-      <Card>
+      <Card style={homeCardStyle}>
         <View style={styles.dotsRow}>
           {days.map((d, i) => {
             const checked = checkedDates.has(isoDate(d));

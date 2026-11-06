@@ -47,6 +47,11 @@ const CONTENT_TYPE_STOCK_IMAGES: Record<
   video: require('../../../assets/images/content-video.jpg'),
 };
 
+/** The generic stock photo for a content type, or null for a type that has none (interactive). */
+export function stockImageFor(contentType: PracticeContentType): ImageSourcePropType | null {
+  return contentType === 'interactive' ? null : CONTENT_TYPE_STOCK_IMAGES[contentType];
+}
+
 /**
  * Real per-practice thumbnail when one exists; otherwise (or if it fails to
  * load) a generic stock photo for the content type, labeled so it's never

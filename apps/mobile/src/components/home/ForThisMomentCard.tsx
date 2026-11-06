@@ -1,12 +1,16 @@
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import { Card } from '@/components/Card';
+import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
-import { capitalize, formatDuration } from '@/lib/format';
-import { colors, imageHeight, spacing } from '@/theme';
+import { stockImageFor } from '@/components/practices/PracticeThumbnail';
+import { formatDuration } from '@/lib/format';
+import { categoryLabel } from '@/lib/practice-library';
+import { fontFamily, linkHitSlop, spacing } from '@/theme';
+import { home } from './homeTheme';
 import type { Practice } from '@/api/types';
+
+const CARD_IMAGE_HEIGHT = 150;
 
 const momentImage = require('../../../assets/images/practice-moment.jpg');
 
@@ -20,126 +24,205 @@ interface ForThisMomentCardProps {
 }
 
 /**
- * Home's editorial presentation of `todayPractice` from GET /api/v1/today -
- * a deterministic content-routing pick from the user's latest capacity
- * check-in (see apps/web/src/lib/practices.ts's getRecommendedPractice),
- * not a display-order pick. This component itself has no recommendation
- * logic - it just renders whatever the backend decided, or one of the two
- * empty states below when that's `null`. Shows the practice's own real
- * thumbnail when it has one; otherwise a placeholder mood photo
- * (not a real photo of this practice - swap for real photography later)
- * rather than the plain branded fallback used elsewhere, since this is
- * Home's single largest visual moment.
- *
- * A single "Begin Practice" button is the only tap target (not the whole
- * card wrapped in a Pressable) - nesting a Pressable button inside a
- * Pressable card is an RN anti-pattern that causes unreliable touch
- * handling between the two.
+ * Home's presentation of `todayPractice` from GET /api/v1/today - a deterministic content-routing pick
+ * from the member's latest capacity check-in (see apps/web/src/lib/practices.ts's
+ * getRecommendedPractice), not a display-order pick. This component has no recommendation logic: it
+ * renders what the backend decided, or an empty state when that is `null`. The card is one
+ * horizontal piece: the practice's own thumbnail (or an existing approved image) on the left, its
+ * category, title, description and length on the right, and a round play button. The whole card opens
+ * the practice; a practice the member's plan does not include is marked "Members" and the practice
+ * screen explains it, exactly as before.
  */
 export function ForThisMomentCard({ practice, hasCheckedInToday }: ForThisMomentCardProps) {
   const router = useRouter();
 
+  const header = (
+    <View style={styles.headerRow}>
+      <ThemedText variant="display" color={home.navy} style={styles.sectionTitle}>
+        For this moment
+      </ThemedText>
+      <Pressable
+        onPress={() => router.push('/practices')}
+        accessibilityRole="link"
+        accessibilityLabel="Browse practices"
+        hitSlop={linkHitSlop}
+      >
+        <ThemedText variant="label" color={home.bronze} style={styles.browse}>
+          Browse practices →
+        </ThemedText>
+      </Pressable>
+    </View>
+  );
+
   if (!practice) {
     return (
       <View style={styles.section}>
-        <ThemedText variant="heading" style={styles.sectionTitle}>
-          For this moment
-        </ThemedText>
-        <ThemedText variant="body" color={colors.charcoal}>
-          {hasCheckedInToday
-            ? 'No practice is available today.'
-            : "Complete today's check-in above to see a practice for this moment."}
-        </ThemedText>
-        {hasCheckedInToday ? (
-          // A way forward instead of a dead end: the library is always available.
-          <PrimaryButton
-            label="Browse practices"
-            variant="secondary"
-            onPress={() => router.push('/practices')}
-            style={styles.emptyButton}
-          />
-        ) : null}
+        {header}
+        <View style={styles.card}>
+          <Image source={momentImage} style={styles.image} accessibilityIgnoresInvertColors />
+          <View style={styles.body}>
+            <ThemedText variant="heading" color={home.navy} style={styles.title}>
+              {hasCheckedInToday ? 'Nothing matched today' : 'Check in first'}
+            </ThemedText>
+            <ThemedText variant="caption" color={home.ink} style={styles.description}>
+              {hasCheckedInToday
+                ? 'No practice is available today.'
+                : "Complete today's check-in above to see a practice for this moment."}
+            </ThemedText>
+            <PrimaryButton
+              label="Browse practices"
+              variant="secondary"
+              onPress={() => router.push('/practices')}
+              style={styles.emptyButton}
+            />
+          </View>
+        </View>
       </View>
     );
   }
 
-  function open() {
-    router.push({ pathname: '/practices/[id]', params: { id: practice!.id } });
-  }
+  const open = () => router.push({ pathname: '/practices/[id]', params: { id: practice.id } });
+  const category = practice.category?.trim() ? categoryLabel(practice.category) : null;
+  const locked = practice.locked === true;
+  const duration = practice.durationSeconds ? formatDuration(practice.durationSeconds) : null;
+  const eyebrow = [category, locked ? 'Members' : null].filter(Boolean).join(' · ');
 
   return (
-    <Animated.View entering={FadeInDown.duration(450)} style={styles.section}>
-      <ThemedText variant="heading" style={styles.sectionTitle}>
-        For this moment
-      </ThemedText>
-      <ThemedText variant="body" color={colors.charcoal} style={styles.sectionSubtitle}>
-        Based on how you're arriving today.
-      </ThemedText>
-
-      <Card style={styles.card}>
-        <Image
-          source={practice.thumbnailUrl ? { uri: practice.thumbnailUrl } : momentImage}
-          style={styles.image}
-        />
-        <ThemedText variant="heading" style={styles.title}>
-          {practice.title.trim()}
-        </ThemedText>
-        <ThemedText variant="caption" color={colors.charcoal} style={styles.meta}>
-          {capitalize(practice.contentType)}
-          {practice.durationSeconds ? ` · ${formatDuration(practice.durationSeconds)}` : ''}
-        </ThemedText>
-        {practice.description ? (
-          <ThemedText variant="body" color={colors.charcoal} style={styles.description}>
-            {practice.description}
+    <View style={styles.section}>
+      {header}
+      <Pressable
+        onPress={open}
+        accessibilityRole="button"
+        accessibilityLabel={`${practice.title.trim()}${duration ? `, ${duration}` : ''}${locked ? ', members only' : ''}. Recommended for you. Opens the practice.`}
+        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      >
+        <View style={styles.imageWrap}>
+          <Image
+            source={
+              practice.thumbnailUrl
+                ? { uri: practice.thumbnailUrl }
+                : (stockImageFor(practice.contentType) ?? momentImage)
+            }
+            style={styles.image}
+            resizeMode="cover"
+            accessibilityIgnoresInvertColors
+          />
+        </View>
+        <View style={styles.body}>
+          <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
+            Recommended for you{eyebrow ? ` · ${eyebrow}` : ''}
           </ThemedText>
-        ) : null}
-        <PrimaryButton label="Begin Practice" onPress={open} style={styles.button} />
-      </Card>
-    </Animated.View>
+          <ThemedText variant="heading" color={home.navy} style={styles.title} numberOfLines={2}>
+            {practice.title.trim()}
+          </ThemedText>
+          {practice.description ? (
+            <ThemedText
+              variant="caption"
+              color={home.ink}
+              style={styles.description}
+              numberOfLines={2}
+            >
+              {practice.description}
+            </ThemedText>
+          ) : null}
+          {duration ? (
+            <View style={styles.duration}>
+              <Ionicons name="time-outline" size={13} color={home.ink} />
+              <ThemedText variant="caption" color={home.ink}>
+                {duration}
+              </ThemedText>
+            </View>
+          ) : null}
+        </View>
+        <View style={styles.play} accessibilityElementsHidden importantForAccessibility="no">
+          <Ionicons name={locked ? 'lock-closed' : 'play'} size={18} color="#FFFFFF" />
+        </View>
+      </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  emptyButton: {
-    marginTop: spacing.md,
-    alignSelf: 'flex-start',
-    paddingHorizontal: spacing.xl,
-  },
   section: {
     marginBottom: spacing.xl,
   },
-  sectionTitle: {
-    marginBottom: spacing.xs,
-  },
-  sectionSubtitle: {
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
     marginBottom: spacing.md,
   },
+  sectionTitle: {
+    fontSize: 26,
+    lineHeight: 32,
+    fontFamily: fontFamily.serif,
+  },
+  browse: {
+    letterSpacing: 0.2,
+  },
   card: {
-    padding: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: home.page,
+    borderWidth: 1,
+    borderColor: home.border,
+    borderRadius: 14,
     overflow: 'hidden',
+    shadowColor: home.navy,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 1,
+  },
+  pressed: {
+    opacity: 0.9,
   },
   image: {
-    width: '100%',
-    height: imageHeight.feature,
-    borderRadius: 0,
+    width: 118,
+    height: CARD_IMAGE_HEIGHT,
+  },
+  imageWrap: {
+    width: 118,
+    height: CARD_IMAGE_HEIGHT,
+    overflow: 'hidden',
+  },
+  body: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+  },
+  eyebrow: {
+    fontSize: 10,
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    marginBottom: 4,
   },
   title: {
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.md,
-    marginBottom: spacing.xs,
-  },
-  meta: {
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.sm,
+    fontSize: 19,
+    lineHeight: 24,
+    marginBottom: 4,
   },
   description: {
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.sm,
   },
-  button: {
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
+  duration: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  play: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: home.navy,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  emptyButton: {
+    marginTop: spacing.sm,
     alignSelf: 'flex-start',
-    paddingHorizontal: spacing.xl,
+    minHeight: 44,
+    paddingHorizontal: spacing.md,
   },
 });

@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { useUser } from '@clerk/clerk-expo';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { ScreenContainer, ErrorNotice, ThemedText, Card } from '@/components';
 import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import { ForThisMomentCard } from '@/components/home/ForThisMomentCard';
 import { ContinuePractiseCard } from '@/components/home/ContinuePractiseCard';
 import { WeekAtAGlance } from '@/components/home/WeekAtAGlance';
-import { ExploreList } from '@/components/home/ExploreList';
+import { ExploreGrid } from '@/components/home/ExploreGrid';
 import { LatestInsightCard } from '@/components/home/LatestInsightCard';
 import { QuoteBlock } from '@/components/home/QuoteBlock';
 import { ClosingStatementCard } from '@/components/home/ClosingStatementCard';
@@ -17,7 +17,8 @@ import { CheckInCard } from '@/components/check-in/CheckInCard';
 import { LifeBeyondTraumaCard } from '@/components/home/LifeBeyondTraumaCard';
 import { BookConsultationCard } from '@/components/home/BookConsultationCard';
 import { useToday } from '@/hooks/useToday';
-import { colors, spacing, linkHitSlop } from '@/theme';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
+import { colors, spacing } from '@/theme';
 import type { CheckIn, Practice } from '@/api/types';
 
 /**
@@ -50,7 +51,6 @@ function findContinueCandidate(practices: Practice[], excludeId: string | undefi
 
 export default function HomeScreen() {
   const { user } = useUser();
-  const router = useRouter();
   const { state, reload, setCheckIn, refresh } = useToday();
 
   function handleCheckInSubmitted(checkIn: CheckIn) {
@@ -86,21 +86,9 @@ export default function HomeScreen() {
   }, [state, todayPractice?.id]);
 
   return (
-    <ScreenContainer scroll inTabs>
+    <ScreenContainer scroll inTabs background={home.page}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <WelcomeHeader firstName={user?.firstName} />
-
-        <Pressable
-          onPress={() => router.push('/practices/journey')}
-          accessibilityRole="link"
-          hitSlop={linkHitSlop}
-          accessibilityLabel="View My Journey"
-          style={styles.journeyLink}
-        >
-          <ThemedText variant="label" color={colors.bronze}>
-            My Journey →
-          </ThemedText>
-        </Pressable>
 
         {state.status === 'loading' && <HomeSkeleton />}
 
@@ -123,7 +111,7 @@ export default function HomeScreen() {
 
         <WeekAtAGlance />
 
-        <ExploreList />
+        <ExploreGrid />
 
         <LatestInsightCard />
 
@@ -138,7 +126,7 @@ export default function HomeScreen() {
           <ThemedText variant="caption" color={colors.charcoal} style={styles.instituteLabel}>
             FROM THE INSTITUTE
           </ThemedText>
-          <Card style={styles.instituteCard}>
+          <Card style={{ ...styles.instituteCard, ...homeCardStyle }}>
             <LifeBeyondTraumaCard />
             <BookConsultationCard />
           </Card>
@@ -149,10 +137,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  journeyLink: {
-    alignSelf: 'flex-end',
-    marginBottom: spacing.md,
-  },
   checkInSection: {
     marginBottom: spacing.xl,
   },

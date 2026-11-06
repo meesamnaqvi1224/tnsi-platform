@@ -11,6 +11,8 @@ interface ScreenContainerProps extends PropsWithChildren {
   underHeader?: boolean;
   /** Set when the tab bar already sits below this screen, so the bottom safe-area inset is not added a second time. */
   inTabs?: boolean;
+  /** Page colour; defaults to the app's cream. */
+  background?: string;
   style?: ViewStyle;
 }
 
@@ -24,6 +26,7 @@ export function ScreenContainer({
   keyboardPersistTaps = false,
   underHeader = false,
   inTabs = false,
+  background,
   style,
 }: ScreenContainerProps) {
   const edges: Edge[] = ['left', 'right'];
@@ -31,7 +34,10 @@ export function ScreenContainer({
   if (!inTabs) edges.push('bottom');
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={edges}>
+    <SafeAreaView
+      style={[styles.safeArea, background ? { backgroundColor: background } : null]}
+      edges={edges}
+    >
       {scroll ? (
         <ScrollView
           contentContainerStyle={[styles.content, style]}
