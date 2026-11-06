@@ -17,7 +17,9 @@ import { SaveToggleButton } from '@/components/practices/SaveToggleButton';
 import { usePracticeDetail } from '@/hooks/usePracticeDetail';
 import { resolveMediaKind } from '@/lib/media';
 import { capitalize, formatDuration } from '@/lib/format';
-import { colors, spacing } from '@/theme';
+import { categoryLabel } from '@/lib/practice-library';
+import { spacing } from '@/theme';
+import { home } from '@/components/home/homeTheme';
 
 export default function PracticeDetailScreen() {
   const params = useLocalSearchParams<{ id: string }>();
@@ -88,7 +90,7 @@ export default function PracticeDetailScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll underHeader inTabs>
+      <ScreenContainer scroll underHeader inTabs background={home.page}>
         <PracticeDetailSkeleton />
       </ScreenContainer>
     );
@@ -96,9 +98,9 @@ export default function PracticeDetailScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer underHeader inTabs>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ThemedText variant="heading">This practice isn&apos;t available.</ThemedText>
-        <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
+        <ThemedText variant="body" color={home.ink} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
         </ThemedText>
       </ScreenContainer>
@@ -107,7 +109,7 @@ export default function PracticeDetailScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer underHeader inTabs>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -117,7 +119,6 @@ export default function PracticeDetailScreen() {
   const title = practice.title.trim();
   const meta = [capitalize(practice.contentType)];
   if (practice.durationSeconds) meta.push(formatDuration(practice.durationSeconds));
-  if (practice.category) meta.push(practice.category);
 
   // Decided by the server; when locked it has also withheld `mediaUrl`.
   const locked = practice.locked === true;
@@ -134,30 +135,34 @@ export default function PracticeDetailScreen() {
     practice.contentType === 'interactive' && practice.interactiveKey === RETURN_PATH_KEY;
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
-      {practice.thumbnailUrl ? (
-        <PracticeThumbnail
-          thumbnailUrl={practice.thumbnailUrl}
-          contentType={practice.contentType}
-          height={220}
-          style={styles.hero}
-        />
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PracticeThumbnail
+        thumbnailUrl={practice.thumbnailUrl}
+        contentType={practice.contentType}
+        height={220}
+        showLabel={false}
+        style={styles.hero}
+      />
+      {practice.category ? (
+        <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
+          {categoryLabel(practice.category)}
+        </ThemedText>
       ) : null}
 
       <View style={styles.titleRow}>
-        <ThemedText variant="display" style={styles.title}>
+        <ThemedText variant="display" color={home.navy} style={styles.title}>
           {title}
         </ThemedText>
         {locked ? null : (
           <SaveToggleButton practiceId={practice.id} initialSaved={practice.saved ?? false} />
         )}
       </View>
-      <ThemedText variant="caption" color={colors.charcoal} style={styles.meta}>
+      <ThemedText variant="caption" color={home.ink} style={styles.meta}>
         {meta.join(' · ')}
       </ThemedText>
 
       {practice.description ? (
-        <ThemedText variant="body" style={styles.description}>
+        <ThemedText variant="body" color={home.ink} style={styles.description}>
           {practice.description}
         </ThemedText>
       ) : null}
@@ -214,6 +219,11 @@ export default function PracticeDetailScreen() {
 const styles = StyleSheet.create({
   hero: {
     marginBottom: spacing.lg,
+  },
+  eyebrow: {
+    textTransform: 'uppercase',
+    letterSpacing: 1.4,
+    marginBottom: spacing.xs,
   },
   titleRow: {
     flexDirection: 'row',

@@ -2,7 +2,8 @@ import { Linking, StyleSheet } from 'react-native';
 import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 
 interface ExternalMediaNoticeProps {
   mediaUrl: string;
@@ -19,8 +20,8 @@ interface ExternalMediaNoticeProps {
  */
 export function ExternalMediaNotice({ mediaUrl }: ExternalMediaNoticeProps) {
   return (
-    <Card style={styles.card}>
-      <ThemedText variant="body" color={colors.charcoal} style={styles.text}>
+    <Card style={{ ...styles.card, ...homeCardStyle }}>
+      <ThemedText variant="body" color={home.ink} style={styles.text}>
         This practice currently opens in your browser rather than playing directly in the app.
       </ThemedText>
       <PrimaryButton

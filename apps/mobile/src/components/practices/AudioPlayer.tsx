@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
+import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
-import { colors, radius, spacing } from '@/theme';
+import { colors, spacing } from '@/theme';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 
 interface AudioPlayerProps {
   uri: string;
@@ -121,9 +123,13 @@ export function AudioPlayer({
           disabled={!status.isLoaded}
           style={({ pressed }) => [styles.playButton, pressed && styles.pressed]}
         >
-          <ThemedText variant="label" color={colors.cream}>
-            {!status.isLoaded ? '···' : status.playing ? 'Pause' : 'Play'}
-          </ThemedText>
+          {!status.isLoaded ? (
+            <ThemedText variant="label" color="#FFFFFF">
+              ···
+            </ThemedText>
+          ) : (
+            <Ionicons name={status.playing ? 'pause' : 'play'} size={24} color="#FFFFFF" />
+          )}
         </Pressable>
 
         {status.isLoaded ? (
@@ -145,16 +151,16 @@ export function AudioPlayer({
               <View style={[styles.trackFill, { width: `${progress * 100}%` }]} />
             </Pressable>
             <View style={styles.timeRow}>
-              <ThemedText variant="caption" color={colors.charcoal}>
+              <ThemedText variant="caption" color={home.ink}>
                 {formatTime(status.currentTime)}
               </ThemedText>
-              <ThemedText variant="caption" color={colors.charcoal}>
+              <ThemedText variant="caption" color={home.ink}>
                 {formatTime(status.duration)}
               </ThemedText>
             </View>
           </View>
         ) : (
-          <ThemedText variant="caption" color={colors.charcoal} style={styles.loadingLabel}>
+          <ThemedText variant="caption" color={home.ink} style={styles.loadingLabel}>
             Loading audio…
           </ThemedText>
         )}
@@ -165,6 +171,9 @@ export function AudioPlayer({
 
 const styles = StyleSheet.create({
   container: {
+    ...homeCardStyle,
+    backgroundColor: home.page,
+    padding: spacing.md,
     marginTop: spacing.md,
   },
   controlsRow: {
@@ -173,10 +182,10 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   playButton: {
-    width: 64,
-    height: 64,
-    borderRadius: radius.lg,
-    backgroundColor: colors.navy,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: home.navy,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -196,12 +205,12 @@ const styles = StyleSheet.create({
   trackBackground: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
+    backgroundColor: '#E6E9ED',
   },
   trackFill: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.bronze,
+    backgroundColor: home.bronze,
     position: 'absolute',
     left: 0,
   },

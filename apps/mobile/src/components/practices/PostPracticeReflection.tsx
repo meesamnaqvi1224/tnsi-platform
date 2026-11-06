@@ -8,6 +8,7 @@ import { TextField } from '@/components/TextField';
 import { colors, radius, spacing } from '@/theme';
 import type { PostPracticeResponse, PracticeReflectionState } from '@/api/types';
 import type { PracticeReflectionInput } from '@/hooks/usePracticeDetail';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 
 const RESPONSE_OPTIONS: { value: PostPracticeResponse; label: string }[] = [
   { value: 'DIFFERENT', label: 'I feel different' },
@@ -65,13 +66,13 @@ export function PostPracticeReflection({
   }
 
   return (
-    <Card style={styles.card}>
+    <Card style={{ ...styles.card, ...homeCardStyle }}>
       <ThemedText variant="heading">Practice complete.</ThemedText>
-      <ThemedText variant="body" color={colors.charcoal} style={styles.subtitle}>
+      <ThemedText variant="body" color={home.ink} style={styles.subtitle}>
         Take a moment before moving on.
       </ThemedText>
 
-      <ThemedText variant="label" color={colors.charcoal} style={styles.label}>
+      <ThemedText variant="label" color={home.ink} style={styles.label}>
         How do you feel now?
       </ThemedText>
       <View style={styles.optionsRow} accessibilityRole="radiogroup">
@@ -91,7 +92,7 @@ export function PostPracticeReflection({
                 pressed && styles.optionPressed,
               ]}
             >
-              <ThemedText variant="label" color={selected ? colors.cream : colors.charcoal}>
+              <ThemedText variant="label" color={selected ? colors.cream : home.ink}>
                 {option.label}
               </ThemedText>
             </Pressable>
@@ -130,7 +131,7 @@ export function PostPracticeReflection({
           accessibilityRole="link"
           accessibilityLabel="Back to Home"
         >
-          <ThemedText variant="label" color={colors.bronze}>
+          <ThemedText variant="label" color={home.bronze}>
             Back to Home
           </ThemedText>
         </Pressable>
@@ -162,13 +163,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     borderRadius: radius.xl,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: home.border,
     minHeight: 44,
     justifyContent: 'center',
   },
   optionSelected: {
-    backgroundColor: colors.navy,
-    borderColor: colors.navy,
+    backgroundColor: home.navy,
+    borderColor: home.navy,
   },
   optionPressed: {
     opacity: 0.85,
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cream,
     borderWidth: 0,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: home.border,
     borderRadius: 0,
     paddingHorizontal: spacing.xs,
     marginBottom: spacing.lg,
