@@ -5,6 +5,8 @@ import { ErrorNotice, PrimaryButton, ScreenContainer, TextField, ThemedText } fr
 import { AssessmentSkeleton } from '@/components/profile/AssessmentSkeleton';
 import { useAssessment } from '@/hooks/useAssessment';
 import { useAssessmentSubmission } from '@/hooks/useAssessmentSubmission';
+import { PageTitle } from '@/components/PageTitle';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { colors, spacing } from '@/theme';
 import type { AssessmentQuestion } from '@/api/types';
 
@@ -87,7 +89,7 @@ export default function CapacityAssessmentScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll underHeader inTabs>
+      <ScreenContainer scroll underHeader inTabs background={home.page}>
         <AssessmentSkeleton />
       </ScreenContainer>
     );
@@ -95,7 +97,7 @@ export default function CapacityAssessmentScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer underHeader inTabs>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ThemedText variant="heading">This assessment isn&apos;t available.</ThemedText>
         <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
@@ -112,7 +114,7 @@ export default function CapacityAssessmentScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer underHeader inTabs>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -128,14 +130,9 @@ export default function CapacityAssessmentScreen() {
   const submitting = submission.status === 'submitting';
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ThemedText variant="display" style={styles.title}>
-          {assessment.title}
-        </ThemedText>
-        <ThemedText variant="body" color={colors.charcoal} style={styles.description}>
-          {ASSESSMENT_DESCRIPTION}
-        </ThemedText>
+        <PageTitle title={assessment.title} subtitle={ASSESSMENT_DESCRIPTION} />
 
         {submission.status === 'error' ? <ErrorNotice message={submission.message} /> : null}
 
@@ -168,7 +165,7 @@ export default function CapacityAssessmentScreen() {
           />
         ))}
 
-        <ThemedText variant="label" color={colors.bronze} style={styles.emailSectionLabel}>
+        <ThemedText variant="label" color={home.bronze} style={styles.emailSectionLabel}>
           YOUR EMAIL
         </ThemedText>
         <TextField
@@ -217,8 +214,11 @@ function QuestionBlock({
 }) {
   return (
     <View style={styles.questionBlock}>
+      <ThemedText variant="label" color={home.bronze} style={styles.questionNumber}>
+        QUESTION {index + 1}
+      </ThemedText>
       <ThemedText variant="heading" style={styles.questionText}>
-        {index + 1}. {question.text}
+        {question.text}
       </ThemedText>
       {question.choices.map((choice) => {
         const isSelected = selected === choice.key;
@@ -229,7 +229,7 @@ function QuestionBlock({
             accessibilityRole="radio"
             accessibilityState={{ selected: isSelected }}
             accessibilityLabel={`${question.text}. ${choice.label}${isSelected ? ', selected' : ''}`}
-            style={styles.choiceRow}
+            style={[styles.choiceRow, isSelected && styles.choiceRowSelected]}
           >
             <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
               {isSelected ? <View style={styles.radioInner} /> : null}
@@ -259,8 +259,8 @@ function AssessmentResultView({
   const router = useRouter();
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
-      <ThemedText variant="label" color={colors.bronze} style={styles.resultEyebrow}>
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <ThemedText variant="label" color={home.bronze} style={styles.resultEyebrow}>
         {title.toUpperCase()} — YOUR RESULT
       </ThemedText>
 
@@ -303,17 +303,18 @@ function AssessmentResultView({
 }
 
 const styles = StyleSheet.create({
-  title: {
-    marginBottom: spacing.sm,
-  },
-  description: {
-    marginBottom: spacing.xl,
-  },
   validationBanner: {
     marginBottom: spacing.lg,
   },
   questionBlock: {
-    marginBottom: spacing.xl,
+    ...homeCardStyle,
+    backgroundColor: home.page,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+  },
+  questionNumber: {
+    letterSpacing: 1.2,
+    marginBottom: spacing.xs,
   },
   questionText: {
     marginBottom: spacing.md,
@@ -321,8 +322,16 @@ const styles = StyleSheet.create({
   choiceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 44,
+    minHeight: 48,
     marginBottom: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: home.border,
+  },
+  choiceRowSelected: {
+    borderColor: home.bronze,
+    backgroundColor: home.bronzeTint,
   },
   radioOuter: {
     width: 22,
@@ -335,13 +344,13 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
   },
   radioOuterSelected: {
-    borderColor: colors.navy,
+    borderColor: home.bronze,
   },
   radioInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: colors.navy,
+    backgroundColor: home.bronze,
   },
   choiceLabel: {
     flex: 1,
