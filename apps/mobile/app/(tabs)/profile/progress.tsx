@@ -5,7 +5,9 @@ import { ScreenContainer, ErrorNotice, ThemedText, PrimaryButton } from '@/compo
 import { CheckInEntry } from '@/components/progress/CheckInEntry';
 import { useCheckInHistory } from '@/hooks/useCheckInHistory';
 import { usePractices } from '@/hooks/usePractices';
-import { colors, radius, spacing } from '@/theme';
+import { PageTitle } from '@/components/PageTitle';
+import { home } from '@/components/home/homeTheme';
+import { radius, spacing } from '@/theme';
 
 /**
  * Progress: a chronological record of two genuinely separate activity
@@ -28,16 +30,11 @@ export default function ProgressScreen() {
   const { state: practicesState } = usePractices();
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
-      <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
-        Progress
-      </ThemedText>
-      <ThemedText variant="display" style={styles.heading}>
-        Notice what you&apos;re practising.
-      </ThemedText>
-      <ThemedText variant="body" color={colors.charcoal} style={styles.subtitle}>
-        A simple record of your check-ins and practice activity over time.
-      </ThemedText>
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PageTitle
+        title="Progress"
+        subtitle="A simple record of your check-ins and practice activity over time."
+      />
 
       <CheckInsSection
         state={checkInsState}
@@ -64,7 +61,7 @@ function CheckInsSection({
   return (
     <View style={styles.section}>
       <View accessibilityRole="header" accessible>
-        <ThemedText variant="heading" style={styles.sectionTitle}>
+        <ThemedText variant="heading" color={home.navy} style={styles.sectionTitle}>
           Your Check-Ins
         </ThemedText>
       </View>
@@ -82,7 +79,7 @@ function CheckInsSection({
           <ThemedText variant="body" style={styles.emptyTitle}>
             No check-ins yet.
           </ThemedText>
-          <ThemedText variant="body" color={colors.charcoal}>
+          <ThemedText variant="body" color={home.ink}>
             Your daily check-ins will appear here as you use TNSI.
           </ThemedText>
         </View>
@@ -129,7 +126,7 @@ function PracticeSummarySection({
   return (
     <View style={styles.section}>
       <View accessibilityRole="header" accessible>
-        <ThemedText variant="heading" style={styles.sectionTitle}>
+        <ThemedText variant="heading" color={home.navy} style={styles.sectionTitle}>
           Your Practice
         </ThemedText>
       </View>
@@ -141,7 +138,7 @@ function PracticeSummarySection({
       {state.status === 'success' && counts && (
         <>
           {counts.completed === 0 && counts.inProgress === 0 ? (
-            <ThemedText variant="body" color={colors.charcoal} style={styles.emptyTitle}>
+            <ThemedText variant="body" color={home.ink} style={styles.emptyTitle}>
               Your practice activity will appear here as you begin.
             </ThemedText>
           ) : (
@@ -177,16 +174,6 @@ function ProgressSkeleton() {
 }
 
 const styles = StyleSheet.create({
-  eyebrow: {
-    textTransform: 'uppercase',
-    marginBottom: spacing.sm,
-  },
-  heading: {
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    marginBottom: spacing.xl,
-  },
   section: {
     marginBottom: spacing.xl,
   },
@@ -208,8 +195,8 @@ const styles = StyleSheet.create({
   skeletonBlock: {
     height: 120,
     borderRadius: radius.md,
-    backgroundColor: colors.creamMuted,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    backgroundColor: home.cool,
+    borderWidth: 1,
+    borderColor: home.border,
   },
 });

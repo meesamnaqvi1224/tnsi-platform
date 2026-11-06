@@ -23,7 +23,10 @@ export default function ProfileLayout() {
           headerLeft: () => <HomeHeaderButton />,
         }}
       />
-      <Stack.Screen name="progress" options={{ title: '' }} />
+      <Stack.Screen
+        name="progress"
+        options={{ title: '', headerStyle: { backgroundColor: '#FFFFFF' } }}
+      />
       <Stack.Screen
         name="membership"
         options={{ title: '', headerStyle: { backgroundColor: '#FFFFFF' } }}

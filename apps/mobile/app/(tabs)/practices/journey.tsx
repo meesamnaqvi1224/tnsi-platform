@@ -1,10 +1,12 @@
 import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ScreenContainer, ErrorNotice, PageHeader, PrimaryButton, ThemedText } from '@/components';
+import { ScreenContainer, ErrorNotice, PrimaryButton, ThemedText } from '@/components';
+import { PageTitle } from '@/components/PageTitle';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { JourneyEntryRow } from '@/components/journey/JourneyEntryRow';
 import { useJourney } from '@/hooks/useJourney';
 import { groupJourneyEntriesByDate } from '@/lib/journeyGrouping';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
 
 /**
  * My Journey: this member's own recorded activity - completed practices
@@ -20,14 +22,14 @@ export default function JourneyScreen() {
   const groups = state.status === 'success' ? groupJourneyEntriesByDate(state.entries) : [];
 
   return (
-    <ScreenContainer scroll underHeader inTabs>
-      <PageHeader
-        eyebrow="My Journey"
-        title="A record of the practices and moments you've chosen to spend time with."
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PageTitle
+        title="My Journey"
+        subtitle="A record of the practices and moments you've chosen to spend time with."
       />
 
       {state.status === 'loading' && (
-        <ThemedText variant="body" color={colors.charcoal}>
+        <ThemedText variant="body" color={home.ink}>
           Loading…
         </ThemedText>
       )}
@@ -39,7 +41,7 @@ export default function JourneyScreen() {
           <ThemedText variant="body" style={styles.emptyTitle}>
             Your journey starts here
           </ThemedText>
-          <ThemedText variant="body" color={colors.charcoal} style={styles.emptyDescription}>
+          <ThemedText variant="body" color={home.ink} style={styles.emptyDescription}>
             Your completed practices and reflections will appear here as you spend time with the
             practices.
           </ThemedText>
@@ -56,7 +58,7 @@ export default function JourneyScreen() {
         <>
           {groups.map((group) => (
             <View key={`${group.label}-${group.entries[0]?.id}`} style={styles.group}>
-              <ThemedText variant="label" color={colors.bronze} style={styles.groupLabel}>
+              <ThemedText variant="label" color={home.bronze} style={styles.groupLabel}>
                 {group.label.toUpperCase()}
               </ThemedText>
               {group.entries.map((entry) => (
@@ -81,7 +83,10 @@ export default function JourneyScreen() {
 
 const styles = StyleSheet.create({
   emptyState: {
-    marginTop: spacing.lg,
+    ...homeCardStyle,
+    backgroundColor: home.page,
+    padding: spacing.lg,
+    marginTop: spacing.sm,
   },
   emptyTitle: {
     marginBottom: spacing.xs,
