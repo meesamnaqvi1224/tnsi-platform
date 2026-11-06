@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   notSaved: {
-    backgroundColor: colors.cream,
+    backgroundColor: '#FFFFFF',
     borderColor: colors.navy,
   },
   saved: {

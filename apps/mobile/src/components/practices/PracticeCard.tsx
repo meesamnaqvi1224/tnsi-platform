@@ -7,7 +7,8 @@ import { SaveToggleButton } from './SaveToggleButton';
 import { capitalize, formatDuration } from '@/lib/format';
 import { inProgressPractices, percentLabel } from '@/lib/my-learning';
 import { categoryLabel } from '@/lib/practice-library';
-import { colors, spacing } from '@/theme';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
+import { spacing } from '@/theme';
 import type { Practice } from '@/api/types';
 
 interface PracticeCardProps {
@@ -60,7 +61,7 @@ export function PracticeCard({ practice, onSavedChange }: PracticeCardProps) {
         accessibilityLabel={label}
         style={({ pressed }) => pressed && styles.pressed}
       >
-        <Card style={styles.card}>
+        <Card style={{ ...styles.card, ...homeCardStyle }}>
           <PracticeThumbnail
             thumbnailUrl={practice.thumbnailUrl}
             contentType={practice.contentType}
@@ -69,23 +70,23 @@ export function PracticeCard({ practice, onSavedChange }: PracticeCardProps) {
           />
           {category || locked ? (
             <View style={styles.eyebrowRow}>
-              <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
+              <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
                 {category ?? ''}
               </ThemedText>
               {locked ? (
-                <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
+                <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
                   Members
                 </ThemedText>
               ) : null}
             </View>
           ) : null}
-          <ThemedText variant="heading" style={styles.title}>
+          <ThemedText variant="heading" color={home.navy} style={styles.title}>
             {title}
           </ThemedText>
           {practice.description ? (
             <ThemedText
               variant="body"
-              color={colors.charcoal}
+              color={home.ink}
               numberOfLines={2}
               style={styles.description}
             >
@@ -93,11 +94,11 @@ export function PracticeCard({ practice, onSavedChange }: PracticeCardProps) {
             </ThemedText>
           ) : null}
           <View style={styles.metaRow}>
-            <ThemedText variant="caption" color={colors.charcoal}>
+            <ThemedText variant="caption" color={home.ink}>
               {meta.join(' · ')}
             </ThemedText>
             {startedPct ? (
-              <ThemedText variant="caption" color={colors.bronze}>
+              <ThemedText variant="caption" color={home.bronze}>
                 {startedPct} complete
               </ThemedText>
             ) : null}

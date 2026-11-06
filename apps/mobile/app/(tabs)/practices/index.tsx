@@ -1,14 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import {
-  ScreenContainer,
-  ErrorNotice,
-  PageHeader,
-  PrimaryButton,
-  SectionLabel,
-  ThemedText,
-} from '@/components';
+import { ScreenContainer, ErrorNotice, PrimaryButton, ThemedText } from '@/components';
+import { PageTitle } from '@/components/PageTitle';
+import { SectionHeading } from '@/components/SectionHeading';
+import { home } from '@/components/home/homeTheme';
 import { PracticeCard } from '@/components/practices/PracticeCard';
 import { PracticeFilterBar } from '@/components/practices/PracticeFilterBar';
 import { PracticeSearchField } from '@/components/practices/PracticeSearchField';
@@ -30,7 +26,7 @@ import {
   resultSummary,
   type LibraryFilters,
 } from '@/lib/practice-library';
-import { colors, spacing, linkHitSlop } from '@/theme';
+import { spacing, linkHitSlop } from '@/theme';
 import type { PracticeContentType } from '@/api/types';
 
 const GUIDED_PRACTICES = [NINETY_SECOND_RESET, THE_EMPTY_CHAIR];
@@ -99,12 +95,8 @@ export default function PracticesScreen() {
   const query = filters.query.trim();
 
   return (
-    <ScreenContainer scroll underHeader inTabs keyboardPersistTaps>
-      <PageHeader
-        variant="plain"
-        eyebrow="Practices"
-        title="A library of practices to support your nervous system."
-      />
+    <ScreenContainer scroll underHeader inTabs keyboardPersistTaps background={home.page}>
+      <PageTitle title="Practices" subtitle="A library to support your nervous system." />
 
       <View style={styles.linkRow}>
         <Pressable
@@ -113,7 +105,7 @@ export default function PracticesScreen() {
           hitSlop={linkHitSlop}
           accessibilityLabel="View Saved Practices"
         >
-          <ThemedText variant="label" color={colors.bronze}>
+          <ThemedText variant="label" color={home.bronze}>
             Saved →
           </ThemedText>
         </Pressable>
@@ -123,7 +115,7 @@ export default function PracticesScreen() {
           hitSlop={linkHitSlop}
           accessibilityLabel="View My Journey"
         >
-          <ThemedText variant="label" color={colors.bronze}>
+          <ThemedText variant="label" color={home.bronze}>
             My Journey →
           </ThemedText>
         </Pressable>
@@ -133,7 +125,7 @@ export default function PracticesScreen() {
           hitSlop={linkHitSlop}
           accessibilityLabel="View Practice History"
         >
-          <ThemedText variant="label" color={colors.bronze}>
+          <ThemedText variant="label" color={home.bronze}>
             Practice History →
           </ThemedText>
         </Pressable>
@@ -146,7 +138,7 @@ export default function PracticesScreen() {
 
       {guided.length > 0 ? (
         <>
-          <SectionLabel>Guided practices</SectionLabel>
+          <SectionHeading>Guided practices</SectionHeading>
           <View style={styles.section}>
             {guided.map((practice) => (
               <GuidedPracticeCard key={practice.slug} practice={practice} />
@@ -157,12 +149,12 @@ export default function PracticesScreen() {
 
       {searching ? null : (
         <>
-          <SectionLabel>Collections</SectionLabel>
+          <SectionHeading>Collections</SectionHeading>
           <CollectionTiles />
         </>
       )}
 
-      <SectionLabel>Practice library</SectionLabel>
+      <SectionHeading>Practice library</SectionHeading>
 
       {state.status === 'loading' && <PracticesSkeleton />}
 
@@ -188,7 +180,7 @@ export default function PracticesScreen() {
           {practices.length > 0 ? (
             <ThemedText
               variant="caption"
-              color={colors.charcoal}
+              color={home.ink}
               accessibilityLiveRegion="polite"
               style={styles.summary}
             >
@@ -198,7 +190,7 @@ export default function PracticesScreen() {
 
           {results.length === 0 ? (
             <View style={styles.empty}>
-              <ThemedText variant="body" color={colors.charcoal}>
+              <ThemedText variant="body" color={home.ink}>
                 {practices.length === 0
                   ? 'No practices are available yet.'
                   : searching
@@ -232,7 +224,7 @@ export default function PracticesScreen() {
 
       {searching ? (
         <View style={styles.collectionsHint}>
-          <ThemedText variant="caption" color={colors.charcoal}>
+          <ThemedText variant="caption" color={home.ink}>
             Looking for a PowerDrop or a Somatic Card? They are separate collections.
           </ThemedText>
           <View style={styles.hintLinks}>
@@ -256,7 +248,7 @@ function HintLink({ label, onPress }: { label: string; onPress: () => void }) {
       accessibilityLabel={label.replace(' →', '')}
       style={styles.hintLink}
     >
-      <ThemedText variant="label" color={colors.bronze}>
+      <ThemedText variant="label" color={home.bronze}>
         {label}
       </ThemedText>
     </Pressable>
