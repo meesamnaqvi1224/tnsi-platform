@@ -125,6 +125,8 @@ Test at: **1440px**, **1280px**, **1024px**, **768px**, **390px**, ultra-wide (1
 - [ ] Configure analytics (privacy-compliant)
 - [ ] Set up error monitoring (Sentry or equivalent)
 - [ ] Run full Visual + Responsive + Accessibility QA on production URL
+- [ ] **`tnsi-platform-somatic-prod` Vercel check fails on every commit (diagnosed 24 Oct 2026).** Build log (`vercel inspect <deployment> --logs`): compile, lint and type checks pass; the build then stops at "Collecting page data" with `Error: DATABASE_URL environment variable is not set` (`packages/db/src/client.ts` throws at import by design). The Vercel project `tnsi-platform-somatic-prod` has no `DATABASE_URL` for the environment these previews use. It has failed on every commit that has a recorded status (about 30 inspected, back to 24 Sep 2026), including its own branch `production/somatic-cards-deploy`, so it predates and is unrelated to recent PRs. **Owner action (Vercel account):** give that project a **Preview-scoped, non-production** `DATABASE_URL` (and the other build variables the main project has), or stop building previews for it. Do not copy the production database URL into Preview. Also confirm the main project's Preview `DATABASE_URL` is not the production database (preview deployments accept form posts).
+- [ ] Work through the prioritised findings in [10-website-claims-and-journeys-audit.md](./10-website-claims-and-journeys-audit.md) (W-02: public claims, customer journeys, product/content mismatches; items marked Verified / Unverified / Owner decision / Legal review)
 
 ---
 
