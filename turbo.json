@@ -20,6 +20,7 @@
         "SANITY_API_READ_TOKEN",
         "SANITY_WEBHOOK_SECRET",
         "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_GA_MEASUREMENT_ID",
         "FLOWI_API_KEY",
         "FLOWI_LOCATION_ID"
       ]

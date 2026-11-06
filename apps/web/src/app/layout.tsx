@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Cormorant_Garamond, Geist_Mono, Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { SkipLink } from '@/components/layout/skip-link';
+import { CookieConsent } from '@/components/seo/cookie-consent';
 import { GoogleAnalytics } from '@/components/seo/google-analytics';
 import { JsonLd } from '@/components/seo/json-ld';
 import { createOrganizationJsonLd, createPageMetadata, createWebSiteJsonLd } from '@/lib/seo';
@@ -60,6 +61,7 @@ export default function RootLayout({
           className={`${sansBody.variable} ${displaySerif.variable} ${geistMono.variable} antialiased`}
         >
           <SkipLink />
+          <CookieConsent />
           <GoogleAnalytics />
           <JsonLd data={[createOrganizationJsonLd(), createWebSiteJsonLd()]} />
           {children}
