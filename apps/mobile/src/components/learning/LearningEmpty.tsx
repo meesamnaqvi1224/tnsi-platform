@@ -2,7 +2,8 @@ import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, spacing } from '@/theme';
+import { home } from '@/components/home/homeTheme';
+import { spacing } from '@/theme';
 
 interface LearningEmptyProps {
   title: string;
@@ -14,10 +15,10 @@ export function LearningEmpty({ title, description }: LearningEmptyProps) {
   const router = useRouter();
   return (
     <View style={styles.wrap}>
-      <ThemedText variant="body" style={styles.title}>
+      <ThemedText variant="heading" color={home.navy} style={styles.title}>
         {title}
       </ThemedText>
-      <ThemedText variant="body" color={colors.charcoal} style={styles.description}>
+      <ThemedText variant="body" color={home.ink} style={styles.description}>
         {description}
       </ThemedText>
       <PrimaryButton

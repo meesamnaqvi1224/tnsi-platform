@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { LEARNING_VIEWS, type LearningView } from '@/lib/my-learning';
-import { colors, spacing } from '@/theme';
+import { home } from '@/components/home/homeTheme';
+import { spacing } from '@/theme';
 
 const LABELS: Record<LearningView, string> = {
   'in-progress': 'In Progress',
@@ -35,17 +36,13 @@ export function LearningTabs({ selected, onSelect, counts = {} }: LearningTabsPr
             accessibilityLabel={count === undefined ? LABELS[view] : `${LABELS[view]}, ${count}`}
             style={[styles.tab, active && styles.tabActive]}
           >
-            <ThemedText
-              variant="label"
-              color={active ? colors.navy : colors.charcoal + '99'}
-              style={styles.label}
-            >
+            <ThemedText variant="label" color={active ? home.navy : home.ink} style={styles.label}>
               {LABELS[view]}
             </ThemedText>
             {count !== undefined ? (
               <ThemedText
                 variant="caption"
-                color={active ? colors.bronze : colors.charcoal + '99'}
+                color={active ? home.bronze : home.ink}
                 style={styles.count}
               >
                 {count}
@@ -62,7 +59,7 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
+    borderBottomColor: home.border,
     marginBottom: spacing.lg,
   },
   tab: {
@@ -78,7 +75,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   tabActive: {
-    borderBottomColor: colors.bronze,
+    borderBottomColor: home.bronze,
   },
   label: {
     textTransform: 'uppercase',

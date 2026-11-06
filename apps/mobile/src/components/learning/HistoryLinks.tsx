@@ -1,7 +1,9 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, spacing } from '@/theme';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
+import { spacing } from '@/theme';
 
 /**
  * Where the full record lives. Completed shows one entry per practice; every individual
@@ -24,28 +26,36 @@ export function HistoryLinks() {
 
   return (
     <View style={styles.wrap}>
-      <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
+      <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
         THE FULL RECORD
       </ThemedText>
-      {links.map((link) => (
-        <Pressable
-          key={link.label}
-          onPress={link.onPress}
-          accessibilityRole="link"
-          accessibilityLabel={`${link.label}. ${link.note}`}
-          style={({ pressed }) => [styles.row, pressed && styles.pressed]}
-        >
-          <View style={styles.text}>
-            <ThemedText variant="heading">{link.label}</ThemedText>
-            <ThemedText variant="caption" color={colors.charcoal}>
-              {link.note}
-            </ThemedText>
-          </View>
-          <ThemedText variant="heading" color={colors.bronze}>
-            ›
-          </ThemedText>
-        </Pressable>
-      ))}
+      <View style={styles.card}>
+        {links.map((link, index) => (
+          <Pressable
+            key={link.label}
+            onPress={link.onPress}
+            accessibilityRole="link"
+            accessibilityLabel={`${link.label}. ${link.note}`}
+            style={({ pressed }) => [
+              styles.row,
+              index > 0 && styles.divider,
+              pressed && styles.pressed,
+            ]}
+          >
+            <View style={styles.text}>
+              <ThemedText variant="heading" color={home.navy} style={styles.title}>
+                {link.label}
+              </ThemedText>
+              <ThemedText variant="caption" color={home.ink}>
+                {link.note}
+              </ThemedText>
+            </View>
+            <View style={styles.chevron} accessibilityElementsHidden importantForAccessibility="no">
+              <Ionicons name="chevron-forward" size={14} color={home.bronze} />
+            </View>
+          </Pressable>
+        ))}
+      </View>
     </View>
   );
 }
@@ -55,7 +65,13 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
   },
   eyebrow: {
-    marginBottom: spacing.xs,
+    marginBottom: spacing.sm,
+    letterSpacing: 1.4,
+  },
+  card: {
+    ...homeCardStyle,
+    backgroundColor: home.page,
+    overflow: 'hidden',
   },
   row: {
     minHeight: 64,
@@ -63,8 +79,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
     paddingVertical: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
+    paddingHorizontal: spacing.md,
+  },
+  divider: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: home.border,
   },
   pressed: {
     opacity: 0.7,
@@ -72,5 +91,17 @@ const styles = StyleSheet.create({
   text: {
     flex: 1,
     minWidth: 0,
+  },
+  title: {
+    fontSize: 17,
+    lineHeight: 22,
+  },
+  chevron: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: home.bronzeTint,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

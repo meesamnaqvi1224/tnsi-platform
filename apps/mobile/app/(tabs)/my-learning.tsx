@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { ScreenContainer, ErrorNotice, PageHeader } from '@/components';
+import { ScreenContainer, ErrorNotice } from '@/components';
+import { PageTitle } from '@/components/PageTitle';
+import { home } from '@/components/home/homeTheme';
 import { CompletedView } from '@/components/learning/CompletedView';
 import { InProgressView } from '@/components/learning/InProgressView';
 import { LearningTabs } from '@/components/learning/LearningTabs';
@@ -127,13 +129,8 @@ export default function MyLearningScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScreenContainer scroll underHeader inTabs>
-        <PageHeader
-          variant="plain"
-          eyebrow="My Learning"
-          title="Return to what you've been practising."
-          description="Continue practices you've started or revisit practices you've completed."
-        />
+      <ScreenContainer scroll underHeader inTabs background={home.page}>
+        <PageTitle title="My Learning" subtitle="Return to what you've been practising." />
 
         <LearningTabs
           selected={view}
