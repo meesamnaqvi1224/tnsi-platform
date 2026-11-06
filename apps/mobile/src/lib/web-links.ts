@@ -8,6 +8,7 @@ export const TNSI_PAGES = {
   privacy: '/privacy',
   terms: '/terms',
   billing: '/dashboard/billing',
+  resources: '/resources',
 } as const;
 
 export type TnsiPage = keyof typeof TNSI_PAGES;

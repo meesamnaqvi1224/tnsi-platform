@@ -9,6 +9,7 @@ describe('buildTnsiUrl', () => {
     expect(buildTnsiUrl('https://example.org', 'contact')).toBe('https://example.org/contact');
     expect(buildTnsiUrl('https://example.org', 'privacy')).toBe('https://example.org/privacy');
     expect(buildTnsiUrl('https://example.org', 'terms')).toBe('https://example.org/terms');
+    expect(buildTnsiUrl('https://example.org', 'resources')).toBe('https://example.org/resources');
   });
   it('does not double the slash when the base ends with one', () => {
     expect(buildTnsiUrl('https://example.org/', 'terms')).toBe('https://example.org/terms');

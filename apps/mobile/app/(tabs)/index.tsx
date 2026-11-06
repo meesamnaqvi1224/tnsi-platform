@@ -9,13 +9,13 @@ import { ForThisMomentCard } from '@/components/home/ForThisMomentCard';
 import { ContinuePractiseCard } from '@/components/home/ContinuePractiseCard';
 import { WeekAtAGlance } from '@/components/home/WeekAtAGlance';
 import { ExploreGrid } from '@/components/home/ExploreGrid';
-import { LatestInsightCard } from '@/components/home/LatestInsightCard';
 import { QuoteBlock } from '@/components/home/QuoteBlock';
 import { ClosingStatementCard } from '@/components/home/ClosingStatementCard';
 import { HomeSkeleton } from '@/components/home/HomeSkeleton';
 import { CheckInCard } from '@/components/check-in/CheckInCard';
 import { LifeBeyondTraumaCard } from '@/components/home/LifeBeyondTraumaCard';
 import { BookConsultationCard } from '@/components/home/BookConsultationCard';
+import { ResourcesOnWebsiteCard } from '@/components/home/ResourcesOnWebsiteCard';
 import { useToday } from '@/hooks/useToday';
 import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { colors, spacing } from '@/theme';
@@ -25,8 +25,7 @@ import type { CheckIn, Practice } from '@/api/types';
  * Home: a calm daily orientation, not a dashboard. Fetches GET
  * /api/v1/today once; the only other network calls this screen makes are
  * the check-in submission (owned by CheckInCard) and two already-existing
- * hooks reused as-is (`useCheckInHistory` inside WeekAtAGlance,
- * `useArticles` inside LatestInsightCard). No fabricated content, no
+ * hooks reused as-is (`useCheckInHistory` inside WeekAtAGlance). No fabricated content, no
  * gamification, no aggregate "progress" score, no new APIs.
  *
  * "Continue" is derived client-side from the same `/api/v1/today` response
@@ -113,8 +112,6 @@ export default function HomeScreen() {
 
         <ExploreGrid />
 
-        <LatestInsightCard />
-
         <QuoteBlock />
 
         <ClosingStatementCard />
@@ -129,6 +126,7 @@ export default function HomeScreen() {
           <Card style={{ ...styles.instituteCard, ...homeCardStyle }}>
             <LifeBeyondTraumaCard />
             <BookConsultationCard />
+            <ResourcesOnWebsiteCard />
           </Card>
         </Animated.View>
       </KeyboardAvoidingView>

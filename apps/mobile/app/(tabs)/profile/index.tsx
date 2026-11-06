@@ -166,6 +166,8 @@ export default function ProfileScreen() {
 
       <SectionLabel>Support</SectionLabel>
       <Card style={styles.card}>
+        <WebRow label="Articles and Resources" page="resources" />
+        <Divider />
         <WebRow label="Contact" page="contact" />
         <Divider />
         <WebRow label="Privacy Policy" page="privacy" />
