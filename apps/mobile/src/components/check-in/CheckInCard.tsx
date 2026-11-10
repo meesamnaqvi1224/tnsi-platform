@@ -17,7 +17,6 @@ type Phase =
   | {
       kind: 'recorded';
       checkIn: CheckIn;
-      justSubmitted: boolean;
       /** Shown once after an additional check-in was saved; the primary stays what is displayed. */
       notice?: string;
     }
@@ -70,7 +69,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
   const [open, setOpen] = useState(false);
   const [phase, setPhase] = useState<Phase>(() =>
     initialCheckIn
-      ? { kind: 'recorded', checkIn: initialCheckIn, justSubmitted: false }
+      ? { kind: 'recorded', checkIn: initialCheckIn }
       : { kind: 'form', capacity: null, submitting: false, error: null },
   );
 
@@ -85,7 +84,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
         '/api/v1/check-ins',
         buildCheckInPayload(capacity, deviceTimeZone()),
       );
-      setPhase({ kind: 'recorded', checkIn, justSubmitted: true });
+      setPhase({ kind: 'recorded', checkIn });
       onSubmitted(checkIn);
     } catch (err) {
       const existing =
@@ -96,7 +95,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
       if (existing) {
         // Same-day duplicate: the backend already has today's check-in -
         // this isn't an error state, just the recorded state arriving late.
-        setPhase({ kind: 'recorded', checkIn: existing, justSubmitted: false });
+        setPhase({ kind: 'recorded', checkIn: existing });
         onSubmitted(existing);
       } else {
         setPhase({
@@ -121,7 +120,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
       );
       if (savedCheckInKind(saved) === 'primary') {
         // The server made it the day's primary (there was none): from here it is today's check-in.
-        setPhase({ kind: 'recorded', checkIn: saved, justSubmitted: true });
+        setPhase({ kind: 'recorded', checkIn: saved });
         onSubmitted(saved);
         return;
       }
@@ -130,7 +129,6 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
       setPhase({
         kind: 'recorded',
         checkIn: primary,
-        justSubmitted: false,
         notice: 'Additional check-in saved.',
       });
     } catch (err) {
@@ -174,9 +172,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
             style={styles.saveButton}
           />
           <Pressable
-            onPress={() =>
-              setPhase({ kind: 'recorded', checkIn: phase.primary, justSubmitted: false })
-            }
+            onPress={() => setPhase({ kind: 'recorded', checkIn: phase.primary })}
             disabled={phase.submitting}
             accessibilityRole="button"
             accessibilityLabel="Cancel"
@@ -197,7 +193,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
       <Surface>
         <Eyebrow />
         <ThemedText variant="heading" color={home.navy} style={styles.title}>
-          {phase.justSubmitted ? 'Check-in complete.' : "Today's check-in is recorded."}
+          Today&apos;s check-in is recorded.
         </ThemedText>
         {phase.checkIn.moodScore === phase.checkIn.capacityScore &&
         capacityOptionLabel(phase.checkIn.capacityScore) ? (
