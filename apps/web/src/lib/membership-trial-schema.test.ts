@@ -66,18 +66,23 @@ describe('migration 0012 (membership trial, payment grace and free content)', ()
     .map((s) => s.trim())
     .filter(Boolean);
 
+  // Later migrations (0013 and on) are appended after 0012, so 0012 is found by tag, not as "the last entry".
+  const entry12 = JOURNAL.entries.findIndex(
+    (e) => e.tag === '0012_add_membership_trial_grace_and_free_content',
+  );
+
   it('is registered in the journal after the migrations already on main (0010 and 0010a)', () => {
-    const last = JOURNAL.entries.at(-1);
-    expect(last).toMatchObject({
+    expect(entry12).toBeGreaterThan(0);
+    expect(JOURNAL.entries[entry12]).toMatchObject({
       idx: 12,
       tag: '0012_add_membership_trial_grace_and_free_content',
     });
-    expect(JOURNAL.entries.at(-2)?.tag).toBe('0010a_add_crm_outbox');
+    expect(JOURNAL.entries[entry12 - 1]?.tag).toBe('0010a_add_crm_outbox');
   });
 
   it('is dated after every earlier migration (drizzle skips a migration older than the last one applied)', () => {
-    const when = JOURNAL.entries.map((e) => e.when);
-    expect(when.at(-1)!).toBeGreaterThan(Math.max(...when.slice(0, -1)));
+    const earlier = JOURNAL.entries.slice(0, entry12).map((e) => e.when);
+    expect(JOURNAL.entries[entry12]!.when).toBeGreaterThan(Math.max(...earlier));
   });
 
   it('is purely additive: no drops, deletes, updates, renames or column rewrites', () => {
