@@ -42,6 +42,8 @@ export async function GET() {
         eq(checkIns.userId, user.id),
         gte(checkIns.completedAt, startOfDay),
         lte(checkIns.completedAt, endOfDay),
+        // Today's primary check-in only; additional check-ins never stand in for it.
+        eq(checkIns.isPrimary, true),
       ),
     )
     .limit(1);

@@ -1,11 +1,8 @@
 import { requireAuth } from '@/lib/auth-api';
-import { db, checkIns } from '@tnsi/db';
-import { eq, and } from 'drizzle-orm';
-import { getCheckInHistory } from '@/lib/check-ins';
+import { getCheckInHistory, recordCheckIn, toPublicCheckIn } from '@/lib/check-ins';
 import { checkInSchema, checkInsListQuerySchema } from '@/lib/validation';
 import { success, unauthorized, badRequest, internalError } from '@/lib/api-response';
 import { buildTimeZoneMetadata, describeRejectedTimeZone } from '@/lib/time-zone';
-import { toPublicCheckIn } from '@/lib/check-ins';
 import type { CheckIn } from '@tnsi/db/schema';
 
 export const runtime = 'nodejs';
@@ -31,6 +28,7 @@ function toCheckInSummary(checkIn: CheckIn) {
     capacityScore: checkIn.capacityScore,
     notes: checkIn.notes,
     completedAt: checkIn.completedAt,
+    isPrimary: checkIn.isPrimary,
   };
 }
 
@@ -90,47 +88,25 @@ export async function POST(request: Request) {
 
   const { moodScore, capacityScore, notes, completedAt, timeZone } = result.data;
 
-  const now = new Date();
-  const completedAtDate = completedAt ? new Date(completedAt) : now;
-  const completedDate = new Date(
-    completedAtDate.getFullYear(),
-    completedAtDate.getMonth(),
-    completedAtDate.getDate(),
-  );
+  const completedAtDate = completedAt ? new Date(completedAt) : new Date();
 
   // Phase 1 of member-local days: RECORD the reported zone (validated, with the server-computed local
-  // date and offset) in metadata. It changes nothing about which day this check-in belongs to:
-  // `completedDate` above is still the server's calendar day. An unusable zone is just not recorded.
+  // date and offset) in metadata. It changes nothing about which day this check-in belongs to: the
+  // day is still the server's calendar day (see recordCheckIn). An unusable zone is just not recorded.
   const { metadata, rejected } = buildTimeZoneMetadata(timeZone, completedAtDate);
   if (rejected) {
     console.warn(`check-in time zone not recorded: ${describeRejectedTimeZone(timeZone)}`);
   }
 
-  // Check if check-in already exists for today
-  const existing = await db
-    .select()
-    .from(checkIns)
-    .where(and(eq(checkIns.userId, user.id), eq(checkIns.completedDate, completedDate)))
-    .limit(1);
+  // The first check-in of the day is the primary; any further one is saved as an additional record
+  // (see recordCheckIn), carrying the same metadata. A repeat never fails and never replaces the primary.
+  const checkIn = await recordCheckIn(user.id, {
+    moodScore,
+    capacityScore,
+    notes: notes ?? null,
+    completedAt: completedAtDate,
+    metadata,
+  });
 
-  if (existing[0]) {
-    return badRequest('Check-in already exists for this date', {
-      checkIn: toPublicCheckIn(existing[0]),
-    });
-  }
-
-  const [checkIn] = await db
-    .insert(checkIns)
-    .values({
-      userId: user.id,
-      moodScore,
-      capacityScore,
-      notes: notes ?? null,
-      completedAt: completedAtDate,
-      completedDate,
-      metadata,
-    })
-    .returning();
-
-  return success(toPublicCheckIn(checkIn!), 201);
+  return success(toPublicCheckIn(checkIn), 201);
 }

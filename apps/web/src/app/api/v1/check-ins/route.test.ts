@@ -6,7 +6,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * recorder, so this proves the route's own rules, not SQL.
  */
 const state = vi.hoisted(() => ({
-  existing: [] as Record<string, unknown>[],
+  /** Whether a primary check-in already exists for the day (the guarded insert then does nothing). */
+  primaryExists: false,
   inserted: [] as Record<string, unknown>[],
 }));
 
@@ -15,17 +16,28 @@ vi.mock('@/lib/auth-api', () => ({
 }));
 
 vi.mock('@tnsi/db', () => ({
-  checkIns: { userId: 'userId', completedDate: 'completedDate' },
+  checkIns: { userId: 'userId', completedDate: 'completedDate', isPrimary: 'isPrimary' },
   db: {
-    select: () => ({ from: () => ({ where: () => ({ limit: async () => state.existing }) }) }),
-    insert: () => ({
-      values: (values: Record<string, unknown>) => ({
-        returning: async () => {
-          state.inserted.push(values);
-          return [{ id: 'new-id', createdAt: new Date(), ...values }];
+    insert: () => {
+      let values: Record<string, unknown> = {};
+      let guarded = false;
+      const chain = {
+        values: (v: Record<string, unknown>) => {
+          values = v;
+          return chain;
         },
-      }),
-    }),
+        onConflictDoNothing: () => {
+          guarded = true;
+          return chain;
+        },
+        returning: async () => {
+          if (guarded && state.primaryExists) return []; // a primary already exists: nothing inserted
+          state.inserted.push(values);
+          return [{ id: `row-${state.inserted.length}`, createdAt: new Date(), ...values }];
+        },
+      };
+      return chain;
+    },
   },
 }));
 
@@ -44,7 +56,7 @@ function post(body: Record<string, unknown>) {
 }
 
 beforeEach(() => {
-  state.existing = [];
+  state.primaryExists = false;
   state.inserted = [];
   vi.restoreAllMocks();
 });
@@ -147,22 +159,53 @@ describe('POST /api/v1/check-ins: time zone recording', () => {
     expect(text).toContain('"metadata":{}');
   });
 
-  it('does not expose a previously recorded zone on the duplicate (400) path either', async () => {
-    state.existing = [
-      {
-        id: 'old',
-        moodScore: 3,
-        capacityScore: 3,
-        metadata: { timeZone: 'America/New_York', localDate: '2026-07-01', utcOffsetMinutes: -240 },
-      },
-    ];
-    const res = await post({ moodScore: 3, capacityScore: 2, timeZone: 'Europe/London' });
-    expect(res.status).toBe(400);
+  it('stores the same time zone metadata on an additional check-in as on the primary', async () => {
+    const body = { moodScore: 3, capacityScore: 2, completedAt: AT, timeZone: 'Europe/London' };
+    await post(body); // primary
+    state.primaryExists = true;
+    const res = await post({ ...body, capacityScore: 5 }); // additional, same day
+    expect(res.status).toBe(201);
+    expect(state.inserted).toHaveLength(2);
+    expect(state.inserted[0]).toMatchObject({ isPrimary: true });
+    expect(state.inserted[1]).toMatchObject({ isPrimary: false, capacityScore: 5 });
+    expect(state.inserted[1]!.metadata).toEqual(state.inserted[0]!.metadata);
+    expect(state.inserted[1]!.metadata).toEqual({
+      timeZone: 'Europe/London',
+      localDate: '2026-07-02',
+      utcOffsetMinutes: 60,
+    });
+  });
+
+  it('an additional check-in without a usable zone is still saved, without time zone data', async () => {
+    state.primaryExists = true;
+    for (const extra of [{}, { timeZone: 'Nowhere/Land' }, { timeZone: 42 }]) {
+      const res = await post({ moodScore: 3, capacityScore: 2, completedAt: AT, ...extra });
+      expect(res.status).toBe(201);
+    }
+    expect(state.inserted).toHaveLength(3);
+    expect(state.inserted.every((row) => row.isPrimary === false)).toBe(true);
+    expect(state.inserted.every((row) => JSON.stringify(row.metadata) === '{}')).toBe(true);
+  });
+
+  it('a client that sends no time zone at all (an older build) works exactly as before', async () => {
+    const res = await post({ moodScore: 3, capacityScore: 2 });
+    expect(res.status).toBe(201);
+    expect(state.inserted[0]).toMatchObject({ userId: 'user-1', moodScore: 3, isPrimary: true });
+    expect(state.inserted[0]!.metadata).toEqual({});
+  });
+
+  it('never exposes timezone information on an additional check-in response either', async () => {
+    state.primaryExists = true;
+    const res = await post({
+      moodScore: 3,
+      capacityScore: 2,
+      completedAt: AT,
+      timeZone: 'Europe/London',
+    });
     const text = JSON.stringify(await res.json());
-    expect(text).toContain('Check-in already exists for this date');
-    expect(text).toContain('"id":"old"');
-    expect(text).not.toContain('America/New_York');
-    expect(state.inserted).toHaveLength(0);
+    expect(text).not.toContain('Europe/London');
+    expect(text).not.toContain('localDate');
+    expect(text).toContain('"metadata":{}');
   });
 
   it('still rejects genuinely invalid answers with the same validation error', async () => {
