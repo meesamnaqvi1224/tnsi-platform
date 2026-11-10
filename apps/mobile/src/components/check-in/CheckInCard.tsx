@@ -10,7 +10,7 @@ import { humanizeApiError } from '@/lib/api-errors';
 import { buildCheckInPayload, deviceTimeZone } from '@/lib/check-in-payload';
 import { canCheckInAgain, savedCheckInKind } from '@/lib/additional-check-in';
 import { home } from '@/components/home/homeTheme';
-import { colors, fontFamily, spacing, linkHitSlop } from '@/theme';
+import { colors, fontFamily, spacing, linkHitSlop, linkTouchTarget } from '@/theme';
 import { ApiRequestError, type CheckIn } from '@/api/types';
 
 type Phase =
@@ -177,6 +177,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
             accessibilityRole="button"
             accessibilityLabel="Cancel"
             hitSlop={linkHitSlop}
+            style={linkTouchTarget}
           >
             <ThemedText variant="label" color={home.bronze}>
               Cancel
@@ -236,6 +237,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
             onPress={() => router.push('/profile/progress')}
             accessibilityRole="link"
             hitSlop={linkHitSlop}
+            style={linkTouchTarget}
             accessibilityLabel="View check-in history"
           >
             <ThemedText variant="label" color={home.bronze}>
@@ -256,6 +258,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
               accessibilityRole="button"
               accessibilityLabel="Check in again"
               hitSlop={linkHitSlop}
+              style={linkTouchTarget}
             >
               <ThemedText variant="label" color={home.bronze}>
                 Check in again
@@ -313,6 +316,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
               onPress={() => router.push('/profile/progress')}
               accessibilityRole="link"
               hitSlop={linkHitSlop}
+              style={linkTouchTarget}
               accessibilityLabel="View check-in history"
             >
               <ThemedText variant="label" color={home.bronze}>
@@ -332,6 +336,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
             onPress={() => router.push('/profile/progress')}
             accessibilityRole="link"
             hitSlop={linkHitSlop}
+            style={linkTouchTarget}
             accessibilityLabel="View check-in history"
           >
             <ThemedText variant="label" color={home.bronze}>

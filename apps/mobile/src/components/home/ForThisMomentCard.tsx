@@ -129,10 +129,9 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: spacing.xl,
   },
+  // A plain block, not a row: as a row child the title was sized to its own measured width, and on
+  // Android that width could come out a hair short so "today" wrapped onto a clipped second line.
   headerRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
     marginBottom: spacing.md,
   },
   sectionTitle: {

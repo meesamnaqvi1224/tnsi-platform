@@ -5,7 +5,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { conditionsOf } from '@/lib/conditions';
 import { formatDuration } from '@/lib/format';
-import { linkHitSlop, spacing } from '@/theme';
+import { linkHitSlop, linkTouchTarget, spacing } from '@/theme';
 import { home, homeCardStyle } from './homeTheme';
 import type { Practice } from '@/api/types';
 
@@ -79,7 +79,7 @@ export function RecommendationExtras({
 const styles = StyleSheet.create({
   wrap: { marginTop: -spacing.md, marginBottom: spacing.xl },
   why: { marginBottom: spacing.md },
-  link: { marginTop: spacing.md, alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' },
+  link: { ...linkTouchTarget, marginTop: spacing.md, alignSelf: 'flex-start' },
   alt: {
     ...homeCardStyle,
     backgroundColor: home.page,
