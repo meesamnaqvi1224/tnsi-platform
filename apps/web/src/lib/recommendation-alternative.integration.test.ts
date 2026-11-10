@@ -68,8 +68,10 @@ async function checkInToday(userId: string, capacityScore: number) {
   });
 }
 
+// Every query is a network round trip to a hosted database, so these tests need far more than vitest's 5 s default.
 describe.skipIf(!enabled)(
   'alternative recommendation and progress summary on real PostgreSQL',
+  { timeout: 120_000 },
   () => {
     beforeAll(async () => {
       process.env.DATABASE_URL = TEST_URL!;
