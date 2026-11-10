@@ -3,6 +3,14 @@ import { eq, and, desc } from 'drizzle-orm';
 import type { CheckIn } from '@tnsi/db/schema';
 
 /**
+ * A check-in row as the API returns it: `metadata` is internal (it can hold the member's recorded time
+ * zone), so it is always sent as the empty object it was before, never its real contents.
+ */
+export function toPublicCheckIn<T extends { metadata: unknown }>(checkIn: T): T {
+  return { ...checkIn, metadata: {} };
+}
+
+/**
  * Today's check-in for a user, if one exists.
  *
  * Computes "today" the same way `POST /api/v1/check-ins` does when checking

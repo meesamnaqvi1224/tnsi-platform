@@ -12,6 +12,7 @@ import { db, checkIns, practices, practiceCompletions } from '@tnsi/db';
 import { eq, and, inArray, gte, lte, desc } from 'drizzle-orm';
 import { success } from '@/lib/api-response';
 import { getRecommendedPractice } from '@/lib/practices';
+import { toPublicCheckIn } from '@/lib/check-ins';
 import { contentAccessFor, withPracticeAccess } from '@/lib/membership';
 
 export const runtime = 'nodejs';
@@ -139,7 +140,7 @@ export async function GET() {
 
   return success({
     date: startOfDay.toISOString().split('T')[0],
-    checkIn: todayCheckIn[0] ?? null,
+    checkIn: todayCheckIn[0] ? toPublicCheckIn(todayCheckIn[0]) : null,
     practices: practicesWithProgress,
     todayPractice,
   });

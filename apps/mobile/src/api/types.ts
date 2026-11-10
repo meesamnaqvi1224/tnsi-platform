@@ -71,6 +71,8 @@ export interface CheckInInput {
   moodScore: number;
   capacityScore: number;
   notes?: string;
+  /** The device's IANA time zone identifier only; the server validates it and derives everything else. */
+  timeZone?: string;
 }
 
 /**
