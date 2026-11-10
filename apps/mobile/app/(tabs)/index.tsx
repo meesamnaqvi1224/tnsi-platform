@@ -76,6 +76,10 @@ export default function HomeScreen() {
           <>
             <Animated.View entering={FadeInDown.duration(450)} style={styles.checkInSection}>
               <CheckInCard
+                // The card reads its starting state once, so it is rebuilt whenever today's check-in
+                // changes. Without this, a new day (no check-in today after a refetch) would still
+                // show yesterday's "Check-in complete" with no way to check in.
+                key={state.data.checkIn?.id ?? 'no-check-in-today'}
                 initialCheckIn={state.data.checkIn}
                 onSubmitted={handleCheckInSubmitted}
               />
