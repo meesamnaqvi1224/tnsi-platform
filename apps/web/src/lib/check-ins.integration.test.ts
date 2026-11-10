@@ -67,7 +67,8 @@ async function newPractice(title: string, category: string, extra: Record<string
   return row!;
 }
 
-describe.skipIf(!enabled)('daily check-ins on real PostgreSQL', () => {
+// Every query is a network round trip to a hosted database, so these tests need far more than vitest's 5 s default.
+describe.skipIf(!enabled)('daily check-ins on real PostgreSQL', { timeout: 120_000 }, () => {
   beforeAll(async () => {
     process.env.DATABASE_URL = TEST_URL!;
     const dbMod = await import('@tnsi/db');
