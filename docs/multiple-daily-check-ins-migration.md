@@ -151,6 +151,26 @@ Set `TNSI_TEST_DATABASE_URL` and `TNSI_TEST_DATABASE_ENDPOINT` in your terminal,
 
 Run only those files: with the variable set, the repository's other database-gated suites would also run.
 
+### Finding: an existing schema with an empty drizzle ledger
+
+The isolated Neon branch used for rehearsal had every table at the 0012 state, no rows, and an empty
+`drizzle.__drizzle_migrations`. `drizzle-kit migrate` then replays from 0000 and fails (for example on
+`users.deleted_at already exists`), changing nothing because the whole run is one transaction. drizzle
+applies only migrations whose journal timestamp is newer than the **latest ledger row**, so one baseline row
+for 0012 (its file hash and journal timestamp) is enough for it to apply only 0013.
+
+- `packages/db/scripts/inspect-test-database.mjs`: read-only, prints the ledger count, table names and row
+  counts (never row contents).
+- `packages/db/scripts/baseline-test-database.mjs`: dry run by default; `--apply` inserts the single 0012
+  ledger row. Refuses production, refuses unless the ledger is empty, the 0012-era tables exist and
+  `check_ins.is_primary` is absent. Rehearsed locally on a replica of this state (migrate fails; baseline;
+  migrate applies only 0013; verification passes).
+
+**Production implication:** the production ledger state is unverified. If it is empty or behind in the same
+way, `drizzle-kit migrate` on production would fail or replay old migrations. Check it read-only before any
+production migration (`select count(*), max(created_at) from drizzle.__drizzle_migrations`), and baseline it
+the same way with explicit approval.
+
 ## 6. Verification SQL (run on the rehearsal branch, then on production after approval)
 
 ```sql
