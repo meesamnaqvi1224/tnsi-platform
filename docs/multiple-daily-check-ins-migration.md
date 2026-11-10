@@ -43,6 +43,11 @@ or the recommendation. It appears in check-in history, My Progress (labelled "Ad
 and My Journey like any other record. `POST /api/v1/check-ins` no longer answers 400 for a second
 check-in the same day; it returns 201 with `isPrimary` in the body.
 
+Time zone metadata (Phase 1, already on `main`): `recordCheckIn` takes the optional metadata and stores
+it identically on the primary and on any additional record, so an additional check-in never loses the
+member's recorded time zone. A missing or invalid zone stores `{}` and the check-in is still saved.
+API responses never contain it (`metadata` is always returned as `{}`).
+
 What is deliberately not part of this change: the "check in again" control in the apps. That is UI
 and follows once this is approved and applied.
 
