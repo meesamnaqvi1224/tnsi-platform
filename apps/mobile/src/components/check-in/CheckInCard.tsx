@@ -7,6 +7,7 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { CapacityOptionList, capacityOptionLabel } from './CapacityOptionList';
 import { useApiClient } from '@/hooks/useApiClient';
 import { humanizeApiError } from '@/lib/api-errors';
+import { buildCheckInPayload, deviceTimeZone } from '@/lib/check-in-payload';
 import { home } from '@/components/home/homeTheme';
 import { colors, fontFamily, spacing, linkHitSlop } from '@/theme';
 import { ApiRequestError, type CheckIn } from '@/api/types';
@@ -65,10 +66,10 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
     setPhase({ ...phase, submitting: true, error: null });
 
     try {
-      const checkIn = await api.post<CheckIn>('/api/v1/check-ins', {
-        moodScore: capacity,
-        capacityScore: capacity,
-      });
+      const checkIn = await api.post<CheckIn>(
+        '/api/v1/check-ins',
+        buildCheckInPayload(capacity, deviceTimeZone()),
+      );
       setPhase({ kind: 'recorded', checkIn, justSubmitted: true });
       onSubmitted(checkIn);
     } catch (err) {

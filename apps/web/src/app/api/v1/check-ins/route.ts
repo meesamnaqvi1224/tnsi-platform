@@ -4,6 +4,8 @@ import { eq, and } from 'drizzle-orm';
 import { getCheckInHistory } from '@/lib/check-ins';
 import { checkInSchema, checkInsListQuerySchema } from '@/lib/validation';
 import { success, unauthorized, badRequest, internalError } from '@/lib/api-response';
+import { buildTimeZoneMetadata, describeRejectedTimeZone } from '@/lib/time-zone';
+import { toPublicCheckIn } from '@/lib/check-ins';
 import type { CheckIn } from '@tnsi/db/schema';
 
 export const runtime = 'nodejs';
@@ -86,7 +88,7 @@ export async function POST(request: Request) {
     return badRequest('Validation failed', { errors: result.error.flatten().fieldErrors });
   }
 
-  const { moodScore, capacityScore, notes, completedAt } = result.data;
+  const { moodScore, capacityScore, notes, completedAt, timeZone } = result.data;
 
   const now = new Date();
   const completedAtDate = completedAt ? new Date(completedAt) : now;
@@ -95,6 +97,14 @@ export async function POST(request: Request) {
     completedAtDate.getMonth(),
     completedAtDate.getDate(),
   );
+
+  // Phase 1 of member-local days: RECORD the reported zone (validated, with the server-computed local
+  // date and offset) in metadata. It changes nothing about which day this check-in belongs to:
+  // `completedDate` above is still the server's calendar day. An unusable zone is just not recorded.
+  const { metadata, rejected } = buildTimeZoneMetadata(timeZone, completedAtDate);
+  if (rejected) {
+    console.warn(`check-in time zone not recorded: ${describeRejectedTimeZone(timeZone)}`);
+  }
 
   // Check if check-in already exists for today
   const existing = await db
@@ -105,7 +115,7 @@ export async function POST(request: Request) {
 
   if (existing[0]) {
     return badRequest('Check-in already exists for this date', {
-      checkIn: existing[0],
+      checkIn: toPublicCheckIn(existing[0]),
     });
   }
 
@@ -118,8 +128,9 @@ export async function POST(request: Request) {
       notes: notes ?? null,
       completedAt: completedAtDate,
       completedDate,
+      metadata,
     })
     .returning();
 
-  return success(checkIn, 201);
+  return success(toPublicCheckIn(checkIn!), 201);
 }

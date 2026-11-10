@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Alert, Button, Label, Stack, Text, Textarea } from '@tnsi/ui';
+import { browserTimeZone, buildCheckInBody } from '@/lib/check-in-request';
 
 const SCALE = [1, 2, 3, 4, 5] as const;
 
@@ -100,11 +101,12 @@ export function CheckInForm() {
       const response = await fetch('/api/v1/check-ins', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          moodScore: mood,
-          capacityScore: capacity,
-          notes: notes.trim() || undefined,
-        }),
+        body: JSON.stringify(
+          buildCheckInBody(
+            { moodScore: mood, capacityScore: capacity, notes: notes.trim() || undefined },
+            browserTimeZone(),
+          ),
+        ),
       });
 
       if (response.ok) {

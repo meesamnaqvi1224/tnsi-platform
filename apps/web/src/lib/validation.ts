@@ -9,6 +9,12 @@ export const checkInSchema = z.object({
   capacityScore: z.number().int().min(1).max(5),
   notes: z.string().max(2000).optional(),
   completedAt: z.string().datetime().optional(),
+  /**
+   * The IANA time zone the member's device reported. Deliberately accepts anything (`unknown`): an
+   * invalid or missing zone must never stop a check-in being saved, so it is validated separately in
+   * `lib/time-zone.ts` and simply not recorded when unusable.
+   */
+  timeZone: z.unknown().optional(),
 });
 
 export type CheckInInput = z.infer<typeof checkInSchema>;
