@@ -91,6 +91,29 @@ Rolling back the database also requires rolling back the application code first 
 `is_primary`). Also remove the `0013` row from `drizzle.__drizzle_migrations` and the journal entry
 if the migration is to be re-run later.
 
+## 5a. Rehearsal script
+
+`packages/db/scripts/rehearse-check-ins-migration.mjs` rehearses everything above on an isolated
+database. It reads only `TNSI_TEST_DATABASE_URL` from your shell (never a `.env` file), prints no
+credentials, and refuses to run unless the target is positively identified as isolated: not the
+production endpoint, not the same endpoint as `DATABASE_URL`/`DATABASE_URL_UNPOOLED` if those are set,
+and either localhost or a Neon host whose endpoint id you also declare in
+`TNSI_TEST_DATABASE_ENDPOINT`. It works only inside a throwaway schema it creates and drops, so it
+never touches an existing table.
+
+```bash
+TNSI_TEST_DATABASE_URL='<isolated database url>' \
+TNSI_TEST_DATABASE_ENDPOINT='<ep-... id of that database>' \
+  node packages/db/scripts/rehearse-check-ins-migration.mjs --check-target   # identify only
+# then, without --check-target, for the full rehearsal
+```
+
+It covers: existing rows, the real `0013` file, the verification SQL, an idempotent re-apply, one
+primary plus several additional check-ins (and a six-at-once burst), the recommendation staying on the
+primary, existing rows byte-identical, rollback with additional rows present, re-apply, and the
+lossless rollback. Exit code 0 only if every check passes. It has been run against a local PostgreSQL 18
+engine (37/37); it has not yet been run on a Neon branch.
+
 ## 6. Verification SQL (run on the rehearsal branch, then on production after approval)
 
 ```sql
