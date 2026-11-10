@@ -138,6 +138,19 @@ The concurrency test must run on Neon. A single-session local engine cannot inte
 queries and may opt out with `TNSI_TEST_SKIP_CONCURRENCY=yes`; that opt-out is ignored for any `.neon.tech`
 target, so a Neon run always executes it. The test creates its own member and practices and deletes them.
 
+### Neon verification sequence (isolated database, no production)
+
+Set `TNSI_TEST_DATABASE_URL` and `TNSI_TEST_DATABASE_ENDPOINT` in your terminal, then:
+
+1. `node packages/db/scripts/verify-check-ins-migration.mjs` (read-only) confirms 0013 is applied on that
+   database; every line must be PASS. Same refusal rules as the rehearsal script.
+2. `cd apps/web && TZ=UTC node_modules/.bin/vitest run src/lib/check-ins.integration.test.ts`, with the
+   concurrency test running (do not set `TNSI_TEST_SKIP_CONCURRENCY`; it is ignored on Neon anyway).
+3. For the alternative recommendation and progress summary (PR #47's code), from a checkout that contains
+   #47: `TZ=UTC node_modules/.bin/vitest run src/lib/recommendation-alternative.integration.test.ts`.
+
+Run only those files: with the variable set, the repository's other database-gated suites would also run.
+
 ## 6. Verification SQL (run on the rehearsal branch, then on production after approval)
 
 ```sql
