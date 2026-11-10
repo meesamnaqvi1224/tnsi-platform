@@ -62,6 +62,8 @@ export interface CheckIn {
   notes: string | null;
   completedAt: string;
   completedDate: string;
+  /** The first check-in of the day (drives the recommendation); further same-day check-ins are false. Absent from older servers. */
+  isPrimary?: boolean;
   metadata: unknown;
   createdAt: string;
 }
