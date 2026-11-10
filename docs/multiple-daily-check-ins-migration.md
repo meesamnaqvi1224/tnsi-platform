@@ -119,6 +119,25 @@ primary, existing rows byte-identical, rollback with additional rows present, re
 lossless rollback. Exit code 0 only if every check passes. It has been run against a local PostgreSQL 18
 engine (37/37); it has not yet been run on a Neon branch.
 
+## 5b. Real-database integration test (run on Neon before approval)
+
+`apps/web/src/lib/check-ins.integration.test.ts` runs the app's own check-in code (`recordCheckIn`,
+`getTodayCheckIn`, `getLatestCheckIn`, `getCheckInHistory`, `getRecommendedPractice`) against a real
+database: primary vs additional flags, identical metadata on both, today/latest/recommendation following
+the primary, history order and paging, and **six simultaneous first check-ins giving exactly one
+primary**. It is skipped unless `TNSI_TEST_DATABASE_URL` is set and refuses the production host. Run it on
+the isolated Neon database, after migration 0013 is applied there, with the server day pinned to UTC:
+
+```bash
+cd apps/web
+TZ=UTC TNSI_TEST_DATABASE_URL='<isolated database url>' \
+  node_modules/.bin/vitest run src/lib/check-ins.integration.test.ts
+```
+
+The concurrency test must run on Neon. A single-session local engine cannot interleave simultaneous
+queries and may opt out with `TNSI_TEST_SKIP_CONCURRENCY=yes`; that opt-out is ignored for any `.neon.tech`
+target, so a Neon run always executes it. The test creates its own member and practices and deletes them.
+
 ## 6. Verification SQL (run on the rehearsal branch, then on production after approval)
 
 ```sql
