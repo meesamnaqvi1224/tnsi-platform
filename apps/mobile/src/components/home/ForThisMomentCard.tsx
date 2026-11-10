@@ -2,11 +2,10 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
-import { PrimaryButton } from '@/components/PrimaryButton';
 import { stockImageFor } from '@/components/practices/PracticeThumbnail';
 import { formatDuration } from '@/lib/format';
 import { categoryLabel } from '@/lib/practice-library';
-import { fontFamily, linkHitSlop, spacing } from '@/theme';
+import { fontFamily, spacing } from '@/theme';
 import { home } from './homeTheme';
 import type { Practice } from '@/api/types';
 
@@ -39,18 +38,8 @@ export function ForThisMomentCard({ practice, hasCheckedInToday }: ForThisMoment
   const header = (
     <View style={styles.headerRow}>
       <ThemedText variant="display" color={home.navy} style={styles.sectionTitle}>
-        For this moment
+        Your practice for today
       </ThemedText>
-      <Pressable
-        onPress={() => router.push('/practices')}
-        accessibilityRole="link"
-        accessibilityLabel="Browse practices"
-        hitSlop={linkHitSlop}
-      >
-        <ThemedText variant="label" color={home.bronze} style={styles.browse}>
-          Browse practices →
-        </ThemedText>
-      </Pressable>
     </View>
   );
 
@@ -67,14 +56,8 @@ export function ForThisMomentCard({ practice, hasCheckedInToday }: ForThisMoment
             <ThemedText variant="caption" color={home.ink} style={styles.description}>
               {hasCheckedInToday
                 ? 'No practice is available today.'
-                : "Complete today's check-in above to see a practice for this moment."}
+                : "Complete today's check-in to see a practice for this moment."}
             </ThemedText>
-            <PrimaryButton
-              label="Browse practices"
-              variant="secondary"
-              onPress={() => router.push('/practices')}
-              style={styles.emptyButton}
-            />
           </View>
         </View>
       </View>
@@ -157,9 +140,6 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     fontFamily: fontFamily.serif,
   },
-  browse: {
-    letterSpacing: 0.2,
-  },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -218,11 +198,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
-  },
-  emptyButton: {
-    marginTop: spacing.sm,
-    alignSelf: 'flex-start',
-    minHeight: 44,
-    paddingHorizontal: spacing.md,
   },
 });

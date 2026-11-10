@@ -242,6 +242,13 @@ export interface TodayResponse {
    * substituted).
    */
   todayPractice: Practice | null;
+  /** One optional alternative from the same category as `todayPractice`; absent from older servers. */
+  alternativePractice?: Practice | null;
+  /** Observable engagement for Home's progress widget (completed sessions, latest one); absent from older servers. */
+  progressSummary?: {
+    completedSessions: number;
+    lastCompleted: { practiceId: string; title: string; completedAt: string } | null;
+  };
 }
 
 /** Response shape of GET /api/v1/practices, per apps/web/src/app/api/v1/practices/route.ts. */

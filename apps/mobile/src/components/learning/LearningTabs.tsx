@@ -8,6 +8,7 @@ const LABELS: Record<LearningView, string> = {
   'in-progress': 'In Progress',
   completed: 'Completed',
   saved: 'Saved',
+  'check-ins': 'Check-ins',
 };
 
 interface LearningTabsProps {
@@ -36,7 +37,12 @@ export function LearningTabs({ selected, onSelect, counts = {} }: LearningTabsPr
             accessibilityLabel={count === undefined ? LABELS[view] : `${LABELS[view]}, ${count}`}
             style={[styles.tab, active && styles.tabActive]}
           >
-            <ThemedText variant="label" color={active ? home.navy : home.ink} style={styles.label}>
+            <ThemedText
+              variant="label"
+              color={active ? home.navy : home.ink}
+              style={styles.label}
+              numberOfLines={1}
+            >
               {LABELS[view]}
             </ThemedText>
             {count !== undefined ? (
@@ -65,10 +71,11 @@ const styles = StyleSheet.create({
   tab: {
     flex: 1,
     minHeight: 48,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
+    gap: 2,
+    paddingHorizontal: 2,
     // The underline of the selected tab sits on the bar's own hairline.
     marginBottom: -StyleSheet.hairlineWidth,
     borderBottomWidth: 2,
@@ -79,6 +86,9 @@ const styles = StyleSheet.create({
   },
   label: {
     textTransform: 'uppercase',
+    fontSize: 11,
+    letterSpacing: 0.3,
+    textAlign: 'center',
   },
   count: {
     minWidth: 12,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { useUser } from '@clerk/clerk-expo';
 import { useFocusEffect } from 'expo-router';
@@ -6,11 +6,10 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { ScreenContainer, ErrorNotice, ThemedText, Card } from '@/components';
 import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import { ForThisMomentCard } from '@/components/home/ForThisMomentCard';
-import { ContinuePractiseCard } from '@/components/home/ContinuePractiseCard';
-import { WeekAtAGlance } from '@/components/home/WeekAtAGlance';
-import { ExploreGrid } from '@/components/home/ExploreGrid';
 import { QuoteBlock } from '@/components/home/QuoteBlock';
 import { ClosingStatementCard } from '@/components/home/ClosingStatementCard';
+import { RecommendationExtras } from '@/components/home/RecommendationExtras';
+import { HomeProgressWidget } from '@/components/home/HomeProgressWidget';
 import { HomeSkeleton } from '@/components/home/HomeSkeleton';
 import { CheckInCard } from '@/components/check-in/CheckInCard';
 import { LifeBeyondTraumaCard } from '@/components/home/LifeBeyondTraumaCard';
@@ -21,35 +20,14 @@ import { useToday } from '@/hooks/useToday';
 import { practiceForToday } from '@/lib/check-in-day';
 import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { colors, spacing } from '@/theme';
-import type { CheckIn, Practice } from '@/api/types';
+import type { CheckIn } from '@/api/types';
 
 /**
- * Home: a calm daily orientation, not a dashboard. Fetches GET
- * /api/v1/today once; the only other network calls this screen makes are
- * the check-in submission (owned by CheckInCard) and two already-existing
- * hooks reused as-is (`useCheckInHistory` inside WeekAtAGlance). No fabricated content, no
- * gamification, no aggregate "progress" score, no new APIs.
- *
- * "Continue" is derived client-side from the same `/api/v1/today` response
- * already fetched (that endpoint returns up to ten published practices with
- * this member's own progress attached) - no second practices fetch. Same
- * in-progress definition as my-learning.tsx: not completed, progressPct
- * strictly between 0 and 1. Completed and saved practices live in My Learning,
- * not here; "Explore" is a single list of ways into each library.
+ * Home: check in, get one practice for the moment, see a small record of what you have done. Fetches
+ * GET /api/v1/today (the check-in, the recommendation and its alternative, and a progress summary).
+ * Before today's check-in there is no recommendation: Home invites the check-in. Practices are not
+ * browsable from here; they arrive through the recommendation and through Human Expansion Theory.
  */
-function findContinueCandidate(practices: Practice[], excludeId: string | undefined) {
-  const candidates = practices.filter((p) => {
-    if (p.id === excludeId) return false;
-    const pct = p.progress?.progressPct ?? 0;
-    return !p.progress?.completed && pct > 0 && pct < 1 && p.progress?.lastPlayedAt;
-  });
-  if (candidates.length === 0) return null;
-  return candidates.sort(
-    (a, b) =>
-      new Date(b.progress!.lastPlayedAt!).getTime() - new Date(a.progress!.lastPlayedAt!).getTime(),
-  )[0];
-}
-
 export default function HomeScreen() {
   const { user } = useUser();
   const { state, reload, setCheckIn, refresh } = useToday();
@@ -85,11 +63,6 @@ export default function HomeScreen() {
     state.status === 'success'
       ? practiceForToday(state.data.checkIn, state.data.todayPractice)
       : null;
-  const continueCandidate = useMemo(() => {
-    if (state.status !== 'success') return null;
-    return findContinueCandidate(state.data.practices, todayPractice?.id);
-  }, [state, todayPractice?.id]);
-
   return (
     <ScreenContainer scroll inTabs background={home.page}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -108,17 +81,26 @@ export default function HomeScreen() {
               />
             </Animated.View>
 
-            <ForThisMomentCard practice={todayPractice} hasCheckedInToday={!!state.data.checkIn} />
+            {state.data.checkIn ? (
+              <>
+                <ForThisMomentCard practice={todayPractice} hasCheckedInToday />
+                {todayPractice ? (
+                  <RecommendationExtras
+                    primary={todayPractice}
+                    alternative={practiceForToday(
+                      state.data.checkIn,
+                      state.data.alternativePractice,
+                    )}
+                  />
+                ) : null}
+              </>
+            ) : null}
 
-            {continueCandidate ? <ContinuePractiseCard practice={continueCandidate} /> : null}
+            <HomeProgressWidget data={state.data} recommended={todayPractice} />
           </>
         )}
 
         <AssessmentEntryCard />
-
-        <WeekAtAGlance />
-
-        <ExploreGrid />
 
         <QuoteBlock />
 

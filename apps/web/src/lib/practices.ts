@@ -1,6 +1,6 @@
 import { db, practices, practiceCompletions, practiceReflections, practiceSaves } from '@tnsi/db';
 import { eq, and, desc, gt, count, countDistinct, inArray } from 'drizzle-orm';
-import { categoryForCapacityScore, pickDeterministicCandidate } from '@tnsi/core';
+import { categoryForCapacityScore, pickDeterministicCandidates } from '@tnsi/core';
 import { getLatestCheckIn } from './check-ins';
 import { paginateRows } from './practice-sessions';
 import type { PracticeReflection as PracticeReflectionRow } from '@tnsi/db/schema';
@@ -122,8 +122,21 @@ export async function getRecommendedPractice(
   userId: string,
   options: { freeOnly?: boolean } = {},
 ): Promise<PracticeSummary | null> {
+  return (await getRecommendedPractices(userId, options)).primary;
+}
+
+/**
+ * The primary recommendation plus one optional alternative, from the same
+ * mapped category and in the same deterministic order (see
+ * `pickDeterministicCandidates`). Same routing as `getRecommendedPractice`,
+ * nothing added: the alternative is just the next practice in that category.
+ */
+export async function getRecommendedPractices(
+  userId: string,
+  options: { freeOnly?: boolean } = {},
+): Promise<{ primary: PracticeSummary | null; alternative: PracticeSummary | null }> {
   const latestCheckIn = await getLatestCheckIn(userId);
-  if (!latestCheckIn) return null;
+  if (!latestCheckIn) return { primary: null, alternative: null };
 
   const category = categoryForCapacityScore(latestCheckIn.capacityScore);
 
@@ -138,7 +151,43 @@ export async function getRecommendedPractice(
       ),
     );
 
-  return pickDeterministicCandidate(candidates);
+  const [primary = null, alternative = null] = pickDeterministicCandidates(candidates, 2);
+  return { primary, alternative };
+}
+
+/**
+ * Observable engagement only, for Home's compact progress widget: how many
+ * completed sessions this member has (a repeat is its own session) and the
+ * most recent one. Not a score and not a claim about any outcome.
+ */
+export async function getPracticeProgressSummary(userId: string): Promise<{
+  completedSessions: number;
+  lastCompleted: { practiceId: string; title: string; completedAt: Date } | null;
+}> {
+  const [totals] = await db
+    .select({ total: count() })
+    .from(practiceCompletions)
+    .where(and(eq(practiceCompletions.userId, userId), eq(practiceCompletions.completed, true)));
+
+  const [latest] = await db
+    .select({
+      practiceId: practices.id,
+      title: practices.title,
+      completedAt: practiceCompletions.completedAt,
+    })
+    .from(practiceCompletions)
+    .innerJoin(practices, eq(practices.id, practiceCompletions.practiceId))
+    .where(and(eq(practiceCompletions.userId, userId), eq(practiceCompletions.completed, true)))
+    .orderBy(desc(practiceCompletions.completedAt))
+    .limit(1);
+
+  return {
+    completedSessions: Number(totals?.total ?? 0),
+    lastCompleted:
+      latest && latest.completedAt
+        ? { practiceId: latest.practiceId, title: latest.title, completedAt: latest.completedAt }
+        : null,
+  };
 }
 
 /**
