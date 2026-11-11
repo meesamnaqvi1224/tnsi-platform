@@ -41,7 +41,7 @@ async function newUser(label: string) {
   return row!.id;
 }
 
-async function newPractice(title: string, category: string) {
+async function newPractice(title: string, category: string, extra: { isFree?: boolean } = {}) {
   const [row] = await m.db
     .insert(m.practices)
     .values({
@@ -51,6 +51,7 @@ async function newPractice(title: string, category: string) {
       category,
       sanityData: {},
       isPublished: true,
+      ...extra,
     })
     .returning();
   return row!;
@@ -143,6 +144,37 @@ describe.skipIf(!enabled)(
           primary: null,
           alternative: null,
         });
+      }
+    });
+
+    it('a free member is only ever recommended free practices; a paid member draws from the whole category', async () => {
+      // EXPANSION (capacity 5): one free practice and two paid ones.
+      const free = await newPractice('exp-free', 'EXPANSION', { isFree: true });
+      await newPractice('exp-paid-a', 'EXPANSION', { isFree: false });
+      await newPractice('exp-paid-b', 'EXPANSION', { isFree: false });
+      const u = await newUser('entitlement');
+      await checkInToday(u, 5);
+
+      const freeMember = await m.lib.getRecommendedPractices(u, { freeOnly: true });
+      expect(freeMember.primary?.id).toBe(free.id);
+      expect(freeMember.primary?.isFree).toBe(true);
+      expect(freeMember.alternative).toBeNull(); // only one free practice in the category
+
+      const paidMember = await m.lib.getRecommendedPractices(u);
+      expect(paidMember.primary).not.toBeNull();
+      expect(paidMember.alternative).not.toBeNull();
+      expect(paidMember.alternative?.id).not.toBe(paidMember.primary?.id);
+      // The single-pick function honours the same option.
+      expect((await m.lib.getRecommendedPractice(u, { freeOnly: true }))?.id).toBe(free.id);
+    });
+
+    it('a free member whose category has no free practice gets no recommendation rather than a paid one', async () => {
+      const u = await newUser('entitlement-none');
+      await newPractice('gro-paid-only', 'GROUNDING', { isFree: false });
+      await checkInToday(u, 1); // GROUNDING
+      const r = await m.lib.getRecommendedPractices(u, { freeOnly: true });
+      for (const practice of [r.primary, r.alternative]) {
+        expect(practice === null || practice.isFree === true).toBe(true);
       }
     });
 

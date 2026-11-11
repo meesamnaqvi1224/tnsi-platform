@@ -3,21 +3,24 @@ import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { relativeDay } from '@/lib/relative-day';
+import { suggestedNextStep } from '@/lib/suggested-next-step';
 import { spacing } from '@/theme';
 import { home, homeCardStyle } from './homeTheme';
 import type { TodayResponse } from '@/api/types';
 
 /**
  * A compact record of what the member has actually done: today's check-in, the latest completed
- * practice, how many practices they have completed, and the practice suggested for today. Counts and
+ * practice, how many practices they have completed, and a suggested next step when there is one. Counts and
  * dates only - no score, streak or claim about what any of it means. The detail lives in My Progress.
  */
 export function HomeProgressWidget({
   data,
   recommended,
+  alternative = null,
 }: {
   data: TodayResponse;
   recommended: TodayResponse['todayPractice'];
+  alternative?: TodayResponse['alternativePractice'];
 }) {
   const router = useRouter();
   const summary = data.progressSummary;
@@ -33,7 +36,14 @@ export function HomeProgressWidget({
     });
     rows.push({ label: 'Practices completed', value: String(summary.completedSessions) });
   }
-  if (recommended) rows.push({ label: 'Suggested next step', value: recommended.title.trim() });
+  // Only while there is a next step to suggest (see suggestedNextStep): once today's recommendation is
+  // done and there is nothing else to offer, the row is left out rather than repeating it.
+  const next = suggestedNextStep({
+    recommended,
+    alternative,
+    lastCompleted: summary?.lastCompleted,
+  });
+  if (next) rows.push({ label: 'Suggested next step', value: next.title.trim() });
 
   return (
     <View style={styles.card} accessibilityLabel="Your progress">

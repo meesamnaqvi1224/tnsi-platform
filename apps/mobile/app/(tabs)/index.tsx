@@ -100,7 +100,11 @@ export default function HomeScreen() {
               </>
             ) : null}
 
-            <HomeProgressWidget data={state.data} recommended={todayPractice} />
+            <HomeProgressWidget
+              data={state.data}
+              recommended={todayPractice}
+              alternative={practiceForToday(state.data.checkIn, state.data.alternativePractice)}
+            />
           </>
         )}
 

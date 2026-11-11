@@ -9,8 +9,10 @@ import { InProgressView } from '@/components/learning/InProgressView';
 import { LearningTabs } from '@/components/learning/LearningTabs';
 import { SavedView } from '@/components/learning/SavedView';
 import { CheckInEntry } from '@/components/progress/CheckInEntry';
+import { ProgressOverview } from '@/components/progress/ProgressOverview';
 import { PrimaryButton } from '@/components';
 import { useCheckInHistory } from '@/hooks/useCheckInHistory';
+import { useToday } from '@/hooks/useToday';
 import { UndoBar } from '@/components/learning/UndoBar';
 import { PracticesSkeleton } from '@/components/practices/PracticesSkeleton';
 import { useApiClient } from '@/hooks/useApiClient';
@@ -54,6 +56,7 @@ export default function MyLearningScreen() {
   const historyState = usePracticeHistory();
   const savedState = useSavedPractices();
   const checkInsState = useCheckInHistory();
+  const todayState = useToday();
 
   // Coming back to this tab (after practising, saving or finishing a practice) shows what the server
   // says now. The first focus is skipped: the hooks already fetch on mount. The API client changes
@@ -66,6 +69,7 @@ export default function MyLearningScreen() {
       historyState.refresh();
       savedState.refresh();
       checkInsState.reload();
+      void todayState.refresh();
     };
   });
   const firstFocus = useRef(true);
@@ -139,6 +143,10 @@ export default function MyLearningScreen() {
           title="My Progress"
           subtitle="A record of your check-ins and practice. Observable activity only."
         />
+
+        {todayState.state.status === 'success' ? (
+          <ProgressOverview data={todayState.state.data} />
+        ) : null}
 
         <LearningTabs
           selected={view}
