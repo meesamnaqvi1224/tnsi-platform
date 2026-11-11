@@ -6,6 +6,7 @@ import NextLink from 'next/link';
 import { Alert, Button, Checkbox, Eyebrow, Heading, Input, Label, Text } from '@tnsi/ui';
 import { cn } from '@/lib/utils';
 import { getUtmParams, trackEvent, type AnalyticsParams } from '@/lib/analytics';
+import { buildSubscribeBody } from '@/lib/return-path-subscribe';
 import type { ReturnPathContent } from './content';
 import {
   LEVELS,
@@ -1150,7 +1151,7 @@ function EmailCapture({ content, level }: { content: ReturnPathContent; level: L
       const response = await fetch('/api/the-return-path/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: value, consent: true, level, utm }),
+        body: buildSubscribeBody(value, level),
       });
       if (!response.ok) throw new Error(`status ${response.status}`);
       setStatus('done');
