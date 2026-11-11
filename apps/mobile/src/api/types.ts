@@ -62,6 +62,8 @@ export interface CheckIn {
   notes: string | null;
   completedAt: string;
   completedDate: string;
+  /** The first check-in of the day (drives the recommendation); further same-day check-ins are false. Absent from older servers. */
+  isPrimary?: boolean;
   metadata: unknown;
   createdAt: string;
 }
@@ -88,6 +90,8 @@ export interface CheckInSummary {
   capacityScore: number;
   notes: string | null;
   completedAt: string;
+  /** false for a further check-in the same day; absent from older servers. */
+  isPrimary?: boolean;
 }
 
 /** Response shape of GET /api/v1/check-ins, per that route. */

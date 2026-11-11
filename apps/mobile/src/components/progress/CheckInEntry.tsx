@@ -36,6 +36,11 @@ export function CheckInEntry({ checkIn }: CheckInEntryProps) {
         <ThemedText variant="heading" color={home.navy} style={styles.date}>
           {dateLabel}
         </ThemedText>
+        {checkIn.isPrimary === false ? (
+          <ThemedText variant="caption" color={home.bronze} style={styles.additional}>
+            Additional check-in
+          </ThemedText>
+        ) : null}
         <View style={styles.scoreRow}>
           <ThemedText variant="body" color={home.ink}>
             Mood
@@ -64,6 +69,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   date: {
+    marginBottom: spacing.sm,
+  },
+  additional: {
     marginBottom: spacing.sm,
   },
   scoreRow: {
