@@ -4,6 +4,7 @@ import {
   categoryForCapacityState,
   normalizeCapacityScore,
   pickDeterministicCandidate,
+  pickDeterministicCandidates,
   type CapacityState,
   type RecommendedPracticeCategory,
 } from './recommendation';
@@ -78,5 +79,24 @@ describe('pickDeterministicCandidate', () => {
     const second = pickDeterministicCandidate(candidates);
     expect(first).toEqual(second);
     expect(first).toEqual({ id: 'a' });
+  });
+});
+
+describe('pickDeterministicCandidates', () => {
+  const list = [{ id: 'c' }, { id: 'a' }, { id: 'b' }];
+
+  it('returns the first n in id order, with the single pick first', () => {
+    expect(pickDeterministicCandidates(list, 2).map((c) => c.id)).toEqual(['a', 'b']);
+    expect(pickDeterministicCandidate(list)?.id).toBe('a');
+  });
+
+  it('returns fewer when there are fewer candidates, and none for none', () => {
+    expect(pickDeterministicCandidates([{ id: 'x' }], 2)).toHaveLength(1);
+    expect(pickDeterministicCandidates([], 2)).toEqual([]);
+  });
+
+  it("does not reorder the caller's array", () => {
+    pickDeterministicCandidates(list, 3);
+    expect(list.map((c) => c.id)).toEqual(['c', 'a', 'b']);
   });
 });

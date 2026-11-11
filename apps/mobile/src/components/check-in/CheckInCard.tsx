@@ -8,12 +8,26 @@ import { CapacityOptionList, capacityOptionLabel } from './CapacityOptionList';
 import { useApiClient } from '@/hooks/useApiClient';
 import { humanizeApiError } from '@/lib/api-errors';
 import { buildCheckInPayload, deviceTimeZone } from '@/lib/check-in-payload';
+import { canCheckInAgain, savedCheckInKind } from '@/lib/additional-check-in';
 import { home } from '@/components/home/homeTheme';
-import { colors, fontFamily, spacing, linkHitSlop } from '@/theme';
+import { colors, fontFamily, spacing, linkHitSlop, linkTouchTarget } from '@/theme';
 import { ApiRequestError, type CheckIn } from '@/api/types';
 
 type Phase =
-  | { kind: 'recorded'; checkIn: CheckIn; justSubmitted: boolean }
+  | {
+      kind: 'recorded';
+      checkIn: CheckIn;
+      /** Shown once after an additional check-in was saved; the primary stays what is displayed. */
+      notice?: string;
+    }
+  | {
+      /** A further check-in the same day. `primary` is kept so Home still shows it, unchanged. */
+      kind: 'additional';
+      primary: CheckIn;
+      capacity: number | null;
+      submitting: boolean;
+      error: string | null;
+    }
   | {
       kind: 'form';
       capacity: number | null;
@@ -55,7 +69,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
   const [open, setOpen] = useState(false);
   const [phase, setPhase] = useState<Phase>(() =>
     initialCheckIn
-      ? { kind: 'recorded', checkIn: initialCheckIn, justSubmitted: false }
+      ? { kind: 'recorded', checkIn: initialCheckIn }
       : { kind: 'form', capacity: null, submitting: false, error: null },
   );
 
@@ -70,7 +84,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
         '/api/v1/check-ins',
         buildCheckInPayload(capacity, deviceTimeZone()),
       );
-      setPhase({ kind: 'recorded', checkIn, justSubmitted: true });
+      setPhase({ kind: 'recorded', checkIn });
       onSubmitted(checkIn);
     } catch (err) {
       const existing =
@@ -81,7 +95,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
       if (existing) {
         // Same-day duplicate: the backend already has today's check-in -
         // this isn't an error state, just the recorded state arriving late.
-        setPhase({ kind: 'recorded', checkIn: existing, justSubmitted: false });
+        setPhase({ kind: 'recorded', checkIn: existing });
         onSubmitted(existing);
       } else {
         setPhase({
@@ -94,12 +108,93 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
     }
   }
 
-  if (phase.kind === 'recorded') {
+  async function handleAdditionalSubmit() {
+    if (phase.kind !== 'additional' || phase.capacity === null) return;
+    const { primary, capacity } = phase;
+    setPhase({ ...phase, submitting: true, error: null });
+
+    try {
+      const saved = await api.post<CheckIn>(
+        '/api/v1/check-ins',
+        buildCheckInPayload(capacity, deviceTimeZone()),
+      );
+      if (savedCheckInKind(saved) === 'primary') {
+        // The server made it the day's primary (there was none): from here it is today's check-in.
+        setPhase({ kind: 'recorded', checkIn: saved });
+        onSubmitted(saved);
+        return;
+      }
+      // A separate record. The primary - what Home shows and what the recommendation follows -
+      // is untouched, so Home's cached "today" state is deliberately not updated.
+      setPhase({
+        kind: 'recorded',
+        checkIn: primary,
+        notice: 'Additional check-in saved.',
+      });
+    } catch (err) {
+      setPhase({
+        kind: 'additional',
+        primary,
+        capacity,
+        submitting: false,
+        error: humanizeApiError(err),
+      });
+    }
+  }
+
+  if (phase.kind === 'additional') {
     return (
       <Surface>
         <Eyebrow />
         <ThemedText variant="heading" color={home.navy} style={styles.title}>
-          {phase.justSubmitted ? 'Check-in complete.' : "Today's check-in is recorded."}
+          Check in again
+        </ThemedText>
+        <ThemedText variant="body" color={home.ink} style={styles.support}>
+          This is saved as a separate check-in. Your first check-in today keeps guiding your
+          practice.
+        </ThemedText>
+        <CapacityOptionList
+          value={phase.capacity}
+          onChange={(capacity) => setPhase({ ...phase, capacity })}
+          disabled={phase.submitting}
+        />
+        {phase.error ? (
+          <ThemedText variant="body" color={colors.error} style={styles.errorText}>
+            {phase.error}
+          </ThemedText>
+        ) : null}
+        <View style={styles.actionsRow}>
+          <PrimaryButton
+            label="Save check-in"
+            onPress={handleAdditionalSubmit}
+            loading={phase.submitting}
+            disabled={phase.capacity === null || phase.submitting}
+            style={styles.saveButton}
+          />
+          <Pressable
+            onPress={() => setPhase({ kind: 'recorded', checkIn: phase.primary })}
+            disabled={phase.submitting}
+            accessibilityRole="button"
+            accessibilityLabel="Cancel"
+            hitSlop={linkHitSlop}
+            style={linkTouchTarget}
+          >
+            <ThemedText variant="label" color={home.bronze}>
+              Cancel
+            </ThemedText>
+          </Pressable>
+        </View>
+      </Surface>
+    );
+  }
+
+  if (phase.kind === 'recorded') {
+    const recorded = phase;
+    return (
+      <Surface>
+        <Eyebrow />
+        <ThemedText variant="heading" color={home.navy} style={styles.title}>
+          Today&apos;s check-in is recorded.
         </ThemedText>
         {phase.checkIn.moodScore === phase.checkIn.capacityScore &&
         capacityOptionLabel(phase.checkIn.capacityScore) ? (
@@ -127,21 +222,55 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
             {phase.checkIn.notes}
           </ThemedText>
         ) : null}
-        <Pressable
-          onPress={() => router.push('/profile/progress')}
-          accessibilityRole="link"
-          hitSlop={linkHitSlop}
-          accessibilityLabel="View check-in history"
-          style={styles.historyLink}
-        >
-          <ThemedText variant="label" color={home.bronze}>
-            View History →
+        {recorded.notice ? (
+          <ThemedText
+            variant="body"
+            color={home.bronze}
+            style={styles.notice}
+            accessibilityLiveRegion="polite"
+          >
+            {recorded.notice}
           </ThemedText>
-        </Pressable>
+        ) : null}
+        <View style={styles.recordedLinks}>
+          <Pressable
+            onPress={() => router.push('/profile/progress')}
+            accessibilityRole="link"
+            hitSlop={linkHitSlop}
+            style={linkTouchTarget}
+            accessibilityLabel="View check-in history"
+          >
+            <ThemedText variant="label" color={home.bronze}>
+              View History →
+            </ThemedText>
+          </Pressable>
+          {canCheckInAgain(recorded.checkIn) ? (
+            <Pressable
+              onPress={() =>
+                setPhase({
+                  kind: 'additional',
+                  primary: recorded.checkIn,
+                  capacity: null,
+                  submitting: false,
+                  error: null,
+                })
+              }
+              accessibilityRole="button"
+              accessibilityLabel="Check in again"
+              hitSlop={linkHitSlop}
+              style={linkTouchTarget}
+            >
+              <ThemedText variant="label" color={home.bronze}>
+                Check in again
+              </ThemedText>
+            </Pressable>
+          ) : null}
+        </View>
       </Surface>
     );
   }
 
+  // Narrowed: 'recorded' and 'additional' returned above, so this is the first-check-in form.
   const canSubmit = phase.capacity !== null && !phase.submitting;
 
   return (
@@ -187,6 +316,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
               onPress={() => router.push('/profile/progress')}
               accessibilityRole="link"
               hitSlop={linkHitSlop}
+              style={linkTouchTarget}
               accessibilityLabel="View check-in history"
             >
               <ThemedText variant="label" color={home.bronze}>
@@ -206,6 +336,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
             onPress={() => router.push('/profile/progress')}
             accessibilityRole="link"
             hitSlop={linkHitSlop}
+            style={linkTouchTarget}
             accessibilityLabel="View check-in history"
           >
             <ThemedText variant="label" color={home.bronze}>
@@ -286,9 +417,16 @@ const styles = StyleSheet.create({
   notesReadout: {
     marginTop: spacing.md,
   },
-  historyLink: {
+  recordedLinks: {
     marginTop: spacing.lg,
-    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    columnGap: spacing.lg,
+    rowGap: spacing.sm,
+  },
+  notice: {
+    marginTop: spacing.md,
   },
   actionsRow: {
     flexDirection: 'row',

@@ -38,4 +38,12 @@ export const imageHeight = {
  * Extra touch area for inline text links ("My Journey →", "View History"), which are drawn about
  * 20 dp tall. Grows the tappable area to roughly 48 dp without changing how the link looks.
  */
+/**
+ * A real minimum height for inline text links. `hitSlop` alone is not enough on Android: a touch
+ * outside the Pressable's own bounds is not delivered when the parent row is no taller than the
+ * link, so an ~18 dp link there stayed ~18 dp tall. Spread this into the link's style so the
+ * Pressable itself is 48 dp tall; the text is centred, so it looks unchanged.
+ */
+export const linkTouchTarget = { minHeight: 48, justifyContent: 'center' } as const;
+
 export const linkHitSlop = { top: 14, bottom: 14, left: 8, right: 8 } as const;

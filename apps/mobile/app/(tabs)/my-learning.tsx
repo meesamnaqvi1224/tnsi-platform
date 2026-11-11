@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { ScreenContainer, ErrorNotice } from '@/components';
+import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
 import { PageTitle } from '@/components/PageTitle';
 import { home } from '@/components/home/homeTheme';
 import { CompletedView } from '@/components/learning/CompletedView';
 import { InProgressView } from '@/components/learning/InProgressView';
 import { LearningTabs } from '@/components/learning/LearningTabs';
 import { SavedView } from '@/components/learning/SavedView';
+import { CheckInEntry } from '@/components/progress/CheckInEntry';
+import { ProgressOverview } from '@/components/progress/ProgressOverview';
+import { PrimaryButton } from '@/components';
+import { useCheckInHistory } from '@/hooks/useCheckInHistory';
+import { useToday } from '@/hooks/useToday';
 import { UndoBar } from '@/components/learning/UndoBar';
 import { PracticesSkeleton } from '@/components/practices/PracticesSkeleton';
 import { useApiClient } from '@/hooks/useApiClient';
@@ -50,6 +55,8 @@ export default function MyLearningScreen() {
   const practicesState = usePractices();
   const historyState = usePracticeHistory();
   const savedState = useSavedPractices();
+  const checkInsState = useCheckInHistory();
+  const todayState = useToday();
 
   // Coming back to this tab (after practising, saving or finishing a practice) shows what the server
   // says now. The first focus is skipped: the hooks already fetch on mount. The API client changes
@@ -61,6 +68,8 @@ export default function MyLearningScreen() {
       practicesState.refresh();
       historyState.refresh();
       savedState.refresh();
+      checkInsState.reload();
+      void todayState.refresh();
     };
   });
   const firstFocus = useRef(true);
@@ -130,7 +139,14 @@ export default function MyLearningScreen() {
   return (
     <View style={{ flex: 1 }}>
       <ScreenContainer scroll underHeader inTabs background={home.page}>
-        <PageTitle title="My Learning" subtitle="Return to what you've been practising." />
+        <PageTitle
+          title="My Progress"
+          subtitle="A record of your check-ins and practice. Observable activity only."
+        />
+
+        {todayState.state.status === 'success' ? (
+          <ProgressOverview data={todayState.state.data} />
+        ) : null}
 
         <LearningTabs
           selected={view}
@@ -168,6 +184,33 @@ export default function MyLearningScreen() {
                 onLoadMore={historyState.loadMore}
               />
             )}
+          </>
+        )}
+
+        {view === 'check-ins' && (
+          <>
+            {checkInsState.state.status === 'loading' && <PracticesSkeleton />}
+            {checkInsState.state.status === 'error' && (
+              <ErrorNotice message={checkInsState.state.message} onRetry={checkInsState.reload} />
+            )}
+            {checkInsState.state.status === 'success' &&
+              checkInsState.state.checkIns.length === 0 && (
+                <ThemedText variant="body" color={home.ink}>
+                  Your check-ins will appear here after you complete one on Home.
+                </ThemedText>
+              )}
+            {checkInsState.state.status === 'success' &&
+              checkInsState.state.checkIns.map((checkIn) => (
+                <CheckInEntry key={checkIn.id} checkIn={checkIn} />
+              ))}
+            {checkInsState.state.status === 'success' && checkInsState.state.hasMore ? (
+              <PrimaryButton
+                label={checkInsState.state.loadingMore ? 'Loading…' : 'Load More'}
+                variant="secondary"
+                onPress={checkInsState.loadMore}
+                loading={checkInsState.state.loadingMore}
+              />
+            ) : null}
           </>
         )}
 

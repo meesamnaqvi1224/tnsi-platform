@@ -55,19 +55,21 @@ export default function TabsLayout() {
         options={{ title: 'Home', tabBarIcon: tabIcon('home-outline', 'home') }}
       />
       <Tabs.Screen
-        name="practices"
-        options={{ title: 'Practices', tabBarIcon: tabIcon('leaf-outline', 'leaf') }}
+        name="theory"
+        options={{
+          title: 'Human Expansion Theory',
+          // The full name does not fit under a tab icon; the page itself carries it.
+          tabBarLabel: 'Theory',
+          tabBarIcon: tabIcon('compass-outline', 'compass'),
+        }}
       />
       <Tabs.Screen
         name="my-learning"
         options={{
-          title: 'My Learning',
-          tabBarIcon: tabIcon('school-outline', 'school'),
-          // The only tab with no nested Stack of its own (a single flat
-          // screen), so unlike Practices/Profile it never had a
-          // header at all under the shared `headerShown: false` above -
-          // opted back in here specifically so it can carry the same
-          // Home button the other three tab roots now have.
+          title: 'My Progress',
+          tabBarIcon: tabIcon('stats-chart-outline', 'stats-chart'),
+          // The only tab with no nested Stack of its own (a single flat screen), so it opts back in to a
+          // header to carry the same Home button the other tab roots have.
           headerShown: true,
           // The page title is drawn in the screen itself, so the bar carries only the Home button.
           headerTitle: '',
@@ -78,6 +80,9 @@ export default function TabsLayout() {
           headerLeft: () => <HomeHeaderButton inset />,
         }}
       />
+      {/* Practices are reached through Home's recommendation and the Human Expansion Theory pages, not
+          from the tab bar. The routes stay (practice detail, history, PowerDrops, ...), just not as a tab. */}
+      <Tabs.Screen name="practices" options={{ href: null }} />
       <Tabs.Screen
         name="profile"
         options={{

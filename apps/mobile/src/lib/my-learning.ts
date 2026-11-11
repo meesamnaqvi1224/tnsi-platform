@@ -15,9 +15,14 @@ import type { Practice, PracticeContentType, PracticeHistoryEntry } from '@/api/
  * - Saved: bookmarked, independent of completion.
  */
 
-export type LearningView = 'in-progress' | 'completed' | 'saved';
+export type LearningView = 'in-progress' | 'completed' | 'saved' | 'check-ins';
 
-export const LEARNING_VIEWS: readonly LearningView[] = ['in-progress', 'completed', 'saved'];
+export const LEARNING_VIEWS: readonly LearningView[] = [
+  'in-progress',
+  'completed',
+  'saved',
+  'check-ins',
+];
 
 /** A route param to a view; anything unrecognised opens the default (In Progress). */
 export function parseLearningView(raw: string | string[] | undefined): LearningView {
