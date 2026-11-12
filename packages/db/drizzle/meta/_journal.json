@@ -99,6 +99,13 @@
       "when": 1794297000451,
       "tag": "0013_multiple_daily_check_ins",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794480320789,
+      "tag": "0014_add_journal_entries",
+      "breakpoints": true
     }
   ]
 }

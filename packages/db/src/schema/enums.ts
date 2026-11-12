@@ -56,3 +56,20 @@ export const somaticPublicationStatusEnum = pgEnum('somatic_publication_status',
   'published',
   'archived',
 ]);
+
+/**
+ * Journal entry lifecycle (My Reflections). A `draft` is an autosave target and never appears in a
+ * member's history; a `saved` entry does. Saved never returns to draft (API rule + DB trigger).
+ */
+export const journalEntryStatusEnum = pgEnum('journal_entry_status', ['draft', 'saved']);
+
+/**
+ * Where a journal entry came from. Descriptive only - it never changes what the member sees
+ * recommended and is never inferred from what they wrote.
+ */
+export const journalEntryTypeEnum = pgEnum('journal_entry_type', [
+  'independent',
+  'guided',
+  'practice',
+  'theory',
+]);
