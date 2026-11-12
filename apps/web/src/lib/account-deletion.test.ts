@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
  * never claimed unless every step succeeded. Postgres and Clerk cannot share a transaction, so the ORDER
  * is what is being proved here.
  */
-vi.mock('@tnsi/db', () => ({ db: {}, entitlements: {}, users: {} }));
+vi.mock('@tnsi/db', () => ({ db: {}, entitlements: {}, accountDeletionRequests: {} }));
 vi.mock('./journal', () => ({ purgeJournalEntries: vi.fn() }));
 const clerk = vi.hoisted(() => ({ deleteClerkUser: vi.fn() }));
 vi.mock('@tnsi/auth/client/server', () => ({ deleteClerkUser: clerk.deleteClerkUser }));

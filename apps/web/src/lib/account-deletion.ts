@@ -7,7 +7,7 @@
  *
  *   0. Refuse while a paid Stripe subscription is still running (deleting the account would otherwise
  *      leave billing active with nobody able to cancel it). Read-only; changes nothing.
- *   1. MARK THE DELETION PENDING (`users.deletion_requested_at`, first request time preserved). From this
+ *   1. MARK THE DELETION PENDING (a row in `account_deletion_requests`, first request time preserved). From this
  *      moment the journal is locked: every journal route refuses the member (423), so nothing can be read,
  *      written or re-created while the rest of the deletion runs or if it stalls. If this fails nothing has
  *      changed and we stop.
@@ -32,10 +32,14 @@
  * Only `deleted` means the deletion is complete, and it is returned only after every step has succeeded.
  * Every function here is idempotent and no step logs anything but a stage label and a short error code.
  */
-import { db, entitlements, users } from '@tnsi/db';
-import { eq, sql } from 'drizzle-orm';
+import { db, entitlements } from '@tnsi/db';
+import { eq } from 'drizzle-orm';
 import { purgeJournalEntries } from './journal';
+import { markDeletionPending, getDeletionState } from './deletion-state';
 import { safeErrorCode } from './private-response';
+
+// Re-exported so the account route and its tests keep one import point for deletion state.
+export { markDeletionPending, getDeletionState };
 
 export type AccountDeletionStage =
   'precheck' | 'mark_pending' | 'journal_purge' | 'identity_provider';
@@ -125,30 +129,6 @@ export async function hasActivePaidSubscription(userId: string): Promise<boolean
     .limit(1);
   if (!row?.subscriptionId || row.cancelAtPeriodEnd) return false;
   return row.status === 'active' || row.status === 'trialing' || row.status === 'past_due';
-}
-
-/** Records that this member has started deleting their account. Idempotent: the first request time is kept. */
-export async function markDeletionPending(userId: string): Promise<void> {
-  await db
-    .update(users)
-    .set({
-      deletionRequestedAt: sql`coalesce(${users.deletionRequestedAt}, now())`,
-      updatedAt: new Date(),
-    })
-    .where(eq(users.id, userId));
-}
-
-/** `active` (no deletion in progress) or `pending` (started, not finished), for the member's own account. */
-export async function getDeletionState(
-  userId: string,
-): Promise<{ status: 'active' | 'pending'; requestedAt: Date | null }> {
-  const [row] = await db
-    .select({ requestedAt: users.deletionRequestedAt })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-  const requestedAt = row?.requestedAt ?? null;
-  return { status: requestedAt ? 'pending' : 'active', requestedAt };
 }
 
 /** The real dependencies. Loaded lazily by the route so importing this module never touches Clerk or the database. */

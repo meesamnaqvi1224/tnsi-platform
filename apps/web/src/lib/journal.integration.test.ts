@@ -34,7 +34,7 @@ vi.mock('@/lib/auth-api', async () => {
   const { forbidden, unauthorized } = await import('@/lib/api-response');
   /**
    * Like the real getAuthUser, this loads the member's CURRENT user row from the database on every call
-   * (so `deletionRequestedAt` reflects the database at that moment, exactly as in production), and
+   * (so the account state reflects the database at that moment, exactly as in production), and
    * treats a missing or deleted user as not signed in.
    */
   const currentUser = async () => {
@@ -141,6 +141,14 @@ const rowOf = async (id: string) =>
 const countFor = async (userId: string) =>
   (await m.db.select().from(m.s.journalEntries).where(m.d.eq(m.s.journalEntries.userId, userId)))
     .length;
+/** When this member's account deletion was requested (the `account_deletion_requests` row), or null. */
+const markerOf = async (id: string) =>
+  (
+    await m.db
+      .select()
+      .from(m.s.accountDeletionRequests)
+      .where(m.d.eq(m.s.accountDeletionRequests.userId, id))
+  )[0]?.requestedAt ?? null;
 const newUuid = () => crypto.randomUUID();
 
 let consoleSpies: ReturnType<typeof vi.spyOn>[] = [];
@@ -802,7 +810,7 @@ describe.skipIf(!enabled)('My Reflections journal on real PostgreSQL', { timeout
       const draft = await data(await create({ content: `${SECRET} lock draft` }));
 
       await m.accountLib.markDeletionPending(P.id);
-      expect((await userRow(P.id)).deletionRequestedAt).toBeInstanceOf(Date);
+      expect(await markerOf(P.id)).toBeInstanceOf(Date);
 
       for (const res of [
         await list(),
@@ -830,10 +838,10 @@ describe.skipIf(!enabled)('My Reflections journal on real PostgreSQL', { timeout
     it('marking a deletion pending is idempotent and keeps the FIRST request time', async () => {
       const P = await newUser('mark');
       await m.accountLib.markDeletionPending(P.id);
-      const first = (await userRow(P.id)).deletionRequestedAt!;
+      const first = (await markerOf(P.id))!;
       await new Promise((r) => setTimeout(r, 20));
       await m.accountLib.markDeletionPending(P.id);
-      expect((await userRow(P.id)).deletionRequestedAt!.getTime()).toBe(first.getTime());
+      expect((await markerOf(P.id))!.getTime()).toBe(first.getTime());
     });
 
     it('identity failure: the journal is gone AND locked, the account is pending (not deleted), the status says so, and a retry completes', async () => {
@@ -857,7 +865,8 @@ describe.skipIf(!enabled)('My Reflections journal on real PostgreSQL', { timeout
       expect(await countFor(G.id)).toBe(0); // the writing was erased
       const mid = await userRow(G.id);
       expect(mid.deletedAt).toBeNull(); // the account is NOT claimed deleted
-      expect(mid.deletionRequestedAt).toBeInstanceOf(Date); // it is pending
+      const midMarker = await markerOf(G.id);
+      expect(midMarker).toBeInstanceOf(Date); // it is pending
       expect(await statusOf()).toMatchObject({ status: 'pending' }); // and the app can be told so
 
       // the member is still signed in but cannot use the journal, and cannot bring anything back
@@ -875,7 +884,7 @@ describe.skipIf(!enabled)('My Reflections journal on real PostgreSQL', { timeout
       expect(await m.accountLib.deleteAccount(G, deps)).toEqual({ status: 'deleted' });
       const done = await userRow(G.id);
       expect(done.deletedAt).toBeInstanceOf(Date);
-      expect(done.deletionRequestedAt!.getTime()).toBe(mid.deletionRequestedAt!.getTime()); // first time kept
+      expect((await markerOf(G.id))!.getTime()).toBe(midMarker!.getTime()); // first time kept
       expect(await countFor(G.id)).toBe(0);
     });
 
@@ -966,7 +975,7 @@ describe.skipIf(!enabled)('My Reflections journal on real PostgreSQL', { timeout
       });
       expect(deleteIdentity).not.toHaveBeenCalled();
       expect(await countFor(H.id)).toBe(1);
-      expect((await userRow(H.id)).deletionRequestedAt).toBeNull(); // blocked: nothing changed, not even pending
+      expect(await markerOf(H.id)).toBeNull(); // blocked: nothing changed, not even pending
       expect((await list()).status).toBe(200); // and the journal still works
 
       // once the subscription is set to end, deletion is allowed
@@ -1071,7 +1080,7 @@ describe.skipIf(!enabled)('My Reflections journal on real PostgreSQL', { timeout
         expect(result).toEqual(c.result);
         expect(result.status).not.toBe('deleted');
         const row = await userRow(u.id);
-        expect(!!row.deletionRequestedAt).toBe(c.marker);
+        expect((await markerOf(u.id)) !== null).toBe(c.marker);
         expect(row.deletedAt === null).toBe(!c.deleted);
         expect(await countFor(u.id)).toBe(c.rows);
         if (c.journalStatus === 423) {
@@ -1098,7 +1107,7 @@ describe.skipIf(!enabled)('My Reflections journal on real PostgreSQL', { timeout
         status: 'deleted',
       });
       const row = await userRow(u.id);
-      expect(row.deletionRequestedAt).toBeInstanceOf(Date); // 1. requested
+      expect(await markerOf(u.id)).toBeInstanceOf(Date); // 1. requested
       expect(row.deletedAt).toBeInstanceOf(Date); // 5. database account deletion completed
       expect(await countFor(u.id)).toBe(0); // 3. journal purged
       // 6. nothing more can be asked of a deleted account: no status, no second deletion, no journal
@@ -1152,7 +1161,7 @@ describe.skipIf(!enabled)('My Reflections journal on real PostgreSQL', { timeout
       // webhook delayed (or never arriving): nothing is exposed and nothing is claimed
       const waiting = await userRow(u.id);
       expect(waiting.deletedAt).toBeNull();
-      expect(waiting.deletionRequestedAt).toBeInstanceOf(Date);
+      expect(await markerOf(u.id)).toBeInstanceOf(Date);
       expect(await countFor(u.id)).toBe(0);
       expect((await list()).status).toBe(423);
 

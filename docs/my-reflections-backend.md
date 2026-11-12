@@ -55,33 +55,57 @@ Indexes (both partial, so each stays small and exact):
 a saved entry can never return to `draft`; `created_at` is pinned to its original value whatever an
 UPDATE says; an entry can never change owner.
 
-### `users.deletion_requested_at` (new, nullable)
+### `account_deletion_requests`
 
-Set when a member starts deleting their account and kept until it completes (first request time preserved).
-While it is set the account is in the **deletion-pending** state: a pending member can still sign in and
-retry, but their journal is locked (§6). It is deliberately **not** `deleted_at`, which logs the member out
-of everything and so would stop them retrying. `NULL` (the default) means no deletion in progress.
+One row per member who has started deleting their account, with `requested_at` (the **first** request
+time; a repeat is `ON CONFLICT DO NOTHING`). While a row exists the account is in the **deletion-pending**
+state: a pending member can still sign in and retry, but their journal is locked (§6). It is deliberately
+**not** `users.deleted_at`, which logs the member out of everything and so would stop them retrying.
+`user_id` is the primary key and references `users` with `ON DELETE CASCADE`.
+
+**Why its own table and not a column on `users`:** every authenticated request runs `select * from users`.
+A new `users` column would make a deployment that runs ahead of its migration fail **every sign-in** (and
+the Clerk sync webhook). As a separate table, nothing on the authentication path reads it; see "Deployment
+order" below.
 
 ### Migration facts (revalidated against the repository, not assumed)
 
 - Next journal index is **14**; tag `0014_add_journal_entries`; snapshot `meta/0014_snapshot.json`;
-  `when` = `1794480320789`, later than 0013's `1794297000451` (drizzle skips a migration whose `when` is
+  `when` = `1794487452959`, later than 0013's `1794297000451` (drizzle skips a migration whose `when` is
   not later than the newest applied one).
-- **Expand-only**: one new table, two new enum types, one function and trigger, and one new **nullable**
-  column on `users`. Nothing existing is altered, renamed or dropped, so code from before this change runs
-  unchanged against the migrated database.
+- **Additive-only**: two new tables (`journal_entries`, `account_deletion_requests`), two new enum types, one
+  function and trigger. **No existing table is altered, renamed or dropped — `users` is untouched** (its
+  schema file is byte-identical to `origin/main`), so code from before this change runs unchanged against the
+  migrated database.
 - drizzle-kit 0.24 does not emit CHECK constraints or triggers, so those are hand-written at the end of
   `0014_add_journal_entries.sql` (same convention as `0000` and `0012`) and are idempotent; the rest of the
-  file is generated. The migration was regenerated when `deletion_requested_at` was added, so the snapshot
-  matches.
+  file is generated. The snapshot is generated from the same schema, so it matches.
 - **Rollback** (only ever needed before real data exists):
-  `DROP TRIGGER journal_entries_guard_update ON journal_entries; DROP FUNCTION journal_entries_guard_update(); DROP TABLE journal_entries; DROP TYPE journal_entry_type; DROP TYPE journal_entry_status; ALTER TABLE users DROP COLUMN deletion_requested_at;`
+  `DROP TRIGGER journal_entries_guard_update ON journal_entries; DROP FUNCTION journal_entries_guard_update(); DROP TABLE journal_entries; DROP TABLE account_deletion_requests; DROP TYPE journal_entry_type; DROP TYPE journal_entry_status;`
   and remove its row from `drizzle.__drizzle_migrations`. After launch this would destroy members'
   writing; prefer a forward fix.
 - **Rehearsal** (isolated database only; the drizzle config refuses the production host):
   `TNSI_TEST_DATABASE_URL="<isolated database>" pnpm --filter @tnsi/db exec drizzle-kit migrate`.
   **Do not run this against production without explicit approval**, a Neon backup branch first, and the
   same checks used for 0013.
+
+### Deployment order (what happens if the code runs before the migration)
+
+Apply migration 0014 **before** merging and deploying — but the design means a mistake here is not an
+outage. On a database that does **not** yet have 0014 (tested for real, see §7):
+
+| Path                                                          | Result                                                                                                                                                |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sign-in / every authenticated request (`select … from users`) | **Unaffected** — no existing table changed, and nothing on this path reads a new table.                                                               |
+| Clerk webhook `user.created` / `user.updated`                 | **Unaffected.**                                                                                                                                       |
+| Journal routes                                                | **Fail closed** with a generic `500` (not `401` — the member's session is fine), nothing served or written, nothing leaked.                           |
+| `GET`/`DELETE /api/v1/me/account`                             | `500`; a failed deletion changes nothing (`ACCOUNT_DELETION_FAILED`, "Nothing was deleted").                                                          |
+| Clerk webhook `user.deleted`                                  | Fails (it purges `journal_entries`) and **rolls back**; Clerk retries it until the migration is applied. Only affects members deleting their account. |
+
+Two Vercel projects deploy this repository from `main` (`tnsi-platform` and `tnsi-platform-somatic-prod`,
+each with its own `DATABASE_URL`), so a merge reaches both; this table is what makes that safe even if one
+of those databases has not been migrated yet. The migration still has to be applied to **every** database
+before the journal and account deletion are expected to work.
 
 ## 3. API contract
 
@@ -171,7 +195,7 @@ persisted pending marker, is the safety design (`apps/web/src/lib/account-deleti
 | Step  | Action                                                                                                                                                                                                                             | If it fails                                                                                                                                                                                             |
 | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **0** | **Pre-check:** refuse while a paid Stripe subscription is running (`status` active/trialing/past_due, has a subscription id, not set to cancel at period end). App-managed trials have no subscription and never block. Read-only. | Blocked: `409 SUBSCRIPTION_ACTIVE`, nothing changed (not even the marker). Pre-check error: `500`, nothing changed.                                                                                     |
-| **1** | **Mark deletion pending** (`users.deletion_requested_at`, first request time kept). From here the journal is **locked**: every journal route returns `423`.                                                                        | Nothing has changed. `500 ACCOUNT_DELETION_FAILED`; stops. Retry.                                                                                                                                       |
+| **1** | **Mark deletion pending** (a row in `account_deletion_requests`, first request time kept). From here the journal is **locked**: every journal route returns `423`.                                                                 | Nothing has changed. `500 ACCOUNT_DELETION_FAILED`; stops. Retry.                                                                                                                                       |
 | **2** | **Purge the journal** (one atomic DELETE of all the member's entries, drafts included).                                                                                                                                            | Deletion is **pending**: the journal is already locked (so unreachable even if rows remain). `502 ACCOUNT_DELETION_PENDING`. Member still signed in; retry.                                             |
 | **3** | **Delete the identity in Clerk.** A Clerk `404` (already deleted) counts as success.                                                                                                                                               | Deletion is **pending**: journal gone and locked, account still exists and signed in. `502 ACCOUNT_DELETION_PENDING`. Retry; the purge is a harmless no-op and Clerk is retried.                        |
 | **4** | **Finalise locally in ONE transaction** (`softDeleteUser`): purge any journal rows again **and** mark the user deleted. The second purge removes anything written by a request that was already in flight when step 1 ran.         | The identity is already gone, so the member cannot sign in. `202 pending` (never `200`). The Clerk `user.deleted` webhook runs the same transactional finalisation and Clerk retries a failing webhook. |
@@ -191,8 +215,8 @@ that is an error status or `202 pending`, and the mobile wording never claims co
 - **Complete:** "Your account has been closed and your journal deleted", then sign-out. **202** says it is
   "being closed… a few minutes", not that it is done.
 
-**A member whose deletion is pending cannot access journal data.** `requireJournalAccess` reads the marker
-from the user row the auth layer already loads (no extra query) and every journal route — list, drafts,
+**A member whose deletion is pending cannot access journal data.** `requireJournalAccess` checks the marker
+(one primary-key lookup on `account_deletion_requests`, on every journal request) and every journal route — list, drafts,
 read, create, edit, save, delete — returns `423 ACCOUNT_DELETION_PENDING` with no data. That includes a
 **retried create with an old client id**, so a stalled deletion can never restore or re-expose writing.
 The marker is set _before_ the purge, so there is no moment where deletion is in progress and the journal
@@ -226,7 +250,7 @@ lives in Clerk, and one is the HTTP response.
 
 | #   | State                                   | Authoritative system   | Recorded as                                                                                                                                                        | Reached at               | Observable through                                                         |
 | --- | --------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------ | -------------------------------------------------------------------------- |
-| 1   | **Deletion requested**                  | Postgres (ours)        | `users.deletion_requested_at` (first request time kept; never cleared)                                                                                             | Step 1                   | `GET /api/v1/me/account` → `pending`                                       |
+| 1   | **Deletion requested**                  | Postgres (ours)        | `account_deletion_requests` row (first request time kept; never cleared)                                                                                           | Step 1                   | `GET /api/v1/me/account` → `pending`                                       |
 | 2   | **Journal access locked**               | Postgres (ours)        | **Not stored separately** — derived from state 1 on every request (`requireJournalAccess`), so it is the same instant                                              | Step 1                   | every journal route → `423 ACCOUNT_DELETION_PENDING`                       |
 | 3   | **Journal purged**                      | Postgres (ours)        | **No flag** — it is the _absence_ of `journal_entries` rows for the user                                                                                           | Step 2 (re-checked in 4) | database only (no API: the member has no access once locked)               |
 | 4   | **Clerk identity deletion confirmed**   | **Clerk**              | **Not recorded in our database.** The route learns it from `deleteUser` succeeding (or returning 404); Clerk separately signals it with the `user.deleted` webhook | Step 3                   | the `DELETE` call result in that request; later, the webhook               |
@@ -271,10 +295,11 @@ rows are findable and finishable by an operator:
 
 ```sql
 -- read-only: deletions started but never marked complete
-select id, clerk_user_id, deletion_requested_at
-from users
-where deletion_requested_at is not null and deleted_at is null
-  and deletion_requested_at < now() - interval '1 hour';
+select u.id, u.clerk_user_id, r.requested_at
+from account_deletion_requests r
+join users u on u.id = r.user_id
+where u.deleted_at is null
+  and r.requested_at < now() - interval '1 hour';
 ```
 
 after confirming in Clerk that the identity no longer exists, the same finalisation as Step 4 is run in one
@@ -317,7 +342,7 @@ longer be used. The app therefore never shows a delayed "deletion complete" conf
   decision outside this PR; store review may expect "associated personal data" to be addressed.
 - **There is no way to cancel a pending deletion** in this PR. Because the journal is erased at step 2,
   cancelling after that would not bring it back anyway; whether to offer cancel before step 2, or a
-  support-assisted reset of `deletion_requested_at`, is a pending decision (§8).
+  support-assisted removal of the `account_deletion_requests` row, is a pending decision (§8).
 - **An active paid subscription blocks deletion** by design. Billing and Stripe code are untouched.
 
 ## 7. Tests
@@ -327,7 +352,7 @@ longer be used. The app therefore never shows a delayed "deletion complete" conf
   stage and retry), `journal-independence.test.ts` (one-module rule, the five HET conditions, parity with
   the app's `CONDITION_NAMES`, recommendation mapping unchanged), `app/api/v1/journal/entries/route.test.ts`
   (including the pending lock on every route), `app/api/v1/me/account/route.test.ts` (including the wording
-  members see); mobile `src/lib/account-deletion.test.ts`.
+  members see; the pending-check-failure case); mobile `src/lib/account-deletion.test.ts`.
 - **Integration on real PostgreSQL** — `lib/journal.integration.test.ts`: authentication; ownership
   isolation and cross-member 404s (drafts and saved); the draft/saved lifecycle; **draft listing** (default
   saved-only, `status=draft` own-drafts-only, drafts never in history or My Journey/milestones); database
@@ -336,7 +361,9 @@ longer be used. The app therefore never shows a delayed "deletion complete" conf
   with real database state** (identity failure, purge failure, finalisation failure), **retry completing**,
   a retry **unable to restore** entries, a straggler write removed at completion, atomic rollback of the
   transactional finalisation, the subscription block; and that nothing the member wrote reaches any log.
-  **Skipped unless `TNSI_TEST_DATABASE_URL` is set**; refuses the production host. Run:
+  **Skipped unless `TNSI_TEST_DATABASE_URL` is set**; refuses the production host. Plus
+  `lib/pre-migration-safety.integration.test.ts`: the new code against a database at migration **0013** (no 0014) — sign-in and the user-sync webhook work, the new routes fail closed with a `500`, a failed deletion
+  changes nothing; it skips itself once 0014 is present. Run:
 
   ```
   TZ=UTC TNSI_TEST_DATABASE_URL="<isolated database, migrations applied through 0014>" \

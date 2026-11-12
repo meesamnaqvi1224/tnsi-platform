@@ -2,7 +2,8 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { JOURNAL_THEORY_CONDITIONS } from '@tnsi/db/schema';
+import { JOURNAL_THEORY_CONDITIONS, users } from '@tnsi/db/schema';
+import { getTableColumns } from 'drizzle-orm';
 import {
   categoryForCapacityScore,
   categoryForCapacityState,
@@ -64,6 +65,36 @@ describe('the journal is read and written by one module only', () => {
     for (const file of guarded) {
       expect(readFileSync(file, 'utf8'), rel(file)).not.toMatch(reachesJournal);
     }
+  });
+});
+
+describe('deployment order: the sign-in path does not depend on migration 0014', () => {
+  it('the `users` table has exactly its original columns - none added by My Reflections', () => {
+    // Every authenticated request runs `select * from users`, so a column added here would make a deployment
+    // that runs ahead of its migration fail EVERY sign-in. New per-member state belongs in its own table
+    // (see account_deletion_requests). If this fails, do not just update the list: read
+    // docs/my-reflections-backend.md ("Deployment order") first.
+    expect(Object.keys(getTableColumns(users)).sort()).toEqual(
+      [
+        'avatarUrl',
+        'clerkUserId',
+        'createdAt',
+        'deletedAt',
+        'email',
+        'fullName',
+        'id',
+        'metadata',
+        'updatedAt',
+      ].sort(),
+    );
+  });
+
+  it('only one module reads the deletion-pending marker table (by its schema identifier, not comments)', () => {
+    const readers = files
+      .filter((file) => /\baccountDeletionRequests\b/.test(readFileSync(file, 'utf8')))
+      .map(rel)
+      .sort();
+    expect(readers).toEqual(['lib/deletion-state.ts']);
   });
 });
 

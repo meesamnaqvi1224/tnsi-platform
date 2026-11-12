@@ -8,8 +8,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
  */
 const state = vi.hoisted(() => ({
   auth: 'member' as 'member' | 'unauthenticated' | 'no-entitlement',
-  /** The member has started deleting their account (users.deletion_requested_at is set). */
+  /** The member has started deleting their account (an account_deletion_requests row exists). */
   pending: false,
+  /** The deletion-pending check cannot be answered (database down, or migration 0014 not applied). */
+  stateError: false,
   lib: {
     list: vi.fn(),
     create: vi.fn(),
@@ -27,7 +29,7 @@ vi.mock('@/lib/auth-api', async () => {
       if (state.auth === 'no-entitlement') {
         throw Object.assign(new Error('no entitlement'), { name: 'EntitlementRequiredError' });
       }
-      return { id: 'user-A', deletionRequestedAt: state.pending ? new Date() : null };
+      return { id: 'user-A' };
     },
     memberAccessErrorResponse: (error: unknown) =>
       (error as { name?: string })?.name === 'EntitlementRequiredError'
@@ -35,6 +37,14 @@ vi.mock('@/lib/auth-api', async () => {
         : unauthorized(),
   };
 });
+
+vi.mock('@/lib/deletion-state', () => ({
+  isDeletionPending: async () => {
+    if (state.stateError)
+      throw Object.assign(new Error('relation does not exist SECRET-TEXT'), { code: '42P01' });
+    return state.pending;
+  },
+}));
 
 vi.mock('@/lib/journal', () => ({
   listJournalEntries: (...args: unknown[]) => state.lib.list(...args),
@@ -63,6 +73,7 @@ let consoleSpies: ReturnType<typeof vi.spyOn>[];
 beforeEach(() => {
   state.auth = 'member';
   state.pending = false;
+  state.stateError = false;
   for (const fn of Object.values(state.lib)) fn.mockReset();
   consoleSpies = (['error', 'warn', 'log', 'info'] as const).map((m) =>
     vi.spyOn(console, m).mockImplementation(() => {}),
@@ -145,6 +156,28 @@ describe('a member whose account deletion is pending', () => {
   it('is served normally again only when the pending marker is absent (an ordinary member)', async () => {
     state.lib.list.mockResolvedValue({ entries: [], hasMore: false });
     expect((await collection.GET(new Request('http://x/api/v1/journal/entries'))).status).toBe(200);
+  });
+});
+
+describe('when the deletion-pending check cannot be answered', () => {
+  it('fails CLOSED with a generic 500 - never a 401 "unauthenticated" - and leaks nothing', async () => {
+    state.stateError = true;
+    const calls = [
+      () => collection.GET(new Request('http://x/api/v1/journal/entries')),
+      () => collection.POST(json('POST', { content: SECRET })),
+      () => single.GET(new Request('http://x'), params()),
+      () => single.PATCH(json('PATCH', { content: SECRET }), params()),
+      () => single.DELETE(new Request('http://x', { method: 'DELETE' }), params()),
+    ];
+    for (const call of calls) {
+      const res = await call();
+      expect(res.status).toBe(500); // not 401: the member's session is fine
+      expect(res.headers.get('Cache-Control')).toBe(NO_STORE);
+      const body = await res.json();
+      expect(body.error.code).toBe('INTERNAL_ERROR');
+      expect(JSON.stringify(body)).not.toContain('SECRET');
+    }
+    for (const fn of Object.values(state.lib)) expect(fn).not.toHaveBeenCalled(); // nothing was served or written
   });
 });
 
