@@ -23,6 +23,7 @@ import {
   Text,
 } from '@tnsi/ui';
 import { CheckInForm } from '@/components/dashboard/check-in-form';
+import { ReflectionsInvitation } from '@/components/dashboard/reflections/reflections-invitation';
 import {
   PracticeArt,
   StatTile,
@@ -573,6 +574,8 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                 </Stack>
+
+                <ReflectionsInvitation />
 
                 <WeekAtAGlance recentCheckIns={checkInHistory.checkIns} />
 

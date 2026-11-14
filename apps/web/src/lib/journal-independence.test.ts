@@ -35,7 +35,7 @@ describe('the journal is read and written by one module only', () => {
     expect(offenders).toEqual(['lib/journal.ts']);
   });
 
-  it('only the journal routes, the account-deletion flow and the user-sync path import the journal module', () => {
+  it('only the journal routes, the journal pages, the account-deletion flow and the user-sync path import the journal module', () => {
     const importers = files
       .filter((file) =>
         /from ['"](@\/lib\/journal|\.\/journal|\.\.\/journal)['"]/.test(readFileSync(file, 'utf8')),
@@ -46,6 +46,10 @@ describe('the journal is read and written by one module only', () => {
       [
         'app/api/v1/journal/entries/[id]/route.ts',
         'app/api/v1/journal/entries/route.ts',
+        // The web journal screens (PR 3): the history list and the single-entry page read the member's own
+        // entries through the same owner-scoped functions as the API.
+        'app/dashboard/reflections/[id]/page.tsx',
+        'app/dashboard/reflections/page.tsx',
         'lib/account-deletion.ts',
         'lib/user-sync-ops.ts',
       ].sort(),
