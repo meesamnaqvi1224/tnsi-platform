@@ -660,3 +660,43 @@ export interface ReturnPathResponse {
   allowedLevels: (1 | 2 | 3)[];
   content: ReturnPathContent;
 }
+
+/**
+ * My Reflections (the private journal). Hand-kept mirrors of apps/web/src/lib/journal.ts's
+ * `JournalEntryDto` / `JournalEntryListItem` and the list envelope of GET /api/v1/journal/entries.
+ * The server never returns the owner's id. Guided prompts, practice and theory links exist on the
+ * server for later phases; this app does not create or show them yet.
+ */
+export type ReflectionStatus = 'draft' | 'saved';
+
+export interface ReflectionEntry {
+  id: string;
+  title: string | null;
+  content: string;
+  status: ReflectionStatus;
+  entryType: 'independent' | 'guided' | 'practice' | 'theory';
+  promptId: string | null;
+  promptText: string | null;
+  practiceId: string | null;
+  completionId: string | null;
+  theoryCondition: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** A row in the history: a short preview, never the full text. */
+export interface ReflectionListItem {
+  id: string;
+  title: string | null;
+  preview: string;
+  previewTruncated: boolean;
+  status: ReflectionStatus;
+  entryType: ReflectionEntry['entryType'];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReflectionsListResponse {
+  entries: ReflectionListItem[];
+  pagination: { limit: number; offset: number; hasMore: boolean };
+}

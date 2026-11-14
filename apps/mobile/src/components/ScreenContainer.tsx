@@ -7,6 +7,11 @@ interface ScreenContainerProps extends PropsWithChildren {
   scroll?: boolean;
   /** Taps on buttons and chips work while the keyboard is open (instead of the first tap only closing it). For screens with a search field. */
   keyboardPersistTaps?: boolean;
+  /**
+   * For screens the member types into: the content scrolls up out of the keyboard's way (iOS) and the
+   * keyboard closes as they drag down, so buttons below the text are always reachable.
+   */
+  keyboardAware?: boolean;
   /** Set when a navigation header already sits above this screen, so the top safe-area inset is not added a second time. */
   underHeader?: boolean;
   /** Set when the tab bar already sits below this screen, so the bottom safe-area inset is not added a second time. */
@@ -24,6 +29,7 @@ export function ScreenContainer({
   children,
   scroll = false,
   keyboardPersistTaps = false,
+  keyboardAware = false,
   underHeader = false,
   inTabs = false,
   background,
@@ -42,6 +48,8 @@ export function ScreenContainer({
         <ScrollView
           contentContainerStyle={[styles.content, style]}
           keyboardShouldPersistTaps={keyboardPersistTaps ? 'handled' : 'never'}
+          automaticallyAdjustKeyboardInsets={keyboardAware}
+          keyboardDismissMode={keyboardAware ? 'interactive' : 'none'}
         >
           {children}
         </ScrollView>
