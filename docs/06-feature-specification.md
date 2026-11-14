@@ -165,7 +165,8 @@ conversations, webinar attendance, revenue, export reports.
 
 ## CRM integration (Flowi)
 
-Every important action syncs automatically:
+Every important action syncs automatically (**except** private content: a member's My Reflections
+journal is never sent to Flowi or any marketing, support or analytics system):
 
 ```
 Assessment        → Create Contact
@@ -278,6 +279,16 @@ else**: no activity, no practice or journey data, nothing health-related.
 - **Service messages only:** these tags drive account messages (welcome, trial,
   payment). They are not marketing consent; see the newsletter and Return Path forms
   for that.
+
+## My Reflections (private journal)
+
+A private personal writing space, independent of check-ins, recommendations and practice completion:
+free writing now, guided prompts and practice/Theory-linked reflections in later phases. Journal content
+never changes what a member is shown and has no AI, emotion or clinical analysis. Available to every
+signed-in member. Members can edit and delete their entries, and account deletion permanently purges
+them. **Backend foundation (schema, API, privacy protections, account deletion):**
+[my-reflections-backend.md](./my-reflections-backend.md). Journal screens (web and mobile), guided
+prompts and the Theory entry point are not part of that foundation.
 
 ## Notification System
 
