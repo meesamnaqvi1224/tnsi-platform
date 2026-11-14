@@ -18,6 +18,12 @@ vi.mock('@clerk/nextjs', () => ({
 const { DashboardSidebar } = await import('./dashboard-sidebar');
 
 describe('DashboardSidebar', () => {
+  it('links to Account (where a member can delete their account)', () => {
+    const html = renderToStaticMarkup(<DashboardSidebar />);
+    expect(html).toContain('href="/dashboard/account"');
+    expect(html).toContain('Account');
+  });
+
   it('renders a Somatic Cards navigation item', () => {
     const html = renderToStaticMarkup(<DashboardSidebar />);
     expect(html).toContain('Somatic Cards');
