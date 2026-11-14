@@ -373,9 +373,20 @@ longer be used. The app therefore never shows a delayed "deletion complete" conf
   The file substitutes its own connection pool (one connection on a single-session local engine such as
   PGlite, the normal pool on a real server) so no repository source is changed for testing.
 
-- **Not covered — see §8:** the real Clerk integration (Clerk is faked); concurrent creates of one id across
-  real connections (the single-session local engine cannot interleave); device-level behaviour of the
-  Profile screen.
+- **Real-Neon validation (14 Nov 2026, isolated Neon project, temporary child branch, since deleted):** the
+  branch was at migration 0012; 0013 was applied through drizzle's ledger (14), the new code was tested
+  against it (`pre-migration-safety`), then **only 0014** was applied (15; `users` still 9 columns; 5 CHECKs,
+  1 trigger, 2 partial indexes) and a second `migrate` was a no-op. All **59 integration tests**, the
+  pre-migration test and the **8 concurrency tests** (`lib/journal.concurrency.integration.test.ts`, Neon-only,
+  real connection pool) passed, with zero test rows left behind. The concurrency tests cover: 12 concurrent
+  creates of one client id (exactly one 201, the rest 200 replays of the winner's text, one row); 12 distinct
+  ids (none lost); a save racing five edits (ends saved, never reverted); concurrent saved → draft attempts
+  (all 409); concurrent deletes (one 200); 10 concurrent deletion markers (one row, first time kept); 5
+  concurrent `user.deleted` deliveries (all complete, one completion time, journal purged); 3 concurrent
+  account-deletion requests (none fails, one marker, journal purged). The parent branch was verified
+  untouched. This still ran against a Neon database with a fake Clerk.
+- **Not covered — see §8:** the real Clerk integration (Clerk is faked); device-level behaviour of the
+  Profile screen; the production databases themselves.
 
 ## 8. Release blockers and pending decisions (NONE of these is complete)
 
@@ -395,9 +406,9 @@ longer be used. The app therefore never shows a delayed "deletion complete" conf
 4. **Real Clerk integration testing — not done.** All tests fake Clerk. The real `deleteUser` call, its
    error shapes (including the `404` assumption), the `user.deleted` webhook delivery and Clerk's webhook
    retry behaviour must be exercised against a real (non-production) Clerk instance.
-5. **Concurrent idempotent-create testing against an isolated Neon database — not done.** The local
-   single-session engine cannot interleave connections. Run the creation-race test on an isolated Neon
-   database before the migration is approved, as was done for 0013.
+5. ~~Concurrent idempotent-create testing against an isolated Neon database~~ — **done 14 Nov 2026** (see
+   §7: 8 concurrency tests and the full integration suite pass on real Neon). Not a substitute for the
+   approved production migration steps (backup branch, explicit approval).
 
 **Pending decisions**
 

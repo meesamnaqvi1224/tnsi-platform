@@ -174,14 +174,16 @@ describe.skipIf(!enabled)('My Reflections journal on real PostgreSQL', { timeout
     m = { db, s, collection, single, account, accountLib, sync, journey, d };
     A = await newUser('a');
     B = await newUser('b');
-  });
+  }, 120_000);
 
   afterAll(async () => {
     if (!m) return;
-    for (const id of userIds) await m.db.delete(m.s.users).where(m.d.eq(m.s.users.id, id));
-    for (const id of practiceIds)
-      await m.db.delete(m.s.practices).where(m.d.eq(m.s.practices.id, id));
-  });
+    // One statement per table (not one round trip per row): over a network database a long list of single
+    // deletes can outlast the hook timeout and leave rows behind.
+    if (userIds.length) await m.db.delete(m.s.users).where(m.d.inArray(m.s.users.id, userIds));
+    if (practiceIds.length)
+      await m.db.delete(m.s.practices).where(m.d.inArray(m.s.practices.id, practiceIds));
+  }, 120_000);
 
   beforeEach(() => {
     consoleSpies = (['error', 'warn', 'log', 'info', 'debug'] as const).map((method) =>
