@@ -396,10 +396,13 @@ longer be used. The app therefore never shows a delayed "deletion complete" conf
    the mobile Profile screen uses it, but there is no website screen, and no public web page describing how
    to delete an account. Google Play requires a web-accessible deletion path; the privacy policy and store
    listings need to point to it. Required before store submission.
-2. **Actual Neon backup retention and its deletion implications — not determined.** Deleting rows removes
-   them from the live database only; they remain in backups and any point-in-time/branch copies until those
-   expire. The real retention window must be read from the Neon plan and documented, and the privacy policy
-   must not describe live deletion as immediate erasure from backups.
+2. ~~Actual Neon backup retention and its deletion implications~~ — **determined 14 Nov 2026 (read-only):**
+   point-in-time restore window **6 hours (21,600 s)** on the **Free** plan; no scheduled backups; the only
+   other copies are **manual branches**, which persist until deleted (one exists:
+   `pre-migration-0013-backup-2026-11-11`). Details and rules: `docs/07-technical-architecture.md` §Backup
+   strategy. The privacy policy must say deleted data can remain in recovery copies for up to that window and
+   until manual backup branches are deleted (proposed wording: `docs/my-reflections-privacy-policy-draft.md`).
+   Open owner decision: whether to pay for a longer window, and a delete-by date for each backup branch.
 3. **Caroline/legal approval of the privacy-policy wording — not obtained.** Nothing in
    `apps/web/src/content/legal/privacy.ts` was changed. Journal data handling, retention and the account
    deletion behaviour (including §6's known limitations) need approved wording before release.

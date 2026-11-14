@@ -166,9 +166,60 @@ monitoring, uptime monitoring, webhook logs, CRM sync logs.
 ## Backup strategy
 
 Sanity content backup, GitHub repository, environment backup, weekly
-deployment snapshots. Database export/PITR strategy for Postgres/Neon to
-be defined alongside the entitlements schema (`ARCHITECTURE.md` open
-items).
+deployment snapshots.
+
+**Postgres (Neon) — measured 14 Nov 2026, read from the Neon API (read-only):**
+
+| Fact                                      | Value                                                                                                                       |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Neon organisation plan                    | **Free** (as reported by `neonctl orgs list`)                                                                               |
+| Point-in-time restore window (production) | **21,600 seconds = 6 hours** (`history_retention_seconds` on project `mute-cherry-69840088`)                                |
+| Scheduled backups / snapshots             | None configured. The only recovery beyond the 6-hour window is a **manual branch**.                                         |
+| Manual backup branch currently present    | `pre-migration-0013-backup-2026-11-11` (created 11 Nov, unprotected, still holding a copy of production data from that day) |
+| Region of the production database         | `aws-us-east-2` (United States)                                                                                             |
+
+Consequences that matter for privacy and deletion:
+
+- Deleting rows removes them from the live database at once. They remain recoverable from Neon's restore
+  history for up to **6 hours**, and **indefinitely in any manual backup branch until that branch is deleted**.
+  A manual branch is therefore a second copy of member data that account deletion does not reach.
+- Backup branches taken **before** migration 0014 contain **no** journal entries (the table does not exist
+  yet). A branch taken **after** the journal launches would hold members' reflections, so every such branch
+  needs an owner, an expiry date and a deletion step.
+- The 6-hour window is short for disaster recovery. A longer window is a paid-plan decision for the owner.
+
+Rule: every manual backup branch is recorded here with its purpose and a delete-by date.
+
+## Production databases and what connects to them (14 Nov 2026)
+
+Neon organisation: **The Nervous System Institute** (`org-mute-sunset-53867425`), three projects:
+
+| Neon project (id)                                      | Region    | Purpose                                                                                                                                         |
+| ------------------------------------------------------ | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mute-cherry-69840088`, named **"tnsi-development"**   | us-east-2 | **PRODUCTION.** Primary branch `production`, endpoint `ep-damp-flower-ayp7i2gc`. Misleadingly named.                                            |
+| `purple-queen-31396386`, also named "tnsi-development" | eu-west-2 | Isolated test database (migration rehearsals, integration tests). **Never production.** Same name as the production project: always use the id. |
+| `late-wildflower-26082707`, "tnsi-previews"            | us-east-2 | Empty database with all migrations, used by **Preview** deployments only.                                                                       |
+
+Vercel (team `meesam1`):
+
+| Vercel project               | Serves                        | Production `DATABASE_URL`                  | Preview `DATABASE_URL` | Git deploys                                         |
+| ---------------------------- | ----------------------------- | ------------------------------------------ | ---------------------- | --------------------------------------------------- |
+| `tnsi-platform`              | thenervoussysteminstitute.com | sensitive (value not readable) — see below | `tnsi-previews`        | Connected (`main` deploys to production)            |
+| `tnsi-platform-somatic-prod` | earlier test deployment       | sensitive (value not readable) — see below | `tnsi-previews`        | **Disconnected 14 Nov 2026** (no automatic deploys) |
+
+Also pointing at the production database: the local `apps/web/.env.local` and `packages/db/.env` on the
+developer machine use `ep-damp-flower-ayp7i2gc`. Any local run, script or test started from those files
+reads and writes **production**. Integration tests refuse that host by design.
+
+**What is NOT proven.** Both production `DATABASE_URL` values are Vercel `sensitive` variables, which are
+write-only, so their hosts cannot be read back by the API. By elimination (the organisation has only one
+production-sized database) both most likely point at `ep-damp-flower-ayp7i2gc`, but that is an inference.
+To confirm without exposing secrets: in the Neon console open the production project's monitoring and watch
+connections while each site's signed-in pages load, or re-enter the value in Vercel from the Neon console.
+
+Implication for migration 0014: apply it to `mute-cherry-69840088` (branch `production`). Because
+`tnsi-platform-somatic-prod` no longer deploys on merge, it keeps its current code; if it does share the
+production database, the additive-only migration cannot affect it.
 
 ## Deployment pipeline
 
