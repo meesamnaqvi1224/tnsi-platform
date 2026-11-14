@@ -406,9 +406,15 @@ longer be used. The app therefore never shows a delayed "deletion complete" conf
 3. **Caroline/legal approval of the privacy-policy wording — not obtained.** Nothing in
    `apps/web/src/content/legal/privacy.ts` was changed. Journal data handling, retention and the account
    deletion behaviour (including §6's known limitations) need approved wording before release.
-4. **Real Clerk integration testing — not done.** All tests fake Clerk. The real `deleteUser` call, its
-   error shapes (including the `404` assumption), the `user.deleted` webhook delivery and Clerk's webhook
-   retry behaviour must be exercised against a real (non-production) Clerk instance.
+4. **Real Clerk integration testing — partly done (14 Nov 2026, development instance only, development keys
+   only; no production keys, users or settings touched).** Verified against real Clerk with `@clerk/backend`
+   1.34.0, the version `packages/auth` uses: creating a user, `deleteUser` (returns `{ deleted: true }`),
+   deleting the **same user again** and deleting a **never-existing** user both throw `ClerkAPIResponseError`
+   with `status: 404` and code `resource_not_found`; `getUser` after deletion is also a 404. This confirms the
+   `404 = already deleted = success` assumption in `realAccountDeletionDeps`. The test user was deleted; no
+   test users were left behind. **Still untested:** the real Clerk `user.deleted` **webhook delivery** and its
+   retry behaviour (needs a publicly reachable endpoint registered on the development instance), and a full
+   run of `DELETE /api/v1/me/account` with a real session.
 5. ~~Concurrent idempotent-create testing against an isolated Neon database~~ — **done 14 Nov 2026** (see
    §7: 8 concurrency tests and the full integration suite pass on real Neon). Not a substitute for the
    approved production migration steps (backup branch, explicit approval).
