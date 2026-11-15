@@ -5,6 +5,7 @@ import { SiteFooter } from '@/components/layout/site-footer';
 import { SiteHeader } from '@/components/layout/site-header';
 import { LegalDocument } from '@/components/utility/legal-document';
 import { accountDeletionContent } from '@/content/legal/account-deletion';
+import { ACCOUNT_PAGE_PATH, signInUrlFor } from '@/lib/auth-redirect';
 import { createBreadcrumbJsonLd, createPageMetadata, createWebPageJsonLd } from '@/lib/seo';
 
 export const metadata = createPageMetadata({
@@ -45,7 +46,7 @@ export default function DeleteAccountPage() {
           <Container size="xl">
             <div className="mx-auto flex max-w-3xl flex-wrap gap-3">
               <NextLink
-                href="/dashboard/account"
+                href={signInUrlFor(ACCOUNT_PAGE_PATH)}
                 className={buttonVariants({ variant: 'primary', size: 'lg' })}
               >
                 Sign in to delete your account

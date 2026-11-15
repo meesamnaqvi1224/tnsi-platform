@@ -9,10 +9,11 @@ import { MEMBERSHIP_PAGE_PATH, PRESELECTABLE_PLANS } from '@/lib/membership-link
  * pages read it themselves and hand Clerk an explicit destination.
  *
  * A redirect target taken from a URL is untrusted input, so this accepts exactly
- * the two shapes the site itself produces and nothing else:
+ * the shapes the site itself produces and nothing else:
  *
  *   /dashboard/billing
  *   /dashboard/billing?plan=monthly | /dashboard/billing?plan=annual
+ *   /dashboard/account                 (the public account-deletion page's "sign in to delete" button)
  *
  * Anything else - an absolute or protocol-relative URL, another path, extra or
  * unknown query parameters, a fragment, a different casing, encoded or control
@@ -22,8 +23,11 @@ import { MEMBERSHIP_PAGE_PATH, PRESELECTABLE_PLANS } from '@/lib/membership-link
  */
 const MAX_LENGTH = 64;
 
+/** Where a visitor who started from the public account-deletion page lands after signing in. */
+export const ACCOUNT_PAGE_PATH = '/dashboard/account';
+
 const ALLOWED = new RegExp(
-  `^${escapeRegExp(MEMBERSHIP_PAGE_PATH)}(?:\\?plan=(?:${PRESELECTABLE_PLANS.join('|')}))?$`,
+  `^(?:${escapeRegExp(MEMBERSHIP_PAGE_PATH)}(?:\\?plan=(?:${PRESELECTABLE_PLANS.join('|')}))?|${escapeRegExp(ACCOUNT_PAGE_PATH)})$`,
 );
 
 function escapeRegExp(value: string): string {

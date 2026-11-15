@@ -16,7 +16,8 @@ describe('public account-deletion page', () => {
     expect(html).toContain('open Account in the Academy menu');
     expect(html).toContain('If you can no longer sign in');
     expect(html).toContain('href="/contact"');
-    expect(html).toContain('href="/dashboard/account"');
+    // The sign-in button carries where to return to, so a visitor lands on the Account page afterwards.
+    expect(html).toContain('href="/sign-in?redirect_url=%2Fdashboard%2Faccount"');
   });
 
   it('is honest about the subscription requirement, what is deleted, what is kept and backups', () => {
