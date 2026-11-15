@@ -434,61 +434,56 @@ longer be used. The app therefore never shows a delayed "deletion complete" conf
 The privacy policy, the store privacy forms (App Store "user content", Play Data safety), and the support
 procedure for a stuck pending deletion need to be completed alongside the blockers above.
 
-## 10. Verification plan: Android and real-API integration (planned, NOT done)
+## 10. Verification: what is done and what remains (updated 16 Nov 2026)
 
-Everything below is **outstanding** until someone runs it and records the result here. Nothing in this plan
-touches production data without the owner's separate approval.
+### 10.1 Status
 
-### 10.1 What has and has not been verified so far
+| Area                                                                          | Status                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Backend API, DB guards, concurrency (PR #51)                                  | Verified on real Neon (isolated project) with a faked Clerk.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Real Clerk deletion calls                                                     | Verified against the development instance (404 semantics).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **Web** journal screens, autosave, Back, refresh, account deletion (#55, #54) | **Verified in a real browser** against the real API, the empty previews database and a real Clerk development user.                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **Android** (#52, #56)                                                        | **Verified on a Pixel 6 emulator (Android 17) running the real app against the real API**: sign-in (including Clerk's new-device step), Home card and Progress entry, editor, **draft autosave**, keyboard behaviour, failed saves and recovery, **hardware Back and unsaved-changes prompt**, Save Draft / Discard / Keep Editing, explicit save and history, delete confirmation, account-deletion lock (423), and account deletion from Profile (409 subscription refusal, **502** pending, **202** finishing). Not yet: a **physical Android device**, TalkBack, rotation, large font sizes. |
+| iOS journal screens                                                           | Verified in the iPhone 17 Pro simulator against a **stub** of the API only. **Not re-run against the real API** and **not re-checked after the navigation fixes in #56** (the Home card opens a Profile-tab screen from another tab, so back/exit behaviour must be confirmed on iOS too).                                                                                                                                                                                                                                                                                                       |
+| Clerk `user.deleted` webhook **handler**                                      | Verified locally with a correctly **Svix-signed** payload: a bad signature is a 400; a valid one that fails to finish is a 500 (so Clerk retries) with no error text; after the cause is removed the retry completes the deletion; a replay is idempotent (same completion time).                                                                                                                                                                                                                                                                                                                |
+| Clerk's **real** webhook delivery                                             | **Not verified.** Needs a publicly reachable endpoint registered on the Clerk development instance (see 10.4).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Production smoke test                                                         | **Not done**, needs the owner's approval (10.5).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
-| Area                                                                             | Status                                                                                                                                                                              |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Backend API, DB guards, concurrency (PR #51)                                     | Verified on real Neon (isolated project) with a faked Clerk.                                                                                                                        |
-| Real Clerk deletion calls                                                        | Verified against the development instance (404 semantics). Webhook delivery not verified.                                                                                           |
-| **Web** journal screens, autosave, Back, refresh, account deletion (PR #55, #54) | **Verified in a real browser** against a local server using the real API, the real (empty, non-production) previews database and a real Clerk development user. Details in each PR. |
-| **iOS** journal screens (PR #52)                                                 | Verified in the iPhone 17 Pro simulator against a **stub** of the API, not the real API.                                                                                            |
-| **Android** (PR #52)                                                             | **Not verified at all.**                                                                                                                                                            |
-| Mobile against the **real** API                                                  | **Not verified.**                                                                                                                                                                   |
+### 10.2 Environment used (no production data, no production keys)
 
-### 10.2 Environment for the real-API run (no production data)
+A local server, the **previews** Neon database (`tnsi-previews`: migrations through 0014, otherwise empty), Clerk
+**development** keys, and a mobile build whose `EXPO_PUBLIC_API_BASE_URL` points at the local server and whose
+`EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` is the **development** key (environment variables for one Metro run, never
+committed). Test members are created in the Clerk development instance with a `+clerk_test` address, for which
+Clerk accepts its documented fixed verification code for the new-device step. Every test member, database row
+and credential file is deleted afterwards and the previews database is confirmed back to zero rows.
 
-1. A Vercel **preview** of the merged stack (#51, #52, #54, #55) or a local server, using the **previews**
-   Neon database (`tnsi-previews`, migrations through 0014, empty) and Clerk **development** keys. Production
-   keys, production database and production Stripe are never used.
-2. A mobile development build whose `EXPO_PUBLIC_API_BASE_URL` points at that server and whose
-   `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` is the **development** key (local `.env.local`, never committed).
-3. Test members are created in the Clerk development instance with a `+clerk_test` address. Clerk accepts its
-   documented fixed test verification code for such addresses, so the new-device email step can be completed.
-   Delete every test member afterwards (Clerk and the previews database) and confirm the previews database is
-   back to zero rows.
+To exercise failure paths **safely**, temporary triggers were added to the previews database only (one made the
+journal purge fail to produce the 502; one made the final local step fail to produce the 202) and dropped
+afterwards. Nothing of this kind is ever done to production.
 
-### 10.3 Android checklist (emulator first, then one physical device before release)
+### 10.3 Android findings that changed the code (fixed in #56)
 
-Run on a current Pixel emulator and, before release, one physical Android device:
+1. The Home card opens a Profile-tab screen from another tab. The editor was the only route on Profile's
+   stack: **Android's Back switched tabs without asking about unsaved text**, the editor stayed alive, hidden,
+   inside the Profile tab, and the header had no back button. The reflection screens now draw their own back
+   button, take Android's hardware Back (asking first when there is unsaved writing) and leave to where the
+   member came from. Behaviour depends on whether Profile's stack already exists, so both cases were tested.
+2. On current Android the keyboard does not resize the window, so **Save sat underneath the keyboard**.
+   Keyboard-aware screens now pad by the keyboard height on Android.
+3. The "unsaved changes" dialog cut its message off (the message was the dialog title).
 
-- Home invitation opens the editor; My Progress link opens the history; empty state wording renders.
-- Typing, keyboard behaviour: the Save buttons are reachable with the keyboard open (the app uses the
-  `keyboardAware` option; Android relies on the activity's resize mode, so confirm it).
-- **Hardware/gesture Back with unsaved text** opens the "unsaved changes" prompt (this relies on the
-  `beforeRemove` listener, which was only verified on iOS). Keep Editing keeps the text; Discard leaves.
-- Save Reflection, Save as Draft (including the "Your draft has been saved." message, never observed on iOS),
-  Delete with its confirmation, edit a saved reflection, a saved reflection never offers Save as Draft.
-- Failed save (airplane mode): message shown, text kept, recovers when the connection returns.
-- Account deletion from Profile: subscription refusal, pending state, completion.
-- Rotation, large font sizes and TalkBack: no clipped text, controls reachable and labelled.
+### 10.4 Real Clerk webhook delivery: steps for the owner (not done)
 
-### 10.4 Real-API integration run (iOS and Android)
-
-Repeat on both platforms against the real API:
-
-1. Create, autosave-equivalent behaviour (the app has no autosave: explicit saves only), edit, delete.
-2. A create whose reply is lost (airplane mode on the reply is hard to time; use the proxy or the Network
-   Link Conditioner) followed by newer text ends with one entry holding the newer text.
-3. A second device or the website signed in as the same member sees the same reflections; a second member
-   never sees them (404 on the id).
-4. A member whose account deletion is pending sees the locked message and cannot read or write.
-5. Account deletion end to end: journal rows gone, Clerk user gone, signed out.
-6. Offline start: the screens show the calm error and offer to retry.
+1. Choose a reachable HTTPS URL for a **non-production** deployment (for example a Vercel preview with its
+   Preview environment pointing at the previews database and Clerk development keys). Deployment protection
+   must allow the webhook path.
+2. In the Clerk **development** instance dashboard, Webhooks: add an endpoint `<url>/api/webhooks/clerk`,
+   subscribe to `user.created`, `user.updated`, `user.deleted`, and copy the signing secret.
+3. Set that secret as `CLERK_WEBHOOK_SECRET` for that non-production deployment (never for production here).
+4. Delete a test member and confirm Clerk's delivery log shows a 200 and the database row is soft-deleted; then
+   force a failure (temporary trigger on the previews database) and confirm Clerk retries and the retry
+   completes it.
 
 ### 10.5 Production smoke test (needs the owner's separate approval, each step)
 
