@@ -6,6 +6,7 @@
 
 import { after, NextRequest, NextResponse } from 'next/server';
 import { syncClerkUser } from '@tnsi/auth/sync/user';
+import { safeErrorCode } from '@/lib/private-response';
 
 /** Room for the after-response CRM send below (a few seconds of Flowi calls). */
 export const maxDuration = 30;
@@ -57,13 +58,21 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, action: result.action });
   } catch (error) {
-    console.error('[Clerk Webhook] Error:', error);
+    // Never log or return the error object or its message: for a database failure it can carry the
+    // statement, and `user.deleted` now also purges a member's journal in the same transaction. A short
+    // label and code is enough to diagnose; Clerk retries any non-2xx.
+    const verification = error instanceof Error && error.name === 'WebhookVerificationFailedError';
+    console.error('[Clerk Webhook] failed', {
+      kind: verification ? 'verification' : 'processing',
+      code: safeErrorCode(error),
+    });
 
-    // Return 400 for verification failures, 500 for other errors
-    const status =
-      error instanceof Error && error.name === 'WebhookVerificationFailedError' ? 400 : 500;
-    const message = error instanceof Error ? error.message : 'Webhook processing failed';
-
-    return NextResponse.json({ error: message }, { status });
+    // 400 for a failed signature check, 500 for anything else; neither echoes what went wrong.
+    return NextResponse.json(
+      {
+        error: verification ? 'Webhook signature verification failed' : 'Webhook processing failed',
+      },
+      { status: verification ? 400 : 500 },
+    );
   }
 }
