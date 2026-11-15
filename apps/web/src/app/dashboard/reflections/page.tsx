@@ -7,6 +7,7 @@ import {
   REFLECTION_STATES,
   REFLECTIONS_LIST,
 } from '@tnsi/core';
+import { RefreshOnReturn } from '@/components/dashboard/reflections/refresh-on-return';
 import { getJournalPageAccess } from '@/lib/journal-page-access';
 import { listJournalEntries, type JournalEntryListItem } from '@/lib/journal';
 import { createPageMetadata } from '@/lib/seo';
@@ -113,6 +114,7 @@ export default async function ReflectionsPage({ searchParams }: PageProps) {
   return (
     <Section spacing="lg" aria-labelledby="reflections-heading">
       <Container size="lg">
+        <RefreshOnReturn />
         <Stack gap="xl">
           {header}
 

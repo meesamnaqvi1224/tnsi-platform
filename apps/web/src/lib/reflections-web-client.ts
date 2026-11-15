@@ -13,7 +13,12 @@ export class ReflectionRequestError extends Error {
   }
 }
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+async function request<T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  keepalive = false,
+): Promise<T> {
   let response: Response;
   try {
     response = await fetch(path, {
@@ -21,6 +26,8 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
       headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
       body: body === undefined ? undefined : JSON.stringify(body),
       cache: 'no-store',
+      // Lets a request started as the page is hidden or closed still finish (the draft autosave flush).
+      ...(keepalive ? { keepalive: true } : {}),
     });
   } catch {
     throw new ReflectionRequestError(0, 'NETWORK_ERROR');
@@ -35,9 +42,24 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   return parsed.data as T;
 }
 
-export const reflectionsApi = {
-  get: <T>(path: string) => request<T>('GET', path),
-  post: <T>(path: string, body?: unknown) => request<T>('POST', path, body),
-  patch: <T>(path: string, body?: unknown) => request<T>('PATCH', path, body),
-  delete: <T>(path: string) => request<T>('DELETE', path),
-};
+function makeApi(keepalive: boolean) {
+  return {
+    get: <T>(path: string) => request<T>('GET', path, undefined, keepalive),
+    post: <T>(path: string, body?: unknown) => request<T>('POST', path, body, keepalive),
+    patch: <T>(path: string, body?: unknown) => request<T>('PATCH', path, body, keepalive),
+    delete: <T>(path: string) => request<T>('DELETE', path, undefined, keepalive),
+  };
+}
+
+export const reflectionsApi = makeApi(false);
+
+/**
+ * The same calls with `keepalive`, for the final autosave as the page is hidden or closed. Browsers cap a
+ * keepalive body at 64 KiB, so use `fitsKeepalive` first.
+ */
+export const reflectionsKeepaliveApi = makeApi(true);
+
+export function fitsKeepalive(fields: { title: string; content: string }): boolean {
+  // Generous margin below the 64 KiB limit for the JSON wrapper and multi-byte characters.
+  return new TextEncoder().encode(JSON.stringify(fields)).length < 60_000;
+}
