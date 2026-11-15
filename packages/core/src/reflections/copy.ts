@@ -47,6 +47,8 @@ export const REFLECTION_EDITOR = {
   draftSavedMessage: 'Your draft has been saved.',
   savedMessage: 'Your reflection has been saved.',
   unsavedMessage: 'You have unsaved changes. Would you like to save before leaving?',
+  autosavedMessage: 'Draft saved automatically.',
+  autosaveFailedMessage: 'We couldn’t save your draft automatically. Your writing is still here.',
   // Button labels for the unsaved-changes prompt. The wording supplied covers the message only.
   unsavedSaveDraft: 'Save Draft',
   unsavedSave: 'Save',

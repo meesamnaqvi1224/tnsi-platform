@@ -46,3 +46,26 @@ describe('reflectionsApi', () => {
     expect(await reflectionsApi.patch('/x', {}).catch((e) => e)).toMatchObject({ status: 502 });
   });
 });
+
+describe('keepalive api', () => {
+  it('sends keepalive only for the keepalive api', async () => {
+    const { reflectionsKeepaliveApi } = await import('./reflections-web-client');
+    respond(200, { data: {} });
+    await reflectionsKeepaliveApi.patch('/x', {});
+    expect((fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0]![1]).toMatchObject({
+      keepalive: true,
+    });
+    respond(200, { data: {} });
+    await reflectionsApi.patch('/x', {});
+    expect((fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0]![1]).not.toHaveProperty(
+      'keepalive',
+    );
+  });
+
+  it('only uses keepalive when the body fits the browser limit', async () => {
+    const { fitsKeepalive } = await import('./reflections-web-client');
+    expect(fitsKeepalive({ title: 'a', content: 'b'.repeat(10_000) })).toBe(true);
+    expect(fitsKeepalive({ title: '', content: 'é'.repeat(20_000) })).toBe(true); // 40 KB
+    expect(fitsKeepalive({ title: '', content: '😀'.repeat(20_000) })).toBe(false); // 80 KB
+  });
+});
