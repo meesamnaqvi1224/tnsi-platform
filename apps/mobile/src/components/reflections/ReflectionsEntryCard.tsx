@@ -23,7 +23,7 @@ export function ReflectionsEntryCard() {
       <PrimaryButton
         label={HOME_INVITATION.button}
         variant="secondary"
-        onPress={() => router.push('/profile/reflection')}
+        onPress={() => router.push({ pathname: '/profile/reflection', params: { from: 'home' } })}
       />
     </View>
   );

@@ -1,5 +1,5 @@
-import type { PropsWithChildren } from 'react';
-import { ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
+import { useEffect, useState, type PropsWithChildren } from 'react';
+import { Keyboard, Platform, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import { colors, spacing } from '@/theme';
 
@@ -22,6 +22,29 @@ interface ScreenContainerProps extends PropsWithChildren {
 }
 
 /**
+ * The on-screen keyboard's height on Android, 0 otherwise. Android's `adjustResize` no longer shrinks the
+ * window on current versions (edge-to-edge), so the keyboard simply covers the bottom of the page. Padding
+ * the scroll content by this height lets the member scroll the buttons above the keyboard. (iOS handles
+ * this itself with `automaticallyAdjustKeyboardInsets`.)
+ */
+function useAndroidKeyboardHeight(enabled: boolean): number {
+  const [height, setHeight] = useState(0);
+  useEffect(() => {
+    if (!enabled || Platform.OS !== 'android') return;
+    const show = Keyboard.addListener('keyboardDidShow', (event) =>
+      setHeight(event.endCoordinates.height),
+    );
+    const hide = Keyboard.addListener('keyboardDidHide', () => setHeight(0));
+    return () => {
+      show.remove();
+      hide.remove();
+      setHeight(0);
+    };
+  }, [enabled]);
+  return height;
+}
+
+/**
  * Standard screen chrome: white background, safe-area aware, consistent
  * horizontal padding. Every Phase 1 screen wraps its content in this.
  */
@@ -35,6 +58,7 @@ export function ScreenContainer({
   background,
   style,
 }: ScreenContainerProps) {
+  const keyboardHeight = useAndroidKeyboardHeight(keyboardAware);
   const edges: Edge[] = ['left', 'right'];
   if (!underHeader) edges.push('top');
   if (!inTabs) edges.push('bottom');
@@ -46,7 +70,11 @@ export function ScreenContainer({
     >
       {scroll ? (
         <ScrollView
-          contentContainerStyle={[styles.content, style]}
+          contentContainerStyle={[
+            styles.content,
+            style,
+            keyboardHeight > 0 ? { paddingBottom: spacing.lg + keyboardHeight } : null,
+          ]}
           keyboardShouldPersistTaps={keyboardPersistTaps ? 'handled' : 'never'}
           automaticallyAdjustKeyboardInsets={keyboardAware}
           keyboardDismissMode={keyboardAware ? 'interactive' : 'none'}
