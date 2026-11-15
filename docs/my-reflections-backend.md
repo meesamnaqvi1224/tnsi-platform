@@ -433,3 +433,67 @@ longer be used. The app therefore never shows a delayed "deletion complete" conf
 
 The privacy policy, the store privacy forms (App Store "user content", Play Data safety), and the support
 procedure for a stuck pending deletion need to be completed alongside the blockers above.
+
+## 10. Verification plan: Android and real-API integration (planned, NOT done)
+
+Everything below is **outstanding** until someone runs it and records the result here. Nothing in this plan
+touches production data without the owner's separate approval.
+
+### 10.1 What has and has not been verified so far
+
+| Area                                                                             | Status                                                                                                                                                                              |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend API, DB guards, concurrency (PR #51)                                     | Verified on real Neon (isolated project) with a faked Clerk.                                                                                                                        |
+| Real Clerk deletion calls                                                        | Verified against the development instance (404 semantics). Webhook delivery not verified.                                                                                           |
+| **Web** journal screens, autosave, Back, refresh, account deletion (PR #55, #54) | **Verified in a real browser** against a local server using the real API, the real (empty, non-production) previews database and a real Clerk development user. Details in each PR. |
+| **iOS** journal screens (PR #52)                                                 | Verified in the iPhone 17 Pro simulator against a **stub** of the API, not the real API.                                                                                            |
+| **Android** (PR #52)                                                             | **Not verified at all.**                                                                                                                                                            |
+| Mobile against the **real** API                                                  | **Not verified.**                                                                                                                                                                   |
+
+### 10.2 Environment for the real-API run (no production data)
+
+1. A Vercel **preview** of the merged stack (#51, #52, #54, #55) or a local server, using the **previews**
+   Neon database (`tnsi-previews`, migrations through 0014, empty) and Clerk **development** keys. Production
+   keys, production database and production Stripe are never used.
+2. A mobile development build whose `EXPO_PUBLIC_API_BASE_URL` points at that server and whose
+   `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` is the **development** key (local `.env.local`, never committed).
+3. Test members are created in the Clerk development instance with a `+clerk_test` address. Clerk accepts its
+   documented fixed test verification code for such addresses, so the new-device email step can be completed.
+   Delete every test member afterwards (Clerk and the previews database) and confirm the previews database is
+   back to zero rows.
+
+### 10.3 Android checklist (emulator first, then one physical device before release)
+
+Run on a current Pixel emulator and, before release, one physical Android device:
+
+- Home invitation opens the editor; My Progress link opens the history; empty state wording renders.
+- Typing, keyboard behaviour: the Save buttons are reachable with the keyboard open (the app uses the
+  `keyboardAware` option; Android relies on the activity's resize mode, so confirm it).
+- **Hardware/gesture Back with unsaved text** opens the "unsaved changes" prompt (this relies on the
+  `beforeRemove` listener, which was only verified on iOS). Keep Editing keeps the text; Discard leaves.
+- Save Reflection, Save as Draft (including the "Your draft has been saved." message, never observed on iOS),
+  Delete with its confirmation, edit a saved reflection, a saved reflection never offers Save as Draft.
+- Failed save (airplane mode): message shown, text kept, recovers when the connection returns.
+- Account deletion from Profile: subscription refusal, pending state, completion.
+- Rotation, large font sizes and TalkBack: no clipped text, controls reachable and labelled.
+
+### 10.4 Real-API integration run (iOS and Android)
+
+Repeat on both platforms against the real API:
+
+1. Create, autosave-equivalent behaviour (the app has no autosave: explicit saves only), edit, delete.
+2. A create whose reply is lost (airplane mode on the reply is hard to time; use the proxy or the Network
+   Link Conditioner) followed by newer text ends with one entry holding the newer text.
+3. A second device or the website signed in as the same member sees the same reflections; a second member
+   never sees them (404 on the id).
+4. A member whose account deletion is pending sees the locked message and cannot read or write.
+5. Account deletion end to end: journal rows gone, Clerk user gone, signed out.
+6. Offline start: the screens show the calm error and offer to retry.
+
+### 10.5 Production smoke test (needs the owner's separate approval, each step)
+
+Only after: a Neon backup branch is taken, migration 0014 is applied to the production database, and the
+merged code is deployed. Then, with **one dedicated test member** created for the purpose and removed
+afterwards: create, save, delete a reflection on web and in the app; confirm no entry text appears in logs or
+analytics; confirm account deletion for that test member. Delete the Neon backup branch only on the owner's
+instruction (see `docs/07-technical-architecture.md` §Backup strategy).
