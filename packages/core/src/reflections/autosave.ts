@@ -37,6 +37,20 @@ export interface Autosaver {
   status(): AutosaveStatus;
 }
 
+/**
+ * Whether autosave applies right now. It applies ONLY to a new reflection or an existing DRAFT, only when
+ * there are unsaved changes, and only when there is real text (a title alone, or whitespace, never creates a
+ * draft). It never applies to a SAVED reflection: that can never become a draft again, and changing it stays
+ * an explicit Save. One rule, shared by the website and the app.
+ */
+export function isAutosaveEligible(
+  entry: { status: 'draft' | 'saved' } | null,
+  fields: { title: string; content: string },
+  dirty: boolean,
+): boolean {
+  return (!entry || entry.status === 'draft') && dirty && fields.content.trim().length > 0;
+}
+
 export const AUTOSAVE_DEBOUNCE_MS = 2_000;
 export const AUTOSAVE_MAX_WAIT_MS = 15_000;
 export const AUTOSAVE_RETRY_MS = 5_000;

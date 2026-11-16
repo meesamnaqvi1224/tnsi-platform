@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createAutosaver, type Autosaver } from './autosave';
+import { createAutosaver, isAutosaveEligible, type Autosaver } from './autosave';
 
 /** A save we can hold open and then resolve, to prove saves never overlap. */
 function controllable() {
@@ -146,5 +146,24 @@ describe('createAutosaver', () => {
     autosaver.cancel();
     await vi.advanceTimersByTimeAsync(60_000);
     expect(run).not.toHaveBeenCalled();
+  });
+});
+
+describe('isAutosaveEligible', () => {
+  const text = { title: '', content: 'some words' };
+  it('applies to a new reflection and to a draft that have real text and unsaved changes', () => {
+    expect(isAutosaveEligible(null, text, true)).toBe(true);
+    expect(isAutosaveEligible({ status: 'draft' }, text, true)).toBe(true);
+  });
+  it('NEVER applies to a saved reflection, however it was changed', () => {
+    expect(isAutosaveEligible({ status: 'saved' }, text, true)).toBe(false);
+    expect(isAutosaveEligible({ status: 'saved' }, { title: 'x', content: 'y' }, true)).toBe(false);
+  });
+  it('does not apply without unsaved changes, or without real text (a title alone is not a draft)', () => {
+    expect(isAutosaveEligible(null, text, false)).toBe(false);
+    expect(isAutosaveEligible(null, { title: 'Only a title', content: '   \n ' }, true)).toBe(
+      false,
+    );
+    expect(isAutosaveEligible({ status: 'draft' }, { title: '', content: '' }, true)).toBe(false);
   });
 });
