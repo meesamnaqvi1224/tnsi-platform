@@ -243,6 +243,84 @@ the writing remains, or the reverse. `ON DELETE CASCADE` on `user_id` covers a h
 | Clerk down for a long time                              | Pending; journal locked and already purged | Retry when Clerk is back. There is no "cancel deletion" — see §8.    |
 | `user.deleted` webhook never arrives (misconfiguration) | Step 4 failed and no retry delivered       | Operational: run the same finalisation for that user. Not automated. |
 
+### Concurrency: journal writes vs account deletion
+
+**The race that existed.** `requireJournalAccess()` checked the pending marker in one query and the route then
+wrote in a _separate_ query. A journal request could pass that check, deletion could then mark the member
+pending and purge, and the already-authorised request could still commit an insert or edit afterwards.
+Before the fix that row survived: the step-4 purge in `softDeleteUser` only protects writes that commit
+_before_ it, and a write committing _after_ step 4 (a slow request, a retried create with an old client id
+that had already been authorised) was never purged and the account was reported deleted with journal text
+remaining. A deletion that stalled at Clerk (state `pending`) also kept any such row until the retry. The
+same gap existed for a deletion started in the Clerk dashboard, which never writes a marker at all.
+
+**Why the final purge alone was not enough.** It is a point-in-time `DELETE`; it says nothing about writes
+that have not committed yet. Only a lock that makes "check the deletion state" and "write" one atomic
+decision, shared with the deleter, closes it.
+
+**The strategy: one transaction-scoped advisory lock per member** (`deletion-state.ts`):
+
+```
+key = hashtextextended('tnsi:journal:' || <member id>, 0)      -- 64-bit, per member
+journal write (create / edit / save / delete)   pg_advisory_xact_lock_shared(key)
+mark deletion pending (step 1)                  pg_advisory_xact_lock(key)          -- exclusive
+softDeleteUser (step 4 and the Clerk webhook)   pg_advisory_xact_lock(key)          -- exclusive
+```
+
+- **Every journal mutation** runs through `withJournalWrite` (`journal.ts`): ONE transaction that (1) takes
+  the shared lock, (2) re-checks, inside the lock, that the member has no marker and `users.deleted_at` is
+  null (`assertJournalWritable`), (3) performs the write. Anything else throws
+  `AccountDeletionPendingError` and the routes answer the same `423 ACCOUNT_DELETION_PENDING` as the early
+  check. The early check in `requireJournalAccess` stays (cheap, and it covers reads), but it is no longer
+  what guarantees safety.
+- **Deletion** takes the exclusive lock, writes the marker, and commits. An exclusive lock is granted only
+  when no shared holder exists, so every write already running has _committed_ before the marker commits,
+  and every write that starts later queues behind the lock, then reads the committed marker and is refused.
+  There is no interleaving in which a write commits after the barrier. The step-2 purge then removes
+  whatever the writes that won the race wrote.
+- **`softDeleteUser`** takes the exclusive lock before its purge and `deleted_at` update, in the same
+  transaction. That covers the step-4 gap and the Clerk-webhook path that never wrote a marker (writers also
+  refuse when `deleted_at` is set).
+- **Across instances and connections:** advisory locks live in the database server, not in the application,
+  so any number of instances and pool connections coordinate. They are released automatically at
+  `COMMIT`/`ROLLBACK`, so a crashed request or connection cannot leave a lock behind. They work under
+  transaction-mode pooling because each is taken and held inside a single transaction.
+- **Lock acquisition order** (no deadlock): advisory lock first, always, then row locks. A writer: advisory
+  (shared) -> read marker / user -> insert or update `journal_entries` (its foreign key takes a key-share
+  lock on the `users` row). A deleter: advisory (exclusive) -> insert marker (key-share on `users`) ->
+  `journal_entries` delete -> update `users`. Nothing takes a row lock and then waits for the advisory lock,
+  and no code path holds two advisory locks, so there is no cycle.
+- **No unnecessary blocking:** writers of one member take the _shared_ mode and do not block each other
+  (concurrent autosaves and double taps are unaffected); different members have different keys, so one
+  member's deletion never makes another member wait. (A 64-bit hash collision would only make two members
+  briefly wait for each other; it can never skip a lock.) Reads are not locked.
+- **Idempotent create, ownership, privacy are unchanged:** the insert is still `ON CONFLICT (id) DO NOTHING`
+  scoped by the authenticated member; every query still filters by `user_id`; nothing logs or returns text.
+  A replay of a client id after deletion began is refused by the lock-protected write (423), never recreated.
+- **Failure and retry:** Clerk failing leaves the marker committed and the journal already purged - the
+  barrier is permanent from step 1 onward - and a retry re-runs the same steps. A transaction that fails
+  rolls back with its lock. The response contract (`200`, `202`, `409`, `423`, `502`) is unchanged; the only
+  new way to see a `423` is a write that lost the race, which previously could have succeeded (and survived).
+- **No schema change and no migration:** the lock is a runtime database facility, not a table or column.
+
+**Tests** (`journal.deletion-race.integration.test.ts`, real multi-connection PostgreSQL; the deterministic
+ones hold a transaction open to force the exact interleaving, the stress ones repeat 8 rounds):
+A1 stale authorisation (passed the check, deletion completes, then writes -> refused); A2 a mid-flight write
+makes deletion wait, then it is purged; A3 creates racing deletion; B edits/saves/deletes racing deletion;
+C drafts/autosave racing deletion; D replay of a client id after deletion began, with Clerk failing and on
+retry; E six concurrent deletions; F deletion + Clerk webhooks + writers overlapping, and a webhook-only
+deletion refusing an in-flight write; G a held deletion barrier for member A does not block member B, and
+writers of one member do not block each other.
+
+**Verification (16 Nov 2026, isolated Neon `tnsi-previews` database, migrations through 0014; never production).**
+New `journal.deletion-race.integration.test.ts`: 11/11 pass. Run against the _pre-fix_ code, A1 and F2 fail
+(a create is accepted and survives after the deletion completed), so the tests do detect the race. The
+existing `journal.integration.test.ts` (59) and `journal.concurrency.integration.test.ts` (8) still pass, as do
+the web unit suite (973), `@tnsi/auth` (205), `tsc`, ESLint and `next build`. Limits: the interleavings are
+forced or stress-sampled, not exhaustively enumerated; the guarantee rests on PostgreSQL advisory-lock
+semantics plus these tests. The real Clerk API is not called (only the delete call is faked), and nothing
+was run against production.
+
 ### State machine
 
 Six states. They are **not** six stored flags: three live in Postgres as real data, one is derived, one

@@ -15,7 +15,11 @@
  * never read from the request; nothing here logs the body, the title or the text (see privateRoute).
  * Journal entries are independent of check-ins, recommendations and practice completion.
  */
-import { requireJournalAccess, journalAccessErrorResponse } from '@/lib/journal-access';
+import {
+  requireJournalAccess,
+  journalAccessErrorResponse,
+  AccountDeletionPendingError,
+} from '@/lib/journal-access';
 import { success, badRequest, notFound, error } from '@/lib/api-response';
 import { privateRoute } from '@/lib/private-response';
 import { createJournalEntry, listJournalEntries } from '@/lib/journal';
@@ -77,7 +81,14 @@ export const POST = privateRoute('journal create', async (request: Request) => {
     return badRequest('Validation failed', journalValidationDetails(parsed.error));
   }
 
-  const result = await createJournalEntry(user.id, parsed.data);
+  let result;
+  try {
+    result = await createJournalEntry(user.id, parsed.data);
+  } catch (err) {
+    // Deletion began after the early check above: the write itself is refused under the journal lock.
+    if (err instanceof AccountDeletionPendingError) return journalAccessErrorResponse(err);
+    throw err;
+  }
   switch (result.kind) {
     case 'created':
       return success(result.entry, 201);
