@@ -1,6 +1,6 @@
 import { db } from '@tnsi/db';
 import { users, entitlements } from '@tnsi/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import {
   type SyncUserData,
   type DbUser,
@@ -9,6 +9,7 @@ import {
 } from '@tnsi/auth/sync/user';
 import { getClerkUser } from '@tnsi/auth/client/server';
 import { enqueueAppSignup } from './crm-membership-sync';
+import { purgeJournalEntries } from './journal';
 
 /**
  * Database operations backing Clerk user sync. Shared by the webhook route
@@ -68,15 +69,27 @@ export const userSyncOps: UserSyncOperations = {
     const existing = await this.findUserByClerkId(clerkUserId);
     if (!existing) return null;
 
-    const [deleted] = await db
-      .update(users)
-      .set({
-        deletedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(users.clerkUserId, clerkUserId))
-      .returning();
-    return deleted ?? null;
+    // The member's private journal is permanently deleted in the SAME transaction that marks the
+    // account deleted, so there is no state in which the account is gone but the writing is still
+    // there (or the reverse). Clerk's `user.deleted` is the permanent deletion on the identity side, so
+    // this is the point at which the text must go. Idempotent: a retried webhook (or the account
+    // deletion route running first) simply finds nothing left to purge. If this throws, the webhook
+    // returns an error and Clerk retries it - see docs/my-reflections-backend.md for the recovery model.
+    return db.transaction(async (tx) => {
+      await purgeJournalEntries(tx, existing.id);
+      const [deleted] = await tx
+        .update(users)
+        .set({
+          // The FIRST completion time is kept: Clerk always sends `user.deleted` after the account
+          // deletion route has already finalised, and a retried webhook can arrive much later, so each
+          // further run must be a true no-op rather than moving the time the deletion completed.
+          deletedAt: sql`coalesce(${users.deletedAt}, now())`,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.clerkUserId, clerkUserId))
+        .returning();
+      return deleted ?? null;
+    });
   },
 
   async createDefaultEntitlements(userId: string): Promise<void> {

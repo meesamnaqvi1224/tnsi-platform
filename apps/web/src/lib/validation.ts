@@ -1,5 +1,14 @@
 import { z } from '@tnsi/validation';
-import { practiceContentTypeEnum, postPracticeResponseEnum } from '@tnsi/db/schema';
+import {
+  practiceContentTypeEnum,
+  postPracticeResponseEnum,
+  journalEntryStatusEnum,
+  journalEntryTypeEnum,
+  JOURNAL_THEORY_CONDITIONS,
+  JOURNAL_TITLE_MAX,
+  JOURNAL_CONTENT_MAX,
+  JOURNAL_PROMPT_TEXT_MAX,
+} from '@tnsi/db/schema';
 import { CHECKOUT_TIERS } from '@tnsi/integrations';
 
 export const practiceContentType = z.enum(practiceContentTypeEnum.enumValues);
@@ -175,3 +184,91 @@ export const somaticSeriesSlugParamSchema = z.object({
 export const somaticCardSlugParamSchema = z.object({
   cardSlug: z.string().trim().min(1).max(200),
 });
+
+// ---------------------------------------------------------------------------------------------
+// My Reflections (journal). These schemas never echo a submitted value back: the route returns only
+// the NAMES of invalid fields (see journalValidationDetails), because a validation message must not
+// become a way for journal text to leak into a response, a log or an error report.
+// ---------------------------------------------------------------------------------------------
+
+/** Postgres cannot store a NUL byte in text; reject it here rather than surface a driver error. */
+const withoutNul = (value: string) => !value.includes('\u0000');
+
+const journalTitle = z
+  .string()
+  .max(JOURNAL_TITLE_MAX)
+  .refine(withoutNul)
+  .transform((value) => value.trim() || null);
+
+const journalContent = z.string().max(JOURNAL_CONTENT_MAX).refine(withoutNul);
+
+const journalStatus = z.enum(journalEntryStatusEnum.enumValues);
+
+export const journalEntryIdParam = z.object({ id: z.string().uuid() });
+
+/**
+ * POST /api/v1/journal/entries. Unknown keys - including any `userId` - are dropped, never read: the
+ * owner is always the authenticated member. `id` is optional and client-generated so a retried create
+ * (a flaky connection, a double tap) cannot produce two entries.
+ */
+export const journalEntryCreateSchema = z
+  .object({
+    id: z.string().uuid().optional(),
+    title: journalTitle.nullish(),
+    content: journalContent.default(''),
+    status: journalStatus.default('draft'),
+    entryType: z.enum(journalEntryTypeEnum.enumValues).default('independent'),
+    promptId: z.string().trim().min(1).max(200).refine(withoutNul).nullish(),
+    promptText: z.string().max(JOURNAL_PROMPT_TEXT_MAX).refine(withoutNul).nullish(),
+    practiceId: z.string().uuid().nullish(),
+    completionId: z.string().uuid().nullish(),
+    theoryCondition: z.enum(JOURNAL_THEORY_CONDITIONS).nullish(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.status === 'saved' && value.content.trim().length === 0) {
+      ctx.addIssue({ code: 'custom', path: ['content'], message: 'invalid' });
+    }
+    if (value.entryType === 'practice' && !value.practiceId && !value.completionId) {
+      ctx.addIssue({ code: 'custom', path: ['practiceId'], message: 'invalid' });
+    }
+    if (value.entryType === 'theory' && !value.theoryCondition) {
+      ctx.addIssue({ code: 'custom', path: ['theoryCondition'], message: 'invalid' });
+    }
+  });
+
+export type JournalEntryCreateInput = z.infer<typeof journalEntryCreateSchema>;
+
+/**
+ * PATCH /api/v1/journal/entries/:id - edit the title and content, or save a draft. `status` can only
+ * ever be `saved` in effect: asking for `draft` on a saved entry is refused by the route (409), and on
+ * a draft it is a no-op. The links (practice, prompt, condition, type) are fixed when the entry is created.
+ */
+export const journalEntryUpdateSchema = z
+  .object({
+    title: journalTitle.nullable().optional(),
+    content: journalContent.optional(),
+    status: journalStatus.optional(),
+  })
+  .refine((value) => Object.values(value).some((field) => field !== undefined), {
+    message: 'invalid',
+  });
+
+export type JournalEntryUpdateInput = z.infer<typeof journalEntryUpdateSchema>;
+
+/** GET /api/v1/journal/entries. Saved entries by default (the history); `status=draft` lists the member's own drafts. */
+export const journalEntriesListQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+  status: journalStatus.default('saved'),
+});
+
+export type JournalEntriesListQuery = z.infer<typeof journalEntriesListQuerySchema>;
+
+/** The invalid field names only - never the messages, which can echo a submitted value. */
+export function journalValidationDetails(error: {
+  issues: ReadonlyArray<{ path: ReadonlyArray<string | number> }>;
+}): { fields: string[] } {
+  const fields = new Set<string>();
+  for (const issue of error.issues) fields.add(String(issue.path[0] ?? 'body'));
+  return { fields: [...fields] };
+}

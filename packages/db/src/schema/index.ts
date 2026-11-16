@@ -6,6 +6,8 @@ export * from './check-ins';
 export * from './practices';
 export * from './practice-completions';
 export * from './practice-reflections';
+export * from './journal-entries';
+export * from './account-deletion-requests';
 export * from './practice-saves';
 export * from './assessment-submissions';
 export * from './power-drop-usages';
