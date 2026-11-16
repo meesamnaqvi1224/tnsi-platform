@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, BackHandler, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import { ErrorNotice, PrimaryButton, ScreenContainer, ThemedText } from '@/components';
@@ -8,6 +8,7 @@ import { ReflectionRow } from '@/components/reflections/ReflectionRow';
 import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { useReflectionExit } from '@/hooks/useReflectionExit';
 import { parseReflectionOrigin } from '@/lib/reflection-origin';
+import { useJournalConsent } from '@/hooks/useJournalConsent';
 import { useReflectionList } from '@/hooks/useReflectionList';
 import { takeReflectionNotice } from '@/lib/reflection-notice';
 import { PRIVACY_LINE, REFLECTIONS_LIST } from '@/lib/reflections-copy';
@@ -31,6 +32,7 @@ export default function ReflectionsScreen() {
   const saved = useReflectionList('saved');
   const drafts = useReflectionList('draft');
   const [notice, setNotice] = useState<string | null>(null);
+  const consent = useJournalConsent();
 
   // Coming back from the editor: show what the server holds now, and any "saved" message once. The
   // first focus is skipped because both hooks already fetch on mount.
@@ -90,6 +92,21 @@ export default function ReflectionsScreen() {
   );
 
   const openNew = () => router.push('/profile/reflection');
+
+  // Withdrawing permission (decision Q1): asks first, then stops writing; nothing is deleted.
+  const confirmWithdraw = () =>
+    Alert.alert(consent.copy.withdraw.confirmTitle, consent.copy.withdraw.confirmMessage, [
+      { text: consent.copy.withdraw.cancelButton, style: 'cancel' },
+      {
+        text: consent.copy.withdraw.confirmButton,
+        style: 'destructive',
+        onPress: () =>
+          void consent.withdraw().then((ok) => {
+            if (ok) setNotice(consent.copy.withdraw.done);
+            else Alert.alert(consent.copy.withdraw.failed);
+          }),
+      },
+    ]);
   const openEntry = (id: string) =>
     router.push({ pathname: '/profile/reflection', params: { id } });
 
@@ -200,6 +217,23 @@ export default function ReflectionsScreen() {
               ) : null}
             </View>
           ) : null}
+
+          {consent.view.status === 'granted' ? (
+            <PrimaryButton
+              label={consent.copy.withdraw.button}
+              variant="secondary"
+              onPress={confirmWithdraw}
+              disabled={consent.busy}
+              style={styles.consentButton}
+            />
+          ) : consent.view.status === 'withdrawn' || consent.view.status === 'required' ? (
+            <PrimaryButton
+              label={consent.copy.agreeButton}
+              variant="secondary"
+              onPress={openNew}
+              style={styles.consentButton}
+            />
+          ) : null}
         </>
       )}
     </ScreenContainer>
@@ -207,6 +241,7 @@ export default function ReflectionsScreen() {
 }
 
 const styles = StyleSheet.create({
+  consentButton: { marginTop: spacing.xl },
   privacy: { marginBottom: spacing.lg },
   notice: {
     ...homeCardStyle,

@@ -272,3 +272,6 @@ export function journalValidationDetails(error: {
   for (const issue of error.issues) fields.add(String(issue.path[0] ?? 'body'));
   return { fields: [...fields] };
 }
+
+/** POST /api/v1/journal/consent: the notice version the member was shown and acknowledged. */
+export const journalConsentBodySchema = z.object({ version: z.string().min(1).max(64) }).strict();

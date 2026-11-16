@@ -17,6 +17,9 @@ vi.mock('@/lib/journal', () => ({
   getJournalEntry: (...a: unknown[]) => getJournalEntry(...a),
 }));
 
+const consent = vi.fn();
+vi.mock('@/lib/journal-consent', () => ({ getJournalConsent: (...a: unknown[]) => consent(...a) }));
+
 const { default: ListPage, metadata: listMeta } = await import('./page');
 const { default: NewPage } = await import('./new/page');
 const { default: EntryPage, metadata: entryMeta } = await import('./[id]/page');
@@ -40,6 +43,7 @@ beforeEach(() => {
   access.mockReset().mockResolvedValue({ state: 'ok', userId: 'u1' });
   listJournalEntries.mockReset().mockResolvedValue({ entries: [], hasMore: false });
   getJournalEntry.mockReset();
+  consent.mockReset().mockResolvedValue({ status: 'granted', version: 'draft-1' });
 });
 
 describe('My Reflections history page', () => {
@@ -153,5 +157,61 @@ describe('My Reflections editor pages', () => {
     const html = await render(EntryPage({ params: Promise.resolve({ id: ID }) }));
     expect(html).toContain('account deletion is in progress');
     expect(getJournalEntry).toHaveBeenCalledTimes(1); // only the 404 case above, never when locked
+  });
+});
+
+describe('first-use acknowledgement on the pages (decision Q1)', () => {
+  it('a member who has not agreed sees the notice, not the editor, on the new-reflection page', async () => {
+    consent.mockResolvedValue({ status: 'required', version: 'draft-1' });
+    const html = await render(NewPage());
+    expect(html).toContain('Before you begin');
+    expect(html).toContain('type="checkbox"');
+    expect(html).not.toContain('checked');
+    expect(html).toContain('Agree and continue');
+    expect(html).toContain('Not now');
+    expect(html).not.toContain('Save Reflection');
+    expect(consent).toHaveBeenCalledWith('u1'); // the signed-in member's own state only
+  });
+
+  it('a member who withdrew is asked again, and the editor is not shown', async () => {
+    consent.mockResolvedValue({ status: 'withdrawn', version: 'draft-1' });
+    const html = await render(NewPage());
+    expect(html).toContain('Before you begin');
+    expect(html).not.toContain('Save Reflection');
+  });
+
+  it('a member who has agreed gets the editor with no notice', async () => {
+    const html = await render(NewPage());
+    expect(html).toContain('Save Reflection');
+    expect(html).not.toContain('Before you begin');
+  });
+
+  it('an existing reflection always opens (reading is never gated); the notice appears above it when needed', async () => {
+    getJournalEntry.mockResolvedValue({
+      id: ID,
+      title: null,
+      content: 'my words',
+      status: 'saved',
+      createdAt: new Date('2026-11-14T10:00:00Z'),
+    });
+    consent.mockResolvedValue({ status: 'withdrawn', version: 'draft-1' });
+    const html = await render(EntryPage({ params: Promise.resolve({ id: ID }) }));
+    expect(html).toContain('Before you begin');
+    expect(html).toContain('my words');
+    expect(html).toContain('Delete Reflection');
+  });
+
+  it('the history page offers to withdraw once agreed, and to agree again after withdrawing; neither when never asked', async () => {
+    const withdraw = await render(ListPage({ searchParams: Promise.resolve({}) }));
+    expect(withdraw).toContain('Withdraw permission');
+
+    consent.mockResolvedValue({ status: 'withdrawn', version: 'draft-1' });
+    const again = await render(ListPage({ searchParams: Promise.resolve({}) }));
+    expect(again).toContain('Permission withdrawn');
+    expect(again).not.toContain('Before you begin');
+
+    consent.mockResolvedValue({ status: 'required', version: 'draft-1' });
+    const never = await render(ListPage({ searchParams: Promise.resolve({}) }));
+    expect(never).not.toContain('Withdraw permission');
   });
 });

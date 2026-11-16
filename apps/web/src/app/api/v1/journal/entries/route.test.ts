@@ -47,6 +47,10 @@ vi.mock('@/lib/deletion-state', () => ({
   },
 }));
 
+vi.mock('@/lib/journal-consent', () => ({
+  JournalConsentRequiredError: class JournalConsentRequiredError extends Error {},
+}));
+
 vi.mock('@/lib/journal', () => ({
   listJournalEntries: (...args: unknown[]) => state.lib.list(...args),
   createJournalEntry: (...args: unknown[]) => state.lib.create(...args),
@@ -383,5 +387,33 @@ describe('a write refused under the journal lock (deletion began after the early
       expect(text).toContain('ACCOUNT_DELETION_PENDING');
       expect(text).not.toContain('SECRET-TEXT');
     }
+  });
+});
+
+describe('a write refused because the first-use acknowledgement is missing', () => {
+  it('POST and PATCH answer 403 with the stable code and no data; DELETE is never refused for it', async () => {
+    const { JournalConsentRequiredError } = await import('@/lib/journal-consent');
+    const refuse = async () => {
+      throw new JournalConsentRequiredError();
+    };
+    state.lib.create.mockImplementation(refuse);
+    state.lib.update.mockImplementation(refuse);
+
+    const responses = await Promise.all([
+      collection.POST(json('POST', { content: SECRET, status: 'saved' })),
+      single.PATCH(json('PATCH', { content: SECRET }), params()),
+    ]);
+    for (const res of responses) {
+      expect(res.status).toBe(403);
+      expect(res.headers.get('cache-control')).toBe(NO_STORE);
+      const text = await res.text();
+      expect(text).toContain('JOURNAL_CONSENT_REQUIRED');
+      expect(text).not.toContain('SECRET-TEXT');
+    }
+
+    state.lib.remove.mockResolvedValue(true);
+    expect(
+      (await single.DELETE(new Request('http://x', { method: 'DELETE' }), params())).status,
+    ).toBe(200);
   });
 });

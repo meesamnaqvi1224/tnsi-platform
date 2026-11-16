@@ -1,10 +1,17 @@
+import { JOURNAL_CONSENT_REQUIRED_CODE } from '@tnsi/core';
 import { requireMemberAccess, memberAccessErrorResponse } from './auth-api';
 import { error, internalError } from './api-response';
 import { isDeletionPending, AccountDeletionPendingError } from './deletion-state';
+import { JournalConsentRequiredError } from './journal-consent';
 import { safeErrorCode } from './private-response';
 
 // Defined next to the lock it enforces (deletion-state.ts); re-exported so existing imports keep working.
-export { AccountDeletionPendingError };
+export { AccountDeletionPendingError, JournalConsentRequiredError };
+
+/** A refusal from inside a journal write: deletion has begun (423) or the acknowledgement is missing (403). */
+export function isJournalWriteRefusal(err: unknown): boolean {
+  return err instanceof AccountDeletionPendingError || err instanceof JournalConsentRequiredError;
+}
 
 /**
  * Thrown when the deletion-pending check itself could not be answered (for example the database is
@@ -51,6 +58,13 @@ export function journalAccessErrorResponse(err: unknown) {
       'ACCOUNT_DELETION_PENDING',
       'Your account deletion is in progress, so your journal is no longer available.',
       423,
+    );
+  }
+  if (err instanceof JournalConsentRequiredError) {
+    return error(
+      JOURNAL_CONSENT_REQUIRED_CODE,
+      'Please review and agree to the My Reflections notice before writing.',
+      403,
     );
   }
   if (err instanceof DeletionStateUnavailableError) {

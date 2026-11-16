@@ -8,6 +8,8 @@ import {
   REFLECTIONS_LIST,
 } from '@tnsi/core';
 import { RefreshOnReturn } from '@/components/dashboard/reflections/refresh-on-return';
+import { ConsentSettings } from '@/components/dashboard/reflections/consent-settings';
+import { getJournalConsent } from '@/lib/journal-consent';
 import { getJournalPageAccess } from '@/lib/journal-page-access';
 import { listJournalEntries, type JournalEntryListItem } from '@/lib/journal';
 import { createPageMetadata } from '@/lib/seo';
@@ -97,6 +99,7 @@ export default async function ReflectionsPage({ searchParams }: PageProps) {
   }
 
   const page = Math.max(1, Number.parseInt(pageParam ?? '1', 10) || 1);
+  const consent = await getJournalConsent(access.userId);
   const [saved, drafts] = await Promise.all([
     listJournalEntries(access.userId, {
       limit: PAGE_SIZE,
@@ -199,6 +202,8 @@ export default async function ReflectionsPage({ searchParams }: PageProps) {
               </Stack>
             </section>
           ) : null}
+
+          {consent.status !== 'required' ? <ConsentSettings status={consent.status} /> : null}
         </Stack>
       </Container>
     </Section>

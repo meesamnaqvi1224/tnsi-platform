@@ -4,6 +4,7 @@
  * (the member's own journal API). The text lives in memory while the editor is open and nowhere else.
  */
 import { REFLECTION_STATES } from './copy';
+import { JOURNAL_CONSENT_COPY, JOURNAL_CONSENT_REQUIRED_CODE } from './consent';
 
 /** Mirrors JOURNAL_TITLE_MAX / JOURNAL_CONTENT_MAX in packages/db/src/schema/journal-entries.ts. */
 export const REFLECTION_TITLE_MAX = 200;
@@ -156,7 +157,13 @@ export async function saveReflection<E extends ReflectionEntryLike>({
 }
 
 export type ReflectionErrorKind =
-  'locked' | 'not_found' | 'already_saved' | 'signed_out' | 'network' | 'failed';
+  | 'locked'
+  | 'not_found'
+  | 'already_saved'
+  | 'signed_out'
+  | 'network'
+  | 'consent_required'
+  | 'failed';
 
 export interface DescribedError {
   kind: ReflectionErrorKind;
@@ -181,6 +188,9 @@ export function describeReflectionError(
   if (typeof status === 'number') {
     if (status === 423 || code === 'ACCOUNT_DELETION_PENDING') {
       return { kind: 'locked', message: REFLECTION_STATES.lockedForDeletion };
+    }
+    if (code === JOURNAL_CONSENT_REQUIRED_CODE) {
+      return { kind: 'consent_required', message: JOURNAL_CONSENT_COPY.required };
     }
     if (status === 404) return { kind: 'not_found', message: REFLECTION_STATES.notFound };
     if (status === 409) return { kind: 'already_saved', message: REFLECTION_STATES.alreadySaved };

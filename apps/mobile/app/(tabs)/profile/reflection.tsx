@@ -11,6 +11,8 @@ import {
   type TextStyle,
 } from 'react-native';
 import { useFocusEffect, useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+import { ConsentNotice } from '@/components/reflections/ConsentNotice';
+import { useJournalConsent } from '@/hooks/useJournalConsent';
 import { Ionicons } from '@expo/vector-icons';
 import { ErrorNotice, PrimaryButton, ScreenContainer, ThemedText } from '@/components';
 import { PageTitle } from '@/components/PageTitle';
@@ -66,7 +68,7 @@ type AutosaveNote = 'none' | 'saved' | 'failed';
  * an explicit save, or a retry after a dropped connection cannot create a second entry; saves never
  * overlap; and a failed save never clears what was typed.
  */
-export default function ReflectionEditorScreen() {
+function ReflectionEditorBody() {
   const { id, from } = useLocalSearchParams<{ id?: string; from?: string }>();
   const origin = parseReflectionOrigin(from);
   const api = useApiClient();
@@ -586,3 +588,38 @@ const styles = StyleSheet.create({
     borderColor: home.border,
   },
 });
+
+/**
+ * A NEW reflection needs the first-use acknowledgement (decision Q1, 16 Nov 2026): until the member has
+ * agreed to the current notice they see the notice instead of the editor. Opening an existing reflection
+ * never needs it (reading and deleting are always allowed); the server refuses to change one without it.
+ * If the state cannot be read the editor opens as before and the server's answer decides.
+ */
+export default function ReflectionEditorScreen() {
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const router = useRouter();
+  const consent = useJournalConsent();
+  const needsNotice =
+    !id && (consent.view.status === 'required' || consent.view.status === 'withdrawn');
+
+  if (!id && consent.view.status === 'loading') {
+    return (
+      <ScreenContainer scroll underHeader background={home.page}>
+        <View accessibilityLabel="Loading" style={{ height: 160 }} />
+      </ScreenContainer>
+    );
+  }
+  if (needsNotice && 'version' in consent.view) {
+    const { version } = consent.view;
+    return (
+      <ScreenContainer scroll underHeader background={home.page}>
+        <ConsentNotice
+          busy={consent.busy}
+          onAgree={() => consent.agree(version)}
+          onNotNow={() => router.back()}
+        />
+      </ScreenContainer>
+    );
+  }
+  return <ReflectionEditorBody />;
+}

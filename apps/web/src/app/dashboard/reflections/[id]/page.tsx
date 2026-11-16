@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
 import { Alert, Container, Section } from '@tnsi/ui';
 import { REFLECTION_EDITOR, REFLECTION_STATES } from '@tnsi/core';
+import { ConsentNotice } from '@/components/dashboard/reflections/consent-notice';
 import { ReflectionEditor } from '@/components/dashboard/reflections/reflection-editor';
+import { getJournalConsent } from '@/lib/journal-consent';
 import { getJournalEntry } from '@/lib/journal';
 import { getJournalPageAccess } from '@/lib/journal-page-access';
 import { createPageMetadata } from '@/lib/seo';
@@ -47,9 +49,18 @@ export default async function ReflectionPage({ params }: PageProps) {
   const entry = await getJournalEntry(access.userId, id.data.id);
   if (!entry) notFound();
 
+  // Reading and deleting never need the acknowledgement, so the entry is always shown; changing it does,
+  // so when it is missing, withdrawn or out of date the notice appears above it.
+  const consent = await getJournalConsent(access.userId);
+
   return (
     <Section spacing="lg">
       <Container size="lg">
+        {consent.status !== 'granted' ? (
+          <div className="mb-8">
+            <ConsentNotice version={consent.version} />
+          </div>
+        ) : null}
         <ReflectionEditor
           initialEntry={{
             id: entry.id,
