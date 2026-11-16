@@ -12,6 +12,7 @@ import {
   fieldsOf,
   formatReflectionDate,
   hasUnsavedChanges,
+  isAutosaveEligible,
   isBlank,
   newClientId,
   PRIVACY_LINE,
@@ -114,7 +115,7 @@ export function ReflectionEditor({
   /** Autosave applies to a new or draft reflection that has real text and unsaved changes. */
   const autosaveEligible = (): boolean => {
     const c = latest.current;
-    return (!c.entry || c.entry.status === 'draft') && c.dirty && !isBlank(c.fields);
+    return isAutosaveEligible(c.entry, c.fields, c.dirty);
   };
 
   /** One autosave. Resolves true when the server confirmed it. Never throws, never touches `busy`. */
@@ -167,7 +168,7 @@ export function ReflectionEditor({
       run: () => autosaveOnceRef.current(),
       shouldRun: () => {
         const c = latest.current;
-        return (!c.entry || c.entry.status === 'draft') && c.dirty && !isBlank(c.fields);
+        return isAutosaveEligible(c.entry, c.fields, c.dirty);
       },
     });
     autosaver.current = a;

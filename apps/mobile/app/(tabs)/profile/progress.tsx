@@ -46,7 +46,11 @@ export default function ProgressScreen() {
         state={practicesState}
         onViewMyLearning={() => router.push('/my-learning')}
       />
-      <ReflectionsSection onOpen={() => router.push('/profile/reflections')} />
+      <ReflectionsSection
+        onOpen={() =>
+          router.push({ pathname: '/profile/reflections', params: { from: 'progress' } })
+        }
+      />
     </ScreenContainer>
   );
 }

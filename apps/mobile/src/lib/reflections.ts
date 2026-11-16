@@ -5,11 +5,13 @@
  */
 export {
   charactersLeft,
+  createAutosaver,
   describeReflectionError,
   EMPTY_FIELDS,
   fieldsOf,
   formatReflectionDate,
   hasUnsavedChanges,
+  isAutosaveEligible,
   isBlank,
   newClientId,
   normalizeFields,
@@ -18,6 +20,7 @@ export {
   REFLECTION_TITLE_MAX,
   ReflectionSaveError,
   saveReflection,
+  type Autosaver,
   type DescribedError,
   type ReflectionErrorKind,
   type ReflectionFields,

@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { BackHandler, Pressable, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect, useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import { ErrorNotice, PrimaryButton, ScreenContainer, ThemedText } from '@/components';
 import { PageTitle } from '@/components/PageTitle';
 import { ReflectionRow } from '@/components/reflections/ReflectionRow';
 import { home, homeCardStyle } from '@/components/home/homeTheme';
+import { useReflectionExit } from '@/hooks/useReflectionExit';
+import { parseReflectionOrigin } from '@/lib/reflection-origin';
 import { useReflectionList } from '@/hooks/useReflectionList';
 import { takeReflectionNotice } from '@/lib/reflection-notice';
 import { PRIVACY_LINE, REFLECTIONS_LIST } from '@/lib/reflections-copy';
@@ -21,6 +24,10 @@ const NOTICE_MS = 4000;
  */
 export default function ReflectionsScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
+  const { from } = useLocalSearchParams<{ from?: string }>();
+  const origin = parseReflectionOrigin(from);
+  const exit = useReflectionExit(origin);
   const saved = useReflectionList('saved');
   const drafts = useReflectionList('draft');
   const [notice, setNotice] = useState<string | null>(null);
@@ -51,6 +58,36 @@ export default function ReflectionsScreen() {
     const timer = setTimeout(() => setNotice(null), NOTICE_MS);
     return () => clearTimeout(timer);
   }, [notice]);
+
+  // Its own back button and Android Back, for the same reason as the editor (see useReflectionExit).
+  const exitRef = useRef(exit);
+  useEffect(() => {
+    exitRef.current = exit;
+  });
+  useEffect(() => {
+    navigation.setOptions({
+      headerBackVisible: false,
+      headerLeft: () => (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Back"
+          hitSlop={12}
+          onPress={() => exitRef.current()}
+        >
+          <Ionicons name="chevron-back" size={24} color={home.navy} />
+        </Pressable>
+      ),
+    });
+  }, [navigation]);
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+        exitRef.current();
+        return true;
+      });
+      return () => subscription.remove();
+    }, []),
+  );
 
   const openNew = () => router.push('/profile/reflection');
   const openEntry = (id: string) =>
