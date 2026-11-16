@@ -10,6 +10,7 @@ import {
 import { getClerkUser } from '@tnsi/auth/client/server';
 import { enqueueAppSignup } from './crm-membership-sync';
 import { purgeJournalEntries } from './journal';
+import { lockJournalExclusive } from './deletion-state';
 
 /**
  * Database operations backing Clerk user sync. Shared by the webhook route
@@ -76,6 +77,10 @@ export const userSyncOps: UserSyncOperations = {
     // deletion route running first) simply finds nothing left to purge. If this throws, the webhook
     // returns an error and Clerk retries it - see docs/my-reflections-backend.md for the recovery model.
     return db.transaction(async (tx) => {
+      // EXCLUSIVE journal lock first (see deletion-state.ts): any journal write already in flight has
+      // committed before the purge below, and any later one sees users.deleted_at and is refused. This is
+      // also what covers a deletion that never wrote a marker (Clerk dashboard -> user.deleted webhook).
+      await lockJournalExclusive(tx, existing.id);
       await purgeJournalEntries(tx, existing.id);
       const [deleted] = await tx
         .update(users)

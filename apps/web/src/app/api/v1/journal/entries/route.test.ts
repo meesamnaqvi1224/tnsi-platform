@@ -39,6 +39,7 @@ vi.mock('@/lib/auth-api', async () => {
 });
 
 vi.mock('@/lib/deletion-state', () => ({
+  AccountDeletionPendingError: class AccountDeletionPendingError extends Error {},
   isDeletionPending: async () => {
     if (state.stateError)
       throw Object.assign(new Error('relation does not exist SECRET-TEXT'), { code: '42P01' });
@@ -357,5 +358,30 @@ describe('/api/v1/journal/entries/:id', () => {
     expect(
       (await single.DELETE(new Request('http://x', { method: 'DELETE' }), params())).status,
     ).toBe(404);
+  });
+});
+
+describe('a write refused under the journal lock (deletion began after the early check)', () => {
+  it('POST, PATCH and DELETE answer the same 423 as the early check, with no data', async () => {
+    const { AccountDeletionPendingError } = await import('@/lib/deletion-state');
+    const refuse = async () => {
+      throw new AccountDeletionPendingError();
+    };
+    state.lib.create.mockImplementation(refuse);
+    state.lib.update.mockImplementation(refuse);
+    state.lib.remove.mockImplementation(refuse);
+
+    const responses = await Promise.all([
+      collection.POST(json('POST', { content: SECRET, status: 'saved' })),
+      single.PATCH(json('PATCH', { content: SECRET }), params()),
+      single.DELETE(new Request('http://x', { method: 'DELETE' }), params()),
+    ]);
+    for (const res of responses) {
+      expect(res.status).toBe(423);
+      expect(res.headers.get('cache-control')).toBe(NO_STORE);
+      const text = await res.text();
+      expect(text).toContain('ACCOUNT_DELETION_PENDING');
+      expect(text).not.toContain('SECRET-TEXT');
+    }
   });
 });

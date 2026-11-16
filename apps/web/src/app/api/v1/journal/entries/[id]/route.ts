@@ -10,7 +10,11 @@
  * Another member's entry is reported as 404, exactly like one that does not exist, so ids reveal nothing.
  * Every response is private/no-store, and nothing here logs the body, title or text (see privateRoute).
  */
-import { requireJournalAccess, journalAccessErrorResponse } from '@/lib/journal-access';
+import {
+  requireJournalAccess,
+  journalAccessErrorResponse,
+  AccountDeletionPendingError,
+} from '@/lib/journal-access';
 import { success, badRequest, notFound, error } from '@/lib/api-response';
 import { privateRoute, safeErrorCode } from '@/lib/private-response';
 import { deleteJournalEntry, getJournalEntry, updateJournalEntry } from '@/lib/journal';
@@ -76,6 +80,8 @@ export const PATCH = privateRoute(
     try {
       result = await updateJournalEntry(user.id, id.data.id, parsed.data);
     } catch (err) {
+      // Deletion began after the early check: refused under the journal lock (same 423 as the check).
+      if (err instanceof AccountDeletionPendingError) return journalAccessErrorResponse(err);
       // 23514 = check_violation: the database refused the change (the draft-revert backstop, or a
       // limit). Reported as a plain conflict with no detail; the error object is never logged or returned.
       if (safeErrorCode(err) === '23514') {
@@ -109,7 +115,13 @@ export const DELETE = privateRoute(
     const id = journalEntryIdParam.safeParse(await params);
     if (!id.success) return notFound('Not found');
 
-    const deleted = await deleteJournalEntry(user.id, id.data.id);
+    let deleted;
+    try {
+      deleted = await deleteJournalEntry(user.id, id.data.id);
+    } catch (err) {
+      if (err instanceof AccountDeletionPendingError) return journalAccessErrorResponse(err);
+      throw err;
+    }
     return deleted ? success({ deleted: true }) : notFound('Not found');
   },
 );
