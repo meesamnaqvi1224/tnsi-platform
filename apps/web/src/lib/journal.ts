@@ -12,6 +12,7 @@ import { db, journalEntries, practices, practiceCompletions } from '@tnsi/db';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { paginateRows } from './practice-sessions';
 import { buildPreview } from './journal-preview';
+import { lockJournalShared, assertJournalWritable, type Tx } from './deletion-state';
 import type { JournalEntryCreateInput, JournalEntryUpdateInput } from './validation';
 
 type JournalRow = typeof journalEntries.$inferSelect;
@@ -52,6 +53,20 @@ export interface JournalEntryListItem {
   theoryCondition: string | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+/**
+ * Every journal mutation runs through here: ONE transaction that takes the member's shared journal lock,
+ * refuses the write if their account deletion has started or finished, and only then runs `fn`. Account
+ * deletion takes the same lock exclusively (deletion-state.ts), so no write can commit after deletion's
+ * barrier. Throws AccountDeletionPendingError (the routes answer 423). Nothing here logs or returns text.
+ */
+async function withJournalWrite<T>(userId: string, fn: (tx: Tx) => Promise<T>): Promise<T> {
+  return db.transaction(async (tx) => {
+    await lockJournalShared(tx, userId);
+    await assertJournalWritable(tx, userId);
+    return fn(tx);
+  });
 }
 
 function toDto(row: JournalRow): JournalEntryDto {
@@ -111,8 +126,12 @@ export async function listJournalEntries(
   };
 }
 
-export async function getJournalEntry(userId: string, id: string): Promise<JournalEntryDto | null> {
-  const [row] = await db
+export async function getJournalEntry(
+  userId: string,
+  id: string,
+  executor: DbOrTransaction = db,
+): Promise<JournalEntryDto | null> {
+  const [row] = await executor
     .select()
     .from(journalEntries)
     .where(and(eq(journalEntries.id, id), eq(journalEntries.userId, userId)))
@@ -135,12 +154,20 @@ export async function createJournalEntry(
   userId: string,
   input: JournalEntryCreateInput,
 ): Promise<CreateJournalResult> {
+  return withJournalWrite(userId, (tx) => createInTransaction(tx, userId, input));
+}
+
+async function createInTransaction(
+  tx: Tx,
+  userId: string,
+  input: JournalEntryCreateInput,
+): Promise<CreateJournalResult> {
   let practiceId = input.practiceId ?? null;
   const completionId = input.completionId ?? null;
 
   // A link must be real and, for a practice session, the member's own - never trusted from the client.
   if (completionId) {
-    const [completion] = await db
+    const [completion] = await tx
       .select({ id: practiceCompletions.id, practiceId: practiceCompletions.practiceId })
       .from(practiceCompletions)
       .where(and(eq(practiceCompletions.id, completionId), eq(practiceCompletions.userId, userId)))
@@ -149,7 +176,7 @@ export async function createJournalEntry(
     if (practiceId && practiceId !== completion.practiceId) return { kind: 'reference_mismatch' };
     practiceId = completion.practiceId;
   } else if (practiceId) {
-    const [practice] = await db
+    const [practice] = await tx
       .select({ id: practices.id })
       .from(practices)
       .where(eq(practices.id, practiceId))
@@ -171,7 +198,7 @@ export async function createJournalEntry(
     theoryCondition: input.theoryCondition ?? null,
   };
 
-  const [inserted] = await db
+  const [inserted] = await tx
     .insert(journalEntries)
     .values(values)
     .onConflictDoNothing({ target: journalEntries.id })
@@ -179,7 +206,7 @@ export async function createJournalEntry(
   if (inserted) return { kind: 'created', entry: toDto(inserted) };
 
   // Only reachable with a client-supplied id that already exists.
-  const existing = input.id ? await getJournalEntry(userId, input.id) : null;
+  const existing = input.id ? await getJournalEntry(userId, input.id, tx) : null;
   return existing ? { kind: 'replayed', entry: existing } : { kind: 'not_found' };
 }
 
@@ -196,9 +223,18 @@ export async function updateJournalEntry(
   id: string,
   patch: JournalEntryUpdateInput,
 ): Promise<UpdateJournalResult> {
+  return withJournalWrite(userId, (tx) => updateInTransaction(tx, userId, id, patch));
+}
+
+async function updateInTransaction(
+  tx: Tx,
+  userId: string,
+  id: string,
+  patch: JournalEntryUpdateInput,
+): Promise<UpdateJournalResult> {
   // One retry: the guarded UPDATE below can lose a race with a concurrent save of the same entry.
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    const [current] = await db
+    const [current] = await tx
       .select()
       .from(journalEntries)
       .where(and(eq(journalEntries.id, id), eq(journalEntries.userId, userId)))
@@ -211,7 +247,7 @@ export async function updateJournalEntry(
     const nextContent = patch.content ?? current.content;
     if (nextStatus === 'saved' && nextContent.trim().length === 0) return { kind: 'empty_saved' };
 
-    const [updated] = await db
+    const [updated] = await tx
       .update(journalEntries)
       .set({
         updatedAt: new Date(), // created_at is never set here, and the database trigger pins it anyway
@@ -235,11 +271,13 @@ export async function updateJournalEntry(
 
 /** Deletes one of the member's own entries. False when there is no such entry for them. */
 export async function deleteJournalEntry(userId: string, id: string): Promise<boolean> {
-  const deleted = await db
-    .delete(journalEntries)
-    .where(and(eq(journalEntries.id, id), eq(journalEntries.userId, userId)))
-    .returning({ id: journalEntries.id });
-  return deleted.length > 0;
+  return withJournalWrite(userId, async (tx) => {
+    const deleted = await tx
+      .delete(journalEntries)
+      .where(and(eq(journalEntries.id, id), eq(journalEntries.userId, userId)))
+      .returning({ id: journalEntries.id });
+    return deleted.length > 0;
+  });
 }
 
 /**

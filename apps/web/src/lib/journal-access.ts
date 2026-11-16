@@ -1,15 +1,10 @@
 import { requireMemberAccess, memberAccessErrorResponse } from './auth-api';
 import { error, internalError } from './api-response';
-import { isDeletionPending } from './deletion-state';
+import { isDeletionPending, AccountDeletionPendingError } from './deletion-state';
 import { safeErrorCode } from './private-response';
 
-/** Thrown when a member whose account deletion has started tries to use the journal. */
-export class AccountDeletionPendingError extends Error {
-  constructor() {
-    super('ACCOUNT_DELETION_PENDING');
-    this.name = 'AccountDeletionPendingError';
-  }
-}
+// Defined next to the lock it enforces (deletion-state.ts); re-exported so existing imports keep working.
+export { AccountDeletionPendingError };
 
 /**
  * Thrown when the deletion-pending check itself could not be answered (for example the database is
