@@ -15,6 +15,7 @@ import { CheckInCard } from '@/components/check-in/CheckInCard';
 import { LifeBeyondTraumaCard } from '@/components/home/LifeBeyondTraumaCard';
 import { BookConsultationCard } from '@/components/home/BookConsultationCard';
 import { AssessmentEntryCard } from '@/components/home/AssessmentEntryCard';
+import { ReflectionsEntryCard } from '@/components/reflections/ReflectionsEntryCard';
 import { ResourcesOnWebsiteCard } from '@/components/home/ResourcesOnWebsiteCard';
 import { useToday } from '@/hooks/useToday';
 import { practiceForToday } from '@/lib/check-in-day';
@@ -107,6 +108,8 @@ export default function HomeScreen() {
             />
           </>
         )}
+
+        <ReflectionsEntryCard />
 
         <AssessmentEntryCard />
 
