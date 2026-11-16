@@ -240,3 +240,109 @@ export async function addFlowiContactTags(
     );
   }
 }
+
+/**
+ * ACCOUNT DELETION SUPPORT (lookup, marketing suppression, contact deletion).
+ *
+ * STATUS: written from GoHighLevel's published API (same base URL, `Version` header and
+ * bearer credential as the calls above). Unlike `/contacts/upsert`, these three calls have
+ * NOT yet been exercised against the TNSI Flowi account. They must be verified against a
+ * test contact (and the credential's scopes confirmed: `contacts.readonly` for the lookup,
+ * `contacts.write` for the other two) before account deletion is released. See
+ * docs/account-deletion-and-data-retention.md.
+ *
+ * None of them creates a contact: suppression and deletion act only on a contact that
+ * already exists, so a late or repeated call can never bring a deleted contact back.
+ */
+
+function flowiHeaders(apiKey: string, withBody: boolean): Record<string, string> {
+  return {
+    Authorization: `Bearer ${apiKey}`,
+    Version: FLOWI_API_VERSION,
+    Accept: 'application/json',
+    ...(withBody ? { 'Content-Type': 'application/json' } : {}),
+  };
+}
+
+interface FlowiDuplicateResponseBody {
+  contact?: { id?: string } | null;
+}
+
+/**
+ * The id of the contact with this email in our location, or null when there is none
+ * (`GET /contacts/search/duplicate?locationId=..&email=..`). Read-only.
+ */
+export async function findFlowiContactIdByEmail(
+  email: string,
+  options: FlowiCallOptions = {},
+): Promise<string | null> {
+  const { apiKey, locationId } = getFlowiConfig();
+  const query = new URLSearchParams({ locationId, email });
+  const response = await fetch(`${FLOWI_API_BASE_URL}/contacts/search/duplicate?${query}`, {
+    method: 'GET',
+    headers: flowiHeaders(apiKey, false),
+    signal: AbortSignal.timeout(toRequestTimeoutMs(options.timeoutMs)),
+  });
+  if (!response.ok) {
+    throw new FlowiRequestError(
+      `Flowi contact lookup failed with status ${response.status}`,
+      response.status,
+    );
+  }
+  const data = (await response.json()) as FlowiDuplicateResponseBody;
+  const id = data.contact?.id;
+  return typeof id === 'string' && id !== '' ? id : null;
+}
+
+/**
+ * Turns on "do not disturb" for every channel on an existing contact
+ * (`PUT /contacts/{contactId}`, body `{ dnd: true }`), which stops Flowi's marketing
+ * messages and automations from contacting them. Resolves false when the contact no
+ * longer exists (404): there is nobody left to suppress. Repeating it is harmless.
+ */
+export async function suppressFlowiContact(
+  contactId: string,
+  options: FlowiCallOptions = {},
+): Promise<boolean> {
+  const { apiKey } = getFlowiConfig();
+  if (contactId === '') throw new FlowiRequestError('Missing contact id', 502);
+  const response = await fetch(`${FLOWI_API_BASE_URL}/contacts/${encodeURIComponent(contactId)}`, {
+    method: 'PUT',
+    headers: flowiHeaders(apiKey, true),
+    body: JSON.stringify({ dnd: true }),
+    signal: AbortSignal.timeout(toRequestTimeoutMs(options.timeoutMs)),
+  });
+  if (response.status === 404) return false;
+  if (!response.ok) {
+    throw new FlowiRequestError(
+      `Flowi suppression request failed with status ${response.status}`,
+      response.status,
+    );
+  }
+  return true;
+}
+
+/**
+ * Permanently deletes a contact (`DELETE /contacts/{contactId}`). Resolves false when it
+ * was already gone (404), which is the same outcome, so a retry never gets stuck.
+ */
+export async function deleteFlowiContact(
+  contactId: string,
+  options: FlowiCallOptions = {},
+): Promise<boolean> {
+  const { apiKey } = getFlowiConfig();
+  if (contactId === '') throw new FlowiRequestError('Missing contact id', 502);
+  const response = await fetch(`${FLOWI_API_BASE_URL}/contacts/${encodeURIComponent(contactId)}`, {
+    method: 'DELETE',
+    headers: flowiHeaders(apiKey, false),
+    signal: AbortSignal.timeout(toRequestTimeoutMs(options.timeoutMs)),
+  });
+  if (response.status === 404) return false;
+  if (!response.ok) {
+    throw new FlowiRequestError(
+      `Flowi delete request failed with status ${response.status}`,
+      response.status,
+    );
+  }
+  return true;
+}

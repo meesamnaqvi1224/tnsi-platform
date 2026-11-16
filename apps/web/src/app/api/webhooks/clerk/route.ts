@@ -45,15 +45,24 @@ export async function POST(request: NextRequest) {
     // once the response has gone, so the welcome email follows sign-up within a minute
     // or two instead of waiting for the daily worker. Best effort: anything that does
     // not go is retried by the worker.
-    if (result.action === 'user.created') {
-      after(async () => {
-        try {
-          const { processOutbox } = await import('@/lib/crm-outbox');
-          await processOutbox({ budgetMs: 8000 });
-        } catch {
-          console.error('[Clerk Webhook] CRM send failed');
-        }
-      });
+    // A new account queues its CRM sign-up; a deleted one queues the CRM contact's deletion
+    // (softDeleteUser). Either way, send what is queued now rather than waiting for the daily worker.
+    if (result.action === 'user.created' || result.action === 'user.deleted') {
+      // Best-effort: the event is already processed and stored. If the follow-up cannot even be
+      // scheduled, the queued job is simply left for the worker - it must never turn a processed
+      // event into an error (Clerk would then retry a deletion that has already happened).
+      try {
+        after(async () => {
+          try {
+            const { processOutbox } = await import('@/lib/crm-outbox');
+            await processOutbox({ budgetMs: 8000 });
+          } catch {
+            console.error('[Clerk Webhook] CRM send failed');
+          }
+        });
+      } catch {
+        /* left for the worker */
+      }
     }
 
     return NextResponse.json({ success: true, action: result.action });

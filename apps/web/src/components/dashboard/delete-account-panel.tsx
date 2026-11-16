@@ -62,8 +62,16 @@ export function DeleteAccountPanel({ initialPending }: { initialPending: boolean
       ) : (
         <Stack gap="md">
           <p className="text-foreground text-sm leading-relaxed">
-            This permanently deletes your account and everything you wrote in My Reflections. You
-            will be signed out everywhere. This cannot be undone.
+            This permanently deletes your account: your sign-in, everything you wrote in My
+            Reflections, and your check-ins, practice history and saved practices. You will be
+            signed out everywhere. This cannot be undone.
+          </p>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            A small number of records are kept where we are required to keep them.{' '}
+            <NextLink href="/delete-account#what-we-keep" className="interaction-focus underline">
+              See what is kept and why
+            </NextLink>
+            .
           </p>
           <label className="flex items-start gap-3 text-sm">
             <input

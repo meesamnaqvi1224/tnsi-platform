@@ -37,8 +37,9 @@ export default async function AccountPage() {
               Delete your account
             </Heading>
             <Text tone="muted">
-              Deleting your account permanently deletes everything you wrote in My Reflections and
-              removes your sign-in.{' '}
+              Deleting your account removes your sign-in and permanently deletes what you wrote in
+              My Reflections, your check-ins, your practice history and your saved practices. A
+              small number of records are kept where we are required to keep them.{' '}
               <NextLink href="/delete-account" className="interaction-focus underline">
                 Read exactly what happens
               </NextLink>

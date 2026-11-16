@@ -1,35 +1,43 @@
 /**
  * Member-initiated account deletion.
  *
- * Postgres and Clerk are separate systems; no transaction spans them, and none is assumed. So the ORDER of
- * the steps, plus one persisted marker, is the safety design. A failure at any point leaves a state that is
- * safe, honestly reported, and can simply be retried:
+ * Postgres, Clerk and the CRM (Flowi) are separate systems; no transaction spans them, and none is
+ * assumed. So the ORDER of the steps, plus persisted state, is the safety design. A failure at any point
+ * leaves a state that is safe, honestly reported, and can simply be retried:
  *
  *   0. Refuse while a paid Stripe subscription is still running (deleting the account would otherwise
  *      leave billing active with nobody able to cancel it). Read-only; changes nothing.
- *   1. MARK THE DELETION PENDING (a row in `account_deletion_requests`, first request time preserved). From this
- *      moment the journal is locked: every journal route refuses the member (423), so nothing can be read,
- *      written or re-created while the rest of the deletion runs or if it stalls. If this fails nothing has
- *      changed and we stop.
- *   2. Purge the member's journal (one atomic DELETE; drafts included).
- *   3. Delete the identity in Clerk. A Clerk 404 (already deleted) counts as success.
- *   4. Finalise locally in ONE transaction: purge any journal rows again (removes anything a request that
- *      was already in flight when step 1 ran might have written) and mark the user deleted (softDeleteUser).
+ *   1. MARK THE DELETION PENDING (a row in `account_deletion_requests`, first request time preserved),
+ *      under the member's EXCLUSIVE journal lock. From this moment the journal is locked: every journal
+ *      route refuses the member (423) and no journal write can commit. If this fails nothing has changed.
+ *   2. STOP MARKETING. Cancel every CRM event still queued for the member and queue a do-not-disturb
+ *      job for their CRM contact, with one immediate attempt (account-data-erasure.ts).
+ *   3. Purge the member's journal (one atomic DELETE; drafts included).
+ *   4. Delete the identity in Clerk. A Clerk 404 (already deleted) counts as success.
+ *   5. Finalise locally in ONE transaction, under the exclusive lock (softDeleteUser): purge the journal
+ *      again, delete the member's activity (check-ins, practice completions, quick reflections, saved
+ *      practices, PowerDrop usage, linked assessment submissions), anonymise the account row, queue the
+ *      CRM contact's deletion, and mark the account deleted.
+ *   6. Delete the CRM contact: one immediate attempt at the queued job.
  *
  * What each failure leaves, and how it recovers:
  *   - step 0 / 1 fail:    nothing changed. `failed`. The member can retry.
- *   - step 2 / 3 fail:    deletion is PENDING: started, not finished. The journal is already locked (and
- *                         gone, or about to be on retry); the member is still signed in and can retry. This
- *                         is reported as `pending`, never as success.
- *   - step 4 fails:       the identity is already gone, so the member can no longer sign in. `pending_cleanup`;
- *                         the Clerk `user.deleted` webhook runs the same transactional finalisation and Clerk
- *                         retries a failing webhook, so nothing is abandoned.
+ *   - step 2 / 3 / 4 fail: deletion is PENDING: started, not finished. The journal is locked; the member
+ *                         is still signed in and can retry. Reported as `pending`, never as success.
+ *   - step 5 fails:       the identity is already gone, so the member can no longer sign in.
+ *                         `pending_cleanup`; the Clerk `user.deleted` webhook runs the same transaction
+ *                         and Clerk retries a failing webhook, so nothing is abandoned.
+ *   - step 6 not confirmed: everything in our own systems is erased, but the CRM has not confirmed the
+ *                         contact is gone. `pending_cleanup`, NOT `deleted`; the job stays queued and
+ *                         the outbox worker retries it. A job that gives up stays visible as `failed`.
  *
- * A retry re-runs every step: marking keeps the first request time, purging an empty journal is a no-op,
- * Clerk's 404 is success. A retry can never restore or expose an entry that was deleted: the journal is
- * locked from step 1 onward and nothing in this flow ever writes to it.
+ * A retry re-runs every step: marking keeps the first request time, the suppression job is queued once,
+ * purging an empty journal is a no-op, Clerk's 404 is success, the erasure finds nothing left. A retry
+ * can never restore or expose anything that was deleted: nothing in this flow writes member data.
  *
- * Only `deleted` means the deletion is complete, and it is returned only after every step has succeeded.
+ * Only `deleted` means the deletion is complete everywhere this application controls, and it is returned
+ * only after every step has succeeded. What is deliberately KEPT, and why, is listed in
+ * account-data-erasure.ts and docs/account-deletion-and-data-retention.md.
  * Every function here is idempotent and no step logs anything but a stage label and a short error code.
  */
 import { db, entitlements } from '@tnsi/db';
@@ -42,28 +50,39 @@ import { safeErrorCode } from './private-response';
 export { markDeletionPending, getDeletionState };
 
 export type AccountDeletionStage =
-  'precheck' | 'mark_pending' | 'journal_purge' | 'identity_provider';
+  'precheck' | 'mark_pending' | 'crm_suppression' | 'journal_purge' | 'identity_provider';
 
 export type AccountDeletionResult =
   /** Every step succeeded. The only complete state. */
   | { status: 'deleted' }
-  /** The identity is deleted; local finalisation did not finish and will be completed by the Clerk webhook retry. */
+  /**
+   * The identity is deleted, but something is still being finished in the background: the local
+   * finalisation (completed by the Clerk webhook retry) or the CRM contact's deletion (completed by the
+   * outbox worker). Never reported as `deleted`.
+   */
   | { status: 'pending_cleanup' }
   | { status: 'blocked_subscription' }
   /** Nothing was changed (the pre-check or the pending marker failed). Safe to retry. */
   | { status: 'failed'; stage: 'precheck' | 'mark_pending' }
   /** Deletion has STARTED but not finished: the journal is locked. Safe to retry. */
-  | { status: 'pending'; stage: 'journal_purge' | 'identity_provider' };
+  | { status: 'pending'; stage: 'crm_suppression' | 'journal_purge' | 'identity_provider' };
 
 export interface AccountDeletionDeps {
   hasActivePaidSubscription(userId: string): Promise<boolean>;
   /** Idempotent: records that deletion started, preserving the first request time. */
   markDeletionPending(userId: string): Promise<unknown>;
+  /**
+   * Stops marketing: cancels queued CRM events and durably queues the do-not-disturb job. Must throw
+   * only when that could not be recorded - a slow or unavailable CRM is not a failure here.
+   */
+  suppressMarketing(userId: string): Promise<unknown>;
   purgeJournal(userId: string): Promise<unknown>;
   /** Deletes the identity. Must resolve when the identity is already gone. */
   deleteIdentity(clerkUserId: string): Promise<void>;
-  /** The transactional "purge journal + mark deleted" (softDeleteUser). */
+  /** The transactional "purge journal + erase activity + anonymise + mark deleted" (softDeleteUser). */
   finalizeLocalDeletion(clerkUserId: string): Promise<unknown>;
+  /** Attempts the queued CRM contact deletion. True only when it is confirmed done. */
+  completeCrmDeletion(userId: string): Promise<boolean>;
 }
 
 export async function deleteAccount(
@@ -85,6 +104,13 @@ export async function deleteAccount(
   }
 
   try {
+    await deps.suppressMarketing(user.id);
+  } catch (error) {
+    logStage('crm_suppression', error);
+    return { status: 'pending', stage: 'crm_suppression' };
+  }
+
+  try {
     await deps.purgeJournal(user.id);
   } catch (error) {
     logStage('journal_purge', error);
@@ -102,6 +128,14 @@ export async function deleteAccount(
     await deps.finalizeLocalDeletion(user.clerkUserId);
   } catch (error) {
     logStage('local_finalisation', error);
+    return { status: 'pending_cleanup' };
+  }
+
+  try {
+    // Not confirmed is not complete: the member's data is erased here, but the CRM still holds a contact.
+    if (!(await deps.completeCrmDeletion(user.id))) return { status: 'pending_cleanup' };
+  } catch (error) {
+    logStage('crm_deletion', error);
     return { status: 'pending_cleanup' };
   }
 
@@ -133,13 +167,15 @@ export async function hasActivePaidSubscription(userId: string): Promise<boolean
 
 /** The real dependencies. Loaded lazily by the route so importing this module never touches Clerk or the database. */
 export async function realAccountDeletionDeps(): Promise<AccountDeletionDeps> {
-  const [{ deleteClerkUser }, { userSyncOps }] = await Promise.all([
+  const [{ deleteClerkUser }, { userSyncOps }, erasure] = await Promise.all([
     import('@tnsi/auth/client/server'),
     import('./user-sync-ops'),
+    import('./account-data-erasure'),
   ]);
   return {
     hasActivePaidSubscription,
     markDeletionPending,
+    suppressMarketing: (userId) => erasure.suppressMarketing(userId),
     purgeJournal: (userId) => purgeJournalEntries(db, userId),
     deleteIdentity: async (clerkUserId) => {
       try {
@@ -151,5 +187,6 @@ export async function realAccountDeletionDeps(): Promise<AccountDeletionDeps> {
       }
     },
     finalizeLocalDeletion: (clerkUserId) => userSyncOps.softDeleteUser(clerkUserId),
+    completeCrmDeletion: (userId) => erasure.completeCrmDeletion(userId),
   };
 }

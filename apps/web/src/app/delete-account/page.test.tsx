@@ -23,8 +23,18 @@ describe('public account-deletion page', () => {
   it('is honest about the subscription requirement, what is deleted, what is kept and backups', () => {
     expect(html).toContain('cancel it first');
     expect(html).toContain('permanently deleted');
-    expect(html).toContain('check-ins, practice activity and saved practices are kept');
-    expect(html).toContain('up to 6 hours');
+    // What is deleted now includes the member's activity, not only the journal.
+    expect(html).toContain('check-ins');
+    expect(html).toContain('saved practices');
+    // It does not claim everything is erased, and says what stays.
+    expect(html).toContain('We do not erase everything');
+    expect(html).toContain('id="what-we-keep"');
+    // Backups: the agreed 30-day maximum for safety backups; no figure for the provider's history.
+    expect(html).toContain('no longer than 30 days');
+    expect(html).not.toContain('6 hours');
+    // No completion-time promise and no unverified security or access claims.
+    expect(html).not.toMatch(/straight away|immediately deleted|within \d+ (hours|days) of/i);
+    expect(html).not.toMatch(/encrypt|no one at|nobody at|never access/i);
   });
 
   it('is indexable and has a canonical path (a store reviewer must be able to reach it)', () => {

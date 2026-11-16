@@ -34,6 +34,15 @@ vi.mock('@/lib/auth-api', () => ({
   memberAccessErrorResponse: () => new Response(null, { status: 401 }),
 }));
 
+vi.mock('@tnsi/integrations', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tnsi/integrations')>()),
+  // Flowi is faked, like Clerk: no network, and "this member has no CRM contact". The CRM step of
+  // account deletion is covered by account-erasure.integration.test.ts.
+  findFlowiContactIdByEmail: async () => null,
+  suppressFlowiContact: async () => false,
+  deleteFlowiContact: async () => false,
+}));
+
 vi.mock('@tnsi/db', async () => {
   const schema = await import('@tnsi/db/schema');
   const { createRequire } = await import('node:module');

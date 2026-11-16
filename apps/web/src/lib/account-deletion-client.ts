@@ -18,6 +18,7 @@ export type DeletionOutcome =
   /** Anything else, including a network failure: we cannot say it completed. */
   | { kind: 'failed'; message: string };
 
+/** PROPOSED WORDING: tone approved in principle (16 Nov 2026); legal approval still required before release. */
 export const DELETION_COPY = {
   subscriptionActive:
     'Your membership is still active, so we can’t delete your account yet. Cancel your membership first, then come back and delete your account. Nothing has been deleted.',
@@ -27,9 +28,14 @@ export const DELETION_COPY = {
   failed:
     'We couldn’t confirm that your account was deleted. Please check your connection and try again.',
   failedKnown: 'We couldn’t delete your account. Nothing was deleted. Please try again.',
-  deleted: 'Your account has been deleted, along with everything in My Reflections.',
+  // `deleted` is shown only for 200: every step, including the CRM contact, is confirmed. It names what
+  // was deleted and says that some records are kept - it must never read as "all your data is gone".
+  deleted:
+    'Your account has been deleted. Your sign-in, your reflections, and your check-ins, practice history and saved practices have been deleted. A small number of records are kept where we are required to keep them, as explained on our Delete Your Account page.',
+  // 202: the sign-in is gone and the journal is purged, but something is still being finished in the
+  // background (the remaining account data, or the CRM contact). No time is promised.
   finishing:
-    'Your sign-in has been removed and your reflections are deleted. We are finishing the last cleanup of your account.',
+    'Your sign-in has been removed and your reflections have been deleted. We are still finishing the removal of the rest of your account information. You don’t need to do anything else.',
 } as const;
 
 const MANAGE_MEMBERSHIP_HREF = '/dashboard/billing';

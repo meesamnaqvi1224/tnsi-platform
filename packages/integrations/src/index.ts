@@ -13,6 +13,9 @@ export {
   FlowiRequestError,
   type FlowiUpsertContactInput,
   type FlowiUpsertContactResult,
+  findFlowiContactIdByEmail,
+  suppressFlowiContact,
+  deleteFlowiContact,
 } from './flowi';
 
 export {
