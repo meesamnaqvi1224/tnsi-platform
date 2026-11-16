@@ -18,6 +18,12 @@ vi.mock('@clerk/nextjs', () => ({
 const { DashboardSidebar } = await import('./dashboard-sidebar');
 
 describe('DashboardSidebar', () => {
+  it('links to My Reflections and does not mark it "Soon"', () => {
+    const html = renderToStaticMarkup(<DashboardSidebar />);
+    expect(html).toContain('href="/dashboard/reflections"');
+    expect(html).toContain('My Reflections');
+  });
+
   it('renders a Somatic Cards navigation item', () => {
     const html = renderToStaticMarkup(<DashboardSidebar />);
     expect(html).toContain('Somatic Cards');
