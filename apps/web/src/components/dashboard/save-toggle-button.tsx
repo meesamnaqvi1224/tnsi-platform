@@ -1,25 +1,34 @@
 'use client';
 
 import { useState } from 'react';
+import { Bookmark } from 'lucide-react';
 import { Button, cn } from '@tnsi/ui';
 
 interface SaveToggleButtonProps {
   practiceId: string;
   initialSaved: boolean;
   className?: string;
+  /** "text" (default) reads Save / Saved; "icon" is a round bookmark for use over card artwork. */
+  display?: 'text' | 'icon';
 }
 
 /**
- * A personal bookmark toggle - "Save" / "Saved", never an icon-only
- * control (see practice-saves.ts's own comment: this is a plain on/off
- * convenience, not a score or an interpretation of intent). Deliberately
+ * A personal bookmark toggle - "Save" / "Saved" (see practice-saves.ts's
+ * own comment: this is a plain on/off convenience, not a score or an
+ * interpretation of intent). The round icon form carries the same accessible
+ * name and pressed state, for placing over card artwork. Deliberately
  * optimistic (flips immediately, reverts on failure) unlike
  * PracticeCompleteButton's wait-for-response pattern elsewhere in this
  * app - saving is trivially reversible with no data-loss consequence, so
  * the instant feedback is worth the small risk of a rare revert, where a
  * completion or reflection is not.
  */
-export function SaveToggleButton({ practiceId, initialSaved, className }: SaveToggleButtonProps) {
+export function SaveToggleButton({
+  practiceId,
+  initialSaved,
+  className,
+  display = 'text',
+}: SaveToggleButtonProps) {
   const [saved, setSaved] = useState(initialSaved);
   const [pending, setPending] = useState(false);
 
@@ -46,6 +55,25 @@ export function SaveToggleButton({ practiceId, initialSaved, className }: SaveTo
     } finally {
       setPending(false);
     }
+  }
+
+  if (display === 'icon') {
+    return (
+      <button
+        type="button"
+        onClick={(event) => void toggle(event)}
+        disabled={pending}
+        aria-label={saved ? 'Remove practice from saved' : 'Save practice'}
+        aria-pressed={saved}
+        className={cn(
+          'focus-visible:ring-ring flex size-8 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+          saved ? 'bg-foreground text-background' : 'bg-background/90 text-foreground',
+          className,
+        )}
+      >
+        <Bookmark aria-hidden className={cn('size-4', saved && 'fill-current')} />
+      </button>
+    );
   }
 
   return (

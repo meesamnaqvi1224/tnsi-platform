@@ -2,9 +2,18 @@ import { groq } from 'next-sanity';
 
 const imageProjection = `{ "url": asset->url, "alt": alt }`;
 
+/**
+ * An article is only published to the site once it has a real body. Documents
+ * with an empty or near-empty body (headline and byline only) are placeholders:
+ * they must not be listed, indexed or served as complete articles. The same
+ * threshold is applied in code by the web app (`lib/articles.ts`).
+ */
+export const ARTICLE_MIN_BODY_CHARS = 500;
+const HAS_BODY = `length(pt::text(body)) >= ${ARTICLE_MIN_BODY_CHARS}`;
+
 /** Articles for the listing page, newest first. */
 export const ARTICLES_QUERY = groq`
-  *[_type == "article" && defined(slug.current)] | order(publishedAt desc) {
+  *[_type == "article" && defined(slug.current) && ${HAS_BODY}] | order(publishedAt desc) {
     "id": _id,
     title,
     "slug": slug.current,
@@ -60,14 +69,14 @@ export const PROGRAMS_QUERY = groq`
 `;
 
 /** Slugs for static generation. */
-export const ARTICLE_SLUGS_QUERY = groq`*[_type == "article" && defined(slug.current)].slug.current`;
+export const ARTICLE_SLUGS_QUERY = groq`*[_type == "article" && defined(slug.current) && ${HAS_BODY}].slug.current`;
 
 /**
  * Slug plus the dates the sitemap's `lastmod` is derived from. `_updatedAt` is
  * Sanity's own last-edit timestamp; `publishedAt` is the editor-entered
  * publication date. Both are real document data, never a generation time.
  */
-export const ARTICLE_SITEMAP_QUERY = groq`*[_type == "article" && defined(slug.current)]{
+export const ARTICLE_SITEMAP_QUERY = groq`*[_type == "article" && defined(slug.current) && ${HAS_BODY}]{
   "slug": slug.current,
   publishedAt,
   _updatedAt
@@ -87,7 +96,7 @@ export const ARTICLE_SITEMAP_QUERY = groq`*[_type == "article" && defined(slug.c
 export const ARTICLES_LIST_API_QUERY = groq`
   {
     "items": *[
-      _type == "article" && defined(slug.current)
+      _type == "article" && defined(slug.current) && ${HAS_BODY}
       && ($category == "" || category->slug.current == $category)
     ] | order(publishedAt desc) [$offset...$end] {
       "id": _id,
@@ -102,7 +111,7 @@ export const ARTICLES_LIST_API_QUERY = groq`
       featured
     },
     "total": count(*[
-      _type == "article" && defined(slug.current)
+      _type == "article" && defined(slug.current) && ${HAS_BODY}
       && ($category == "" || category->slug.current == $category)
     ])
   }
@@ -117,7 +126,7 @@ export const ARTICLES_LIST_API_QUERY = groq`
  * articles can never inflate the response.
  */
 export const ARTICLE_API_BY_SLUG_QUERY = groq`
-  *[_type == "article" && slug.current == $slug][0] {
+  *[_type == "article" && slug.current == $slug && ${HAS_BODY}][0] {
     "id": _id,
     title,
     "slug": slug.current,
@@ -192,7 +201,8 @@ export const POWER_DROPS_LIST_API_QUERY = groq`
       description,
       cardImage ${imageProjection},
       focus,
-      featured
+      featured,
+      "isFree": coalesce(freeAccess, false)
     },
     "total": count(*[
       _type == "powerDrop" && defined(slug.current) && status == "published"
@@ -215,7 +225,8 @@ export const POWER_DROP_API_BY_SLUG_QUERY = groq`
     focus,
     instructions,
     anchorStatement,
-    featured
+    featured,
+    "isFree": coalesce(freeAccess, false)
   }
 `;
 

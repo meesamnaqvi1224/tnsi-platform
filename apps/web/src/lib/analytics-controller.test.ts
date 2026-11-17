@@ -236,6 +236,43 @@ describe('Accept', () => {
   });
 });
 
+describe('private pages are never reported (My Reflections)', () => {
+  it('sends no page view for a private page, even after Accept, and switches GA off for it', () => {
+    const env = makeEnv();
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/dashboard/reflections/new');
+    controller.grant();
+
+    expect(env.pageViews()).toEqual([]);
+    expect(env.win[`ga-disable-${ID}`]).toBe(true);
+  });
+
+  it('turns reporting back on when the member leaves the private area, and off again on return', () => {
+    const env = makeEnv();
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/dashboard/reflections');
+    controller.grant();
+    controller.routeChanged('/dashboard');
+    expect(env.win[`ga-disable-${ID}`]).toBe(false);
+    expect(env.pageViews()).toEqual([
+      ['config', ID, { page_path: '/dashboard', ...MEASUREMENT_ONLY }],
+    ]);
+
+    controller.routeChanged('/dashboard/reflections/abc');
+    expect(env.win[`ga-disable-${ID}`]).toBe(true);
+    expect(env.pageViews()).toHaveLength(1);
+  });
+
+  it('keeps GA's per-property switch on for a private page, so GA drops events too', () => {
+    const env = makeEnv();
+    const controller = createAnalyticsController(env.deps);
+    controller.hydrate('/dashboard/reflections');
+    controller.grant();
+    // track() reaches gtag, but GA drops it because the per-property switch is on.
+    expect(env.win[`ga-disable-${ID}`]).toBe(true);
+  });
+});
+
 describe('Reject', () => {
   it('keeps analytics disabled and saves the choice', () => {
     const env = makeEnv();

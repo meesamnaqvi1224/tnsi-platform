@@ -1,6 +1,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { countFailed, failedByCategory, processOutbox } from '@/lib/crm-outbox';
+import { enqueueEndedTrials } from '@/lib/crm-membership-sync';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -32,7 +33,11 @@ async function run(request: Request) {
   }
 
   try {
-    const summary = await processOutbox();
+    // Trials end by the clock, so nothing else notices when one does: queue the
+    // "trial ended" update for any that have, then send everything due. A failure
+    // here must not stop the outbox itself from running.
+    const trialsQueued = await enqueueEndedTrials().catch(() => 0);
+    const summary = { ...(await processOutbox()), trialsQueued };
     const failedRows = await countFailed();
     // Counts by failure category only (e.g. "HTTP 401"): enough to see that something
     // needs fixing and what kind, with no personal data and no provider text.

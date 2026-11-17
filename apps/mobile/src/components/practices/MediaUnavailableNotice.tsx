@@ -1,7 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 
 /**
  * Shown when a practice's `contentType` says it should have audio or video
@@ -13,8 +14,8 @@ import { colors, spacing } from '@/theme';
  */
 export function MediaUnavailableNotice() {
   return (
-    <Card style={styles.card}>
-      <ThemedText variant="body" color={colors.charcoal}>
+    <Card style={{ ...styles.card, ...homeCardStyle }}>
+      <ThemedText variant="body" color={home.ink}>
         This practice isn&apos;t available yet. Check back soon.
       </ThemedText>
     </Card>

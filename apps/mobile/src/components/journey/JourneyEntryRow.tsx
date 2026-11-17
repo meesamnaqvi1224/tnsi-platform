@@ -4,7 +4,8 @@ import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { capacityOptionLabel } from '@/components/check-in/CapacityOptionList';
 import { capitalize, formatDuration } from '@/lib/format';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 import type { JourneyEntry, PostPracticeResponse } from '@/api/types';
 
 const RESPONSE_LABELS: Record<PostPracticeResponse, string> = {
@@ -40,16 +41,16 @@ export function JourneyEntryRow({ entry }: JourneyEntryRowProps) {
     const label =
       entry.moodScore === entry.capacityScore ? capacityOptionLabel(entry.capacityScore) : null;
     return (
-      <Card style={styles.card}>
-        <ThemedText variant="heading" style={styles.title}>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
+        <ThemedText variant="heading" color={home.navy} style={styles.title}>
           Daily Check-In
         </ThemedText>
-        <ThemedText variant="caption" color={colors.charcoal}>
+        <ThemedText variant="caption" color={home.ink}>
           {label ?? `Mood ${entry.moodScore} of 5 · Capacity ${entry.capacityScore} of 5`}
         </ThemedText>
         {entry.notes ? (
           <View style={styles.reflectionRow}>
-            <ThemedText variant="body" color={colors.charcoal} style={styles.reflectionText}>
+            <ThemedText variant="body" color={home.ink} style={styles.reflectionText}>
               &ldquo;{truncate(entry.notes)}&rdquo;
             </ThemedText>
           </View>
@@ -72,16 +73,16 @@ export function JourneyEntryRow({ entry }: JourneyEntryRowProps) {
       accessibilityRole="button"
       accessibilityLabel={`${entry.title}, completed`}
     >
-      <Card style={styles.card}>
-        <ThemedText variant="heading" style={styles.title}>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
+        <ThemedText variant="heading" color={home.navy} style={styles.title}>
           {entry.title}
         </ThemedText>
-        <ThemedText variant="caption" color={colors.charcoal}>
+        <ThemedText variant="caption" color={home.ink}>
           Completed · {meta.join(' · ')}
         </ThemedText>
         {reflectionText ? (
           <View style={styles.reflectionRow}>
-            <ThemedText variant="body" color={colors.charcoal} style={styles.reflectionText}>
+            <ThemedText variant="body" color={home.ink} style={styles.reflectionText}>
               &ldquo;{truncate(reflectionText)}&rdquo;
             </ThemedText>
           </View>
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     paddingTop: spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
+    borderTopColor: home.border,
   },
   reflectionText: {
     fontStyle: 'italic',

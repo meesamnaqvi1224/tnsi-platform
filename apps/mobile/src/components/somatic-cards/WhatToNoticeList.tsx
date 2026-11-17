@@ -1,8 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { sortByOrder } from '@/lib/somatic-card-order';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
 import type { SomaticWhatToNoticeItem } from '@/api/types';
+import { home } from '@/components/home/homeTheme';
 
 interface WhatToNoticeListProps {
   items: SomaticWhatToNoticeItem[];
@@ -17,7 +18,7 @@ export function WhatToNoticeList({ items }: WhatToNoticeListProps) {
     <View accessibilityRole="list">
       {ordered.map((item, i) => (
         <View key={`${item.order}-${i}`} style={styles.row}>
-          <ThemedText variant="body" color={colors.bronze} style={styles.bullet}>
+          <ThemedText variant="body" color={home.bronze} style={styles.bullet}>
             •
           </ThemedText>
           <ThemedText variant="body" style={styles.text}>

@@ -20,7 +20,12 @@
 import { db, practiceReflections } from '@tnsi/db';
 import { sql, inArray } from 'drizzle-orm';
 import { paginateRows } from './practice-sessions';
-import { mapJourneyRow, type JourneyEntry, type JourneyRawRow } from './journey-presentation';
+import {
+  mapJourneyRow,
+  type JourneyEntry,
+  type JourneyRawRow,
+  type MilestoneDates,
+} from './journey-presentation';
 
 export type {
   JourneyEntry,
@@ -48,6 +53,8 @@ export async function getJourneyEntries(
   userId: string,
   limit: number,
   offset: number,
+  /** Show only practices or only check-ins; filtered in SQL so every page still holds `limit` entries. */
+  kind?: 'practice' | 'check_in',
 ): Promise<{ entries: JourneyEntry[]; hasMore: boolean }> {
   const rawRows = (await db.execute(sql`
     select * from (
@@ -84,6 +91,7 @@ export async function getJourneyEntries(
       from check_ins ci
       where ci.user_id = ${userId}
     ) combined
+    ${kind ? sql`where combined.kind = ${kind}` : sql``}
     order by "occurredAt" desc, "entryId" desc
     limit ${limit + 1} offset ${offset}
   `)) as unknown as JourneyRawRow[];
@@ -119,5 +127,33 @@ export async function getJourneyEntries(
   return {
     entries: page.map((row) => mapJourneyRow(row, reflectionByCompletionId)),
     hasMore,
+  };
+}
+
+/**
+ * The earliest time this member recorded a check-in, completed a practice and
+ * wrote a reflection (free text only - choosing "I feel different" alone does
+ * not count as writing one). Scoped to `userId`; `null` for anything they have
+ * not done yet. Feeds the timeline's quiet milestones, nothing else.
+ */
+export async function getMilestoneDates(userId: string): Promise<MilestoneDates> {
+  const [row] = (await db.execute(sql`
+    select
+      (select min(ci.completed_at) from check_ins ci where ci.user_id = ${userId}) as "firstCheckIn",
+      (select min(pc.completed_at) from practice_completions pc
+         where pc.user_id = ${userId} and pc.completed = true) as "firstPractice",
+      (select min(pr.created_at) from practice_reflections pr
+         where pr.user_id = ${userId} and nullif(btrim(pr.reflection), '') is not null) as "firstReflection"
+  `)) as unknown as {
+    firstCheckIn: string | null;
+    firstPractice: string | null;
+    firstReflection: string | null;
+  }[];
+
+  const toDate = (value: string | null | undefined) => (value ? new Date(value) : null);
+  return {
+    firstCheckIn: toDate(row?.firstCheckIn),
+    firstPractice: toDate(row?.firstPractice),
+    firstReflection: toDate(row?.firstReflection),
   };
 }

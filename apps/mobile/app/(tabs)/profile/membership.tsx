@@ -1,54 +1,39 @@
-import { Linking, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { useAuth } from '@clerk/clerk-expo';
 import { Card, ErrorNotice, PrimaryButton, ScreenContainer, ThemedText } from '@/components';
 import { MembershipSkeleton } from '@/components/profile/MembershipSkeleton';
 import { useEntitlements } from '@/hooks/useEntitlements';
-import { formatArticleDate } from '@/lib/format';
-import { env } from '@/lib/env';
-import { colors, spacing } from '@/theme';
-import type { Entitlements, EntitlementStatus, EntitlementTier } from '@/api/types';
-
-const TIER_LABEL: Record<EntitlementTier, string> = {
-  free: 'Free Member',
-  monthly: 'Monthly Member',
-  annual: 'Annual Member',
-  lifetime: 'Lifetime Member',
-};
-
-/**
- * Every status shown explicitly on this detailed screen (unlike Profile's
- * compact summary, which hides the unremarkable 'active' case) - "more
- * context than the compact Profile summary" is the whole point of this
- * screen existing.
- */
-const STATUS_LABEL: Record<EntitlementStatus, string> = {
-  active: 'Active',
-  trialing: 'Trial',
-  past_due: 'Payment overdue',
-  canceled: 'Canceled',
-  expired: 'Expired',
-};
-
-/**
- * The real, already-existing web billing page - not invented. Same
- * destination for every state: it already shows either the member's
- * current plan + "Manage billing" (via the existing Stripe Customer
- * Portal, web-only) or the subscribe options, depending on their real
- * account state once they're signed in there.
- */
-const MEMBERSHIP_WEB_PATH = '/dashboard/billing';
+import {
+  membershipActionLabel,
+  membershipDetailLines,
+  membershipStateLabel,
+  tierLabel,
+} from '@/lib/membership-copy';
+import { openTnsiPage } from '@/lib/open-web';
+import { PageTitle } from '@/components/PageTitle';
+import { SectionHeading } from '@/components/SectionHeading';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
+import { spacing } from '@/theme';
+import type { Entitlements } from '@/api/types';
 
 export default function MembershipScreen() {
   const { state, reload } = useEntitlements();
+  const { signOut } = useAuth();
 
   return (
-    <ScreenContainer scroll>
-      <ThemedText variant="display" style={styles.heading}>
-        Membership & Access
-      </ThemedText>
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PageTitle title="Membership & Access" subtitle="Your current access and how to manage it." />
 
       {state.status === 'loading' ? <MembershipSkeleton /> : null}
 
-      {state.status === 'error' ? <ErrorNotice message={state.message} onRetry={reload} /> : null}
+      {state.status === 'error' ? (
+        <ErrorNotice
+          message={state.message}
+          onRetry={reload}
+          onSignInAgain={state.sessionExpired ? () => void signOut() : undefined}
+        />
+      ) : null}
 
       {state.status === 'success' ? (
         <MembershipContent entitlements={state.entitlements} onRefresh={reload} />
@@ -64,21 +49,23 @@ function MembershipContent({
   entitlements: Entitlements;
   onRefresh: () => void;
 }) {
-  const isPaidRelationship = entitlements.tier !== 'free';
+  const [opening, setOpening] = useState(false);
   const hasPrograms = entitlements.programs.length > 0;
   const hasCertifications = entitlements.certifications.length > 0;
 
   return (
     <View>
-      <SectionLabel>Current Access</SectionLabel>
-      <Card style={styles.card}>
+      <SectionHeading>Current Access</SectionHeading>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
         <View
           accessible
-          accessibilityLabel={`Membership: ${TIER_LABEL[entitlements.tier]}. Status: ${STATUS_LABEL[entitlements.status]}`}
+          accessibilityLabel={`Membership: ${tierLabel(entitlements)}. Status: ${membershipStateLabel(entitlements)}`}
         >
-          <ThemedText variant="heading">{TIER_LABEL[entitlements.tier]}</ThemedText>
-          <ThemedText variant="body" color={colors.charcoal} style={styles.statusLine}>
-            Status: {STATUS_LABEL[entitlements.status]}
+          <ThemedText variant="heading" color={home.navy}>
+            {tierLabel(entitlements)}
+          </ThemedText>
+          <ThemedText variant="body" color={home.ink} style={styles.statusLine}>
+            Status: {membershipStateLabel(entitlements)}
           </ThemedText>
         </View>
 
@@ -87,13 +74,13 @@ function MembershipContent({
 
       {hasPrograms ? (
         <>
-          <SectionLabel>Programmes</SectionLabel>
-          <Card style={styles.card}>
+          <SectionHeading>Programmes</SectionHeading>
+          <Card style={{ ...styles.card, ...homeCardStyle }}>
             {entitlements.programs.map((program, index) => (
               <ThemedText
                 key={program}
                 variant="body"
-                color={colors.charcoal}
+                color={home.ink}
                 style={index > 0 ? styles.listItem : undefined}
               >
                 {program}
@@ -105,13 +92,13 @@ function MembershipContent({
 
       {hasCertifications ? (
         <>
-          <SectionLabel>Certifications</SectionLabel>
-          <Card style={styles.card}>
+          <SectionHeading>Certifications</SectionHeading>
+          <Card style={{ ...styles.card, ...homeCardStyle }}>
             {entitlements.certifications.map((certification, index) => (
               <ThemedText
                 key={certification}
                 variant="body"
-                color={colors.charcoal}
+                color={home.ink}
                 style={index > 0 ? styles.listItem : undefined}
               >
                 {certification}
@@ -121,17 +108,27 @@ function MembershipContent({
         </>
       ) : null}
 
-      <SectionLabel>Manage</SectionLabel>
-      <Card style={styles.card}>
+      <SectionHeading>Manage</SectionHeading>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
         <PrimaryButton
-          label={isPaidRelationship ? 'Manage Membership' : 'Visit TNSI Website'}
+          label={membershipActionLabel(entitlements)}
           variant="secondary"
-          onPress={() => Linking.openURL(`${env.apiBaseUrl}${MEMBERSHIP_WEB_PATH}`)}
+          loading={opening}
+          onPress={async () => {
+            setOpening(true);
+            try {
+              await openTnsiPage('billing');
+            } finally {
+              setOpening(false);
+              // The member may have changed their plan on the website: show what the server now says.
+              onRefresh();
+            }
+          }}
           style={styles.manageButton}
         />
-        <ThemedText variant="caption" color={colors.charcoal} style={styles.manageNote}>
-          This opens the TNSI website in your browser, where membership and billing are managed
-          securely.
+        <ThemedText variant="caption" color={home.ink} style={styles.manageNote}>
+          This opens the TNSI website in a secure browser window, where membership and billing are
+          managed.
         </ThemedText>
 
         <View style={styles.refreshDivider} />
@@ -146,51 +143,29 @@ function MembershipContent({
   );
 }
 
-function AccessDetail({ entitlements }: { entitlements: Entitlements }) {
-  if (entitlements.tier === 'free') {
-    return (
-      <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
-        You currently have free access to TNSI.
-      </ThemedText>
-    );
-  }
-
-  if (entitlements.cancelAtPeriodEnd && entitlements.currentPeriodEnd) {
-    return (
-      <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
-        Your access continues until {formatArticleDate(entitlements.currentPeriodEnd)}, after which
-        your membership will not renew.
-      </ThemedText>
-    );
-  }
-
-  if (entitlements.status === 'active' && entitlements.currentPeriodEnd) {
-    return (
-      <ThemedText variant="body" color={colors.charcoal} style={styles.detailLine}>
-        Renews {formatArticleDate(entitlements.currentPeriodEnd)}.
-      </ThemedText>
-    );
-  }
-
-  return null;
-}
-
-function SectionLabel({ children }: { children: string }) {
+function DetailLine({ children }: { children: string }) {
   return (
-    <ThemedText variant="label" color={colors.bronze} style={styles.sectionLabel}>
-      {children.toUpperCase()}
+    <ThemedText variant="body" color={home.ink} style={styles.detailLine}>
+      {children}
     </ThemedText>
   );
 }
 
+function AccessDetail({ entitlements }: { entitlements: Entitlements }) {
+  // What to say is decided in `membershipDetailLines` (unit-tested); the screen
+  // only displays the server's resolved membership and never derives it.
+  const lines = membershipDetailLines(entitlements);
+  if (lines.length === 0) return null;
+  return (
+    <>
+      {lines.map((line) => (
+        <DetailLine key={line}>{line}</DetailLine>
+      ))}
+    </>
+  );
+}
+
 const styles = StyleSheet.create({
-  heading: {
-    marginBottom: spacing.xl,
-  },
-  sectionLabel: {
-    marginBottom: spacing.sm,
-    letterSpacing: 1,
-  },
   card: {
     marginBottom: spacing.xl,
   },
@@ -201,7 +176,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingTop: spacing.md,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
+    borderTopColor: home.border,
   },
   listItem: {
     marginTop: spacing.sm,
@@ -214,7 +189,7 @@ const styles = StyleSheet.create({
   },
   refreshDivider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.border,
+    backgroundColor: home.border,
     marginBottom: spacing.md,
   },
   refreshButton: {

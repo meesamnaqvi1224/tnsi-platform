@@ -5,7 +5,11 @@ import { ScreenContainer, ErrorNotice, ThemedText, PrimaryButton } from '@/compo
 import { CheckInEntry } from '@/components/progress/CheckInEntry';
 import { useCheckInHistory } from '@/hooks/useCheckInHistory';
 import { usePractices } from '@/hooks/usePractices';
-import { colors, radius, spacing } from '@/theme';
+import { PageTitle } from '@/components/PageTitle';
+import { home } from '@/components/home/homeTheme';
+import { REFLECTION_STATES } from '@/lib/reflections-copy';
+import { useFeatures } from '@/hooks/useFeatures';
+import { radius, spacing } from '@/theme';
 
 /**
  * Progress: a chronological record of two genuinely separate activity
@@ -20,6 +24,7 @@ import { colors, radius, spacing } from '@/theme';
  */
 export default function ProgressScreen() {
   const router = useRouter();
+  const features = useFeatures();
   const {
     state: checkInsState,
     reload: reloadCheckIns,
@@ -28,16 +33,11 @@ export default function ProgressScreen() {
   const { state: practicesState } = usePractices();
 
   return (
-    <ScreenContainer scroll>
-      <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
-        Progress
-      </ThemedText>
-      <ThemedText variant="display" style={styles.heading}>
-        Notice what you&apos;re practising.
-      </ThemedText>
-      <ThemedText variant="body" color={colors.charcoal} style={styles.subtitle}>
-        A simple record of your check-ins and practice activity over time.
-      </ThemedText>
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PageTitle
+        title="Progress"
+        subtitle="A simple record of your check-ins and practice activity over time."
+      />
 
       <CheckInsSection
         state={checkInsState}
@@ -48,6 +48,13 @@ export default function ProgressScreen() {
         state={practicesState}
         onViewMyLearning={() => router.push('/my-learning')}
       />
+      {features.reflections ? (
+        <ReflectionsSection
+          onOpen={() =>
+            router.push({ pathname: '/profile/reflections', params: { from: 'progress' } })
+          }
+        />
+      ) : null}
     </ScreenContainer>
   );
 }
@@ -64,7 +71,7 @@ function CheckInsSection({
   return (
     <View style={styles.section}>
       <View accessibilityRole="header" accessible>
-        <ThemedText variant="heading" style={styles.sectionTitle}>
+        <ThemedText variant="heading" color={home.navy} style={styles.sectionTitle}>
           Your Check-Ins
         </ThemedText>
       </View>
@@ -82,7 +89,7 @@ function CheckInsSection({
           <ThemedText variant="body" style={styles.emptyTitle}>
             No check-ins yet.
           </ThemedText>
-          <ThemedText variant="body" color={colors.charcoal}>
+          <ThemedText variant="body" color={home.ink}>
             Your daily check-ins will appear here as you use TNSI.
           </ThemedText>
         </View>
@@ -129,7 +136,7 @@ function PracticeSummarySection({
   return (
     <View style={styles.section}>
       <View accessibilityRole="header" accessible>
-        <ThemedText variant="heading" style={styles.sectionTitle}>
+        <ThemedText variant="heading" color={home.navy} style={styles.sectionTitle}>
           Your Practice
         </ThemedText>
       </View>
@@ -141,7 +148,7 @@ function PracticeSummarySection({
       {state.status === 'success' && counts && (
         <>
           {counts.completed === 0 && counts.inProgress === 0 ? (
-            <ThemedText variant="body" color={colors.charcoal} style={styles.emptyTitle}>
+            <ThemedText variant="body" color={home.ink} style={styles.emptyTitle}>
               Your practice activity will appear here as you begin.
             </ThemedText>
           ) : (
@@ -167,6 +174,32 @@ function PracticeSummarySection({
   );
 }
 
+/**
+ * A way into My Reflections. Deliberately shows nothing about what the member has written - no counts,
+ * dates or previews - and never joins the check-in or practice records above: the journal is a separate,
+ * private space, and fetching it here would let a journal failure or its content touch this screen.
+ */
+function ReflectionsSection({ onOpen }: { onOpen: () => void }) {
+  return (
+    <View style={styles.section}>
+      <View accessibilityRole="header" accessible>
+        <ThemedText variant="heading" color={home.navy} style={styles.sectionTitle}>
+          {REFLECTION_STATES.progressTitle}
+        </ThemedText>
+      </View>
+      <ThemedText variant="body" color={home.ink} style={styles.emptyTitle}>
+        {REFLECTION_STATES.progressBody}
+      </ThemedText>
+      <PrimaryButton
+        label={REFLECTION_STATES.progressButton}
+        variant="secondary"
+        onPress={onOpen}
+        style={styles.myLearningButton}
+      />
+    </View>
+  );
+}
+
 /** Static placeholder blocks while a section's data loads - no animation, matching HomeSkeleton/PracticesSkeleton. */
 function ProgressSkeleton() {
   return (
@@ -177,16 +210,6 @@ function ProgressSkeleton() {
 }
 
 const styles = StyleSheet.create({
-  eyebrow: {
-    textTransform: 'uppercase',
-    marginBottom: spacing.sm,
-  },
-  heading: {
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    marginBottom: spacing.xl,
-  },
   section: {
     marginBottom: spacing.xl,
   },
@@ -208,8 +231,8 @@ const styles = StyleSheet.create({
   skeletonBlock: {
     height: 120,
     borderRadius: radius.md,
-    backgroundColor: colors.creamMuted,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    backgroundColor: home.cool,
+    borderWidth: 1,
+    borderColor: home.border,
   },
 });

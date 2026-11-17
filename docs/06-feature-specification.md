@@ -117,6 +117,40 @@ Profile, saved resources, learning history, assessment results,
 certificates, invoices, membership, notification preferences, security
 settings, password management.
 
+### Membership and billing: implementation and verification status (27 October 2026)
+
+Membership is **closed in production** and the integration is **not launch-ready**.
+The approved model is a free account plus paid membership (£5.99 per month or
+£59.99 per year), a 30-day card-free trial managed by the application, a 7-day
+grace period after a failed payment, and no new Lifetime purchases. The policy
+and detail are in `membership-commercial-decisions.md`; the release procedure and
+test results are in `membership-release-runbook.md`.
+
+- **Verified on 27 October 2026**, in a local run against Stripe **Sandbox**, a
+  Clerk **development** instance and a disposable PostgreSQL, with no production
+  configuration changed: checkout session creation, two owner-paid payments on
+  the hosted Checkout page (genuine `checkout.session.completed`, valid
+  signatures, one subscription, one entitlement row and one invoice each time),
+  the success page recording the subscription **while the genuine webhooks were
+  held** (zero webhooks processed by the app; signature verification was never
+  disabled), with the held deliveries then released unchanged and processed safely, duplicate-subscription
+  flagging, cancellation at period end and immediately, a failed payment with its
+  grace period and recovery, webhook signature rejection and replay safety (the
+  last two with locally forged requests), and the card-free trial through live
+  Clerk. Grace expiry was verified only as a database simulation.
+- **Unverified or not tested:** the Stripe-to-localhost browser redirect after
+  payment (the browser returned to Clerk's sign-in page; the success page passed
+  when its exact URL was loaded after signing in again, and the redirect has not
+  been checked with a production Clerk configuration), the visible price on the
+  hosted page (Stripe's data confirms £5.99; no screenshot), a natural renewal
+  cycle, and the lapse at the end of a paid period. The trial with an unverified
+  primary email is **blocked**, because Clerk does not allow that account state in
+  the development instance.
+- **Required before launch:** live-mode Stripe configuration (it does not exist),
+  a named owner and backup, an alerting mechanism and an approved procedure for
+  flagged duplicate subscriptions (today only a log line and a metadata flag),
+  counsel's review of the refund wording, and a separate launch authorisation.
+
 ## Admin Dashboard
 
 User management, content management, programme management, assessment
@@ -131,7 +165,8 @@ conversations, webinar attendance, revenue, export reports.
 
 ## CRM integration (Flowi)
 
-Every important action syncs automatically:
+Every important action syncs automatically (**except** private content: a member's My Reflections
+journal is never sent to Flowi or any marketing, support or analytics system):
 
 ```
 Assessment        → Create Contact
@@ -210,7 +245,50 @@ outage, slow response or missing credential can never lose a submission.
 - **Not done yet:** applying the `crm_outbox` migration to production (before this
   code is deployed), adding `CRON_SECRET`, verification of the custom-field payload
   against the live Flowi account with a throw-away contact, and an admin view of
-  failed rows. Membership state is not mirrored into Flowi (separate project).
+  failed rows.
+
+### Membership and app sign-up events (same outbox)
+
+New kinds `app_signup` and `membership` use the same queue (`kind` is plain text, so
+no migration). Sent: email, first/last name (from the account), one tag, and four
+"TNSI" custom fields - Membership State, Plan, Trial Ends, Paid Through. **Nothing
+else**: no activity, no practice or journey data, nothing health-related.
+
+- **State is not recomputed.** It is read from `resolveMembership` (`@tnsi/auth`),
+  the same decision behind every access check, then translated to the wording of the
+  Flowi dropdown (`apps/web/src/lib/crm-membership.ts`). Only a CHANGE of state
+  sends anything, so duplicate or replayed Stripe events send nothing.
+- **Events and tags:** sign-up `TNSI App Signup` (once, when the account's entitlement
+  row is first created); trial start `TNSI Trial Started`; paying `TNSI Member`;
+  cancelling `TNSI Membership Cancelling`; failed payment `TNSI Payment Issue`;
+  trial over `TNSI Trial Ended` (found by the daily worker run, once per account,
+  marked in `entitlements.metadata.crmTrialEndedQueuedAt`); membership over
+  `TNSI Membership Ended`. A move back to Member (payment recovered, cancellation
+  undone) updates the fields only.
+- **Tags are only ever added.** Flowi workflows remove their entry tag when they start,
+  so the same tag can trigger them again later.
+- **Never blocks the member.** Each queueing step runs in its own savepoint; a failure
+  is logged by error class only and the sign-up, trial or Stripe sync carries on.
+  Stripe-driven updates are queued in the same transaction as the entitlement change.
+- **Timing:** sign-up and Stripe updates are sent right after the response/commit
+  (`after()` / `attemptNow`); the daily worker retries anything left. "Trial ended"
+  can therefore be up to a day late (Hobby cron).
+- **Prerequisite in Flowi:** the "TNSI Plan" dropdown option must read `Annual`
+  (it currently reads `Anuual`), and all seven tags above must exist. Legacy Lifetime
+  members are never touched.
+- **Service messages only:** these tags drive account messages (welcome, trial,
+  payment). They are not marketing consent; see the newsletter and Return Path forms
+  for that.
+
+## My Reflections (private journal)
+
+A private personal writing space, independent of check-ins, recommendations and practice completion:
+free writing now, guided prompts and practice/Theory-linked reflections in later phases. Journal content
+never changes what a member is shown and has no AI, emotion or clinical analysis. Available to every
+signed-in member. Members can edit and delete their entries, and account deletion permanently purges
+them. **Backend foundation (schema, API, privacy protections, account deletion):**
+[my-reflections-backend.md](./my-reflections-backend.md). Journal screens (web and mobile), guided
+prompts and the Theory entry point are not part of that foundation.
 
 ## Notification System
 

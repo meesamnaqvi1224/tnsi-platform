@@ -3,8 +3,9 @@ import { useRouter } from 'expo-router';
 import { Card } from '@/components/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { SomaticImageBlock } from './SomaticImageBlock';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
 import type { SomaticCardSummary } from '@/api/types';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 
 interface SomaticCardListItemProps {
   card: SomaticCardSummary;
@@ -33,17 +34,17 @@ export function SomaticCardListItem({ card }: SomaticCardListItemProps) {
       accessibilityLabel={`Card ${card.cardNumber}, ${title}`}
       style={({ pressed }) => pressed && styles.pressed}
     >
-      <Card style={styles.card}>
+      <Card style={{ ...styles.card, ...homeCardStyle }}>
         <SomaticImageBlock
           image={card.cardArtwork}
           fallbackLabel={title}
           aspectRatio={9 / 16}
           style={styles.artwork}
         />
-        <ThemedText variant="label" color={colors.bronze} style={styles.eyebrow}>
+        <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
           CARD {card.cardNumber}
         </ThemedText>
-        <ThemedText variant="heading" style={styles.title}>
+        <ThemedText variant="heading" color={home.navy} style={styles.title}>
           {title}
         </ThemedText>
       </Card>

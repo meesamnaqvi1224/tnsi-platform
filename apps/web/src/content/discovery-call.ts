@@ -87,13 +87,13 @@ export const discoveryCallContent = {
     heading: 'Meet Caroline',
     name: 'Caroline Reed',
     credentials: [
-      '20+ years in practice',
+      '25+ years in practice',
       'Trauma therapist',
       'Founder',
       'Evidence-informed educator',
     ],
     biography: [
-      'Caroline Reed is the founder of The Nervous System Institute and a trauma-informed educator with more than twenty years of clinical experience. Her work integrates neuroscience, attachment theory and somatic practice into practical frameworks for sustainable change.',
+      'Caroline Reed is the founder of The Nervous System Institute and a trauma-informed educator with more than 25 years of clinical experience. Her work integrates neuroscience, attachment theory and somatic practice into practical frameworks for sustainable change.',
       'She has worked with high-achieving women, senior leaders and practitioners across Europe and North America — always with the same commitment: understand deeply, teach responsibly, and meet people where they are.',
     ],
     imageSrc: '/images/discovery/caroline-portrait.webp',
@@ -108,7 +108,7 @@ export const discoveryCallContent = {
       {
         question: 'How long is the Discovery Call?',
         answer:
-          'Discovery Calls are typically thirty minutes. This is enough time to understand your situation, answer your questions and discuss potential next steps — without rushing.',
+          'Discovery Calls are 20 minutes. This is enough time to understand your situation, answer your questions and discuss potential next steps — without rushing.',
       },
       {
         question: 'Is there any obligation afterwards?',

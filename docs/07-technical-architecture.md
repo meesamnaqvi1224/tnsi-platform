@@ -121,6 +121,18 @@ in `PROJECT.md`, 2026-10-12).
 - **Analytics** go to GA4 through `gtag`; **email capture** goes through a
   server route to Flowi (`upsertFlowiContact`), never from the browser.
 
+### My Reflections (private journal)
+
+A member's private writing lives in its own table, `journal_entries` (migration 0014), separate from
+`practice_reflections` (the quick post-practice check-out, unchanged). Postgres stores the private text;
+Sanity will later hold the editorial prompts. Routes: `GET/POST /api/v1/journal/entries`,
+`GET/PATCH/DELETE /api/v1/journal/entries/:id`; account deletion `DELETE /api/v1/me/account`, which
+permanently purges the journal. Every journal response is `private, no-store`; ownership is enforced in
+the server's queries; journal text is never logged, never in a URL, never in analytics (GA4 excludes
+`/dashboard/reflections`), and never sent to Flowi or any third party. Full schema, API contract,
+ownership and privacy model, the account-deletion sequence and its failure recovery, and known
+limitations: [my-reflections-backend.md](./my-reflections-backend.md).
+
 ## Performance requirements
 
 Google Lighthouse: Performance, Accessibility, SEO, and Best Practices all

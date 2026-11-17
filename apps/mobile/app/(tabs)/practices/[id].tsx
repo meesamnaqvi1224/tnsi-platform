@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { RETURN_PATH_KEY } from '@tnsi/core';
 import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
 import { PracticeThumbnail } from '@/components/practices/PracticeThumbnail';
 import { PracticeDetailSkeleton } from '@/components/practices/PracticeDetailSkeleton';
@@ -9,12 +10,16 @@ import { VideoPlayer } from '@/components/practices/VideoPlayer';
 import { ExternalMediaNotice } from '@/components/practices/ExternalMediaNotice';
 import { MediaUnavailableNotice } from '@/components/practices/MediaUnavailableNotice';
 import { MarkCompleteButton } from '@/components/practices/CompletionSection';
+import { MembershipLockedNotice } from '@/components/membership/MembershipLockedNotice';
+import { ReturnPathSection } from '@/components/return-path/ReturnPathSection';
 import { PostPracticeReflection } from '@/components/practices/PostPracticeReflection';
 import { SaveToggleButton } from '@/components/practices/SaveToggleButton';
 import { usePracticeDetail } from '@/hooks/usePracticeDetail';
 import { resolveMediaKind } from '@/lib/media';
 import { capitalize, formatDuration } from '@/lib/format';
-import { colors, spacing } from '@/theme';
+import { categoryLabel } from '@/lib/practice-library';
+import { spacing } from '@/theme';
+import { home } from '@/components/home/homeTheme';
 
 export default function PracticeDetailScreen() {
   const params = useLocalSearchParams<{ id: string }>();
@@ -85,7 +90,7 @@ export default function PracticeDetailScreen() {
 
   if (state.status === 'loading') {
     return (
-      <ScreenContainer scroll>
+      <ScreenContainer scroll underHeader inTabs background={home.page}>
         <PracticeDetailSkeleton />
       </ScreenContainer>
     );
@@ -93,9 +98,9 @@ export default function PracticeDetailScreen() {
 
   if (state.status === 'not-found') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ThemedText variant="heading">This practice isn&apos;t available.</ThemedText>
-        <ThemedText variant="body" color={colors.charcoal} style={styles.notFoundBody}>
+        <ThemedText variant="body" color={home.ink} style={styles.notFoundBody}>
           It may have been removed or is no longer published.
         </ThemedText>
       </ScreenContainer>
@@ -104,7 +109,7 @@ export default function PracticeDetailScreen() {
 
   if (state.status === 'error') {
     return (
-      <ScreenContainer>
+      <ScreenContainer underHeader inTabs background={home.page}>
         <ErrorNotice message={state.message} onRetry={reload} />
       </ScreenContainer>
     );
@@ -114,8 +119,9 @@ export default function PracticeDetailScreen() {
   const title = practice.title.trim();
   const meta = [capitalize(practice.contentType)];
   if (practice.durationSeconds) meta.push(formatDuration(practice.durationSeconds));
-  if (practice.category) meta.push(practice.category);
 
+  // Decided by the server; when locked it has also withheld `mediaUrl`.
+  const locked = practice.locked === true;
   const mediaKind = resolveMediaKind(practice.mediaUrl, practice.contentType);
   const completed = practice.progress?.completed ?? false;
   // `journal` genuinely has no media by design; the other five content
@@ -123,35 +129,47 @@ export default function PracticeDetailScreen() {
   // one Sanity practice actually does), that's a real content gap worth
   // saying out loud rather than leaving a silent empty space.
   const expectsMedia = practice.contentType !== 'journal';
+  // An interactive practice is its own native experience, chosen by its key;
+  // it has no recording and saves its own completion.
+  const isReturnPath =
+    practice.contentType === 'interactive' && practice.interactiveKey === RETURN_PATH_KEY;
 
   return (
-    <ScreenContainer scroll>
-      {practice.thumbnailUrl ? (
-        <PracticeThumbnail
-          thumbnailUrl={practice.thumbnailUrl}
-          contentType={practice.contentType}
-          height={220}
-          style={styles.hero}
-        />
+    <ScreenContainer scroll underHeader inTabs background={home.page}>
+      <PracticeThumbnail
+        thumbnailUrl={practice.thumbnailUrl}
+        contentType={practice.contentType}
+        height={220}
+        showLabel={false}
+        style={styles.hero}
+      />
+      {practice.category ? (
+        <ThemedText variant="label" color={home.bronze} style={styles.eyebrow}>
+          {categoryLabel(practice.category)}
+        </ThemedText>
       ) : null}
 
       <View style={styles.titleRow}>
-        <ThemedText variant="display" style={styles.title}>
+        <ThemedText variant="display" color={home.navy} style={styles.title}>
           {title}
         </ThemedText>
-        <SaveToggleButton practiceId={practice.id} initialSaved={practice.saved ?? false} />
+        {locked ? null : (
+          <SaveToggleButton practiceId={practice.id} initialSaved={practice.saved ?? false} />
+        )}
       </View>
-      <ThemedText variant="caption" color={colors.charcoal} style={styles.meta}>
+      <ThemedText variant="caption" color={home.ink} style={styles.meta}>
         {meta.join(' · ')}
       </ThemedText>
 
       {practice.description ? (
-        <ThemedText variant="body" style={styles.description}>
+        <ThemedText variant="body" color={home.ink} style={styles.description}>
           {practice.description}
         </ThemedText>
       ) : null}
 
-      {mediaKind === 'audio' && practice.mediaUrl ? (
+      {locked ? <MembershipLockedNotice /> : null}
+
+      {!locked && mediaKind === 'audio' && practice.mediaUrl ? (
         <AudioPlayer
           key={mediaAttempt}
           uri={practice.mediaUrl}
@@ -161,7 +179,7 @@ export default function PracticeDetailScreen() {
           onRetry={handleMediaRetry}
         />
       ) : null}
-      {mediaKind === 'video' && practice.mediaUrl ? (
+      {!locked && mediaKind === 'video' && practice.mediaUrl ? (
         <VideoPlayer
           key={mediaAttempt}
           uri={practice.mediaUrl}
@@ -171,19 +189,26 @@ export default function PracticeDetailScreen() {
           onRetry={handleMediaRetry}
         />
       ) : null}
-      {mediaKind === 'external' && practice.mediaUrl ? (
+      {!locked && mediaKind === 'external' && practice.mediaUrl ? (
         <ExternalMediaNotice mediaUrl={practice.mediaUrl} />
       ) : null}
-      {mediaKind === 'none' && expectsMedia ? <MediaUnavailableNotice /> : null}
+      {!locked && isReturnPath ? (
+        <ReturnPathSection
+          onComplete={() => submitCompletion({ completed: true, progressPct: 1 })}
+        />
+      ) : null}
+      {!locked && !isReturnPath && mediaKind === 'none' && expectsMedia ? (
+        <MediaUnavailableNotice />
+      ) : null}
 
       <View style={styles.completionArea}>
-        {completed && practice.progress?.id ? (
+        {locked ? null : completed && practice.progress?.id ? (
           <PostPracticeReflection
             completionId={practice.progress.id}
             initialReflection={practice.reflection}
             onSubmit={submitReflection}
           />
-        ) : mediaKind === 'audio' || mediaKind === 'video' ? null : (
+        ) : isReturnPath || mediaKind === 'audio' || mediaKind === 'video' ? null : (
           <MarkCompleteButton submitting={submitting} onPress={handleMarkComplete} />
         )}
       </View>
@@ -194,6 +219,11 @@ export default function PracticeDetailScreen() {
 const styles = StyleSheet.create({
   hero: {
     marginBottom: spacing.lg,
+  },
+  eyebrow: {
+    textTransform: 'uppercase',
+    letterSpacing: 1.4,
+    marginBottom: spacing.xs,
   },
   titleRow: {
     flexDirection: 'row',

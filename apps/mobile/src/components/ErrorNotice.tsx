@@ -7,16 +7,25 @@ import { PrimaryButton } from './PrimaryButton';
 interface ErrorNoticeProps {
   message: string;
   onRetry?: () => void;
+  /** When the session has ended, retrying cannot help: offer signing in again instead. */
+  onSignInAgain?: () => void;
 }
 
 /** Calm, human error display with an optional retry action - never shows raw backend text. */
-export function ErrorNotice({ message, onRetry }: ErrorNoticeProps) {
+export function ErrorNotice({ message, onRetry, onSignInAgain }: ErrorNoticeProps) {
   return (
     <Card>
       <ThemedText variant="body" color={colors.error}>
         {message}
       </ThemedText>
-      {onRetry ? (
+      {onSignInAgain ? (
+        <PrimaryButton
+          label="Sign In Again"
+          variant="secondary"
+          onPress={onSignInAgain}
+          style={styles.retryButton}
+        />
+      ) : onRetry ? (
         <PrimaryButton
           label="Try Again"
           variant="secondary"

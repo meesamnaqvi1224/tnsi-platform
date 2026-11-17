@@ -1,8 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { sortByOrder } from '@/lib/somatic-card-order';
-import { colors, spacing } from '@/theme';
+import { spacing } from '@/theme';
 import type { SomaticPracticeStep } from '@/api/types';
+import { home } from '@/components/home/homeTheme';
 
 interface PracticeStepsListProps {
   steps: SomaticPracticeStep[];
@@ -23,7 +24,7 @@ export function PracticeStepsList({ steps }: PracticeStepsListProps) {
     <View accessibilityRole="list">
       {ordered.map((step, i) => (
         <View key={`${step.order}-${i}`} style={styles.row} accessibilityRole="text">
-          <ThemedText variant="body" color={colors.bronze} style={styles.number}>
+          <ThemedText variant="body" color={home.bronze} style={styles.number}>
             {i + 1}
           </ThemedText>
           <ThemedText variant="body" style={styles.instruction}>

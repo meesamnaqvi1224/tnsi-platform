@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/auth-api';
 import { db, entitlements } from '@tnsi/db';
 import { eq } from 'drizzle-orm';
 import {
+  describeStripeFailure,
   createBillingPortalSession,
   NoStripeCustomerError,
   StripeConfigError,
@@ -46,7 +47,8 @@ export async function POST() {
     if (error instanceof StripeConfigError) {
       return NextResponse.json({ error: 'Billing is not available right now.' }, { status: 503 });
     }
-    console.error('[billing portal] failed:', error);
+    // Class, code, status and request id only: a Stripe or database error's message can echo request parameters.
+    console.error('[billing portal] failed:', describeStripeFailure(error));
     return internalError('Could not open billing management. Please try again.');
   }
 }

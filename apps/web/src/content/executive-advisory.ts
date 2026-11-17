@@ -11,7 +11,7 @@
  * (open-ended engagements, no fixed structure) which the source document
  * directly contradicts: the actual programme is a fixed three-month,
  * six-session advisory built on the Capacity Recalibration Model. Content
- * below is drawn from that source rather than invented. The "twenty years"
+ * below is drawn from that source rather than invented. The "25+ years"
  * founder detail is kept - it is an established, site-wide biographical fact
  * (see faculty.ts, discovery-call.ts), not a claim invented here.
  */
@@ -197,7 +197,7 @@ export const executiveAdvisoryContent = {
     imageSrc: '/images/programs/executive/founder-portrait.webp',
     imageAlt: 'Portrait of Caroline Reed — Private Executive Advisory and leadership education.',
     paragraphs: [
-      'Caroline Reed brings more than twenty years of experience in trauma recovery, leadership education and nervous system science.',
+      'Caroline Reed brings more than 25 years of experience in trauma recovery, leadership education and nervous system science.',
       'Her advisory work combines clinical expertise, evidence-informed methodology and a deep understanding of how physiological state shapes executive judgment, team culture and organisational performance.',
       'Executives engage Caroline not for coaching platitudes — but for rigorous, confidential counsel grounded in neuroscience and decades of practice.',
     ],

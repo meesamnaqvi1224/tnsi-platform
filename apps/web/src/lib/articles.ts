@@ -1,5 +1,10 @@
 import { sanityFetch } from '@tnsi/cms/server';
-import { ARTICLE_BY_SLUG_QUERY, ARTICLE_SITEMAP_QUERY, ARTICLE_SLUGS_QUERY } from '@tnsi/cms';
+import {
+  ARTICLE_BY_SLUG_QUERY,
+  ARTICLE_MIN_BODY_CHARS,
+  ARTICLE_SITEMAP_QUERY,
+  ARTICLE_SLUGS_QUERY,
+} from '@tnsi/cms';
 import { articlesContent } from '@/content/articles';
 import type { ArticleItem } from '@/content/articles';
 import { reliableLastModified } from '@/lib/sitemap-dates';
@@ -8,12 +13,16 @@ import type { ArticleBodyBlock, ArticlePost } from '@/content/article-posts/type
 
 const defaultPost = nervousSystemFrameworkPost;
 
-/** Slugs from the static articles listing — each resolves to the master template with tailored metadata, used only when a slug has no matching Sanity document. */
-const listingSlugs = articlesContent.latest.items.map((item) => item.slug);
-
 const featuredSlug = 'nervous-system-framework';
 
-const staticSlugs = [...new Set([featuredSlug, ...listingSlugs])];
+/**
+ * The only slug that may be served from the hand-authored template when
+ * Sanity has no usable document. The other slugs in the static articles
+ * listing used to resolve to this same template body under their own titles,
+ * which showed one article's text under another's headline; they now resolve
+ * only when Sanity holds a real article for them.
+ */
+const staticSlugs = [featuredSlug];
 
 function mergeListingMeta(slug: string, post: ArticlePost): ArticlePost {
   const listingItem = articlesContent.latest.items.find((item) => item.slug === slug);
@@ -101,6 +110,19 @@ function formatMonth(iso?: string): string {
 
 function plainText(block: SanityBodyBlock): string {
   return (block.children ?? []).map((child) => child.text).join('');
+}
+
+/**
+ * Whether a Sanity article has enough real text to publish. A document with an
+ * empty or near-empty body is a placeholder (headline and byline only) and is
+ * treated as not published.
+ */
+export function hasPublishedBody(blocks: SanityBodyBlock[] | undefined): boolean {
+  const chars = (blocks ?? []).reduce(
+    (total, block) => total + plainText(block).length + (block.text?.length ?? 0),
+    0,
+  );
+  return chars >= ARTICLE_MIN_BODY_CHARS;
 }
 
 /** "How relationships shape lives" -> "how-relationships-shape-lives", for in-page heading anchors. */
@@ -288,7 +310,7 @@ export async function getArticleSitemapEntries(
  */
 export async function getArticleBySlug(slug: string): Promise<ArticlePost | null> {
   const sanityArticle = await sanityFetch<SanityArticleDetail>(ARTICLE_BY_SLUG_QUERY, { slug });
-  if (sanityArticle) {
+  if (sanityArticle && hasPublishedBody(sanityArticle.body)) {
     return mapSanityArticle(sanityArticle);
   }
 

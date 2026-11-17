@@ -240,3 +240,129 @@ export async function addFlowiContactTags(
     );
   }
 }
+
+/**
+ * ACCOUNT DELETION SUPPORT (lookup, marketing suppression, contact deletion).
+ *
+ * STATUS: written from GoHighLevel's published API (same base URL, `Version` header and
+ * bearer credential as the calls above). A live run on 17 Nov 2026 (flowi.live-check.test.ts) confirmed
+ * the lookup, the do-not-disturb update (read back as `dnd: true`) and the first delete, and found that
+ * a repeat delete answers 400 "Contact not found" rather than 404 (see `contactIsMissing`). The
+ * suppression of a contact that no longer exists has NOT been exercised live. They must be verified against a
+ * test contact (and the credential's scopes confirmed: `contacts.readonly` for the lookup,
+ * `contacts.write` for the other two) before account deletion is released. See
+ * docs/account-deletion-and-data-retention.md.
+ *
+ * None of them creates a contact: suppression and deletion act only on a contact that
+ * already exists, so a late or repeated call can never bring a deleted contact back.
+ */
+
+function flowiHeaders(apiKey: string, withBody: boolean): Record<string, string> {
+  return {
+    Authorization: `Bearer ${apiKey}`,
+    Version: FLOWI_API_VERSION,
+    Accept: 'application/json',
+    ...(withBody ? { 'Content-Type': 'application/json' } : {}),
+  };
+}
+
+interface FlowiDuplicateResponseBody {
+  contact?: { id?: string } | null;
+}
+
+/**
+ * The id of the contact with this email in our location, or null when there is none
+ * (`GET /contacts/search/duplicate?locationId=..&email=..`). Read-only.
+ */
+export async function findFlowiContactIdByEmail(
+  email: string,
+  options: FlowiCallOptions = {},
+): Promise<string | null> {
+  const { apiKey, locationId } = getFlowiConfig();
+  const query = new URLSearchParams({ locationId, email });
+  const response = await fetch(`${FLOWI_API_BASE_URL}/contacts/search/duplicate?${query}`, {
+    method: 'GET',
+    headers: flowiHeaders(apiKey, false),
+    signal: AbortSignal.timeout(toRequestTimeoutMs(options.timeoutMs)),
+  });
+  if (!response.ok) {
+    throw new FlowiRequestError(
+      `Flowi contact lookup failed with status ${response.status}`,
+      response.status,
+    );
+  }
+  const data = (await response.json()) as FlowiDuplicateResponseBody;
+  const id = data.contact?.id;
+  return typeof id === 'string' && id !== '' ? id : null;
+}
+
+/**
+ * True when Flowi is saying "that contact does not exist". LIVE-VERIFIED on the real account (17 Nov 2026):
+ * a repeat DELETE of an already-deleted contact answers `400 {"message":"Contact not found for id:..."}`,
+ * NOT 404 as the unit tests' fake Flowi first assumed. Both mean the same thing here - there is nothing
+ * left to act on - and treating the 400 as a failure would leave a retried deletion `failed` for a
+ * contact that is already gone. Any other 400 (different message, unreadable body) is still a failure.
+ */
+async function contactIsMissing(response: Response): Promise<boolean> {
+  if (response.status === 404) return true;
+  if (response.status !== 400) return false;
+  try {
+    const body = (await response.json()) as { message?: unknown };
+    return typeof body.message === 'string' && /contact not found/i.test(body.message);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Turns on "do not disturb" for every channel on an existing contact
+ * (`PUT /contacts/{contactId}`, body `{ dnd: true }`), which stops Flowi's marketing
+ * messages and automations from contacting them. Resolves false when the contact no
+ * longer exists (404): there is nobody left to suppress. Repeating it is harmless.
+ */
+export async function suppressFlowiContact(
+  contactId: string,
+  options: FlowiCallOptions = {},
+): Promise<boolean> {
+  const { apiKey } = getFlowiConfig();
+  if (contactId === '') throw new FlowiRequestError('Missing contact id', 502);
+  const response = await fetch(`${FLOWI_API_BASE_URL}/contacts/${encodeURIComponent(contactId)}`, {
+    method: 'PUT',
+    headers: flowiHeaders(apiKey, true),
+    body: JSON.stringify({ dnd: true }),
+    signal: AbortSignal.timeout(toRequestTimeoutMs(options.timeoutMs)),
+  });
+  if (await contactIsMissing(response)) return false;
+  if (!response.ok) {
+    throw new FlowiRequestError(
+      `Flowi suppression request failed with status ${response.status}`,
+      response.status,
+    );
+  }
+  return true;
+}
+
+/**
+ * Permanently deletes a contact (`DELETE /contacts/{contactId}`). Resolves false when it
+ * was already gone (404), which is the same outcome, so a retry never gets stuck.
+ */
+export async function deleteFlowiContact(
+  contactId: string,
+  options: FlowiCallOptions = {},
+): Promise<boolean> {
+  const { apiKey } = getFlowiConfig();
+  if (contactId === '') throw new FlowiRequestError('Missing contact id', 502);
+  const response = await fetch(`${FLOWI_API_BASE_URL}/contacts/${encodeURIComponent(contactId)}`, {
+    method: 'DELETE',
+    headers: flowiHeaders(apiKey, false),
+    signal: AbortSignal.timeout(toRequestTimeoutMs(options.timeoutMs)),
+  });
+  if (await contactIsMissing(response)) return false;
+  if (!response.ok) {
+    throw new FlowiRequestError(
+      `Flowi delete request failed with status ${response.status}`,
+      response.status,
+    );
+  }
+  return true;
+}

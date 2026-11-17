@@ -38,6 +38,7 @@ route expects:
     "category": category,
     "tags": tags,
     "difficulty": difficulty,
+    "freeAccess": freeAccess,
     "status": status
   }
 }
@@ -47,6 +48,12 @@ route expects:
 2026-10-12). A webhook registered before then must have its projection
 updated in the Sanity dashboard, or interactive practices sync with a null
 key and the member page shows "not available yet".
+
+`freeAccess` (added for Regulation Suite membership) mirrors the practice's
+"Free for all members" switch into `practices.is_free`. This projection
+change must be saved in the Sanity dashboard **before** membership is opened;
+an older projection without it simply leaves every practice paid (`false`),
+never free.
 
 ## Draft exclusion
 

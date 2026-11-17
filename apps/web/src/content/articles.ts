@@ -196,7 +196,7 @@ export const articlesContent = {
         slug: 'interview-caroline-reed',
         title: 'In Conversation: Caroline Reed on Trauma-Informed Education',
         summary:
-          'The founder reflects on twenty years of clinical practice and the evolution of nervous system education.',
+          'The founder reflects on more than 25 years of clinical practice and the evolution of nervous system education.',
         category: 'Interviews',
         publishedAt: 'March 2026',
         readingTime: '15 min read',

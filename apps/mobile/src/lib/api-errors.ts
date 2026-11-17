@@ -31,3 +31,14 @@ export function humanizeApiError(err: unknown): string {
   }
   return 'Something went wrong. Please try again.';
 }
+
+/**
+ * True when the server refused content because it is in the paid library and
+ * the member lacks paid access (403 `MEMBERSHIP_REQUIRED`, see
+ * apps/web/src/lib/api-response.ts). This is an expected state, not a failure:
+ * retrying can never help, so screens show a members-only notice instead of a
+ * generic error. A 403 with any other code is NOT treated as locked.
+ */
+export function isMembershipRequiredError(err: unknown): boolean {
+  return err instanceof ApiRequestError && err.status === 403 && err.code === 'MEMBERSHIP_REQUIRED';
+}

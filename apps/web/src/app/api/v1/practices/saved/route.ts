@@ -6,6 +6,7 @@
 import { requireMemberAccess, memberAccessErrorResponse } from '@/lib/auth-api';
 import { getSavedPractices } from '@/lib/practices';
 import { success } from '@/lib/api-response';
+import { contentAccessFor, withPracticeAccess } from '@/lib/membership';
 
 export const runtime = 'nodejs';
 
@@ -20,7 +21,10 @@ export async function GET() {
   // getSavedPractices always scopes by the given userId - this route
   // never accepts one from the client, only ever the authenticated
   // caller's own id.
-  const practices = await getSavedPractices(user.id);
+  const access = contentAccessFor(user.entitlements);
+  const practices = (await getSavedPractices(user.id)).map((practice) =>
+    withPracticeAccess(practice, access),
+  );
 
   return success({ practices });
 }

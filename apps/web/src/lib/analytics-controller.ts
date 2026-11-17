@@ -7,6 +7,7 @@ import {
   type ConsentStorage,
 } from '@/lib/analytics-consent';
 import { GA_MEASUREMENT_ID } from '@/lib/analytics-config';
+import { isAnalyticsExcludedPath } from '@/lib/analytics-exclusions';
 import {
   UTM_STORAGE_KEY,
   hasUtm,
@@ -216,8 +217,15 @@ export function createAnalyticsController(deps: AnalyticsDeps): AnalyticsControl
 
   function sendPageView(): void {
     if (!id || !deps.win.gtag) return;
-    deps.win.gtag('config', id, { page_path: currentPath, ...MEASUREMENT_ONLY });
+    // Private pages (My Reflections, see analytics-exclusions.ts) are NEVER reported, even after Accept:
+    // GA's own switch is turned on for them, so gtag sends nothing at all (no page view, no event), and
+    // turned off again on any other page. This is decided before the config call, so not even the first
+    // page view of a visit that starts on a private page is sent.
+    const excluded = isAnalyticsExcludedPath(currentPath);
+    deps.win[`ga-disable-${id}`] = excluded;
     lastSentPath = currentPath;
+    if (excluded) return;
+    deps.win.gtag('config', id, { page_path: currentPath, ...MEASUREMENT_ONLY });
   }
 
   function enable(): void {

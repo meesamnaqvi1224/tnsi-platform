@@ -1,6 +1,6 @@
 import { db } from '@tnsi/db';
 import { users, entitlements } from '@tnsi/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import {
   type SyncUserData,
   type DbUser,
@@ -8,6 +8,10 @@ import {
   DEFAULT_ENTITLEMENTS,
 } from '@tnsi/auth/sync/user';
 import { getClerkUser } from '@tnsi/auth/client/server';
+import { enqueueAppSignup } from './crm-membership-sync';
+import { purgeJournalEntries } from './journal';
+import { lockJournalExclusive } from './deletion-state';
+import { eraseMemberData } from './account-data-erasure';
 
 /**
  * Database operations backing Clerk user sync. Shared by the webhook route
@@ -23,6 +27,13 @@ export const userSyncOps: UserSyncOperations = {
 
   async upsertUser(userData: SyncUserData): Promise<DbUser> {
     const existing = await this.findUserByClerkId(userData.clerkUserId);
+
+    if (existing?.deletedAt) {
+      // A deleted account has been anonymised (see account-data-erasure.ts). Clerk never sends an
+      // "undelete", so any user.created / user.updated for it is stale or out of order, and applying it
+      // would write the person's email and name back into a record that was erased. Nothing is written.
+      return existing;
+    }
 
     if (existing) {
       // deletedAt is intentionally left untouched here. Clerk never sends an
@@ -67,15 +78,35 @@ export const userSyncOps: UserSyncOperations = {
     const existing = await this.findUserByClerkId(clerkUserId);
     if (!existing) return null;
 
-    const [deleted] = await db
-      .update(users)
-      .set({
-        deletedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(users.clerkUserId, clerkUserId))
-      .returning();
-    return deleted ?? null;
+    // The member's private journal is permanently deleted in the SAME transaction that marks the
+    // account deleted, so there is no state in which the account is gone but the writing is still
+    // there (or the reverse). Clerk's `user.deleted` is the permanent deletion on the identity side, so
+    // this is the point at which the text must go. Idempotent: a retried webhook (or the account
+    // deletion route running first) simply finds nothing left to purge. If this throws, the webhook
+    // returns an error and Clerk retries it - see docs/my-reflections-backend.md for the recovery model.
+    return db.transaction(async (tx) => {
+      // EXCLUSIVE journal lock first (see deletion-state.ts): any journal write already in flight has
+      // committed before the purge below, and any later one sees users.deleted_at and is refused. This is
+      // also what covers a deletion that never wrote a marker (Clerk dashboard -> user.deleted webhook).
+      await lockJournalExclusive(tx, existing.id);
+      await purgeJournalEntries(tx, existing.id);
+      // Everything else personal goes in the same transaction: the member's activity is deleted, the
+      // account row is anonymised, queued CRM events are cancelled and the CRM contact's deletion is
+      // queued. One commit, so there is no state in which the account is deleted but its data is not.
+      await eraseMemberData(tx, existing.id);
+      const [deleted] = await tx
+        .update(users)
+        .set({
+          // The FIRST completion time is kept: Clerk always sends `user.deleted` after the account
+          // deletion route has already finalised, and a retried webhook can arrive much later, so each
+          // further run must be a true no-op rather than moving the time the deletion completed.
+          deletedAt: sql`coalesce(${users.deletedAt}, now())`,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.clerkUserId, clerkUserId))
+        .returning();
+      return deleted ?? null;
+    });
   },
 
   async createDefaultEntitlements(userId: string): Promise<void> {
@@ -87,10 +118,18 @@ export const userSyncOps: UserSyncOperations = {
 
     if (existing.length > 0) return;
 
-    await db.insert(entitlements).values({
-      userId,
-      ...DEFAULT_ENTITLEMENTS,
-    });
+    // Only the call that actually creates the row tells the CRM about the new
+    // account, so a repeated Clerk delivery or a racing session cannot queue a
+    // second sign-up. Queueing never fails the sign-up (see crm-membership-sync.ts).
+    const created = await db
+      .insert(entitlements)
+      .values({
+        userId,
+        ...DEFAULT_ENTITLEMENTS,
+      })
+      .onConflictDoNothing()
+      .returning({ userId: entitlements.userId });
+    if (created.length > 0) await enqueueAppSignup(db, userId);
   },
 
   async getOrCreateUser(clerkUserId: string): Promise<DbUser> {

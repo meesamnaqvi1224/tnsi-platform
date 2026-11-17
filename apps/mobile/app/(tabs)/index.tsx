@@ -1,72 +1,39 @@
-import { useMemo } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, StyleSheet } from 'react-native';
+import { useCallback, useEffect, useRef } from 'react';
+import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { useUser } from '@clerk/clerk-expo';
-import { useRouter } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { ScreenContainer, ErrorNotice, ThemedText, Card } from '@/components';
 import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import { ForThisMomentCard } from '@/components/home/ForThisMomentCard';
-import { ContinuePractiseCard } from '@/components/home/ContinuePractiseCard';
-import { WeekAtAGlance } from '@/components/home/WeekAtAGlance';
-import { QuickPracticeRow } from '@/components/home/QuickPracticeRow';
-import { RecentlyPractisedCard } from '@/components/home/RecentlyPractisedCard';
-import { ExploreTiles } from '@/components/home/ExploreTiles';
-import { LatestInsightCard } from '@/components/home/LatestInsightCard';
 import { QuoteBlock } from '@/components/home/QuoteBlock';
 import { ClosingStatementCard } from '@/components/home/ClosingStatementCard';
+import { RecommendationExtras } from '@/components/home/RecommendationExtras';
+import { HomeProgressWidget } from '@/components/home/HomeProgressWidget';
 import { HomeSkeleton } from '@/components/home/HomeSkeleton';
 import { CheckInCard } from '@/components/check-in/CheckInCard';
 import { LifeBeyondTraumaCard } from '@/components/home/LifeBeyondTraumaCard';
 import { BookConsultationCard } from '@/components/home/BookConsultationCard';
+import { AssessmentEntryCard } from '@/components/home/AssessmentEntryCard';
+import { ReflectionsEntryCard } from '@/components/reflections/ReflectionsEntryCard';
+import { ResourcesOnWebsiteCard } from '@/components/home/ResourcesOnWebsiteCard';
 import { useToday } from '@/hooks/useToday';
+import { useFeatures } from '@/hooks/useFeatures';
+import { practiceForToday } from '@/lib/check-in-day';
+import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { colors, spacing } from '@/theme';
-import type { CheckIn, Practice } from '@/api/types';
+import type { CheckIn } from '@/api/types';
 
 /**
- * Home: a calm daily orientation, not a dashboard. Fetches GET
- * /api/v1/today once; the only other network calls this screen makes are
- * the check-in submission (owned by CheckInCard) and two already-existing
- * hooks reused as-is (`useCheckInHistory` inside WeekAtAGlance,
- * `useArticles` inside LatestInsightCard). No fabricated content, no
- * gamification, no aggregate "progress" score, no new APIs.
- *
- * "Continue" and "Recently practised" are both derived client-side from
- * the same `/api/v1/today` response already fetched (that endpoint
- * returns up to ten published practices with this member's own progress
- * attached) - no second practices fetch. Same definitions already used by
- * profile/progress.tsx and my-learning.tsx: in-progress is not completed
- * with progressPct strictly between 0 and 1; completed is progress.completed
- * === true, newest completedAt first.
+ * Home: check in, get one practice for the moment, see a small record of what you have done. Fetches
+ * GET /api/v1/today (the check-in, the recommendation and its alternative, and a progress summary).
+ * Before today's check-in there is no recommendation: Home invites the check-in. Practices are not
+ * browsable from here; they arrive through the recommendation and through Human Expansion Theory.
  */
-function findContinueCandidate(practices: Practice[], excludeId: string | undefined) {
-  const candidates = practices.filter((p) => {
-    if (p.id === excludeId) return false;
-    const pct = p.progress?.progressPct ?? 0;
-    return !p.progress?.completed && pct > 0 && pct < 1 && p.progress?.lastPlayedAt;
-  });
-  if (candidates.length === 0) return null;
-  return candidates.sort(
-    (a, b) =>
-      new Date(b.progress!.lastPlayedAt!).getTime() - new Date(a.progress!.lastPlayedAt!).getTime(),
-  )[0];
-}
-
-function completedTime(practice: Practice): number {
-  const iso = practice.progress?.completedAt;
-  return iso ? new Date(iso).getTime() : 0;
-}
-
-function findRecentlyCompleted(practices: Practice[], excludeId: string | undefined): Practice[] {
-  return practices
-    .filter((p) => p.id !== excludeId && p.progress?.completed === true)
-    .sort((a, b) => completedTime(b) - completedTime(a))
-    .slice(0, 2);
-}
-
 export default function HomeScreen() {
   const { user } = useUser();
-  const router = useRouter();
   const { state, reload, setCheckIn, refresh } = useToday();
+  const features = useFeatures();
 
   function handleCheckInSubmitted(checkIn: CheckIn) {
     // Instant feedback (CheckInCard's own "recorded" view doesn't wait on
@@ -76,31 +43,33 @@ export default function HomeScreen() {
     void refresh();
   }
 
-  const todayPractice = state.status === 'success' ? state.data.todayPractice : null;
-  const continueCandidate = useMemo(() => {
-    if (state.status !== 'success') return null;
-    return findContinueCandidate(state.data.practices, todayPractice?.id);
-  }, [state, todayPractice?.id]);
-  const recentlyCompleted = useMemo(() => {
-    if (state.status !== 'success') return [];
-    return findRecentlyCompleted(state.data.practices, todayPractice?.id);
-  }, [state, todayPractice?.id]);
+  // Coming back to Home (after practising, saving or checking in elsewhere) shows what the
+  // server says now. The first focus is skipped because the hook already fetches on mount, and
+  // the refresh lives in a ref because the API client changes identity every render.
+  const refreshToday = useRef(() => {});
+  useEffect(() => {
+    refreshToday.current = () => void refresh();
+  });
+  const firstFocus = useRef(true);
+  useFocusEffect(
+    useCallback(() => {
+      if (firstFocus.current) {
+        firstFocus.current = false;
+        return;
+      }
+      refreshToday.current();
+    }, []),
+  );
 
+  // The recommendation belongs to a check-in made today (see src/lib/check-in-day.ts).
+  const todayPractice =
+    state.status === 'success'
+      ? practiceForToday(state.data.checkIn, state.data.todayPractice)
+      : null;
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll inTabs background={home.page}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <WelcomeHeader firstName={user?.firstName} />
-
-        <Pressable
-          onPress={() => router.push('/practices/journey')}
-          accessibilityRole="link"
-          accessibilityLabel="View My Journey"
-          style={styles.journeyLink}
-        >
-          <ThemedText variant="label" color={colors.bronze}>
-            My Journey →
-          </ThemedText>
-        </Pressable>
 
         {state.status === 'loading' && <HomeSkeleton />}
 
@@ -110,26 +79,41 @@ export default function HomeScreen() {
           <>
             <Animated.View entering={FadeInDown.duration(450)} style={styles.checkInSection}>
               <CheckInCard
+                // The card reads its starting state once, so it is rebuilt whenever today's check-in
+                // changes. Without this, a new day (no check-in today after a refetch) would still
+                // show yesterday's "Check-in complete" with no way to check in.
+                key={state.data.checkIn?.id ?? 'no-check-in-today'}
                 initialCheckIn={state.data.checkIn}
                 onSubmitted={handleCheckInSubmitted}
               />
             </Animated.View>
 
-            <ForThisMomentCard practice={todayPractice} hasCheckedInToday={!!state.data.checkIn} />
+            {state.data.checkIn ? (
+              <>
+                <ForThisMomentCard practice={todayPractice} hasCheckedInToday />
+                {todayPractice ? (
+                  <RecommendationExtras
+                    primary={todayPractice}
+                    alternative={practiceForToday(
+                      state.data.checkIn,
+                      state.data.alternativePractice,
+                    )}
+                  />
+                ) : null}
+              </>
+            ) : null}
 
-            {continueCandidate ? <ContinuePractiseCard practice={continueCandidate} /> : null}
+            <HomeProgressWidget
+              data={state.data}
+              recommended={todayPractice}
+              alternative={practiceForToday(state.data.checkIn, state.data.alternativePractice)}
+            />
           </>
         )}
 
-        <WeekAtAGlance />
+        {features.reflections ? <ReflectionsEntryCard /> : null}
 
-        <QuickPracticeRow />
-
-        <RecentlyPractisedCard practices={recentlyCompleted} />
-
-        <ExploreTiles />
-
-        <LatestInsightCard />
+        <AssessmentEntryCard />
 
         <QuoteBlock />
 
@@ -142,9 +126,10 @@ export default function HomeScreen() {
           <ThemedText variant="caption" color={colors.charcoal} style={styles.instituteLabel}>
             FROM THE INSTITUTE
           </ThemedText>
-          <Card style={styles.instituteCard}>
+          <Card style={{ ...styles.instituteCard, ...homeCardStyle }}>
             <LifeBeyondTraumaCard />
             <BookConsultationCard />
+            <ResourcesOnWebsiteCard />
           </Card>
         </Animated.View>
       </KeyboardAvoidingView>
@@ -153,10 +138,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  journeyLink: {
-    alignSelf: 'flex-end',
-    marginBottom: spacing.md,
-  },
   checkInSection: {
     marginBottom: spacing.xl,
   },

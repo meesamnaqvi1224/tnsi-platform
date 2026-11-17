@@ -4,6 +4,7 @@ const sanityFetch = vi.fn();
 vi.mock('@tnsi/cms/server', () => ({ sanityFetch: (...a: unknown[]) => sanityFetch(...a) }));
 vi.mock('@tnsi/cms', () => ({
   ARTICLE_BY_SLUG_QUERY: 'by-slug',
+  ARTICLE_MIN_BODY_CHARS: 500,
   ARTICLE_SLUGS_QUERY: 'slugs',
   ARTICLE_SITEMAP_QUERY: 'sitemap',
 }));
@@ -80,5 +81,20 @@ describe('getArticleSitemapEntries', () => {
     const entries = await getArticleSitemapEntries(NOW);
     expect(entries.length).toBeGreaterThan(0);
     expect(entries.every((e) => e.lastModified === undefined)).toBe(true);
+  });
+
+  it('never lists the former placeholder slugs or any static article except the featured one', async () => {
+    sanityFetch.mockResolvedValue([]);
+    const slugs = (await getArticleSitemapEntries(NOW)).map((e) => e.slug);
+    expect(slugs).toEqual(['nervous-system-framework']);
+    for (const placeholder of [
+      'window-of-tolerance',
+      'polyvagal-theory-in-practice',
+      'case-integration',
+      'physiology-of-burnout',
+      'co-regulation',
+    ]) {
+      expect(slugs).not.toContain(placeholder);
+    }
   });
 });

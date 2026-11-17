@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   checkoutModeForTier,
+  ENTITLEMENT_TIERS,
   isPurchasableTier,
   mapPriceIdToTier,
   mapStripeSubscriptionStatus,
+  PURCHASABLE_TIERS,
   resolvePriceId,
   type PurchasableTier,
 } from './tier-mapping';
@@ -11,14 +13,20 @@ import {
 const priceIds: Record<PurchasableTier, string | undefined> = {
   monthly: 'price_monthly_123',
   annual: 'price_annual_456',
-  lifetime: undefined,
 };
 
 describe('isPurchasableTier', () => {
-  it('accepts the three purchasable tiers', () => {
+  it('accepts the two purchasable plans', () => {
+    expect(PURCHASABLE_TIERS).toEqual(['monthly', 'annual']);
     expect(isPurchasableTier('monthly')).toBe(true);
     expect(isPurchasableTier('annual')).toBe(true);
-    expect(isPurchasableTier('lifetime')).toBe(true);
+  });
+
+  it('rejects "lifetime" — it is closed to new purchases, though stored Lifetime rows stay valid', () => {
+    expect(isPurchasableTier('lifetime')).toBe(false);
+    expect(PURCHASABLE_TIERS as readonly string[]).not.toContain('lifetime');
+    // The tier itself still exists, so legacy Lifetime memberships remain representable.
+    expect(ENTITLEMENT_TIERS as readonly string[]).toContain('lifetime');
   });
 
   it('rejects "free" — it has no Stripe price and is never a checkout target', () => {
@@ -37,8 +45,8 @@ describe('checkoutModeForTier', () => {
     expect(checkoutModeForTier('annual')).toBe('subscription');
   });
 
-  it('uses one-time payment mode for lifetime', () => {
-    expect(checkoutModeForTier('lifetime')).toBe('payment');
+  it('has no one-time mode: every purchasable plan is a subscription', () => {
+    for (const tier of PURCHASABLE_TIERS) expect(checkoutModeForTier(tier)).toBe('subscription');
   });
 });
 
@@ -48,7 +56,7 @@ describe('resolvePriceId', () => {
   });
 
   it('returns null — never a fabricated id — for a tier with no configured price', () => {
-    expect(resolvePriceId('lifetime', priceIds)).toBeNull();
+    expect(resolvePriceId('annual', { monthly: 'price_m', annual: undefined })).toBeNull();
   });
 });
 
@@ -62,9 +70,7 @@ describe('mapPriceIdToTier', () => {
   });
 
   it('returns null when the tier exists but has no price id configured', () => {
-    expect(
-      mapPriceIdToTier('anything', { monthly: undefined, annual: undefined, lifetime: undefined }),
-    ).toBeNull();
+    expect(mapPriceIdToTier('anything', { monthly: undefined, annual: undefined })).toBeNull();
   });
 });
 

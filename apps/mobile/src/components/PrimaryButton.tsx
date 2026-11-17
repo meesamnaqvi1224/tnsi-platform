@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
   },
   label: {
     textTransform: 'uppercase',
+    textAlign: 'center',
     fontSize: typography.label.fontSize,
   },
 });

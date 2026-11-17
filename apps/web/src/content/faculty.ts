@@ -36,7 +36,7 @@ export const facultyContent = {
     roles: [
       'Founder',
       'Trauma Recovery Specialist',
-      '20+ Years Experience',
+      '25+ Years Experience',
       'Master\u2019s Degree',
       'EMDR Practitioner',
       'Founder of the Life Beyond Trauma Method',
@@ -44,7 +44,7 @@ export const facultyContent = {
     imageSrc: '/images/faculty/founder-portrait.webp',
     imageAlt: 'Professional portrait of Caroline Reed — editorial treatment, natural daylight.',
     biography: [
-      'Caroline Reed founded The Nervous System Institute after more than twenty years in clinical practice, during which she observed the same pattern repeatedly: capable people exhausting themselves not through lack of effort, but through a nervous system trained to override its own signals.',
+      'Caroline Reed founded The Nervous System Institute after more than 25 years in clinical practice, during which she observed the same pattern repeatedly: capable people exhausting themselves not through lack of effort, but through a nervous system trained to override its own signals.',
       'Her clinical work spans trauma recovery, attachment-informed therapy and somatic practice — integrated not as competing modalities, but as a coherent methodology grounded in neuroscience and disciplined clinical observation.',
       'As an educator, Caroline has developed curricula for practitioners, leaders and individuals seeking sustainable change. Her teaching prioritises understanding before intervention: the belief that lasting capacity requires comprehension, not compliance.',
       'Her research interests include autonomic regulation, trauma physiology and the application of polyvagal theory in clinical and educational settings. She contributes to the Institute\u2019s evidence-informed framework and ongoing research initiatives.',

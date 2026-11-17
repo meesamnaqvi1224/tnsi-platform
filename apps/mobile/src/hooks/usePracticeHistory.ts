@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useApiClient } from './useApiClient';
 import { humanizeApiError } from '@/lib/api-errors';
 import type { PracticeHistoryEntry, PracticeHistoryResponse } from '@/api/types';
@@ -20,23 +20,31 @@ export type PracticeHistoryState =
 export function usePracticeHistory() {
   const api = useApiClient();
   const [state, setState] = useState<PracticeHistoryState>({ status: 'loading' });
+  const hasData = useRef(false);
 
-  const load = useCallback(async () => {
-    setState({ status: 'loading' });
-    try {
-      const result = await api.get<PracticeHistoryResponse>(
-        `/api/v1/practices/history?limit=${PAGE_SIZE}&offset=0`,
-      );
-      setState({
-        status: 'success',
-        history: result.history,
-        hasMore: result.pagination.hasMore,
-        loadingMore: false,
-      });
-    } catch (err) {
-      setState({ status: 'error', message: humanizeApiError(err) });
-    }
-  }, [api]);
+  const load = useCallback(
+    async (silent = false) => {
+      // A silent refresh keeps what is on screen until the answer arrives (no loading flash).
+      if (!silent) setState({ status: 'loading' });
+      try {
+        const result = await api.get<PracticeHistoryResponse>(
+          `/api/v1/practices/history?limit=${PAGE_SIZE}&offset=0`,
+        );
+        hasData.current = true;
+        setState({
+          status: 'success',
+          history: result.history,
+          hasMore: result.pagination.hasMore,
+          loadingMore: false,
+        });
+      } catch (err) {
+        // A failed silent refresh keeps the last good answer instead of replacing it with an error.
+        if (silent && hasData.current) return;
+        setState({ status: 'error', message: humanizeApiError(err) });
+      }
+    },
+    [api],
+  );
 
   // Not memoized with useCallback: it reads the current `history.length` as
   // its offset, so it must always be the version closed over the latest
@@ -78,5 +86,8 @@ export function usePracticeHistory() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch-once-on-mount is intentional: `load` depends on `api`, whose identity can change every render (Clerk's `getToken` isn't guaranteed stable - see useApiClient.ts), so depending on `[load]` here would re-fire on every render instead of once per mount.
   }, []);
 
-  return { state, reload: load, loadMore };
+  const reload = useCallback(() => load(false), [load]);
+  const refresh = useCallback(() => load(true), [load]);
+
+  return { state, reload, refresh, loadMore };
 }

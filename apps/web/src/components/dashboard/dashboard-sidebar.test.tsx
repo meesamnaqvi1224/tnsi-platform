@@ -18,6 +18,24 @@ vi.mock('@clerk/nextjs', () => ({
 const { DashboardSidebar } = await import('./dashboard-sidebar');
 
 describe('DashboardSidebar', () => {
+  it('links to My Reflections (when the feature is switched on) and does not mark it "Soon"', () => {
+    const html = renderToStaticMarkup(<DashboardSidebar reflectionsEnabled />);
+    expect(html).toContain('href="/dashboard/reflections"');
+    expect(html).toContain('My Reflections');
+  });
+
+  it('hides My Reflections entirely when the feature is switched off (the default)', () => {
+    const html = renderToStaticMarkup(<DashboardSidebar />);
+    expect(html).not.toContain('/dashboard/reflections');
+    expect(html).not.toContain('My Reflections');
+  });
+
+  it('links to Account (where a member can delete their account)', () => {
+    const html = renderToStaticMarkup(<DashboardSidebar />);
+    expect(html).toContain('href="/dashboard/account"');
+    expect(html).toContain('Account');
+  });
+
   it('renders a Somatic Cards navigation item', () => {
     const html = renderToStaticMarkup(<DashboardSidebar />);
     expect(html).toContain('Somatic Cards');
@@ -46,6 +64,16 @@ describe('DashboardSidebar', () => {
     expect(html).toContain('Academy Home');
     expect(html).toContain('Practices');
     expect(html).toContain('My Journey');
+  });
+
+  it('renders a Membership item that links to the membership page and is not marked "Soon"', () => {
+    const html = renderToStaticMarkup(<DashboardSidebar />);
+    expect(html).toContain('Membership');
+    expect(html).toContain('href="/dashboard/billing"');
+    const idx = html.indexOf('Membership');
+    const nextItem = html.indexOf('Programs', idx);
+    const badge = html.indexOf('Soon', idx);
+    expect(badge === -1 || badge > nextItem).toBe(true);
   });
 
   it('existing roadmap ("Soon") items are unchanged', () => {

@@ -1,0 +1,141 @@
+/*
+ * The 90-Second Reset's colours, mapped onto the site's own tokens
+ * (packages/ui/src/styles/tokens.css and theme.css): warm ivory ground, a deep
+ * navy built from the deep slate, bronze and a softer gold for accents.
+ * Motion is slow and optional: every animation below is switched off for
+ * people who ask for reduced motion.
+ */
+.root {
+  --rs-ink: color-mix(in oklch, var(--deep-slate) 72%, oklch(0.38 0.1 255));
+  --rs-ink-soft: color-mix(in oklch, var(--rs-ink) 68%, var(--background));
+  --rs-ground: color-mix(in oklch, var(--background) 62%, var(--warm-sand));
+  --rs-bronze: var(--accent-bronze);
+  /* Bronze for SMALL text: --accent-bronze (oklch 0.56 0.08 55) with its lightness lowered and its hue kept, so it clears 4.5:1 on the ivory ground. */
+  --rs-bronze-text: oklch(0.47 0.08 55);
+  --rs-gold: color-mix(in oklch, var(--accent-bronze) 62%, white);
+  --rs-line: color-mix(in oklch, var(--rs-ink) 14%, transparent);
+  --rs-wash: color-mix(in oklch, var(--rs-gold) 16%, transparent);
+  --rs-card: color-mix(in oklch, var(--card) 78%, transparent);
+
+  color: var(--rs-ink);
+  background:
+    radial-gradient(
+      120% 70% at 50% -10%,
+      color-mix(in oklch, var(--rs-gold) 14%, transparent),
+      transparent 62%
+    ),
+    var(--rs-ground);
+}
+
+:global(.dark) .root {
+  --rs-ink: oklch(0.94 0.012 75);
+  --rs-ink-soft: oklch(0.78 0.012 75);
+  --rs-ground: var(--deep-slate);
+  --rs-gold: oklch(0.77 0.09 70);
+  --rs-bronze-text: oklch(0.8 0.09 70);
+  --rs-line: color-mix(in oklch, var(--rs-ink) 18%, transparent);
+  --rs-card: color-mix(in oklch, var(--deep-slate-raised) 80%, transparent);
+}
+
+/* The grounding rings drift very slowly, in opposite directions. */
+.driftA {
+  transform-origin: 200px 200px;
+  animation: rs-drift 140s linear infinite;
+}
+.driftB {
+  transform-origin: 200px 200px;
+  animation: rs-drift 190s linear infinite reverse;
+}
+
+/* A quiet pulse for the centre point: "you are here". */
+.presence {
+  transform-origin: 200px 200px;
+  animation: rs-presence 9s ease-in-out infinite;
+}
+
+/* A slow breathing halo behind the progress ring, only while the practice is playing. */
+.halo {
+  animation: rs-halo 10s ease-in-out infinite;
+}
+.haloPaused {
+  animation-play-state: paused;
+}
+
+/* A stage change: the old words ease out, the new ones ease in, and one soft ripple leaves the ring. */
+.leaving {
+  animation: rs-leave 220ms var(--ease-in) both;
+}
+.arrive {
+  animation: rs-arrive 650ms var(--ease-out) both;
+}
+.ripple {
+  animation: rs-ripple 1500ms var(--ease-out) both;
+}
+
+@keyframes rs-drift {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes rs-presence {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+@keyframes rs-halo {
+  0%,
+  100% {
+    transform: scale(0.96);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.95;
+  }
+}
+@keyframes rs-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+@keyframes rs-leave {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes rs-ripple {
+  from {
+    opacity: 0.5;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .driftA,
+  .driftB,
+  .presence,
+  .halo,
+  .arrive,
+  .leaving,
+  .ripple {
+    animation: none;
+  }
+}

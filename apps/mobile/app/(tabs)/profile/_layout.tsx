@@ -15,10 +15,39 @@ export default function ProfileLayout() {
     >
       <Stack.Screen
         name="index"
-        options={{ title: 'Profile', headerLeft: () => <HomeHeaderButton /> }}
+        options={{
+          title: 'Profile',
+          // The page title is drawn in the screen itself; the title text stays for back labels.
+          headerTitle: '',
+          headerStyle: { backgroundColor: '#FFFFFF' },
+          headerLeft: () => <HomeHeaderButton />,
+        }}
       />
-      <Stack.Screen name="progress" options={{ title: '' }} />
-      <Stack.Screen name="membership" options={{ title: '' }} />
+      <Stack.Screen
+        name="progress"
+        options={{ title: '', headerStyle: { backgroundColor: '#FFFFFF' } }}
+      />
+      <Stack.Screen
+        name="reflections"
+        options={{ title: '', headerStyle: { backgroundColor: '#FFFFFF' } }}
+      />
+      {/*
+       * The editor confirms before discarding unsaved writing (see reflection.tsx's `beforeRemove`
+       * listener), so - like the assessment below - it disables iOS's long-press-back menu, which
+       * could pop several screens without that listener seeing a single removal.
+       */}
+      <Stack.Screen
+        name="reflection"
+        options={{
+          title: '',
+          headerStyle: { backgroundColor: '#FFFFFF' },
+          headerBackButtonMenuEnabled: false,
+        }}
+      />
+      <Stack.Screen
+        name="membership"
+        options={{ title: '', headerStyle: { backgroundColor: '#FFFFFF' } }}
+      />
       {/*
        * `headerBackButtonMenuEnabled: false` disables iOS's long-press-back-
        * button menu, which can pop multiple screens at once outside the

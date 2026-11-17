@@ -27,7 +27,6 @@ function readPriceIds(): Record<PurchasableTier, string | undefined> {
   return {
     monthly: process.env.STRIPE_PRICE_ID_MONTHLY || undefined,
     annual: process.env.STRIPE_PRICE_ID_ANNUAL || undefined,
-    lifetime: process.env.STRIPE_PRICE_ID_LIFETIME || undefined,
   };
 }
 
@@ -46,4 +45,45 @@ export function getStripeConfig(): StripeConfig {
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
     priceIds: readPriceIds(),
   };
+}
+
+/**
+ * True only when everything a Regulation Suite™ self-serve checkout needs
+ * is configured: the Stripe secret key, the webhook signing secret (without
+ * which a successful payment could never grant access), and BOTH approved
+ * subscription Prices (monthly + annual). There is no Lifetime Price: Lifetime is
+ * closed to new purchases and no environment variable for it is read.
+ *
+ * Used to keep membership closed (no checkout buttons, no content locking)
+ * until billing is genuinely ready, rather than exposing a checkout that
+ * would fail. Reads the environment only; never throws.
+ */
+export function isMembershipCheckoutConfigured(): boolean {
+  const { secretKey, webhookSecret, priceIds } = getStripeConfig();
+  return Boolean(secretKey && webhookSecret && priceIds.monthly && priceIds.annual);
+}
+
+/**
+ * Whether Regulation Suite membership is open for purchase: deliberately
+ * launched (`REGULATION_SUITE_MEMBERSHIP_OPEN` is exactly the string "true" -
+ * unset, empty, "TRUE", "1", " true" and anything else are closed) AND billing
+ * fully configured. This is the single definition: the web app's `isMembershipOpen`
+ * re-exports it, and `createCheckoutSession` enforces it itself, so no caller can
+ * start a purchase while it is closed.
+ */
+export function isMembershipOpen(): boolean {
+  return (
+    process.env.REGULATION_SUITE_MEMBERSHIP_OPEN === 'true' && isMembershipCheckoutConfigured()
+  );
+}
+
+/**
+ * Optional id of a restricted Stripe Billing Portal configuration (one that
+ * allows payment methods, cancellation, invoices and billing history but NOT
+ * plan switching or products the app does not sell). When set, every portal
+ * session uses it; when unset Stripe uses the account's default configuration,
+ * which has not been inspected. Returns undefined, never an empty string.
+ */
+export function getPortalConfigurationId(): string | undefined {
+  return process.env.STRIPE_PORTAL_CONFIGURATION_ID || undefined;
 }

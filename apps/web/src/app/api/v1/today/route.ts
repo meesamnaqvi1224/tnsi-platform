@@ -11,7 +11,9 @@ import { requireMemberAccess, memberAccessErrorResponse } from '@/lib/auth-api';
 import { db, checkIns, practices, practiceCompletions } from '@tnsi/db';
 import { eq, and, inArray, gte, lte, desc } from 'drizzle-orm';
 import { success } from '@/lib/api-response';
-import { getRecommendedPractice } from '@/lib/practices';
+import { getRecommendedPractices, getPracticeProgressSummary } from '@/lib/practices';
+import { toPublicCheckIn } from '@/lib/check-ins';
+import { contentAccessFor, withPracticeAccess } from '@/lib/membership';
 
 export const runtime = 'nodejs';
 
@@ -22,6 +24,10 @@ export async function GET() {
   } catch (err) {
     return memberAccessErrorResponse(err);
   }
+
+  const access = contentAccessFor(user.entitlements);
+  // When paid practices are locked for this member, don't recommend one.
+  const freeOnly = access.gatingActive && !access.membership.hasPaidAccess;
 
   const today = new Date();
   const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -36,6 +42,8 @@ export async function GET() {
         eq(checkIns.userId, user.id),
         gte(checkIns.completedAt, startOfDay),
         lte(checkIns.completedAt, endOfDay),
+        // Today's primary check-in only; additional check-ins never stand in for it.
+        eq(checkIns.isPrimary, true),
       ),
     )
     .limit(1);
@@ -77,7 +85,7 @@ export async function GET() {
   const practicesWithProgress = recentPractices.map((practice) => {
     const completion = completionsMap.get(practice.id);
     return {
-      ...practice,
+      ...withPracticeAccess(practice, access),
       progress: completion
         ? {
             progressPct: completion.progressPct,
@@ -97,7 +105,9 @@ export async function GET() {
   // independent of `recentPractices`: the recommended category may not be
   // among the first 10 practices in category/difficulty order, so this is
   // its own lookup, not a re-slice of `practicesWithProgress`.
-  const recommendedPractice = await getRecommendedPractice(user.id);
+  const { primary: recommendedPractice, alternative: alternativeRecommendation } =
+    await getRecommendedPractices(user.id, { freeOnly });
+  const progressSummary = await getPracticeProgressSummary(user.id);
   let todayPractice = null;
   if (recommendedPractice) {
     const existingCompletion = completionsMap.get(recommendedPractice.id);
@@ -118,7 +128,7 @@ export async function GET() {
       )[0];
 
     todayPractice = {
-      ...recommendedPractice,
+      ...withPracticeAccess(recommendedPractice, access),
       progress: completion
         ? {
             progressPct: completion.progressPct,
@@ -134,8 +144,14 @@ export async function GET() {
 
   return success({
     date: startOfDay.toISOString().split('T')[0],
-    checkIn: todayCheckIn[0] ?? null,
+    checkIn: todayCheckIn[0] ? toPublicCheckIn(todayCheckIn[0]) : null,
     practices: practicesWithProgress,
     todayPractice,
+    // One optional alternative from the same category (see getRecommendedPractices).
+    alternativePractice: alternativeRecommendation
+      ? withPracticeAccess(alternativeRecommendation, access)
+      : null,
+    // Observable engagement only (completed sessions, latest one), for Home's progress widget.
+    progressSummary,
   });
 }

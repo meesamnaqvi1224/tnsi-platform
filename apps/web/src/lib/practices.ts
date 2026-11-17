@@ -1,6 +1,6 @@
 import { db, practices, practiceCompletions, practiceReflections, practiceSaves } from '@tnsi/db';
 import { eq, and, desc, gt, count, countDistinct, inArray } from 'drizzle-orm';
-import { categoryForCapacityScore, pickDeterministicCandidate } from '@tnsi/core';
+import { categoryForCapacityScore, pickDeterministicCandidates } from '@tnsi/core';
 import { getLatestCheckIn } from './check-ins';
 import { paginateRows } from './practice-sessions';
 import type { PracticeReflection as PracticeReflectionRow } from '@tnsi/db/schema';
@@ -25,6 +25,7 @@ const PRACTICE_SUMMARY_COLUMNS = {
   category: practices.category,
   tags: practices.tags,
   difficulty: practices.difficulty,
+  isFree: practices.isFree,
 } as const;
 
 export type PracticeSummary = {
@@ -40,6 +41,8 @@ export type PracticeSummary = {
   category: string | null;
   tags: string[];
   difficulty: number;
+  /** Part of the free introductory selection (editorial `freeAccess`). Only meaningful once membership is open. */
+  isFree: boolean;
 };
 
 /**
@@ -76,11 +79,16 @@ export async function getPublishedPracticeById(id: string): Promise<PracticeSumm
  */
 export async function getTodayPractice(
   userId: string,
+  options: { freeOnly?: boolean } = {},
 ): Promise<{ practice: PracticeSummary; completed: boolean } | null> {
   const [practice] = await db
     .select(PRACTICE_SUMMARY_COLUMNS)
     .from(practices)
-    .where(eq(practices.isPublished, true))
+    .where(
+      options.freeOnly
+        ? and(eq(practices.isPublished, true), eq(practices.isFree, true))
+        : eq(practices.isPublished, true),
+    )
     .orderBy(practices.category, practices.difficulty, practices.title)
     .limit(1);
 
@@ -97,6 +105,10 @@ export async function getTodayPractice(
  * `getTodayPractice` above. Mechanical only: no LLM, no clinical inference,
  * just a fixed capacity-state -> category table.
  *
+ * `freeOnly` restricts candidates to the free introductory selection — set
+ * by callers when the member can't open paid practices, so the daily
+ * suggestion is never something they'd immediately hit a lock on.
+ *
  * Returns `null` (never a silent `practices[0]`-style fallback) when:
  * - the user has no check-in yet (no capacity signal to route on), or
  * - no published practice is tagged with the mapped category yet.
@@ -106,18 +118,76 @@ export async function getTodayPractice(
  * wanting a guaranteed non-null result must pass an explicitly-designated
  * fallback practice id once one exists; none is hardcoded here.
  */
-export async function getRecommendedPractice(userId: string): Promise<PracticeSummary | null> {
+export async function getRecommendedPractice(
+  userId: string,
+  options: { freeOnly?: boolean } = {},
+): Promise<PracticeSummary | null> {
+  return (await getRecommendedPractices(userId, options)).primary;
+}
+
+/**
+ * The primary recommendation plus one optional alternative, from the same
+ * mapped category and in the same deterministic order (see
+ * `pickDeterministicCandidates`). Same routing as `getRecommendedPractice`,
+ * nothing added: the alternative is just the next practice in that category.
+ */
+export async function getRecommendedPractices(
+  userId: string,
+  options: { freeOnly?: boolean } = {},
+): Promise<{ primary: PracticeSummary | null; alternative: PracticeSummary | null }> {
   const latestCheckIn = await getLatestCheckIn(userId);
-  if (!latestCheckIn) return null;
+  if (!latestCheckIn) return { primary: null, alternative: null };
 
   const category = categoryForCapacityScore(latestCheckIn.capacityScore);
 
   const candidates = await db
     .select(PRACTICE_SUMMARY_COLUMNS)
     .from(practices)
-    .where(and(eq(practices.isPublished, true), eq(practices.category, category)));
+    .where(
+      and(
+        eq(practices.isPublished, true),
+        eq(practices.category, category),
+        ...(options.freeOnly ? [eq(practices.isFree, true)] : []),
+      ),
+    );
 
-  return pickDeterministicCandidate(candidates);
+  const [primary = null, alternative = null] = pickDeterministicCandidates(candidates, 2);
+  return { primary, alternative };
+}
+
+/**
+ * Observable engagement only, for Home's compact progress widget: how many
+ * completed sessions this member has (a repeat is its own session) and the
+ * most recent one. Not a score and not a claim about any outcome.
+ */
+export async function getPracticeProgressSummary(userId: string): Promise<{
+  completedSessions: number;
+  lastCompleted: { practiceId: string; title: string; completedAt: Date } | null;
+}> {
+  const [totals] = await db
+    .select({ total: count() })
+    .from(practiceCompletions)
+    .where(and(eq(practiceCompletions.userId, userId), eq(practiceCompletions.completed, true)));
+
+  const [latest] = await db
+    .select({
+      practiceId: practices.id,
+      title: practices.title,
+      completedAt: practiceCompletions.completedAt,
+    })
+    .from(practiceCompletions)
+    .innerJoin(practices, eq(practices.id, practiceCompletions.practiceId))
+    .where(and(eq(practiceCompletions.userId, userId), eq(practiceCompletions.completed, true)))
+    .orderBy(desc(practiceCompletions.completedAt))
+    .limit(1);
+
+  return {
+    completedSessions: Number(totals?.total ?? 0),
+    lastCompleted:
+      latest && latest.completedAt
+        ? { practiceId: latest.practiceId, title: latest.title, completedAt: latest.completedAt }
+        : null,
+  };
 }
 
 /**

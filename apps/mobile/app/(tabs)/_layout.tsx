@@ -36,8 +36,8 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.navy,
-        tabBarInactiveTintColor: colors.charcoal + '80',
+        tabBarActiveTintColor: '#A87942',
+        tabBarInactiveTintColor: '#4B5563',
         // `display: 'none'` rather than unmounting anything - the tab bar
         // is still the same persistent React Navigation component, just
         // not drawn while the session route is active, so nothing about
@@ -46,7 +46,7 @@ export default function TabsLayout() {
         // again (leaving the session, e.g. via End or natural completion).
         tabBarStyle: hideTabBar
           ? { display: 'none' }
-          : { backgroundColor: colors.cream, borderTopColor: colors.border },
+          : { backgroundColor: '#FFFFFF', borderTopColor: '#DDE1E5' },
         tabBarLabelStyle: { fontFamily: typography.caption.fontFamily, fontSize: 11 },
       }}
     >
@@ -55,31 +55,34 @@ export default function TabsLayout() {
         options={{ title: 'Home', tabBarIcon: tabIcon('home-outline', 'home') }}
       />
       <Tabs.Screen
-        name="practices"
-        options={{ title: 'Practices', tabBarIcon: tabIcon('leaf-outline', 'leaf') }}
+        name="theory"
+        options={{
+          title: 'Human Expansion Theory',
+          // The full name does not fit under a tab icon; the page itself carries it.
+          tabBarLabel: 'Theory',
+          tabBarIcon: tabIcon('compass-outline', 'compass'),
+        }}
       />
       <Tabs.Screen
         name="my-learning"
         options={{
-          title: 'My Learning',
-          tabBarIcon: tabIcon('school-outline', 'school'),
-          // The only tab with no nested Stack of its own (a single flat
-          // screen), so unlike Practices/Resources/Profile it never had a
-          // header at all under the shared `headerShown: false` above -
-          // opted back in here specifically so it can carry the same
-          // Home button the other three tab roots now have.
+          title: 'My Progress',
+          tabBarIcon: tabIcon('stats-chart-outline', 'stats-chart'),
+          // The only tab with no nested Stack of its own (a single flat screen), so it opts back in to a
+          // header to carry the same Home button the other tab roots have.
           headerShown: true,
-          headerStyle: { backgroundColor: colors.cream },
+          // The page title is drawn in the screen itself, so the bar carries only the Home button.
+          headerTitle: '',
+          headerStyle: { backgroundColor: '#FFFFFF' },
           headerTintColor: colors.navy,
           headerTitleStyle: { fontFamily: typography.heading.fontFamily },
           headerShadowVisible: false,
-          headerLeft: () => <HomeHeaderButton />,
+          headerLeft: () => <HomeHeaderButton inset />,
         }}
       />
-      <Tabs.Screen
-        name="resources"
-        options={{ title: 'Resources', tabBarIcon: tabIcon('book-outline', 'book') }}
-      />
+      {/* Practices are reached through Home's recommendation and the Human Expansion Theory pages, not
+          from the tab bar. The routes stay (practice detail, history, PowerDrops, ...), just not as a tab. */}
+      <Tabs.Screen name="practices" options={{ href: null }} />
       <Tabs.Screen
         name="profile"
         options={{

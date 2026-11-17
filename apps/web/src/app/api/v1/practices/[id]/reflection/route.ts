@@ -13,7 +13,14 @@ import { db } from '@tnsi/db';
 import { practices, practiceCompletions, practiceReflections } from '@tnsi/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { practiceIdParam, practiceReflectionSchema } from '@/lib/validation';
-import { success, notFound, badRequest, internalError } from '@/lib/api-response';
+import {
+  success,
+  notFound,
+  badRequest,
+  internalError,
+  membershipRequired,
+} from '@/lib/api-response';
+import { contentAccessFor } from '@/lib/membership';
 
 export const runtime = 'nodejs';
 
@@ -46,6 +53,10 @@ export async function POST(request: Request, { params }: RouteParams) {
 
   if (!practice[0]) {
     return notFound('Practice not found');
+  }
+
+  if (!contentAccessFor(user.entitlements).canOpen(practice[0])) {
+    return membershipRequired();
   }
 
   let body;

@@ -1,6 +1,7 @@
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { colors, radius, spacing } from '@/theme';
+import { home } from '@/components/home/homeTheme';
 
 interface PowerDropCategoryBarProps {
   /** Only the category values actually present in the fetched PowerDrops - never the full taxonomy, so no filter ever leads to a guaranteed-empty result. */
@@ -21,6 +22,8 @@ export function PowerDropCategoryBar({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
+      // Do not grow to fill spare height when the screen below is short.
+      style={styles.scroller}
       contentContainerStyle={styles.row}
     >
       <Chip label="All" active={selected === null} onPress={() => onSelect(null)} />
@@ -49,7 +52,7 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
         pressed && styles.chipPressed,
       ]}
     >
-      <ThemedText variant="label" color={active ? colors.cream : colors.charcoal}>
+      <ThemedText variant="label" color={active ? colors.cream : home.ink}>
         {label}
       </ThemedText>
     </Pressable>
@@ -57,25 +60,28 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
 }
 
 const styles = StyleSheet.create({
+  scroller: {
+    flexGrow: 0,
+  },
   row: {
     gap: spacing.sm,
     paddingBottom: spacing.lg,
   },
   chip: {
     paddingHorizontal: spacing.md,
-    minHeight: 44,
+    minHeight: 48,
     borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
   },
   chipActive: {
-    backgroundColor: colors.navy,
-    borderColor: colors.navy,
+    backgroundColor: home.navy,
+    borderColor: home.navy,
   },
   chipInactive: {
     backgroundColor: colors.white,
-    borderColor: colors.border,
+    borderColor: home.border,
   },
   chipPressed: {
     opacity: 0.85,

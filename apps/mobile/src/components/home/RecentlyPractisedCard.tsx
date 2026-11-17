@@ -65,6 +65,7 @@ export function RecentlyPractisedCard({ practices }: RecentlyPractisedCardProps)
                 thumbnailUrl={practice.thumbnailUrl}
                 contentType={practice.contentType}
                 height={48}
+                showLabel={false}
                 style={styles.thumb}
               />
               <View style={styles.textColumn}>

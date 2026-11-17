@@ -6,9 +6,8 @@
  * "percentage complete" — the same PowerDrop can be used again later, and
  * each use is its own row. `userId` is always the authenticated caller's
  * own internal id from `getAuthUser()`, never trusted from the request.
- * Same authenticated-only model as `GET /api/v1/powerdrops` — membership
- * entitlement gating is deferred until a canonical PowerDrops
- * entitlement/product identifier exists.
+ * Same free-vs-paid model as `GET /api/v1/powerdrops`: usage can only be
+ * recorded against a PowerDrop the member is allowed to open.
  */
 import { db, powerDropUsages } from '@tnsi/db';
 import { sanityFetch } from '@tnsi/cms/server';
@@ -16,7 +15,14 @@ import { POWER_DROP_API_BY_SLUG_QUERY } from '@tnsi/cms';
 import type { RawPowerDropDetail } from '@/lib/power-drop-api';
 import { powerDropSlugParamSchema } from '@/lib/validation';
 import { getAuthUser } from '@/lib/auth-api';
-import { success, unauthorized, badRequest, notFound } from '@/lib/api-response';
+import {
+  success,
+  unauthorized,
+  badRequest,
+  notFound,
+  membershipRequired,
+} from '@/lib/api-response';
+import { contentAccessFor } from '@/lib/membership';
 
 export const runtime = 'nodejs';
 
@@ -43,6 +49,10 @@ export async function POST(_request: Request, { params }: RouteParams) {
   const powerDrop = await sanityFetch<RawPowerDropDetail>(POWER_DROP_API_BY_SLUG_QUERY, { slug });
   if (!powerDrop) {
     return notFound('PowerDrop not found');
+  }
+
+  if (!contentAccessFor(user.entitlements).canOpen({ isFree: powerDrop.isFree ?? false })) {
+    return membershipRequired();
   }
 
   const [usage] = await db

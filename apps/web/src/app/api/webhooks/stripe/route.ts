@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import {
+  describeStripeFailure,
   StripeConfigError,
   StripeWebhookVerificationError,
   verifyStripeWebhookEvent,
@@ -41,7 +42,10 @@ export async function POST(request: NextRequest) {
     console.info('[Stripe Webhook]', { type: event.type, ...result });
     return NextResponse.json({ received: true, ...result });
   } catch (error) {
-    console.error('[Stripe Webhook] Sync failed:', event.type, error);
+    // Class, code, status and request id only: a Stripe or database error's
+    // message and object can echo request parameters. A 500 makes Stripe retry
+    // the delivery, and the retry re-reads Stripe's current state.
+    console.error('[Stripe Webhook] Sync failed:', event.type, describeStripeFailure(error));
     return NextResponse.json({ error: 'Sync failed' }, { status: 500 });
   }
 }

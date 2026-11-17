@@ -85,7 +85,7 @@ export const aboutContent = {
     subtitle: 'Developer of Human Expansion Theory™',
     paragraphs: [
       'Caroline Reed is the Founder and Director of The Nervous System Institute and the developer of the Human Expansion Theory™.',
-      "Drawing on more than two decades of clinical experience, postgraduate study, and ongoing research, Caroline's work brings together neuroscience, psychology, education, and human development into evidence-informed frameworks that support lasting change across individuals, professionals, and organisations.",
+      "Drawing on more than 25 years of clinical experience, postgraduate study, and ongoing research, Caroline's work brings together neuroscience, psychology, education, and human development into evidence-informed frameworks that support lasting change across individuals, professionals, and organisations.",
       'Her work explores the relationship between nervous system functioning, human capacity, and lifelong development, with a particular interest in how the conditions surrounding an individual shape their ability to learn, adapt, connect, lead, and participate in life.',
       'Through The Nervous System Institute, Caroline leads the development of educational programmes, professional training, original frameworks, and research initiatives dedicated to advancing the practical understanding of nervous system science.',
     ],

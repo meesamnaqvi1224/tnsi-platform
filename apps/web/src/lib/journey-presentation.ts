@@ -104,9 +104,9 @@ export function formatJourneyDate(date: Date, now: Date): string {
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-export interface JourneyGroup {
+export interface JourneyGroup<T extends { occurredAt: Date } = JourneyEntry> {
   label: string;
-  entries: JourneyEntry[];
+  entries: T[];
 }
 
 /**
@@ -117,10 +117,13 @@ export interface JourneyGroup {
  * display label string, so two different "14 Sep"s a year apart can
  * never merge into one section.
  */
-export function groupJourneyEntriesByDate(entries: JourneyEntry[], now: Date): JourneyGroup[] {
-  const groups: JourneyGroup[] = [];
+export function groupJourneyEntriesByDate<T extends { occurredAt: Date }>(
+  entries: T[],
+  now: Date,
+): JourneyGroup<T>[] {
+  const groups: JourneyGroup<T>[] = [];
   let currentKey: string | null = null;
-  let currentGroup: JourneyGroup | null = null;
+  let currentGroup: JourneyGroup<T> | null = null;
 
   for (const entry of entries) {
     const d = entry.occurredAt;
@@ -171,4 +174,132 @@ export function truncateReflection(text: string, maxLength = 140): string {
   const lastSpace = slice.lastIndexOf(' ');
   const boundary = lastSpace > maxLength * 0.6 ? lastSpace : maxLength;
   return `${slice.slice(0, boundary).trimEnd()}…`;
+}
+
+/**
+ * Quiet markers on the timeline: the first time a member did each thing, and
+ * one month since they began. Not badges, points or streaks - nothing here is
+ * earned, ranked or compared; each is just a date the member's own records
+ * already contain, labelled in plain words.
+ */
+export type MilestoneKey = 'first_check_in' | 'first_practice' | 'first_reflection' | 'one_month';
+
+export interface MilestoneItem {
+  kind: 'milestone';
+  id: string;
+  occurredAt: Date;
+  key: MilestoneKey;
+  label: string;
+}
+
+/** The earliest time the member did each thing, or `null` if they have not yet. */
+export interface MilestoneDates {
+  firstCheckIn: Date | null;
+  firstPractice: Date | null;
+  firstReflection: Date | null;
+}
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+/** A calendar month is not a fixed number of days; thirty is the same figure the free trial uses. */
+const ONE_MONTH_DAYS = 30;
+
+/**
+ * The milestones a member has reached, from the dates their own records
+ * contain. "One month since you began" counts from their very first recorded
+ * activity of any kind, and only appears once that month has actually passed.
+ * Pure: `now` is a parameter.
+ */
+export function buildMilestones(dates: MilestoneDates, now: Date): MilestoneItem[] {
+  const items: MilestoneItem[] = [];
+  const add = (key: MilestoneKey, occurredAt: Date | null, label: string) => {
+    if (occurredAt)
+      items.push({ kind: 'milestone', id: `milestone-${key}`, occurredAt, key, label });
+  };
+
+  add('first_check_in', dates.firstCheckIn, 'Your first check-in');
+  add('first_practice', dates.firstPractice, 'Your first practice completed');
+  add('first_reflection', dates.firstReflection, 'Your first reflection');
+
+  const earliest = [dates.firstCheckIn, dates.firstPractice, dates.firstReflection]
+    .filter((date): date is Date => date !== null)
+    .reduce<Date | null>((a, b) => (a === null || b < a ? b : a), null);
+  if (earliest) {
+    const oneMonthOn = new Date(earliest.getTime() + ONE_MONTH_DAYS * MS_PER_DAY);
+    if (oneMonthOn <= now) add('one_month', oneMonthOn, 'One month since you began');
+  }
+
+  return items;
+}
+
+/**
+ * Places milestones among a page of newest-first entries. A page only shows
+ * the milestones that fall inside the dates it covers: the first page has no
+ * upper limit (nothing newer exists), and the last page has no lower limit
+ * (nothing older exists). At the same moment a milestone sits just after the
+ * entry that caused it, since the list runs newest-first.
+ */
+export function mergeMilestones(
+  entries: JourneyEntry[],
+  milestones: MilestoneItem[],
+  position: { isFirstPage: boolean; hasMore: boolean },
+): (JourneyEntry | MilestoneItem)[] {
+  if (entries.length === 0) return [];
+  const newest = entries[0]!.occurredAt.getTime();
+  const oldest = entries[entries.length - 1]!.occurredAt.getTime();
+
+  const inside = milestones.filter((milestone) => {
+    const at = milestone.occurredAt.getTime();
+    return (position.isFirstPage || at <= newest) && (!position.hasMore || at >= oldest);
+  });
+
+  return [...entries, ...inside].sort((a, b) => {
+    const diff = b.occurredAt.getTime() - a.occurredAt.getTime();
+    if (diff !== 0) return diff;
+    if (a.kind === 'milestone' && b.kind !== 'milestone') return 1;
+    if (b.kind === 'milestone' && a.kind !== 'milestone') return -1;
+    return 0;
+  });
+}
+
+/** "Yesterday · Sunday", "Today", "Thursday 29 Oct" (with the year when it is not this year). */
+export function formatJourneyDayLabel(date: Date, now: Date): string {
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfYesterday = new Date(startOfToday.getTime() - MS_PER_DAY);
+  const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const weekday = date.toLocaleDateString('en-GB', { weekday: 'long' });
+
+  if (startOfDay.getTime() === startOfToday.getTime()) return 'Today';
+  if (startOfDay.getTime() === startOfYesterday.getTime()) return `Yesterday · ${weekday}`;
+  const dayMonth = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  const year = date.getFullYear() === now.getFullYear() ? '' : ` ${date.getFullYear()}`;
+  return `${weekday} ${dayMonth}${year}`;
+}
+
+export interface JourneyMonth<T extends { occurredAt: Date }> {
+  /** "November 2026". */
+  label: string;
+  items: T[];
+}
+
+/** Groups newest-first items under their calendar month and year, never re-sorting them. */
+export function groupJourneyByMonth<T extends { occurredAt: Date }>(items: T[]): JourneyMonth<T>[] {
+  const months: JourneyMonth<T>[] = [];
+  let currentKey: string | null = null;
+  let current: JourneyMonth<T> | null = null;
+
+  for (const item of items) {
+    const d = item.occurredAt;
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    if (key !== currentKey || !current) {
+      current = {
+        label: d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
+        items: [],
+      };
+      months.push(current);
+      currentKey = key;
+    }
+    current.items.push(item);
+  }
+
+  return months;
 }

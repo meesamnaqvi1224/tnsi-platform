@@ -11,6 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemedText } from '@/components/ThemedText';
 import { capitalize } from '@/lib/format';
+import { LabyrinthThumb } from '@/components/return-path/LabyrinthThumb';
 import { colors, radius } from '@/theme';
 import type { PracticeContentType } from '@/api/types';
 
@@ -18,6 +19,8 @@ interface PracticeThumbnailProps {
   thumbnailUrl: string | null;
   contentType: PracticeContentType;
   height?: number;
+  /** The content-type word drawn on the image. Hide it on small thumbnails, where it cannot fit and wraps. */
+  showLabel?: boolean;
   /** Only layout-affecting properties (margin, etc.) are expected here - shared across the <Image>/<View> fallback. */
   style?: StyleProp<ViewStyle>;
 }
@@ -32,7 +35,10 @@ interface PracticeThumbnailProps {
  * and needs attribution wherever image credits are shown; the rest are
  * Unsplash License (no attribution required).
  */
-const CONTENT_TYPE_STOCK_IMAGES: Record<PracticeContentType, ImageSourcePropType> = {
+const CONTENT_TYPE_STOCK_IMAGES: Record<
+  Exclude<PracticeContentType, 'interactive'>,
+  ImageSourcePropType
+> = {
   meditation: require('../../../assets/images/content-meditation.jpg'),
   movement: require('../../../assets/images/content-movement.jpg'),
   journal: require('../../../assets/images/content-journal.jpg'),
@@ -40,6 +46,11 @@ const CONTENT_TYPE_STOCK_IMAGES: Record<PracticeContentType, ImageSourcePropType
   audio: require('../../../assets/images/content-audio.jpg'),
   video: require('../../../assets/images/content-video.jpg'),
 };
+
+/** The generic stock photo for a content type, or null for a type that has none (interactive). */
+export function stockImageFor(contentType: PracticeContentType): ImageSourcePropType | null {
+  return contentType === 'interactive' ? null : CONTENT_TYPE_STOCK_IMAGES[contentType];
+}
 
 /**
  * Real per-practice thumbnail when one exists; otherwise (or if it fails to
@@ -50,6 +61,7 @@ export function PracticeThumbnail({
   thumbnailUrl,
   contentType,
   height = 160,
+  showLabel = true,
   style,
 }: PracticeThumbnailProps) {
   const [failed, setFailed] = useState(false);
@@ -66,6 +78,21 @@ export function PracticeThumbnail({
     );
   }
 
+  // An interactive practice has no recording and no stock photo: show its own
+  // labyrinth (drawn from the shared geometry) rather than an unrelated image.
+  if (contentType === 'interactive') {
+    return (
+      <View style={[styles.interactiveSurface, { height }, style]}>
+        <LabyrinthThumb level={2} size={Math.round(height * 0.78)} />
+        {showLabel ? (
+          <ThemedText variant="label" color={colors.charcoal} style={styles.interactiveLabel}>
+            {capitalize(contentType)}
+          </ThemedText>
+        ) : null}
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.surface, { height }, style]}>
       <Image
@@ -75,9 +102,11 @@ export function PracticeThumbnail({
         accessible={false}
       />
       <LinearGradient colors={['transparent', 'rgba(11,21,38,0.75)']} style={styles.gradient}>
-        <ThemedText variant="label" color={colors.cream} style={styles.surfaceLabel}>
-          {capitalize(contentType)}
-        </ThemedText>
+        {showLabel ? (
+          <ThemedText variant="label" color={colors.cream} style={styles.surfaceLabel}>
+            {capitalize(contentType)}
+          </ThemedText>
+        ) : null}
       </LinearGradient>
     </View>
   );
@@ -94,6 +123,21 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     backgroundColor: colors.navy,
     overflow: 'hidden',
+  },
+  interactiveSurface: {
+    width: '100%',
+    borderRadius: radius.lg,
+    backgroundColor: colors.creamMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  interactiveLabel: {
+    position: 'absolute',
+    left: 12,
+    bottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   stockImage: {
     position: 'absolute',

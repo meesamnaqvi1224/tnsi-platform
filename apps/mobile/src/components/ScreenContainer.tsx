@@ -1,22 +1,86 @@
-import type { PropsWithChildren } from 'react';
-import { ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect, useState, type PropsWithChildren } from 'react';
+import { Keyboard, Platform, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
+import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import { colors, spacing } from '@/theme';
 
 interface ScreenContainerProps extends PropsWithChildren {
   scroll?: boolean;
+  /** Taps on buttons and chips work while the keyboard is open (instead of the first tap only closing it). For screens with a search field. */
+  keyboardPersistTaps?: boolean;
+  /**
+   * For screens the member types into: the content scrolls up out of the keyboard's way (iOS) and the
+   * keyboard closes as they drag down, so buttons below the text are always reachable.
+   */
+  keyboardAware?: boolean;
+  /** Set when a navigation header already sits above this screen, so the top safe-area inset is not added a second time. */
+  underHeader?: boolean;
+  /** Set when the tab bar already sits below this screen, so the bottom safe-area inset is not added a second time. */
+  inTabs?: boolean;
+  /** Page colour; defaults to white. */
+  background?: string;
   style?: ViewStyle;
 }
 
 /**
- * Standard screen chrome: cream background, safe-area aware, consistent
+ * The on-screen keyboard's height on Android, 0 otherwise. Android's `adjustResize` no longer shrinks the
+ * window on current versions (edge-to-edge), so the keyboard simply covers the bottom of the page. Padding
+ * the scroll content by this height lets the member scroll the buttons above the keyboard. (iOS handles
+ * this itself with `automaticallyAdjustKeyboardInsets`.)
+ */
+function useAndroidKeyboardHeight(enabled: boolean): number {
+  const [height, setHeight] = useState(0);
+  useEffect(() => {
+    if (!enabled || Platform.OS !== 'android') return;
+    const show = Keyboard.addListener('keyboardDidShow', (event) =>
+      setHeight(event.endCoordinates.height),
+    );
+    const hide = Keyboard.addListener('keyboardDidHide', () => setHeight(0));
+    return () => {
+      show.remove();
+      hide.remove();
+      setHeight(0);
+    };
+  }, [enabled]);
+  return height;
+}
+
+/**
+ * Standard screen chrome: white background, safe-area aware, consistent
  * horizontal padding. Every Phase 1 screen wraps its content in this.
  */
-export function ScreenContainer({ children, scroll = false, style }: ScreenContainerProps) {
+export function ScreenContainer({
+  children,
+  scroll = false,
+  keyboardPersistTaps = false,
+  keyboardAware = false,
+  underHeader = false,
+  inTabs = false,
+  background,
+  style,
+}: ScreenContainerProps) {
+  const keyboardHeight = useAndroidKeyboardHeight(keyboardAware);
+  const edges: Edge[] = ['left', 'right'];
+  if (!underHeader) edges.push('top');
+  if (!inTabs) edges.push('bottom');
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={[styles.safeArea, background ? { backgroundColor: background } : null]}
+      edges={edges}
+    >
       {scroll ? (
-        <ScrollView contentContainerStyle={[styles.content, style]}>{children}</ScrollView>
+        <ScrollView
+          contentContainerStyle={[
+            styles.content,
+            style,
+            keyboardHeight > 0 ? { paddingBottom: spacing.lg + keyboardHeight } : null,
+          ]}
+          keyboardShouldPersistTaps={keyboardPersistTaps ? 'handled' : 'never'}
+          automaticallyAdjustKeyboardInsets={keyboardAware}
+          keyboardDismissMode={keyboardAware ? 'interactive' : 'none'}
+        >
+          {children}
+        </ScrollView>
       ) : (
         <View style={[styles.content, style]}>{children}</View>
       )}

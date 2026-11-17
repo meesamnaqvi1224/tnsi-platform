@@ -83,6 +83,10 @@ export const resourcesContent = {
   latest: {
     chapter: '04',
     heading: 'Latest Resources',
+    // `items` is NOT rendered. The resources page lists the real, published
+    // articles from `getLatestArticles()` instead: these entries pointed at
+    // article URLs that had no article body. Kept as a record of the drafted
+    // summaries until the articles themselves are written.
     items: [
       {
         id: 'polyvagal-theory-practice',
@@ -256,6 +260,17 @@ export const resourcesContent = {
 } as const;
 
 export type ResourcesContent = typeof resourcesContent;
-export type ResourceItem = (typeof resourcesContent.latest.items)[number];
+export interface ResourceItem {
+  id: string;
+  title: string;
+  category: string;
+  summary: string;
+  readingTime: string;
+  publishedAt: string;
+  href: string;
+  imageSrc: string;
+  imageAlt: string;
+  layout: 'image-left' | 'image-right';
+}
 export type ResourceCategory = (typeof resourcesContent.categories.items)[number];
 export type ResourceCollectionItem = (typeof resourcesContent.collections.items)[number];

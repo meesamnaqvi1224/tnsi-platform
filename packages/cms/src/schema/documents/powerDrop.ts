@@ -95,6 +95,15 @@ export const powerDrop = defineType({
       initialValue: false,
     }),
     defineField({
+      name: 'freeAccess',
+      title: 'Free for all members',
+      type: 'boolean',
+      initialValue: false,
+      description:
+        'Regulation Suite membership: switch on to make this PowerDrop part of the free introductory selection that every member can open. Leave off and it is part of the paid library. Has no effect until Regulation Suite membership is open. The approved model offers exactly three free PowerDrops; free Practices are a selected set.',
+    }),
+
+    defineField({
       name: 'sortOrder',
       type: 'number',
       description: 'Manual display order within the library. Lower first.',

@@ -8,7 +8,14 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://thenervoussysteminstitute.com",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsudGhlbmVydm91c3N5c3RlbWluc3RpdHV0ZS5jb20k"
+      }
     },
     "production": {
       "autoIncrement": true

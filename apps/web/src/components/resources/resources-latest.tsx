@@ -1,10 +1,34 @@
 import { ChapterMarker, Container, Section, Stack } from '@tnsi/ui';
 import { ResourceCard } from '@/components/resources/resource-card';
-import { resourcesContent } from '@/content/resources';
+import { getLatestArticles } from '@/content/cms/loaders';
+import { resourcesContent, type ResourceItem } from '@/content/resources';
 
 const { latest } = resourcesContent;
 
-export function ResourcesLatest() {
+const MAX_ITEMS = 6;
+
+/**
+ * The newest published articles. Reads the same source as the Insights page, so
+ * only articles with a real body appear and nothing links to a placeholder.
+ * Renders nothing when there are none.
+ */
+export async function ResourcesLatest() {
+  const articles = await getLatestArticles();
+  const items: ResourceItem[] = articles.slice(0, MAX_ITEMS).map((article, index) => ({
+    id: article.id,
+    title: article.title,
+    category: article.category,
+    summary: article.summary,
+    readingTime: article.readingTime,
+    publishedAt: article.publishedAt,
+    href: article.href,
+    imageSrc: article.imageSrc,
+    imageAlt: article.imageAlt,
+    layout: index % 2 === 0 ? 'image-left' : 'image-right',
+  }));
+
+  if (items.length === 0) return null;
+
   return (
     <Section
       id="latest"
@@ -19,7 +43,7 @@ export function ResourcesLatest() {
       </Container>
 
       <div>
-        {latest.items.map((resource) => (
+        {items.map((resource) => (
           <ResourceCard key={resource.id} resource={resource} />
         ))}
       </div>

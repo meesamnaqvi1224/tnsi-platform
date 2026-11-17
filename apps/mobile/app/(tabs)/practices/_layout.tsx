@@ -32,7 +32,7 @@ export default function PracticesLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: colors.cream },
+        headerStyle: { backgroundColor: '#FFFFFF' },
         headerTintColor: colors.navy,
         headerTitleStyle: { fontFamily: typography.heading.fontFamily },
         headerShadowVisible: false,
@@ -40,18 +40,31 @@ export default function PracticesLayout() {
     >
       <Stack.Screen
         name="index"
-        options={{ title: 'Practices', headerLeft: () => <HomeHeaderButton /> }}
+        options={{
+          title: 'Practices',
+          // The page title is drawn in the screen itself; the title text stays for back labels.
+          headerTitle: '',
+          headerStyle: { backgroundColor: '#FFFFFF' },
+          headerLeft: () => <HomeHeaderButton />,
+        }}
       />
       <Stack.Screen name="[id]" options={{ title: '' }} />
-      <Stack.Screen name="history" options={{ title: 'Practice History' }} />
-      <Stack.Screen name="journey" options={{ title: 'My Journey' }} />
-      <Stack.Screen name="saved" options={{ title: 'Saved Practices' }} />
+      <Stack.Screen name="history" options={{ title: 'Practice History', headerTitle: '' }} />
+      <Stack.Screen name="journey" options={{ title: 'My Journey', headerTitle: '' }} />
+      <Stack.Screen name="saved" options={{ title: 'Saved Practices', headerTitle: '' }} />
       <Stack.Screen
         name="powerdrops/index"
-        options={{ title: 'PowerDrops', headerLeft: () => <BackToPracticesButton /> }}
+        options={{
+          title: 'PowerDrops',
+          headerTitle: '',
+          headerLeft: () => <BackToPracticesButton />,
+        }}
       />
       <Stack.Screen name="powerdrops/[slug]" options={{ title: '' }} />
-      <Stack.Screen name="somatic-cards/index" options={{ title: 'Somatic Cards' }} />
+      <Stack.Screen
+        name="somatic-cards/index"
+        options={{ title: 'Somatic Cards', headerTitle: '' }}
+      />
       <Stack.Screen name="somatic-cards/[seriesSlug]" options={{ title: '' }} />
       <Stack.Screen name="somatic-cards/card/[cardSlug]" options={{ title: '' }} />
       {/* The breathing flow builds its own header/close controls to match
@@ -66,6 +79,14 @@ export default function PracticesLayout() {
         options={{ headerShown: false, gestureEnabled: false }}
       />
       <Stack.Screen name="breathing/complete" options={{ headerShown: false }} />
+      {/* The two standalone guided audio practices draw their own chrome (see
+          each screen), so the stack header stays off for all six screens. */}
+      <Stack.Screen name="90-second-reset/index" options={{ headerShown: false }} />
+      <Stack.Screen name="90-second-reset/session" options={{ headerShown: false }} />
+      <Stack.Screen name="90-second-reset/complete" options={{ headerShown: false }} />
+      <Stack.Screen name="the-empty-chair/index" options={{ headerShown: false }} />
+      <Stack.Screen name="the-empty-chair/session" options={{ headerShown: false }} />
+      <Stack.Screen name="the-empty-chair/complete" options={{ headerShown: false }} />
     </Stack>
   );
 }

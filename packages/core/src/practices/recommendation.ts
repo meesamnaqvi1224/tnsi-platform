@@ -71,6 +71,21 @@ export function categoryForCapacityScore(capacityScore: number): RecommendedPrac
 export function pickDeterministicCandidate<T extends { id: string }>(
   candidates: readonly T[],
 ): T | null {
-  if (candidates.length === 0) return null;
-  return [...candidates].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))[0] ?? null;
+  return pickDeterministicCandidates(candidates, 1)[0] ?? null;
+}
+
+/**
+ * The first `count` candidates in the same deterministic (id) order
+ * `pickDeterministicCandidate` uses, so the primary pick is always element 0
+ * and an optional alternative is element 1 - the same category, the next one
+ * in the same fixed order. No new scoring rule: it only reads further down the
+ * list the existing routing already produces.
+ */
+export function pickDeterministicCandidates<T extends { id: string }>(
+  candidates: readonly T[],
+  count: number,
+): T[] {
+  return [...candidates]
+    .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+    .slice(0, Math.max(0, count));
 }

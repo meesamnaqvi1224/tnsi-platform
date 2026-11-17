@@ -62,6 +62,8 @@ export interface CheckIn {
   notes: string | null;
   completedAt: string;
   completedDate: string;
+  /** The first check-in of the day (drives the recommendation); further same-day check-ins are false. Absent from older servers. */
+  isPrimary?: boolean;
   metadata: unknown;
   createdAt: string;
 }
@@ -71,6 +73,8 @@ export interface CheckInInput {
   moodScore: number;
   capacityScore: number;
   notes?: string;
+  /** The device's IANA time zone identifier only; the server validates it and derives everything else. */
+  timeZone?: string;
 }
 
 /**
@@ -86,6 +90,8 @@ export interface CheckInSummary {
   capacityScore: number;
   notes: string | null;
   completedAt: string;
+  /** false for a further check-in the same day; absent from older servers. */
+  isPrimary?: boolean;
 }
 
 /** Response shape of GET /api/v1/check-ins, per that route. */
@@ -96,7 +102,7 @@ export interface CheckInsListResponse {
 
 /** Mirrors packages/db/src/schema/practices.ts's `practices` row shape (fields this app uses). */
 export type PracticeContentType =
-  'audio' | 'video' | 'meditation' | 'breathwork' | 'movement' | 'journal';
+  'audio' | 'video' | 'meditation' | 'breathwork' | 'movement' | 'journal' | 'interactive';
 
 /**
  * This member's *current* relationship with a practice - the most
@@ -140,6 +146,8 @@ export interface Practice {
   title: string;
   description: string | null;
   contentType: PracticeContentType;
+  /** Set only when `contentType` is `interactive`: which native experience the practice screen renders (The Return Path is `the-return-path`). */
+  interactiveKey?: string | null;
   mediaUrl: string | null;
   thumbnailUrl: string | null;
   durationSeconds: number | null;
@@ -151,6 +159,10 @@ export interface Practice {
   reflection?: PracticeReflectionState | null;
   /** Whether the authenticated member currently has this practice saved. Populated by GET /api/v1/practices and GET /api/v1/practices/[id] - absent/undefined from /today, which doesn't attach it (Home doesn't show a save control). */
   saved?: boolean;
+  /** Part of the free introductory selection (editorial flag). Informational - `locked` is what decides what the member can open. */
+  isFree?: boolean;
+  /** Decided by the server: true when this practice is in the paid library and the member lacks paid access. `mediaUrl` is then null - the server withholds it. Absent from older servers, i.e. treated as unlocked. */
+  locked?: boolean;
 }
 
 /**
@@ -234,6 +246,13 @@ export interface TodayResponse {
    * substituted).
    */
   todayPractice: Practice | null;
+  /** One optional alternative from the same category as `todayPractice`; absent from older servers. */
+  alternativePractice?: Practice | null;
+  /** Observable engagement for Home's progress widget (completed sessions, latest one); absent from older servers. */
+  progressSummary?: {
+    completedSessions: number;
+    lastCompleted: { practiceId: string; title: string; completedAt: string } | null;
+  };
 }
 
 /** Response shape of GET /api/v1/practices, per apps/web/src/app/api/v1/practices/route.ts. */
@@ -295,104 +314,6 @@ export interface PracticeCompletionResult {
   playCount: number;
 }
 
-/** Mirrors apps/web/src/lib/article-api.ts's `ApiImage`. */
-export interface ArticleImage {
-  url: string;
-  alt: string;
-}
-
-/** Mirrors apps/web/src/lib/article-api.ts's `ApiCategory` - a real Sanity `category` document, never invented. */
-export interface ArticleCategory {
-  title: string;
-  slug: string | null;
-}
-
-/** Mirrors apps/web/src/lib/article-api.ts's `ApiAuthorSummary`. */
-export interface ArticleAuthorSummary {
-  name: string;
-  role: string | null;
-}
-
-/**
- * The article fields the Resources library needs, per
- * apps/web/src/app/api/v1/articles/route.ts's response shape. Deliberately
- * only what GET /api/v1/articles actually returns - no `body`/`related`
- * (detail-only, added in Phase 4.3), no invented fields (tags, views,
- * likes, popularity never exist on the Sanity `article` schema).
- */
-export interface ArticleListItem {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  coverImage: ArticleImage | null;
-  category: ArticleCategory | null;
-  author: ArticleAuthorSummary | null;
-  publishedAt: string | null;
-  readingTime: string | null;
-  featured: boolean;
-}
-
-/** Response shape of GET /api/v1/articles, per apps/web/src/app/api/v1/articles/route.ts. */
-export interface ArticlesListResponse {
-  articles: ArticleListItem[];
-  pagination: { limit: number; offset: number; total: number; hasMore: boolean };
-}
-
-/** Mirrors apps/web/src/lib/article-api.ts's `ApiAuthorDetail` - the detail-only author shape, with a photo. */
-export interface ArticleAuthorDetail extends ArticleAuthorSummary {
-  photo: ArticleImage | null;
-}
-
-/**
- * Mirrors apps/web/src/lib/article-api.ts's `ApiArticleBodyBlock` exactly -
- * every block type `GET /api/v1/articles/[slug]` can currently return.
- * Inline marks (bold/italic/links) are flattened to plain text by the API
- * itself (see that file's own doc comment) - there is no richer inline
- * shape to render here, so none is invented.
- */
-export type ArticleBodyBlock =
-  | { type: 'paragraph'; text: string }
-  | { type: 'heading'; level: 2 | 3; text: string; id: string }
-  | { type: 'pullQuote'; quote: string }
-  | { type: 'orderedList'; items: string[] }
-  | { type: 'unorderedList'; items: string[] }
-  | { type: 'figure'; imageSrc: string | null; imageAlt: string; caption: string }
-  | { type: 'callout'; title: string | null; text: string };
-
-/**
- * Mirrors apps/web/src/lib/article-api.ts's `ApiRelatedArticle` - a
- * compact summary, deliberately without `author`/`featured` (the detail
- * API never nests a related article's own body/related, preventing
- * recursive expansion).
- */
-export interface ArticleRelated {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  coverImage: ArticleImage | null;
-  category: ArticleCategory | null;
-  publishedAt: string | null;
-  readingTime: string | null;
-}
-
-/** Response shape of GET /api/v1/articles/[slug], per apps/web/src/app/api/v1/articles/[slug]/route.ts. */
-export interface ArticleDetail {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  coverImage: ArticleImage | null;
-  category: ArticleCategory | null;
-  author: ArticleAuthorDetail | null;
-  publishedAt: string | null;
-  readingTime: string | null;
-  featured: boolean;
-  body: ArticleBodyBlock[];
-  related: ArticleRelated[];
-}
-
 /** Mirrors packages/db/src/schema/enums.ts's `entitlement_tier`/`entitlement_status` enums. */
 export type EntitlementTier = 'free' | 'monthly' | 'annual' | 'lifetime';
 export type EntitlementStatus = 'active' | 'past_due' | 'canceled' | 'trialing' | 'expired';
@@ -405,6 +326,36 @@ export type EntitlementStatus = 'active' | 'past_due' | 'canceled' | 'trialing' 
  * ids) - deliberately not modeled here since nothing in this app should
  * ever display them.
  */
+export type MembershipState = 'free' | 'trialing' | 'active' | 'grace' | 'inactive';
+
+/**
+ * The server's resolved membership (GET /api/v1/me/entitlements ->
+ * `membership`). The app displays this; it never derives paid access from
+ * `tier`/`status` itself, so what it shows is what the server enforces.
+ * Optional so the app still works against a server without it.
+ */
+export interface MembershipSummary {
+  state: MembershipState;
+  /** Full Regulation Suite library (trialing, active, or inside the payment grace period). */
+  hasPaidAccess: boolean;
+  /** Only while `state` is `grace`: when access ends if the payment isn't resolved. */
+  graceEndsAt: string | null;
+  /** Cancelled but still inside the paid period - `currentPeriodEnd` is when access ends. */
+  cancelsAtPeriodEnd: boolean;
+  /** Whether free/paid locking is in force at all (false until membership opens). */
+  contentLocking: boolean;
+  /** Only while `state` is `grace`: a failed payment, or a renewal the server could not confirm. */
+  graceReason?: 'payment_failed' | 'renewal_unconfirmed' | null;
+  /** The end of the paid period, when known. */
+  paidThrough?: string | null;
+  /** Only while `state` is `trialing`: when the free trial ends. */
+  trialEndsAt?: string | null;
+  /** A free account whose trial has ended (it is Free again). */
+  trialExpired?: boolean;
+  /** Whether the account may start its free trial now (the server still decides). */
+  trialAvailable?: boolean;
+}
+
 export interface Entitlements {
   tier: EntitlementTier;
   status: EntitlementStatus;
@@ -416,6 +367,7 @@ export interface Entitlements {
   cancelAtPeriodEnd: boolean;
   /** Real field, already returned by the API - null unless the membership has actually been canceled. */
   canceledAt: string | null;
+  membership?: MembershipSummary;
 }
 
 /** Mirrors apps/web/src/lib/assessment-api.ts's `ApiAssessmentChoice` - deliberately no score `value`, the server owns scoring. */
@@ -487,6 +439,10 @@ export interface PowerDropSummary {
   cardImage: PowerDropImage | null;
   focus: string;
   featured: boolean;
+  /** Part of the free introductory selection of three. */
+  isFree?: boolean;
+  /** Decided by the server: true when this PowerDrop is in the paid library and the member lacks paid access. `cardImage` is then null. Absent from older servers, i.e. treated as unlocked. */
+  locked?: boolean;
 }
 
 /** Response shape of GET /api/v1/powerdrops, per that route. */
@@ -627,4 +583,120 @@ export interface SomaticCardDetail {
   whatToNotice: SomaticWhatToNoticeItem[];
   supportingImages: SomaticSupportingImage[];
   demonstrationSequence: SomaticDemonstrationFrame[];
+}
+
+/**
+ * The Return Path (interactive labyrinth practice). Mirrors
+ * apps/web/src/components/return-path/content.ts's `ReturnPathContent` minus
+ * its public-web-only `email` group, which GET /api/v1/return-path omits.
+ * Hand-kept like the other API mirrors in this file; the copy and timings
+ * come from the server (Sanity), never from the app. The labyrinth geometry
+ * is generated on the device from `@tnsi/core`.
+ */
+export interface ReturnPathContent {
+  intro: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    instructions: string[];
+    beginLabel: string;
+    safetyNote: string;
+  };
+  settings: {
+    gentlePauseLabel: string;
+    gentlePauseHelp: string;
+    noBreathLabel: string;
+    noBreathHelp: string;
+  };
+  choose: {
+    heading: string;
+    /** `{level}` is replaced with the level's name. */
+    lockedMessage: string;
+    lockedLinkLabel: string;
+  };
+  practice: {
+    firstHint: string;
+    startHint: string;
+    tracingHint: string;
+    guideHint: string;
+    guideFollowHint: string;
+    centreLine: string;
+    returnHint: string;
+  };
+  checkpoints: {
+    breathLines: string[];
+    noBreathLines: string[];
+    cueIn: string;
+    cuePause: string;
+    cueOut: string;
+    noBreathCue: string;
+    continueLabel: string;
+  };
+  ending: {
+    eyebrow: string;
+    heading: string;
+    line: string;
+    assessmentLabel: string;
+    practiseAgainLabel: string;
+    memberSavedLabel: string;
+    memberSaveFailedLabel: string;
+    tryAnotherLabel: string;
+    backToDashboardLabel: string;
+  };
+  timings: {
+    inhaleSeconds: number;
+    pauseSeconds: number;
+    exhaleSeconds: number;
+    centreCycles: number;
+    noBreathMarkerSeconds: number;
+    noBreathCentreSeconds: number;
+  };
+}
+
+/** Response shape of GET /api/v1/return-path, per that route. */
+export interface ReturnPathResponse {
+  practiceId: string;
+  /** Levels this member may start (1 spiral, 2 seven circuits, 3 eleven circuits). */
+  allowedLevels: (1 | 2 | 3)[];
+  content: ReturnPathContent;
+}
+
+/**
+ * My Reflections (the private journal). Hand-kept mirrors of apps/web/src/lib/journal.ts's
+ * `JournalEntryDto` / `JournalEntryListItem` and the list envelope of GET /api/v1/journal/entries.
+ * The server never returns the owner's id. Guided prompts, practice and theory links exist on the
+ * server for later phases; this app does not create or show them yet.
+ */
+export type ReflectionStatus = 'draft' | 'saved';
+
+export interface ReflectionEntry {
+  id: string;
+  title: string | null;
+  content: string;
+  status: ReflectionStatus;
+  entryType: 'independent' | 'guided' | 'practice' | 'theory';
+  promptId: string | null;
+  promptText: string | null;
+  practiceId: string | null;
+  completionId: string | null;
+  theoryCondition: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** A row in the history: a short preview, never the full text. */
+export interface ReflectionListItem {
+  id: string;
+  title: string | null;
+  preview: string;
+  previewTruncated: boolean;
+  status: ReflectionStatus;
+  entryType: ReflectionEntry['entryType'];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReflectionsListResponse {
+  entries: ReflectionListItem[];
+  pagination: { limit: number; offset: number; hasMore: boolean };
 }
