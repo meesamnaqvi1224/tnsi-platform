@@ -44,6 +44,31 @@ basis, and makes no claim about encryption, who at TNSI can access data, or wher
 5. Whether a minimum age applies and how it is checked. Not decided and not invented here.
 6. Where the notice must also appear (for example next to the privacy policy link).
 
+## Proposed: consent history that supports a legally approved retention policy (NOT implemented)
+
+**Today.** One row per member in `journal_consents` (current notice version, `consented_at`, `withdrawn_at`).
+Re-consent overwrites the earlier timestamps, so the first agreement, earlier notice versions and earlier
+withdrawals are not kept. Nothing expires. No retention period has been implemented, on purpose: the
+six-year figure (DR-REF-01) is a provisional operational choice, not a legal conclusion.
+
+**Proposal, to be built only after counsel confirms what must be kept (migration 0016, a separately
+approved production step):**
+
+1. A new append-only table `journal_consent_events` (`id`, `user_id`, `event` = `agreed` | `withdrawn`,
+   `policy_version`, `occurred_at`). The server writes one row, in the same transaction, each time
+   `journal_consents` changes. `journal_consents` stays as the fast "current state" row that the write
+   gate reads, so enforcement and its tests do not change.
+2. A nullable `purge_after` timestamp on the events (and a matching one on the current-state row). It is
+   NULL while the member's account exists. Account deletion sets it to `deleted_at + <approved period>`.
+   While the period is not decided it stays NULL, so nothing is ever purged by accident.
+3. A purge job (daily, same cron as the CRM worker) that deletes rows whose `purge_after` has passed and
+   reports counts only. It is disabled until the approved period is configured.
+4. Content rule unchanged: no journal text, no email, no IP, in either table.
+
+**Counsel decides:** whether history (not only the latest state) must be kept; the period and its start
+date; whether prior notice versions must be retained alongside the events; whether a shorter period is
+appropriate. Engineering supplies the mechanism above and does not choose the period.
+
 ## Release steps and consequences
 
 - **Do not enable My Reflections for members until legal has approved this**, per Q1.
