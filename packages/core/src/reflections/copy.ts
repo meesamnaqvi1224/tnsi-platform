@@ -65,8 +65,14 @@ export const REFLECTION_DELETE = {
   confirm: 'Delete Reflection',
 } as const;
 
-/** REVIEW: the privacy line shown wherever the member writes or reads. */
-export const PRIVACY_LINE = 'Your reflections are private. Only you can see them.';
+/**
+ * REVIEW: the privacy line shown wherever the member writes or reads.
+ *
+ * Deliberately NOT "only you can see them": decision Q2 (16 Nov 2026) forbids an absolute claim about every
+ * person with infrastructure access, because TNSI and its providers could technically reach database
+ * content. What is verified is that OTHER MEMBERS cannot read an entry, so that is all it says.
+ */
+export const PRIVACY_LINE = 'Your reflections are private. Other members can’t see them.';
 
 /**
  * REVIEW (not in the supplied wording, written to match its tone): messages for situations the

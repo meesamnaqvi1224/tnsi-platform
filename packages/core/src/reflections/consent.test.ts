@@ -8,7 +8,7 @@ import { describeReflectionError } from './logic';
 
 describe('the first-use acknowledgement (proposed wording)', () => {
   it('is marked as an unapproved draft in its version, so approved wording must get a new one', () => {
-    expect(JOURNAL_CONSENT_VERSION).toBe('draft-1');
+    expect(JOURNAL_CONSENT_VERSION).toBe('draft-2');
   });
 
   it('says what the decision requires: personal or health-related information may be written, it is stored in the account, and how to withdraw', () => {
@@ -19,12 +19,27 @@ describe('the first-use acknowledgement (proposed wording)', () => {
     expect(JOURNAL_CONSENT_COPY.checkboxLabel).toMatch(/stored in my account/);
   });
 
-  it('claims nothing that is not verified or decided: no lawful basis, encryption, staff access, hosting location, or outcomes', () => {
+  it('claims nothing that is not verified or decided: no lawful basis, encryption, absolute access claims, hosting location, or outcomes', () => {
     const all = JSON.stringify(JOURNAL_CONSENT_COPY);
     expect(all).not.toMatch(/lawful|legitimate interest|article|gdpr|consent to processing/i);
-    expect(all).not.toMatch(/encrypt|secure|safe|no one at|nobody at|never access|staff|employee/i);
+    expect(all).not.toMatch(
+      /encrypt|certif|only you|no one|nobody|never access|cannot be accessed/i,
+    );
     expect(all).not.toMatch(/united states|us region|neon|aws|vercel|clerk/i);
     expect(all).not.toMatch(/\bheal(s|ing|ed)?\b|recover|improve|therap|treat|diagnos|clinical/i);
+  });
+
+  it('follows decision Q2: other members cannot see entries, no routine review, and limited authorised technical access is acknowledged', () => {
+    const text = JOURNAL_CONSENT_COPY.points.join(' ');
+    expect(text).toMatch(/Other members can’t see it/);
+    expect(text).toMatch(/don’t routinely read reflections/);
+    expect(text).toMatch(/authorised technical access/);
+  });
+
+  it('tells the member a record of their agreement is kept, and that it holds nothing they wrote', () => {
+    const text = JOURNAL_CONSENT_COPY.points.join(' ');
+    expect(text).toMatch(/record that you agreed to this notice, and when/);
+    expect(text).toMatch(/does not include anything you wrote/);
   });
 
   it('keeps the agree step separate and never pre-ticked: it is a checkbox label plus a button', () => {

@@ -43,7 +43,7 @@ beforeEach(() => {
   access.mockReset().mockResolvedValue({ state: 'ok', userId: 'u1' });
   listJournalEntries.mockReset().mockResolvedValue({ entries: [], hasMore: false });
   getJournalEntry.mockReset();
-  consent.mockReset().mockResolvedValue({ status: 'granted', version: 'draft-1' });
+  consent.mockReset().mockResolvedValue({ status: 'granted', version: 'draft-2' });
 });
 
 describe('My Reflections history page', () => {
@@ -57,7 +57,8 @@ describe('My Reflections history page', () => {
     const html = await render(ListPage({ searchParams: Promise.resolve({}) }));
     expect(html).toContain('Your space to reflect');
     expect(html).toContain('Write Your First Reflection');
-    expect(html).toContain('Your reflections are private. Only you can see them.');
+    expect(html).toContain('Your reflections are private. Other members can’t see them.');
+    expect(html).not.toMatch(/only you can see/i);
     expect(html).toContain('href="/dashboard/reflections/new"');
   });
 
@@ -162,7 +163,7 @@ describe('My Reflections editor pages', () => {
 
 describe('first-use acknowledgement on the pages (decision Q1)', () => {
   it('a member who has not agreed sees the notice, not the editor, on the new-reflection page', async () => {
-    consent.mockResolvedValue({ status: 'required', version: 'draft-1' });
+    consent.mockResolvedValue({ status: 'required', version: 'draft-2' });
     const html = await render(NewPage());
     expect(html).toContain('Before you begin');
     expect(html).toContain('type="checkbox"');
@@ -174,7 +175,7 @@ describe('first-use acknowledgement on the pages (decision Q1)', () => {
   });
 
   it('a member who withdrew is asked again, and the editor is not shown', async () => {
-    consent.mockResolvedValue({ status: 'withdrawn', version: 'draft-1' });
+    consent.mockResolvedValue({ status: 'withdrawn', version: 'draft-2' });
     const html = await render(NewPage());
     expect(html).toContain('Before you begin');
     expect(html).not.toContain('Save Reflection');
@@ -194,7 +195,7 @@ describe('first-use acknowledgement on the pages (decision Q1)', () => {
       status: 'saved',
       createdAt: new Date('2026-11-14T10:00:00Z'),
     });
-    consent.mockResolvedValue({ status: 'withdrawn', version: 'draft-1' });
+    consent.mockResolvedValue({ status: 'withdrawn', version: 'draft-2' });
     const html = await render(EntryPage({ params: Promise.resolve({ id: ID }) }));
     expect(html).toContain('Before you begin');
     expect(html).toContain('my words');
@@ -205,12 +206,12 @@ describe('first-use acknowledgement on the pages (decision Q1)', () => {
     const withdraw = await render(ListPage({ searchParams: Promise.resolve({}) }));
     expect(withdraw).toContain('Withdraw permission');
 
-    consent.mockResolvedValue({ status: 'withdrawn', version: 'draft-1' });
+    consent.mockResolvedValue({ status: 'withdrawn', version: 'draft-2' });
     const again = await render(ListPage({ searchParams: Promise.resolve({}) }));
     expect(again).toContain('Permission withdrawn');
     expect(again).not.toContain('Before you begin');
 
-    consent.mockResolvedValue({ status: 'required', version: 'draft-1' });
+    consent.mockResolvedValue({ status: 'required', version: 'draft-2' });
     const never = await render(ListPage({ searchParams: Promise.resolve({}) }));
     expect(never).not.toContain('Withdraw permission');
   });

@@ -16,7 +16,7 @@ describe('first-use acknowledgement in the app', () => {
     expect(JOURNAL_CONSENT_COPY.checkboxLabel).toBeTruthy();
     expect(JOURNAL_CONSENT_COPY.agreeButton).toBe('Agree and continue');
     expect(JOURNAL_CONSENT_COPY.notNowButton).toBe('Not now');
-    expect(JOURNAL_CONSENT_COPY.points.length).toBeGreaterThanOrEqual(3);
+    expect(JOURNAL_CONSENT_COPY.points.length).toBeGreaterThanOrEqual(4);
   });
 
   it('withdrawal asks before it acts and says nothing is deleted', () => {
@@ -36,6 +36,6 @@ describe('first-use acknowledgement in the app', () => {
   });
 
   it('the notice version is the draft marker, so approved wording must change it', () => {
-    expect(JOURNAL_CONSENT_VERSION).toBe('draft-1');
+    expect(JOURNAL_CONSENT_VERSION).toBe('draft-2');
   });
 });

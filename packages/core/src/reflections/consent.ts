@@ -13,8 +13,11 @@
  * asks every member to acknowledge the new notice before they write again.
  */
 
-/** `draft-1` marks the notice as unapproved. The approved wording gets its own version. */
-export const JOURNAL_CONSENT_VERSION = 'draft-1';
+/**
+ * `draft-N` marks the notice as unapproved. `draft-2` (17 Nov 2026) adds the staff-access and consent-record
+ * sentences required by decisions Q1/Q2. The approved wording gets its own version.
+ */
+export const JOURNAL_CONSENT_VERSION = 'draft-2';
 
 /**
  * `granted`: has accepted the current notice and not withdrawn. `required`: has not accepted the
@@ -38,8 +41,9 @@ export const JOURNAL_CONSENT_COPY = {
     'My Reflections is a private place to write for yourself. You choose what to write, and you never have to write anything.',
   points: [
     'You may choose to include personal or health-related information. That is up to you.',
-    'What you write is stored in your TNSI account so you can come back to it. Other members can’t see it, and we don’t use it to recommend practices or to analyse you.',
+    'What you write is stored in your TNSI account so you can come back to it. Other members can’t see it, and we don’t use it to recommend practices or to analyse you. We don’t routinely read reflections. Limited, authorised technical access may sometimes be needed to keep the service running, to help you if you ask, or where the law requires it.',
     'You can stop at any time. Choose Withdraw permission in My Reflections, and you won’t be able to write new reflections or change existing ones. You can still delete what you’ve written, or delete your account.',
+    'We keep a record that you agreed to this notice, and when. It does not include anything you wrote.',
   ],
   checkboxLabel:
     'I understand this, and I agree that what I write in My Reflections is stored in my account.',
