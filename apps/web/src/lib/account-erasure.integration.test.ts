@@ -177,6 +177,10 @@ async function seedMember(label: string) {
     { userId: user.id, content: `saved ${SECRET}`, status: 'saved' },
     { userId: user.id, content: `draft ${SECRET}`, status: 'draft' },
   ]);
+  // The member has acknowledged the My Reflections notice (writes need it), and the consent record is a
+  // documented RETAINED record (docs/account-deletion-and-data-retention.md): member id, notice version
+  // and two timestamps, never journal text or an email.
+  await m.db.insert(m.s.journalConsents).values({ userId: user.id, policyVersion: 'draft-2' });
   await m.db.insert(m.s.entitlements).values({
     userId: user.id,
     stripeCustomerId: `cus_${RUN}_${label}`,
@@ -221,6 +225,7 @@ async function footprint(userId: string) {
       m.s.assessmentSubmissions,
       eq(m.s.assessmentSubmissions.userId, userId),
     ),
+    consents: await count(m.s.journalConsents, eq(m.s.journalConsents.userId, userId)),
   };
 }
 const ERASED = {
@@ -231,6 +236,7 @@ const ERASED = {
   saves: 0,
   powerDrops: 0,
   assessments: 0,
+  consents: 1, // retained on purpose: evidence of agreement, no content
 };
 const FULL = {
   ...ERASED,
@@ -241,6 +247,7 @@ const FULL = {
   saves: 1,
   powerDrops: 1,
   assessments: 1,
+  consents: 1,
 };
 
 const userRow = async (id: string) =>
