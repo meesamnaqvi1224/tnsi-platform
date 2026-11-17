@@ -1,5 +1,6 @@
 import NextLink from 'next/link';
 import { Container, Divider, Grid, Stack, Text } from '@tnsi/ui';
+import { CookiePreferencesButton } from '@/components/seo/cookie-preferences-button';
 import { footerColumns } from '@/lib/nav-links';
 
 const legalLinks = [
@@ -71,6 +72,7 @@ export function SiteFooter() {
                 {link.label}
               </NextLink>
             ))}
+            <CookiePreferencesButton className="interaction-colors interaction-focus text-muted-foreground hover:text-foreground text-sm" />
           </Stack>
         </Stack>
       </Container>

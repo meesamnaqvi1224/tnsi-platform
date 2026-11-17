@@ -35,7 +35,7 @@ export const privacyContent = {
       id: 'cookies',
       heading: 'Cookies',
       paragraphs: [
-        'Our website uses cookies to maintain essential functionality and understand how visitors use the site. You can manage cookie preferences through your browser settings.',
+        'Our website uses cookies to maintain essential functionality. If you accept analytics cookies, we also use Google Analytics to understand how visitors use the site; it stays off unless you accept. You can accept, reject or change your analytics choice at any time using “Cookie preferences” in the footer, and you can also manage cookies through your browser settings.',
         'For further detail, please see our Cookie Policy.',
       ],
     },
