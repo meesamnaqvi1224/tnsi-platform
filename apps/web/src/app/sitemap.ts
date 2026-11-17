@@ -23,6 +23,7 @@ const STATIC_ROUTES = [
   '/book-a-call',
   '/contact',
   '/privacy',
+  '/delete-account',
   '/terms',
   '/accessibility',
   '/cookies',

@@ -11,6 +11,7 @@ import { getClerkUser } from '@tnsi/auth/client/server';
 import { enqueueAppSignup } from './crm-membership-sync';
 import { purgeJournalEntries } from './journal';
 import { lockJournalExclusive } from './deletion-state';
+import { eraseMemberData } from './account-data-erasure';
 
 /**
  * Database operations backing Clerk user sync. Shared by the webhook route
@@ -26,6 +27,13 @@ export const userSyncOps: UserSyncOperations = {
 
   async upsertUser(userData: SyncUserData): Promise<DbUser> {
     const existing = await this.findUserByClerkId(userData.clerkUserId);
+
+    if (existing?.deletedAt) {
+      // A deleted account has been anonymised (see account-data-erasure.ts). Clerk never sends an
+      // "undelete", so any user.created / user.updated for it is stale or out of order, and applying it
+      // would write the person's email and name back into a record that was erased. Nothing is written.
+      return existing;
+    }
 
     if (existing) {
       // deletedAt is intentionally left untouched here. Clerk never sends an
@@ -82,6 +90,10 @@ export const userSyncOps: UserSyncOperations = {
       // also what covers a deletion that never wrote a marker (Clerk dashboard -> user.deleted webhook).
       await lockJournalExclusive(tx, existing.id);
       await purgeJournalEntries(tx, existing.id);
+      // Everything else personal goes in the same transaction: the member's activity is deleted, the
+      // account row is anonymised, queued CRM events are cancelled and the CRM contact's deletion is
+      // queued. One commit, so there is no state in which the account is deleted but its data is not.
+      await eraseMemberData(tx, existing.id);
       const [deleted] = await tx
         .update(users)
         .set({

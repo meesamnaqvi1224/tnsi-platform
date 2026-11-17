@@ -23,9 +23,11 @@ function makeDeps() {
   const deps = {
     hasActivePaidSubscription: vi.fn(async () => (calls.push('subscription'), false)),
     markDeletionPending: vi.fn(async () => void calls.push('mark_pending')),
+    suppressMarketing: vi.fn(async () => void calls.push('suppress')),
     purgeJournal: vi.fn(async () => (calls.push('purge'), 3)),
     deleteIdentity: vi.fn(async () => void calls.push('identity')),
     finalizeLocalDeletion: vi.fn(async () => void calls.push('finalize')),
+    completeCrmDeletion: vi.fn(async () => (calls.push('crm_delete'), true)),
   };
   return { deps, calls };
 }
@@ -44,7 +46,15 @@ describe('deleteAccount: the sequence', () => {
   it('marks the deletion pending BEFORE anything is erased, and reports deleted only when all steps succeed', async () => {
     const { deps, calls } = makeDeps();
     expect(await deleteAccount(USER, deps)).toEqual({ status: 'deleted' });
-    expect(calls).toEqual(['subscription', 'mark_pending', 'purge', 'identity', 'finalize']);
+    expect(calls).toEqual([
+      'subscription',
+      'mark_pending',
+      'suppress',
+      'purge',
+      'identity',
+      'finalize',
+      'crm_delete',
+    ]);
     expect(deps.markDeletionPending).toHaveBeenCalledWith('user-1');
     expect(deps.purgeJournal).toHaveBeenCalledWith('user-1');
     expect(deps.deleteIdentity).toHaveBeenCalledWith('clerk_1');
@@ -108,6 +118,73 @@ describe('deleteAccount: failure at each step', () => {
   });
 });
 
+describe('deleteAccount: marketing suppression and the CRM contact', () => {
+  it('stops marketing straight after the pending marker and BEFORE anything is erased; deletes the CRM contact last', async () => {
+    const { deps, calls } = makeDeps();
+    expect(await deleteAccount(USER, deps)).toEqual({ status: 'deleted' });
+    expect(calls).toEqual([
+      'subscription',
+      'mark_pending',
+      'suppress',
+      'purge',
+      'identity',
+      'finalize',
+      'crm_delete',
+    ]);
+    expect(deps.suppressMarketing).toHaveBeenCalledWith('user-1');
+    expect(deps.completeCrmDeletion).toHaveBeenCalledWith('user-1');
+  });
+
+  it('a refused deletion (paid subscription) suppresses nothing and deletes no CRM contact', async () => {
+    const { deps } = makeDeps();
+    deps.hasActivePaidSubscription.mockResolvedValue(true);
+    await deleteAccount(USER, deps);
+    expect(deps.suppressMarketing).not.toHaveBeenCalled();
+    expect(deps.completeCrmDeletion).not.toHaveBeenCalled();
+  });
+
+  it('if suppression cannot be recorded, deletion is PENDING (it has started), nothing is erased and the identity is kept', async () => {
+    const { deps } = makeDeps();
+    deps.suppressMarketing.mockRejectedValue(new Error('db blip'));
+    expect(await deleteAccount(USER, deps)).toEqual({
+      status: 'pending',
+      stage: 'crm_suppression',
+    });
+    expect(deps.purgeJournal).not.toHaveBeenCalled();
+    expect(deps.deleteIdentity).not.toHaveBeenCalled();
+    expect(deps.finalizeLocalDeletion).not.toHaveBeenCalled();
+  });
+
+  it('if the CRM has NOT confirmed the contact is deleted, the result is pending_cleanup - never deleted', async () => {
+    const { deps } = makeDeps();
+    deps.completeCrmDeletion.mockResolvedValue(false);
+    const result = await deleteAccount(USER, deps);
+    expect(result).toEqual({ status: 'pending_cleanup' });
+    expect(deps.finalizeLocalDeletion).toHaveBeenCalledTimes(1); // our own data is already erased
+  });
+
+  it('if the CRM step itself throws, the result is pending_cleanup - never deleted, never a failure that hides the erasure', async () => {
+    const { deps } = makeDeps();
+    deps.completeCrmDeletion.mockRejectedValue(new Error('crm down'));
+    expect(await deleteAccount(USER, deps)).toEqual({ status: 'pending_cleanup' });
+  });
+
+  it('the CRM contact is never deleted before the local erasure has committed', async () => {
+    const { deps } = makeDeps();
+    deps.finalizeLocalDeletion.mockRejectedValue(new Error('db blip'));
+    await deleteAccount(USER, deps);
+    expect(deps.completeCrmDeletion).not.toHaveBeenCalled();
+  });
+
+  it('a retry after a CRM-suppression failure completes, queueing suppression again harmlessly', async () => {
+    const { deps } = makeDeps();
+    deps.suppressMarketing.mockRejectedValueOnce(new Error('db blip'));
+    expect((await deleteAccount(USER, deps)).status).toBe('pending');
+    expect(await deleteAccount(USER, deps)).toEqual({ status: 'deleted' });
+    expect(deps.suppressMarketing).toHaveBeenCalledTimes(2);
+  });
+});
+
 describe('deleteAccount: retries are safe', () => {
   it('retry after an identity failure completes, re-running every step (all idempotent)', async () => {
     const { deps } = makeDeps();
@@ -149,9 +226,11 @@ describe('deleteAccount: retries are safe', () => {
     expect(Object.keys(deps)).toEqual([
       'hasActivePaidSubscription',
       'markDeletionPending',
+      'suppressMarketing',
       'purgeJournal',
       'deleteIdentity',
       'finalizeLocalDeletion',
+      'completeCrmDeletion',
     ]); // there is no "restore" or "write" dependency for a retry to call
   });
 });
@@ -167,14 +246,16 @@ describe('deleteAccount: logging', () => {
       });
     for (const key of [
       'markDeletionPending',
+      'suppressMarketing',
       'purgeJournal',
       'deleteIdentity',
       'finalizeLocalDeletion',
+      'completeCrmDeletion',
     ] as const) {
       deps[key].mockRejectedValueOnce(leaky());
       await deleteAccount(USER, deps);
     }
-    expect(errorSpy).toHaveBeenCalledTimes(4);
+    expect(errorSpy).toHaveBeenCalledTimes(6);
     expect(JSON.stringify(errorSpy.mock.calls)).not.toContain('SECRET');
     for (const call of errorSpy.mock.calls) {
       expect(call[0]).toBe('[account deletion] step failed');

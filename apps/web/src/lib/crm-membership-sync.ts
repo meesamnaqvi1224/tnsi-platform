@@ -25,11 +25,13 @@ function failureName(error: unknown): string {
 
 async function personFor(trx: Pick<DB, 'select'>, userId: string) {
   const [row] = await trx
-    .select({ email: users.email, fullName: users.fullName })
+    .select({ email: users.email, fullName: users.fullName, deletedAt: users.deletedAt })
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
-  return row && row.email ? row : null;
+  // A deleted (anonymised) account has no person to tell the CRM about.
+  if (!row || !row.email || row.deletedAt) return null;
+  return { email: row.email, fullName: row.fullName };
 }
 
 /**
