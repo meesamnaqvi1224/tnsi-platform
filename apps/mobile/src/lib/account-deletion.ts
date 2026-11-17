@@ -56,7 +56,7 @@ export function accountDeletionFailure(err: unknown): AccountDeletionFailure {
 }
 
 export const DELETE_ACCOUNT_CONFIRMATION =
-  'Your account will be closed and you will be signed out. Anything you have written in My Reflections is permanently deleted. This cannot be undone.';
+  'Your account will be closed and you will be signed out. Your reflections, check-ins, practice history and saved practices are permanently deleted. A small number of records are kept where we are required to keep them; see Delete Your Account on our website. This cannot be undone.';
 
 /** The message shown when a deletion that was started earlier is still unfinished. */
 export const PENDING_DELETION_NOTICE =
@@ -73,11 +73,12 @@ export function accountDeletionOutcomeMessage(status: 'deleted' | 'pending'): {
   return status === 'deleted'
     ? {
         title: 'Account deleted',
-        message: 'Your account has been closed and your journal deleted.',
+        message:
+          'Your account has been closed. Your reflections, check-ins, practice history and saved practices have been deleted.',
       }
     : {
         title: 'Deletion in progress',
         message:
-          "You've been signed out. Your account is being closed and this can take a few minutes to finish.",
+          "You've been signed out. Your account is being closed: your reflections have been deleted, and we are still finishing the removal of the rest of your account information. You don't need to do anything else.",
       };
 }

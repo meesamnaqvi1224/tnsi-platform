@@ -26,6 +26,8 @@ const isPublicRoute = createRouteMatcher([
   '/apply(.*)',
   '/prospectus(.*)',
   '/privacy(.*)',
+  // Public so the account-deletion instructions are reachable without signing in (store requirement).
+  '/delete-account',
   '/terms(.*)',
   '/cookies(.*)',
   '/accessibility(.*)',

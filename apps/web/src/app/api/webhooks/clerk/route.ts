@@ -6,6 +6,7 @@
 
 import { after, NextRequest, NextResponse } from 'next/server';
 import { syncClerkUser } from '@tnsi/auth/sync/user';
+import { safeErrorCode } from '@/lib/private-response';
 
 /** Room for the after-response CRM send below (a few seconds of Flowi calls). */
 export const maxDuration = 30;
@@ -44,26 +45,43 @@ export async function POST(request: NextRequest) {
     // once the response has gone, so the welcome email follows sign-up within a minute
     // or two instead of waiting for the daily worker. Best effort: anything that does
     // not go is retried by the worker.
-    if (result.action === 'user.created') {
-      after(async () => {
-        try {
-          const { processOutbox } = await import('@/lib/crm-outbox');
-          await processOutbox({ budgetMs: 8000 });
-        } catch {
-          console.error('[Clerk Webhook] CRM send failed');
-        }
-      });
+    // A new account queues its CRM sign-up; a deleted one queues the CRM contact's deletion
+    // (softDeleteUser). Either way, send what is queued now rather than waiting for the daily worker.
+    if (result.action === 'user.created' || result.action === 'user.deleted') {
+      // Best-effort: the event is already processed and stored. If the follow-up cannot even be
+      // scheduled, the queued job is simply left for the worker - it must never turn a processed
+      // event into an error (Clerk would then retry a deletion that has already happened).
+      try {
+        after(async () => {
+          try {
+            const { processOutbox } = await import('@/lib/crm-outbox');
+            await processOutbox({ budgetMs: 8000 });
+          } catch {
+            console.error('[Clerk Webhook] CRM send failed');
+          }
+        });
+      } catch {
+        /* left for the worker */
+      }
     }
 
     return NextResponse.json({ success: true, action: result.action });
   } catch (error) {
-    console.error('[Clerk Webhook] Error:', error);
+    // Never log or return the error object or its message: for a database failure it can carry the
+    // statement, and `user.deleted` now also purges a member's journal in the same transaction. A short
+    // label and code is enough to diagnose; Clerk retries any non-2xx.
+    const verification = error instanceof Error && error.name === 'WebhookVerificationFailedError';
+    console.error('[Clerk Webhook] failed', {
+      kind: verification ? 'verification' : 'processing',
+      code: safeErrorCode(error),
+    });
 
-    // Return 400 for verification failures, 500 for other errors
-    const status =
-      error instanceof Error && error.name === 'WebhookVerificationFailedError' ? 400 : 500;
-    const message = error instanceof Error ? error.message : 'Webhook processing failed';
-
-    return NextResponse.json({ error: message }, { status });
+    // 400 for a failed signature check, 500 for anything else; neither echoes what went wrong.
+    return NextResponse.json(
+      {
+        error: verification ? 'Webhook signature verification failed' : 'Webhook processing failed',
+      },
+      { status: verification ? 400 : 500 },
+    );
   }
 }

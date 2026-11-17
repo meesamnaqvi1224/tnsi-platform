@@ -6,6 +6,7 @@ describe('parseAuthRedirect: what is allowed', () => {
     '/dashboard/billing',
     '/dashboard/billing?plan=monthly',
     '/dashboard/billing?plan=annual',
+    '/dashboard/account',
   ])('accepts %s and returns it unchanged', (value) => {
     expect(parseAuthRedirect(value)).toBe(value);
   });
@@ -28,6 +29,11 @@ describe('parseAuthRedirect: what is rejected', () => {
     ['a javascript: URL', 'javascript:alert(1)'],
     ['a data: URL', 'data:text/html,<script>alert(1)</script>'],
     ['a different dashboard path', '/dashboard'],
+    ['the account path with extra query', '/dashboard/account?next=//evil.example'],
+    ['the account path with a trailing path', '/dashboard/account/../billing'],
+    ['the account path in a different case', '/Dashboard/Account'],
+    ['the account path with a fragment', '/dashboard/account#x'],
+    ['a lookalike account path', '/dashboard/accounts'],
     ['another dashboard page', '/dashboard/journey'],
     ['a longer path under billing', '/dashboard/billing/extra'],
     ['a trailing slash', '/dashboard/billing/'],

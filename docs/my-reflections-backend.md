@@ -188,6 +188,12 @@ Outcomes of `DELETE`:
 
 ## 6. Account deletion: final sequence and recovery
 
+> **Superseded in part (16 Nov 2026, PR #54).** Account deletion now also erases the member's activity,
+> anonymises the account row, stops CRM marketing when deletion starts and deletes the CRM contact. The
+> current sequence, what is kept and why, the CRM failure handling, the backup policy and the restore
+> procedure are in [account-deletion-and-data-retention.md](./account-deletion-and-data-retention.md).
+> The journal locking and the advisory-lock design described below are unchanged.
+
 In the mobile app: **Profile → Delete Account** (confirmation, then the call). Postgres and Clerk are
 separate systems; **no shared transaction is assumed or possible**. The **order** of the steps, plus the
 persisted pending marker, is the safety design (`apps/web/src/lib/account-deletion.ts`):
@@ -414,10 +420,10 @@ longer be used. The app therefore never shows a delayed "deletion complete" conf
 
 ### Known limitations of account deletion (not hidden)
 
-- **Only the journal is purged.** Closing the account soft-deletes the `users` row (existing behaviour:
-  `getAuthUser` then treats the member as gone). Check-ins, practice completions, reflections, saves and
-  other member rows are **retained**. A full-erasure policy for those (and any CRM/Flowi record) is a
-  decision outside this PR; store review may expect "associated personal data" to be addressed.
+- ~~Only the journal is purged.~~ **Changed in PR #54:** check-ins, practice completions, quick
+  reflections, saves, PowerDrop usage and linked assessment submissions are deleted, the `users` row is
+  anonymised and the CRM contact is deleted. What is still kept, and why, is in
+  [account-deletion-and-data-retention.md](./account-deletion-and-data-retention.md) §3.
 - **There is no way to cancel a pending deletion** in this PR. Because the journal is erased at step 2,
   cancelling after that would not bring it back anyway; whether to offer cancel before step 2, or a
   support-assisted removal of the `account_deletion_requests` row, is a pending decision (§8).

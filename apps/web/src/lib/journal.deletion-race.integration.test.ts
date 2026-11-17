@@ -25,6 +25,13 @@ const enabled =
   !!TEST_URL && TEST_URL.includes('.neon.tech') && !TEST_URL.includes(PRODUCTION_DB_HOST);
 const RUN = `journal-race-${Date.now()}`;
 const ROUNDS = 8;
+/**
+ * Test B does the most work per round: three creates, six edits and saves and a delete, all racing a full
+ * account deletion (which, since PR #54, also erases the member's activity and queues the CRM job). Against a
+ * network database that outgrew the suite's 240 s default (it timed out there on 17 Nov 2026 without
+ * reaching a single assertion). A longer budget changes no assertion and no round count.
+ */
+const B_TIMEOUT_MS = 900_000;
 
 const auth = vi.hoisted(() => ({ id: '', clerkUserId: '' }));
 
@@ -32,6 +39,15 @@ vi.mock('@/lib/auth-api', () => ({
   requireMemberAccess: async () => ({ id: auth.id }),
   requireAuth: async () => ({ id: auth.id, clerkUserId: auth.clerkUserId }),
   memberAccessErrorResponse: () => new Response(null, { status: 401 }),
+}));
+
+vi.mock('@tnsi/integrations', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tnsi/integrations')>()),
+  // Flowi is faked, like Clerk: no network, and "this member has no CRM contact". The CRM step of
+  // account deletion is covered by account-erasure.integration.test.ts.
+  findFlowiContactIdByEmail: async () => null,
+  suppressFlowiContact: async () => false,
+  deleteFlowiContact: async () => false,
 }));
 
 vi.mock('@tnsi/db', async () => {
@@ -236,28 +252,32 @@ describe.skipIf(!enabled)(
     });
 
     // ---------------------------------------------------------------- Test B
-    it('B. edits, saves and deletes racing a deletion: nothing survives', async () => {
-      for (let round = 0; round < ROUNDS; round += 1) {
-        const u = await newUser(`b-${round}`);
-        const ids: string[] = [];
-        for (let i = 0; i < 3; i += 1) {
-          ids.push(
-            (await (await create({ content: `keep ${i}`, status: 'draft' })).json()).data.id,
-          );
+    it(
+      'B. edits, saves and deletes racing a deletion: nothing survives',
+      async () => {
+        for (let round = 0; round < ROUNDS; round += 1) {
+          const u = await newUser(`b-${round}`);
+          const ids: string[] = [];
+          for (let i = 0; i < 3; i += 1) {
+            ids.push(
+              (await (await create({ content: `keep ${i}`, status: 'draft' })).json()).data.id,
+            );
+          }
+          const [responses, result] = await Promise.all([
+            Promise.all([
+              ...ids.map((id) => patch(id, { content: 'edited after deletion began' })),
+              ...ids.map((id) => patch(id, { status: 'saved' })),
+              del(ids[0]!),
+            ]),
+            deleteAccountFor(u),
+          ]);
+          expect(result.status).toBe('deleted');
+          for (const r of responses) expect([200, 404, 423]).toContain(r.status);
+          expect(await countFor(u.id)).toBe(0);
         }
-        const [responses, result] = await Promise.all([
-          Promise.all([
-            ...ids.map((id) => patch(id, { content: 'edited after deletion began' })),
-            ...ids.map((id) => patch(id, { status: 'saved' })),
-            del(ids[0]!),
-          ]),
-          deleteAccountFor(u),
-        ]);
-        expect(result.status).toBe('deleted');
-        for (const r of responses) expect([200, 404, 423]).toContain(r.status);
-        expect(await countFor(u.id)).toBe(0);
-      }
-    });
+      },
+      B_TIMEOUT_MS,
+    );
 
     // ---------------------------------------------------------------- Test C
     it('C. drafts (the autosave path) cannot be created or touched into survival', async () => {
