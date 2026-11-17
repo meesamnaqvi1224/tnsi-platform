@@ -18,6 +18,8 @@ const config: ExpoConfig = {
     bundleIdentifier: 'org.tnsi.mobile',
     buildNumber: '1',
     supportsTablet: false,
+    // The app only uses HTTPS (exempt encryption), so App Store Connect need not ask about export compliance.
+    infoPlist: { ITSAppUsesNonExemptEncryption: false },
   },
   android: {
     package: 'org.tnsi.mobile',
