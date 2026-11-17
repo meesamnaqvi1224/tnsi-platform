@@ -15,8 +15,10 @@ import { CheckInCard } from '@/components/check-in/CheckInCard';
 import { LifeBeyondTraumaCard } from '@/components/home/LifeBeyondTraumaCard';
 import { BookConsultationCard } from '@/components/home/BookConsultationCard';
 import { AssessmentEntryCard } from '@/components/home/AssessmentEntryCard';
+import { ReflectionsEntryCard } from '@/components/reflections/ReflectionsEntryCard';
 import { ResourcesOnWebsiteCard } from '@/components/home/ResourcesOnWebsiteCard';
 import { useToday } from '@/hooks/useToday';
+import { useFeatures } from '@/hooks/useFeatures';
 import { practiceForToday } from '@/lib/check-in-day';
 import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { colors, spacing } from '@/theme';
@@ -31,6 +33,7 @@ import type { CheckIn } from '@/api/types';
 export default function HomeScreen() {
   const { user } = useUser();
   const { state, reload, setCheckIn, refresh } = useToday();
+  const features = useFeatures();
 
   function handleCheckInSubmitted(checkIn: CheckIn) {
     // Instant feedback (CheckInCard's own "recorded" view doesn't wait on
@@ -107,6 +110,8 @@ export default function HomeScreen() {
             />
           </>
         )}
+
+        {features.reflections ? <ReflectionsEntryCard /> : null}
 
         <AssessmentEntryCard />
 

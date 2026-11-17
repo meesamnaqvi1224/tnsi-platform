@@ -13,7 +13,7 @@
 import {
   requireJournalAccess,
   journalAccessErrorResponse,
-  AccountDeletionPendingError,
+  isJournalWriteRefusal,
 } from '@/lib/journal-access';
 import { success, badRequest, notFound, error } from '@/lib/api-response';
 import { privateRoute, safeErrorCode } from '@/lib/private-response';
@@ -81,7 +81,7 @@ export const PATCH = privateRoute(
       result = await updateJournalEntry(user.id, id.data.id, parsed.data);
     } catch (err) {
       // Deletion began after the early check: refused under the journal lock (same 423 as the check).
-      if (err instanceof AccountDeletionPendingError) return journalAccessErrorResponse(err);
+      if (isJournalWriteRefusal(err)) return journalAccessErrorResponse(err);
       // 23514 = check_violation: the database refused the change (the draft-revert backstop, or a
       // limit). Reported as a plain conflict with no detail; the error object is never logged or returned.
       if (safeErrorCode(err) === '23514') {
@@ -119,7 +119,7 @@ export const DELETE = privateRoute(
     try {
       deleted = await deleteJournalEntry(user.id, id.data.id);
     } catch (err) {
-      if (err instanceof AccountDeletionPendingError) return journalAccessErrorResponse(err);
+      if (isJournalWriteRefusal(err)) return journalAccessErrorResponse(err);
       throw err;
     }
     return deleted ? success({ deleted: true }) : notFound('Not found');

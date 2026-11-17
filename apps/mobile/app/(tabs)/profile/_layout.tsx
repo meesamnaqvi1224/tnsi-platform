@@ -28,6 +28,23 @@ export default function ProfileLayout() {
         options={{ title: '', headerStyle: { backgroundColor: '#FFFFFF' } }}
       />
       <Stack.Screen
+        name="reflections"
+        options={{ title: '', headerStyle: { backgroundColor: '#FFFFFF' } }}
+      />
+      {/*
+       * The editor confirms before discarding unsaved writing (see reflection.tsx's `beforeRemove`
+       * listener), so - like the assessment below - it disables iOS's long-press-back menu, which
+       * could pop several screens without that listener seeing a single removal.
+       */}
+      <Stack.Screen
+        name="reflection"
+        options={{
+          title: '',
+          headerStyle: { backgroundColor: '#FFFFFF' },
+          headerBackButtonMenuEnabled: false,
+        }}
+      />
+      <Stack.Screen
         name="membership"
         options={{ title: '', headerStyle: { backgroundColor: '#FFFFFF' } }}
       />

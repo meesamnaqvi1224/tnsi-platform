@@ -7,6 +7,8 @@ import { useCheckInHistory } from '@/hooks/useCheckInHistory';
 import { usePractices } from '@/hooks/usePractices';
 import { PageTitle } from '@/components/PageTitle';
 import { home } from '@/components/home/homeTheme';
+import { REFLECTION_STATES } from '@/lib/reflections-copy';
+import { useFeatures } from '@/hooks/useFeatures';
 import { radius, spacing } from '@/theme';
 
 /**
@@ -22,6 +24,7 @@ import { radius, spacing } from '@/theme';
  */
 export default function ProgressScreen() {
   const router = useRouter();
+  const features = useFeatures();
   const {
     state: checkInsState,
     reload: reloadCheckIns,
@@ -45,6 +48,13 @@ export default function ProgressScreen() {
         state={practicesState}
         onViewMyLearning={() => router.push('/my-learning')}
       />
+      {features.reflections ? (
+        <ReflectionsSection
+          onOpen={() =>
+            router.push({ pathname: '/profile/reflections', params: { from: 'progress' } })
+          }
+        />
+      ) : null}
     </ScreenContainer>
   );
 }
@@ -160,6 +170,32 @@ function PracticeSummarySection({
           />
         </>
       )}
+    </View>
+  );
+}
+
+/**
+ * A way into My Reflections. Deliberately shows nothing about what the member has written - no counts,
+ * dates or previews - and never joins the check-in or practice records above: the journal is a separate,
+ * private space, and fetching it here would let a journal failure or its content touch this screen.
+ */
+function ReflectionsSection({ onOpen }: { onOpen: () => void }) {
+  return (
+    <View style={styles.section}>
+      <View accessibilityRole="header" accessible>
+        <ThemedText variant="heading" color={home.navy} style={styles.sectionTitle}>
+          {REFLECTION_STATES.progressTitle}
+        </ThemedText>
+      </View>
+      <ThemedText variant="body" color={home.ink} style={styles.emptyTitle}>
+        {REFLECTION_STATES.progressBody}
+      </ThemedText>
+      <PrimaryButton
+        label={REFLECTION_STATES.progressButton}
+        variant="secondary"
+        onPress={onOpen}
+        style={styles.myLearningButton}
+      />
     </View>
   );
 }

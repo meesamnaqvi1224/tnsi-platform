@@ -18,7 +18,7 @@
 import {
   requireJournalAccess,
   journalAccessErrorResponse,
-  AccountDeletionPendingError,
+  isJournalWriteRefusal,
 } from '@/lib/journal-access';
 import { success, badRequest, notFound, error } from '@/lib/api-response';
 import { privateRoute } from '@/lib/private-response';
@@ -86,7 +86,7 @@ export const POST = privateRoute('journal create', async (request: Request) => {
     result = await createJournalEntry(user.id, parsed.data);
   } catch (err) {
     // Deletion began after the early check above: the write itself is refused under the journal lock.
-    if (err instanceof AccountDeletionPendingError) return journalAccessErrorResponse(err);
+    if (isJournalWriteRefusal(err)) return journalAccessErrorResponse(err);
     throw err;
   }
   switch (result.kind) {

@@ -1,3 +1,4 @@
+import { JOURNAL_CONSENT_VERSION } from '@tnsi/core';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 /**
@@ -87,6 +88,11 @@ async function newUser(label: string) {
     .values({ clerkUserId: `${RUN}-${label}`, email: `${RUN}-${label}@example.test` })
     .returning();
   userIds.push(row!.id);
+  // These suites test the journal, not the first-use acknowledgement (journal-consent.integration.test.ts
+  // does), so every member they create has already acknowledged the current notice.
+  await m.db
+    .insert(m.s.journalConsents)
+    .values({ userId: row!.id, policyVersion: JOURNAL_CONSENT_VERSION });
   auth.id = row!.id;
   auth.clerkUserId = row!.clerkUserId;
   return row!;

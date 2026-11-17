@@ -5,3 +5,4 @@ export * from './assessment/prepare-submission';
 export * from './practices/recommendation';
 export * from './return-path/geometry';
 export * from './return-path/constants';
+export * from './reflections';

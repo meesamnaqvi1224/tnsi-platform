@@ -10,6 +10,7 @@ import {
   BookOpen,
   Calendar,
   Compass,
+  Feather,
   FileText,
   GraduationCap,
   HelpCircle,
@@ -56,6 +57,7 @@ const navItems: NavItem[] = [
   { label: 'My Learning', icon: BookOpen },
   { label: 'Practices', icon: Sparkles, href: '/dashboard/practices' },
   { label: 'My Journey', icon: Compass, href: '/dashboard/journey' },
+  { label: 'My Reflections', icon: Feather, href: '/dashboard/reflections' },
   { label: 'Somatic Cards', icon: Layers, href: '/dashboard/somatic-cards' },
   { label: 'Membership', icon: BadgeCheck, href: '/dashboard/billing' },
   { label: 'Programs', icon: GraduationCap },
@@ -65,6 +67,13 @@ const navItems: NavItem[] = [
   { label: 'Live Events', icon: Calendar },
   { label: 'Certification', icon: Award },
 ];
+
+/** The nav without My Reflections unless the feature is switched on (fail closed: default is hidden). */
+function visibleNavItems(reflectionsEnabled: boolean): NavItem[] {
+  return reflectionsEnabled
+    ? navItems
+    : navItems.filter((item) => item.href !== '/dashboard/reflections');
+}
 
 function isActive(pathname: string, href: string): boolean {
   if (href === '/dashboard') return pathname === '/dashboard';
@@ -148,8 +157,9 @@ function FooterLinks() {
 }
 
 /** Persistent left sidebar for large screens. */
-export function DashboardSidebar() {
+export function DashboardSidebar({ reflectionsEnabled = false }: { reflectionsEnabled?: boolean }) {
   const pathname = usePathname();
+  const items = visibleNavItems(reflectionsEnabled);
 
   return (
     <aside className="dark bg-background text-foreground border-border hidden h-full w-64 shrink-0 flex-col border-r lg:flex">
@@ -168,7 +178,7 @@ export function DashboardSidebar() {
 
       <nav aria-label="Academy" className="flex-1 overflow-y-auto px-3 py-4">
         <Stack gap="3xs">
-          {navItems.map((item) =>
+          {items.map((item) =>
             item.href ? (
               <NextLink
                 key={item.label}
@@ -196,8 +206,13 @@ export function DashboardSidebar() {
 }
 
 /** Hamburger + drawer equivalent for small screens, rendered in the topbar. */
-export function DashboardMobileNav() {
+export function DashboardMobileNav({
+  reflectionsEnabled = false,
+}: {
+  reflectionsEnabled?: boolean;
+}) {
   const pathname = usePathname();
+  const items = visibleNavItems(reflectionsEnabled);
 
   return (
     <DrawerRoot>
@@ -214,7 +229,7 @@ export function DashboardMobileNav() {
       <DrawerContent title="Academy" side="left">
         <nav aria-label="Academy">
           <Stack gap="3xs">
-            {navItems.map((item) =>
+            {items.map((item) =>
               item.href ? (
                 <DrawerClose
                   key={item.label}

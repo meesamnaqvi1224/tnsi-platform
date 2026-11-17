@@ -13,6 +13,7 @@ import { and, desc, eq, sql } from 'drizzle-orm';
 import { paginateRows } from './practice-sessions';
 import { buildPreview } from './journal-preview';
 import { lockJournalShared, assertJournalWritable, type Tx } from './deletion-state';
+import { assertJournalConsent } from './journal-consent';
 import type { JournalEntryCreateInput, JournalEntryUpdateInput } from './validation';
 
 type JournalRow = typeof journalEntries.$inferSelect;
@@ -61,10 +62,16 @@ export interface JournalEntryListItem {
  * deletion takes the same lock exclusively (deletion-state.ts), so no write can commit after deletion's
  * barrier. Throws AccountDeletionPendingError (the routes answer 423). Nothing here logs or returns text.
  */
-async function withJournalWrite<T>(userId: string, fn: (tx: Tx) => Promise<T>): Promise<T> {
+async function withJournalWrite<T>(
+  userId: string,
+  fn: (tx: Tx) => Promise<T>,
+  /** Creating or changing a reflection needs the first-use acknowledgement; deleting one never does. */
+  { requireConsent = true }: { requireConsent?: boolean } = {},
+): Promise<T> {
   return db.transaction(async (tx) => {
     await lockJournalShared(tx, userId);
     await assertJournalWritable(tx, userId);
+    if (requireConsent) await assertJournalConsent(tx, userId);
     return fn(tx);
   });
 }
@@ -271,13 +278,18 @@ async function updateInTransaction(
 
 /** Deletes one of the member's own entries. False when there is no such entry for them. */
 export async function deleteJournalEntry(userId: string, id: string): Promise<boolean> {
-  return withJournalWrite(userId, async (tx) => {
-    const deleted = await tx
-      .delete(journalEntries)
-      .where(and(eq(journalEntries.id, id), eq(journalEntries.userId, userId)))
-      .returning({ id: journalEntries.id });
-    return deleted.length > 0;
-  });
+  return withJournalWrite(
+    userId,
+    async (tx) => {
+      const deleted = await tx
+        .delete(journalEntries)
+        .where(and(eq(journalEntries.id, id), eq(journalEntries.userId, userId)))
+        .returning({ id: journalEntries.id });
+      return deleted.length > 0;
+    },
+    // Deleting your own writing is always allowed, with or without the acknowledgement.
+    { requireConsent: false },
+  );
 }
 
 /**
