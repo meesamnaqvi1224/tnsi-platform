@@ -263,7 +263,7 @@ describe('private pages are never reported (My Reflections)', () => {
     expect(env.pageViews()).toHaveLength(1);
   });
 
-  it('keeps GA's per-property switch on for a private page, so GA drops events too', () => {
+  it('keeps the per-property switch on for a private page, so events are dropped too', () => {
     const env = makeEnv();
     const controller = createAnalyticsController(env.deps);
     controller.hydrate('/dashboard/reflections');
