@@ -311,6 +311,39 @@ describe('Flowi account-deletion calls (fake fetch)', () => {
     expect(init.body).toBeUndefined();
   });
 
+  it('LIVE-OBSERVED: a contact that is already gone is answered 400 "Contact not found", which is also the outcome wanted', async () => {
+    const notFound = {
+      ok: false,
+      status: 400,
+      json: async () => ({
+        message: 'Contact not found for id:RBl8jkZvT0TEpunTaivL',
+        error: 'Bad Request',
+        statusCode: 400,
+      }),
+    };
+    fetchMock.mockResolvedValue(notFound);
+    expect(await suppressFlowiContact('c9')).toBe(false);
+    expect(await deleteFlowiContact('c9')).toBe(false);
+  });
+
+  it('any OTHER 400 is still a failure (a different message, or a body that cannot be read), so it is retried or left visible', async () => {
+    fetchMock.mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: async () => ({ message: 'Invalid request', statusCode: 400 }),
+    });
+    await expect(deleteFlowiContact('c9')).rejects.toMatchObject({ status: 400 });
+    await expect(suppressFlowiContact('c9')).rejects.toMatchObject({ status: 400 });
+    fetchMock.mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: async () => {
+        throw new Error('not json');
+      },
+    });
+    await expect(deleteFlowiContact('c9')).rejects.toMatchObject({ status: 400 });
+  });
+
   it('suppress and delete: a contact that is already gone (404) is the outcome wanted, not a failure', async () => {
     fetchMock.mockResolvedValue(status(404));
     expect(await suppressFlowiContact('c9')).toBe(false);

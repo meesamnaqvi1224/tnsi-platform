@@ -245,8 +245,10 @@ export async function addFlowiContactTags(
  * ACCOUNT DELETION SUPPORT (lookup, marketing suppression, contact deletion).
  *
  * STATUS: written from GoHighLevel's published API (same base URL, `Version` header and
- * bearer credential as the calls above). Unlike `/contacts/upsert`, these three calls have
- * NOT yet been exercised against the TNSI Flowi account. They must be verified against a
+ * bearer credential as the calls above). A live run on 17 Nov 2026 (flowi.live-check.test.ts) confirmed
+ * the lookup, the do-not-disturb update (read back as `dnd: true`) and the first delete, and found that
+ * a repeat delete answers 400 "Contact not found" rather than 404 (see `contactIsMissing`). The
+ * suppression of a contact that no longer exists has NOT been exercised live. They must be verified against a
  * test contact (and the credential's scopes confirmed: `contacts.readonly` for the lookup,
  * `contacts.write` for the other two) before account deletion is released. See
  * docs/account-deletion-and-data-retention.md.
@@ -295,6 +297,24 @@ export async function findFlowiContactIdByEmail(
 }
 
 /**
+ * True when Flowi is saying "that contact does not exist". LIVE-VERIFIED on the real account (17 Nov 2026):
+ * a repeat DELETE of an already-deleted contact answers `400 {"message":"Contact not found for id:..."}`,
+ * NOT 404 as the unit tests' fake Flowi first assumed. Both mean the same thing here - there is nothing
+ * left to act on - and treating the 400 as a failure would leave a retried deletion `failed` for a
+ * contact that is already gone. Any other 400 (different message, unreadable body) is still a failure.
+ */
+async function contactIsMissing(response: Response): Promise<boolean> {
+  if (response.status === 404) return true;
+  if (response.status !== 400) return false;
+  try {
+    const body = (await response.json()) as { message?: unknown };
+    return typeof body.message === 'string' && /contact not found/i.test(body.message);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Turns on "do not disturb" for every channel on an existing contact
  * (`PUT /contacts/{contactId}`, body `{ dnd: true }`), which stops Flowi's marketing
  * messages and automations from contacting them. Resolves false when the contact no
@@ -312,7 +332,7 @@ export async function suppressFlowiContact(
     body: JSON.stringify({ dnd: true }),
     signal: AbortSignal.timeout(toRequestTimeoutMs(options.timeoutMs)),
   });
-  if (response.status === 404) return false;
+  if (await contactIsMissing(response)) return false;
   if (!response.ok) {
     throw new FlowiRequestError(
       `Flowi suppression request failed with status ${response.status}`,
@@ -337,7 +357,7 @@ export async function deleteFlowiContact(
     headers: flowiHeaders(apiKey, false),
     signal: AbortSignal.timeout(toRequestTimeoutMs(options.timeoutMs)),
   });
-  if (response.status === 404) return false;
+  if (await contactIsMissing(response)) return false;
   if (!response.ok) {
     throw new FlowiRequestError(
       `Flowi delete request failed with status ${response.status}`,

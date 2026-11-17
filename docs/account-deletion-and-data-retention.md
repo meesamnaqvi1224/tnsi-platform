@@ -141,11 +141,22 @@ legal decision (§9); implementing one is a follow-up.
 
 ### What is NOT verified, and manual requirements
 
-1. **The three Flowi calls have not been run against the TNSI account.** They follow GoHighLevel's
-   published API (`GET /contacts/search/duplicate`, `PUT /contacts/{id}` with `dnd: true`,
-   `DELETE /contacts/{id}`). Before release: run them once against a **test contact**, confirm the
-   credential has `contacts.readonly` and `contacts.write`, and confirm that `dnd: true` really stops the
-   automations and campaigns Caroline uses. Nothing in this PR called the real CRM.
+1. **The three Flowi calls were run LIVE once, on 17 Nov 2026**, with `flowi.live-check.test.ts` (gated;
+   see the file for how to run it). It created one synthetic contact on `example.com` with no tags and
+   removed it again. **Verified against the real account:** the lookup finds the contact by email (and
+   returns nothing for an unknown address and after deletion); `PUT /contacts/{id}` with `dnd: true` turns
+   do-not-disturb on (read back as `dnd: true`) and repeating it is harmless; `DELETE /contacts/{id}`
+   removes it; suppressing a contact that no longer exists does not recreate it; and the API token worked
+   with contacts read and write permissions. **A defect was found and fixed:** a repeat delete of an
+   already-deleted contact answers `400 {"message":"Contact not found for id:..."}`, not `404`, so the
+   first version of the client would have recorded a retried deletion as a permanent failure. It now
+   treats that exact response as "already gone" (any other 400 is still a failure). Two synthetic contacts
+   were created and removed in total (the first run found the defect), both verified gone.
+   **Not verified:** that `dnd: true` actually stops the campaigns and automations Caroline uses (needs a
+   contact enrolled in one); and whether the run created the contact in the live location or a test
+   location (the check used the credential in the owner's private file; the contact was visible to the
+   Flowi connector attached to the live account). A new contact can fire that location's "contact
+   created" automations; the owner should check Flowi for anything triggered by "TNSI deletion check".
 2. **"Deleted" in Flowi is not verified to be permanent.** Whether Flowi keeps a deleted contact in a
    recycle bin, in conversation history, in opportunity records or in its own backups is a provider
    question (**NOT VERIFIED, LEGAL**).
@@ -340,7 +351,9 @@ This procedure has not been rehearsed. A rehearsal on an isolated project is rec
   erasure, overlapping deletions and webhooks, journal writers racing a full deletion.
 - `apps/web/src/lib/account-deletion.test.ts`: step order, each failure stage, `pending_cleanup` when the
   CRM has not confirmed, logging.
-- `packages/integrations/src/flowi.test.ts`: the three CRM calls (request shape, 404 handling, failures,
-  never an upsert).
+- `packages/integrations/src/flowi.test.ts`: the three CRM calls (request shape, 404 and the live-observed
+  400 "Contact not found" handling, other failures, never an upsert).
+- `packages/integrations/src/flowi.live-check.test.ts`: the gated LIVE check of the three calls against a
+  real Flowi account (skipped unless `FLOWI_LIVE_CHECK=yes` and credentials are set).
 - `apps/web/src/app/api/webhooks/clerk/route.test.ts`: the follow-up send after `user.deleted`.
 - Existing journal, concurrency and deletion-race suites (unchanged assertions; the CRM is faked in them).
