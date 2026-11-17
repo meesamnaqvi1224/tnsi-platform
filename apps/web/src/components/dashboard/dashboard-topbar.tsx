@@ -5,14 +5,15 @@ import { DashboardMobileNav } from '@/components/dashboard/dashboard-sidebar';
 
 export interface DashboardTopbarProps {
   firstName: string | null;
+  reflectionsEnabled?: boolean;
 }
 
-export function DashboardTopbar({ firstName }: DashboardTopbarProps) {
+export function DashboardTopbar({ firstName, reflectionsEnabled = false }: DashboardTopbarProps) {
   return (
     <div className="border-border bg-background border-b">
       <Container size="xl" className="flex h-14 items-center justify-between gap-3">
         <Stack direction="row" align="center" gap="sm" className="min-w-0">
-          <DashboardMobileNav />
+          <DashboardMobileNav reflectionsEnabled={reflectionsEnabled} />
           <Text size="sm" tone="muted" className="truncate tracking-[0.05em] uppercase">
             {firstName ? `Welcome back, ${firstName}` : 'Welcome back'}
           </Text>

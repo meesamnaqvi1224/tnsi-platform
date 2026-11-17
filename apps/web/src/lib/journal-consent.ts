@@ -86,7 +86,10 @@ export async function recordJournalConsent(
 }
 
 /** Withdraws permission to write. Idempotent; keeps the first withdrawal time. Existing reflections are not touched. */
-export async function withdrawJournalConsent(userId: string): Promise<JournalConsentState> {
+export async function withdrawJournalConsent(
+  userId: string,
+  { deleteEntries = false }: { deleteEntries?: boolean } = {},
+): Promise<JournalConsentState & { deletedEntries?: number }> {
   return db.transaction(async (tx) => {
     await lockJournalShared(tx, userId);
     await assertJournalWritable(tx, userId);
@@ -94,6 +97,17 @@ export async function withdrawJournalConsent(userId: string): Promise<JournalCon
       .update(journalConsents)
       .set({ withdrawnAt: sql`coalesce(${journalConsents.withdrawnAt}, now())` })
       .where(eq(journalConsents.userId, userId));
-    return getJournalConsent(userId, tx);
+    // The member's choice at withdrawal: also delete every reflection and draft they have. Same
+    // transaction as the withdrawal, so it is all-or-nothing and no write can slip in between (the shared
+    // lock is held). Deleting never needs the acknowledgement. Nothing here reads or returns text.
+    let deletedEntries: number | undefined;
+    if (deleteEntries) {
+      // journal.ts is the ONLY module that touches the entries table (journal-independence.test.ts), so
+      // the deletion is delegated to it. Imported here, at call time, because journal.ts imports this file.
+      const { purgeJournalEntries } = await import('./journal');
+      deletedEntries = await purgeJournalEntries(tx, userId);
+    }
+    const state = await getJournalConsent(userId, tx);
+    return deleteEntries ? { ...state, deletedEntries } : state;
   });
 }

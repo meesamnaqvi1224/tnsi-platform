@@ -55,9 +55,15 @@ export const JOURNAL_CONSENT_COPY = {
     button: 'Withdraw permission',
     confirmTitle: 'Withdraw permission?',
     confirmMessage:
-      'You won’t be able to write new reflections or change existing ones. Your existing reflections stay in your account until you delete them. You can agree again at any time.',
+      'You won’t be able to write new reflections or change existing ones. You can keep your existing reflections (you can still read and delete them) or delete them all now. You can agree again at any time.',
     confirmButton: 'Withdraw',
     cancelButton: 'Cancel',
+    /** The choice offered at withdrawal (counsel to confirm). Keeping is the default; deleting is deliberate. */
+    keepButton: 'Withdraw and keep my reflections',
+    deleteButton: 'Withdraw and delete all my reflections',
+    deleteWarning:
+      'This permanently deletes every reflection and draft you have written. It can’t be undone.',
+    deleteDone: 'Permission withdrawn and all your reflections deleted.',
     done: 'Permission withdrawn. You can agree again whenever you like.',
     failed: 'We couldn’t withdraw permission just now. Please try again.',
   },

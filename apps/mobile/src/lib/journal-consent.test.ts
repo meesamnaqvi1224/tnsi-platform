@@ -19,10 +19,14 @@ describe('first-use acknowledgement in the app', () => {
     expect(JOURNAL_CONSENT_COPY.points.length).toBeGreaterThanOrEqual(4);
   });
 
-  it('withdrawal asks before it acts and says nothing is deleted', () => {
+  it('withdrawal asks before it acts, offers keep (default) or delete-all, and warns that deleting cannot be undone', () => {
     const w = JOURNAL_CONSENT_COPY.withdraw;
     expect(w.confirmTitle).toBeTruthy();
-    expect(w.confirmMessage).toMatch(/stay in your account/);
+    expect(w.confirmMessage).toMatch(/keep your existing reflections/);
+    expect(w.confirmMessage).toMatch(/delete them all/);
+    expect(w.keepButton).toMatch(/keep/i);
+    expect(w.deleteButton).toMatch(/delete all/i);
+    expect(w.deleteWarning).toMatch(/can’t be undone/);
     expect(w.cancelButton).toBe('Cancel');
   });
 

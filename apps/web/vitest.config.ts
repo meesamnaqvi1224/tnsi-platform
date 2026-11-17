@@ -16,6 +16,9 @@ export default defineConfig({
   css: { postcss: { plugins: [] } },
   test: {
     environment: 'node',
+    // My Reflections is OFF unless MY_REFLECTIONS_ENABLED=true (src/lib/reflections-flag.ts). The suite runs
+    // with it ON so the feature's own tests exercise the feature; tests of the OFF state set it explicitly.
+    env: { MY_REFLECTIONS_ENABLED: 'true' },
     // `validation.ts` imports `@tnsi/integrations`, which transitively
     // imports the Next.js-only `server-only` marker package (it has no
     // real exports - Next's own bundler is what enforces its "server

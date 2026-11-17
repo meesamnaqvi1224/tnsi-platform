@@ -6,7 +6,9 @@
  *                                  version. A version other than the current one is refused (409), so
  *                                  nobody is recorded as agreeing to wording they were not shown.
  * DELETE /api/v1/journal/consent   withdraws permission to write. Existing reflections are untouched;
- *                                  the member can still read and delete them.
+ *                                  the member can still read and delete them. With ?entries=delete the
+ *                                  member ALSO chooses to delete every reflection and draft, in the same
+ *                                  transaction (all-or-nothing).
  *
  * Same access rule and privacy rules as the journal itself: a signed-in member whose deletion is not
  * pending (423 otherwise), private/no-store responses, nothing logged. The wording and legal basis are
@@ -67,7 +69,7 @@ export const POST = privateRoute('journal consent record', async (request: Reque
   }
 });
 
-export const DELETE = privateRoute('journal consent withdraw', async () => {
+export const DELETE = privateRoute('journal consent withdraw', async (request: Request) => {
   let user;
   try {
     user = await requireJournalAccess();
@@ -75,7 +77,8 @@ export const DELETE = privateRoute('journal consent withdraw', async () => {
     return journalAccessErrorResponse(err);
   }
   try {
-    return success(await withdrawJournalConsent(user.id));
+    const deleteEntries = new URL(request.url).searchParams.get('entries') === 'delete';
+    return success(await withdrawJournalConsent(user.id, { deleteEntries }));
   } catch (err) {
     if (err instanceof AccountDeletionPendingError) return journalAccessErrorResponse(err);
     throw err;

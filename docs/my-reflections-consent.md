@@ -44,6 +44,25 @@ basis, and makes no claim about encryption, who at TNSI can access data, or wher
 5. Whether a minimum age applies and how it is checked. Not decided and not invented here.
 6. Where the notice must also appear (for example next to the privacy policy link).
 
+## The release switch and the withdraw-and-delete choice
+
+**Switch (`MY_REFLECTIONS_ENABLED`).** My Reflections is OFF unless the server environment variable is
+exactly `true` (`apps/web/src/lib/reflections-flag.ts`). Merging the code therefore exposes nothing. When
+OFF: every journal and consent API route answers 404, the three pages 404, the sidebar link and the
+dashboard invitation are not rendered, and `GET /api/v1/features` reports `reflections: false` so the
+mobile app hides its entry points (it fails closed if the answer cannot be read). Account deletion is not
+affected; it erases journals regardless. To turn it on after counsel signs off: set the variable to `true`
+in the Vercel Production environment and redeploy. To turn it off again, remove it or set it to anything
+else and redeploy. Turning it off does not delete anyone's reflections; they are simply unreachable until
+it is turned on again. The test suite runs with it ON (`apps/web/vitest.config.ts`).
+
+**Withdraw and delete.** Withdrawing now offers a choice: keep the existing reflections (default) or delete
+them all, the latter behind a second explicit confirmation on web and mobile. API:
+`DELETE /api/v1/journal/consent` withdraws and keeps; `DELETE /api/v1/journal/consent?entries=delete`
+withdraws and deletes every reflection and draft in the same transaction (all-or-nothing, under the shared
+journal lock), returning `deletedEntries`. Only the exact value `delete` deletes anything. Wording is
+PROPOSED and unapproved; counsel confirms.
+
 ## Release steps and consequences
 
 - **Do not enable My Reflections for members until legal has approved this**, per Q1.

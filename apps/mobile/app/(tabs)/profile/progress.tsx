@@ -8,6 +8,7 @@ import { usePractices } from '@/hooks/usePractices';
 import { PageTitle } from '@/components/PageTitle';
 import { home } from '@/components/home/homeTheme';
 import { REFLECTION_STATES } from '@/lib/reflections-copy';
+import { useFeatures } from '@/hooks/useFeatures';
 import { radius, spacing } from '@/theme';
 
 /**
@@ -23,6 +24,7 @@ import { radius, spacing } from '@/theme';
  */
 export default function ProgressScreen() {
   const router = useRouter();
+  const features = useFeatures();
   const {
     state: checkInsState,
     reload: reloadCheckIns,
@@ -46,11 +48,13 @@ export default function ProgressScreen() {
         state={practicesState}
         onViewMyLearning={() => router.push('/my-learning')}
       />
-      <ReflectionsSection
-        onOpen={() =>
-          router.push({ pathname: '/profile/reflections', params: { from: 'progress' } })
-        }
-      />
+      {features.reflections ? (
+        <ReflectionsSection
+          onOpen={() =>
+            router.push({ pathname: '/profile/reflections', params: { from: 'progress' } })
+          }
+        />
+      ) : null}
     </ScreenContainer>
   );
 }

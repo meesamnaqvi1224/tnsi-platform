@@ -24,6 +24,7 @@ import {
 } from '@tnsi/ui';
 import { CheckInForm } from '@/components/dashboard/check-in-form';
 import { ReflectionsInvitation } from '@/components/dashboard/reflections/reflections-invitation';
+import { isReflectionsEnabled } from '@/lib/reflections-flag';
 import {
   PracticeArt,
   StatTile,
@@ -575,7 +576,7 @@ export default async function DashboardPage() {
                   </div>
                 </Stack>
 
-                <ReflectionsInvitation />
+                {isReflectionsEnabled() ? <ReflectionsInvitation /> : null}
 
                 <WeekAtAGlance recentCheckIns={checkInHistory.checkIns} />
 

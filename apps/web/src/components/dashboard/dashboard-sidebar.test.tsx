@@ -18,10 +18,16 @@ vi.mock('@clerk/nextjs', () => ({
 const { DashboardSidebar } = await import('./dashboard-sidebar');
 
 describe('DashboardSidebar', () => {
-  it('links to My Reflections and does not mark it "Soon"', () => {
-    const html = renderToStaticMarkup(<DashboardSidebar />);
+  it('links to My Reflections (when the feature is switched on) and does not mark it "Soon"', () => {
+    const html = renderToStaticMarkup(<DashboardSidebar reflectionsEnabled />);
     expect(html).toContain('href="/dashboard/reflections"');
     expect(html).toContain('My Reflections');
+  });
+
+  it('hides My Reflections entirely when the feature is switched off (the default)', () => {
+    const html = renderToStaticMarkup(<DashboardSidebar />);
+    expect(html).not.toContain('/dashboard/reflections');
+    expect(html).not.toContain('My Reflections');
   });
 
   it('renders a Somatic Cards navigation item', () => {
