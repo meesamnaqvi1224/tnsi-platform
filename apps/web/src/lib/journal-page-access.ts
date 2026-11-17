@@ -1,9 +1,10 @@
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import {
   AccountDeletionPendingError,
   DeletionStateUnavailableError,
   requireJournalAccess,
 } from '@/lib/journal-access';
+import { ReflectionsDisabledError } from '@/lib/reflections-flag';
 
 /**
  * The same access rule the journal API applies (a signed-in member whose account deletion is not
@@ -18,6 +19,7 @@ export async function getJournalPageAccess(): Promise<
     const user = await requireJournalAccess();
     return { state: 'ok', userId: user.id };
   } catch (error) {
+    if (error instanceof ReflectionsDisabledError) notFound();
     if (error instanceof AccountDeletionPendingError) return { state: 'locked' };
     if (error instanceof DeletionStateUnavailableError) return { state: 'unavailable' };
     if (error instanceof Error && error.message === 'UNAUTHENTICATED') redirect('/sign-in');

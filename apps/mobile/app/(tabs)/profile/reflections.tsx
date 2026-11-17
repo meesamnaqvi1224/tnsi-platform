@@ -93,19 +93,29 @@ export default function ReflectionsScreen() {
 
   const openNew = () => router.push('/profile/reflection');
 
-  // Withdrawing permission (decision Q1): asks first, then stops writing; nothing is deleted.
+  // Withdrawing permission (decision Q1): asks first, and the member chooses whether to keep their
+  // reflections (default) or delete them all (a second, explicit confirmation: it cannot be undone).
+  const finishWithdraw = (deleteEntries: boolean) =>
+    void consent.withdraw(deleteEntries).then((ok) => {
+      if (ok) {
+        setNotice(deleteEntries ? consent.copy.withdraw.deleteDone : consent.copy.withdraw.done);
+        if (deleteEntries) refreshAll.current();
+      } else Alert.alert(consent.copy.withdraw.failed);
+    });
+  const confirmDeleteAll = () =>
+    Alert.alert(consent.copy.withdraw.deleteButton + '?', consent.copy.withdraw.deleteWarning, [
+      { text: consent.copy.withdraw.cancelButton, style: 'cancel' },
+      {
+        text: consent.copy.withdraw.deleteButton,
+        style: 'destructive',
+        onPress: () => finishWithdraw(true),
+      },
+    ]);
   const confirmWithdraw = () =>
     Alert.alert(consent.copy.withdraw.confirmTitle, consent.copy.withdraw.confirmMessage, [
       { text: consent.copy.withdraw.cancelButton, style: 'cancel' },
-      {
-        text: consent.copy.withdraw.confirmButton,
-        style: 'destructive',
-        onPress: () =>
-          void consent.withdraw().then((ok) => {
-            if (ok) setNotice(consent.copy.withdraw.done);
-            else Alert.alert(consent.copy.withdraw.failed);
-          }),
-      },
+      { text: consent.copy.withdraw.keepButton, onPress: () => finishWithdraw(false) },
+      { text: consent.copy.withdraw.deleteButton, style: 'destructive', onPress: confirmDeleteAll },
     ]);
   const openEntry = (id: string) =>
     router.push({ pathname: '/profile/reflection', params: { id } });

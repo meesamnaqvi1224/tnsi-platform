@@ -13,8 +13,9 @@ export type JournalConsentView =
  * JOURNAL_CONSENT_REQUIRED), so this hook only decides what to SHOW. If the state cannot be read the view
  * is `unknown`, and the screens carry on as before - a save the server refuses reports why.
  *
- * `agree` records the notice version the member was shown; `withdraw` stops writing (existing
- * reflections stay and can still be read and deleted). Both return whether they worked. Nothing is
+ * `agree` records the notice version the member was shown; `withdraw` stops writing; with
+ * `deleteEntries` it also deletes every reflection (the member's explicit choice). Otherwise existing
+ * reflections stay and can still be read and deleted. Both return whether they worked. Nothing is
  * stored on the device.
  */
 export function useJournalConsent() {
@@ -53,10 +54,12 @@ export function useJournalConsent() {
     }
   }
 
-  async function withdraw(): Promise<boolean> {
+  async function withdraw(deleteEntries = false): Promise<boolean> {
     setBusy(true);
     try {
-      const state = await api.delete<JournalConsentState>('/api/v1/journal/consent');
+      const state = await api.delete<JournalConsentState>(
+        deleteEntries ? '/api/v1/journal/consent?entries=delete' : '/api/v1/journal/consent',
+      );
       setView({ status: state.status, version: state.version });
       return true;
     } catch {

@@ -85,7 +85,8 @@ const get = (id: string) => m.single.GET(json('GET'), params(id));
 const list = () => m.collection.GET(new Request('http://x/api/v1/journal/entries'));
 const consentGet = () => m.consentRoute.GET();
 const consentPost = (body: unknown) => m.consentRoute.POST(json('POST', body));
-const consentDelete = () => m.consentRoute.DELETE();
+const consentDelete = (qs = '') =>
+  m.consentRoute.DELETE(new Request(`http://x/api/v1/journal/consent${qs}`, { method: 'DELETE' }));
 const rows = async (userId: string) =>
   m.db.select().from(m.s.journalEntries).where(m.d.eq(m.s.journalEntries.userId, userId));
 const consentRows = async (userId: string) =>
@@ -214,6 +215,46 @@ describe.skipIf(!enabled)(
       await consentDelete();
       expect((await del(entry.id)).status).toBe(200);
       expect(await rows(u.id)).toEqual([]);
+    });
+
+    it('withdrawing WITH the delete choice removes every reflection and draft of that member only, atomically, and still stops writing', async () => {
+      const a = await newUser('wd-a');
+      await grant();
+      await create({ content: `saved ${SECRET}`, status: 'saved' });
+      await create({ content: `draft ${SECRET}`, status: 'draft' });
+      const b = await newUser('wd-b');
+      await grant();
+      await create({ content: `b ${SECRET}`, status: 'saved' });
+
+      auth.id = a.id;
+      auth.clerkUserId = a.clerkUserId;
+      expect(await rows(a.id)).toHaveLength(2);
+      const res = await consentDelete('?entries=delete');
+      expect(res.status).toBe(200);
+      const body = (await res.json()).data;
+      expect(body.status).toBe('withdrawn');
+      expect(body.deletedEntries).toBe(2);
+      expect(await rows(a.id)).toEqual([]);
+      expect((await consentRows(a.id))[0]!.withdrawnAt).toBeInstanceOf(Date);
+      // Another member's writing is untouched.
+      expect(await rows(b.id)).toHaveLength(1);
+      // Writing is stopped, and repeating the call is harmless (zero rows).
+      expect((await create({ content: 'new', status: 'saved' })).status).toBe(403);
+      const again = await consentDelete('?entries=delete');
+      expect(again.status).toBe(200);
+      expect((await again.json()).data.deletedEntries).toBe(0);
+    });
+
+    it('withdrawing WITHOUT the delete choice deletes nothing, whatever other query text is sent', async () => {
+      const u = await newUser('wd-keep');
+      await grant();
+      await create({ content: `keep ${SECRET}`, status: 'saved' });
+      for (const qs of ['', '?entries=keep', '?entries=', '?all=true']) {
+        const res = await consentDelete(qs);
+        expect(res.status).toBe(200);
+        expect((await res.json()).data.deletedEntries).toBeUndefined();
+      }
+      expect(await rows(u.id)).toHaveLength(1);
     });
 
     it('withdrawing with nothing recorded is harmless, and records nothing', async () => {

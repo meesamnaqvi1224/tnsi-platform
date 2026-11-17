@@ -29,6 +29,7 @@ vi.mock('@/lib/journal-consent', () => ({
 const { GET, POST, DELETE } = await import('./route');
 
 const NO_STORE = 'private, no-store, max-age=0';
+const del = (qs = '') => new Request(`http://x/api/v1/journal/consent${qs}`, { method: 'DELETE' });
 const post = (body: unknown) =>
   new Request('http://x', {
     method: 'POST',
@@ -82,17 +83,37 @@ describe('/api/v1/journal/consent', () => {
   );
 
   it('DELETE withdraws for the authenticated member', async () => {
-    const res = await DELETE();
+    const res = await DELETE(del());
     expect(res.status).toBe(200);
-    expect(state.withdraw).toHaveBeenCalledWith('user-1');
+    expect(state.withdraw).toHaveBeenCalledWith('user-1', { deleteEntries: false });
     expect((await res.json()).data.status).toBe('withdrawn');
   });
+
+  it('DELETE ?entries=delete passes the member’s choice to delete every reflection, and nothing else', async () => {
+    state.withdraw.mockResolvedValueOnce({
+      status: 'withdrawn',
+      version: JOURNAL_CONSENT_VERSION,
+      deletedEntries: 3,
+    });
+    const res = await DELETE(del('?entries=delete'));
+    expect(res.status).toBe(200);
+    expect(state.withdraw).toHaveBeenCalledWith('user-1', { deleteEntries: true });
+    expect((await res.json()).data.deletedEntries).toBe(3);
+  });
+
+  it.each(['?entries=keep', '?entries=', '?entries=DELETE', '?all=true'])(
+    'DELETE %s does NOT delete reflections (only the exact choice does)',
+    async (qs) => {
+      await DELETE(del(qs));
+      expect(state.withdraw).toHaveBeenCalledWith('user-1', { deleteEntries: false });
+    },
+  );
 
   it('a member whose account deletion is pending gets 423 from all three, and nothing is touched', async () => {
     state.access = 'pending';
     expect((await GET()).status).toBe(423);
     expect((await POST(post({ version: JOURNAL_CONSENT_VERSION }))).status).toBe(423);
-    expect((await DELETE()).status).toBe(423);
+    expect((await DELETE(del())).status).toBe(423);
     expect(state.get).not.toHaveBeenCalled();
     expect(state.record).not.toHaveBeenCalled();
     expect(state.withdraw).not.toHaveBeenCalled();
@@ -102,7 +123,7 @@ describe('/api/v1/journal/consent', () => {
     state.access = 'unauth';
     expect((await GET()).status).toBe(401);
     expect((await POST(post({ version: JOURNAL_CONSENT_VERSION }))).status).toBe(401);
-    expect((await DELETE()).status).toBe(401);
+    expect((await DELETE(del())).status).toBe(401);
     expect(state.record).not.toHaveBeenCalled();
   });
 });

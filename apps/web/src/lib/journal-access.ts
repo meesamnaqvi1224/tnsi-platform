@@ -4,6 +4,7 @@ import { error, internalError } from './api-response';
 import { isDeletionPending, AccountDeletionPendingError } from './deletion-state';
 import { JournalConsentRequiredError } from './journal-consent';
 import { safeErrorCode } from './private-response';
+import { isReflectionsEnabled, ReflectionsDisabledError } from './reflections-flag';
 
 // Defined next to the lock it enforces (deletion-state.ts); re-exported so existing imports keep working.
 export { AccountDeletionPendingError, JournalConsentRequiredError };
@@ -37,6 +38,8 @@ export class DeletionStateUnavailableError extends Error {
  * database.
  */
 export async function requireJournalAccess() {
+  // The switch comes first: when off, nothing about the member (not even their session) is consulted.
+  if (!isReflectionsEnabled()) throw new ReflectionsDisabledError();
   const user = await requireMemberAccess();
   let pending: boolean;
   try {
@@ -53,6 +56,7 @@ export async function requireJournalAccess() {
  * check could not be answered; every other failure is the ordinary member-access response (401/403).
  */
 export function journalAccessErrorResponse(err: unknown) {
+  if (err instanceof ReflectionsDisabledError) return error('NOT_FOUND', 'Not found', 404);
   if (err instanceof AccountDeletionPendingError) {
     return error(
       'ACCOUNT_DELETION_PENDING',
