@@ -4,8 +4,11 @@ import {
   buildUpsertBody,
   toRequestTimeoutMs,
   classifyFlowiFailure,
+  deleteFlowiContact,
+  findFlowiContactIdByEmail,
   FlowiConfigError,
   FlowiRequestError,
+  suppressFlowiContact,
   upsertFlowiContact,
 } from './flowi';
 import { FLOWI_FIELD } from './flowi-fields';
@@ -230,5 +233,155 @@ describe('toRequestTimeoutMs', () => {
   ])('%s → %s', (input, expected) => {
     expect(toRequestTimeoutMs(input)).toBe(expected);
     expect(Number.isInteger(toRequestTimeoutMs(input))).toBe(true);
+  });
+});
+
+/**
+ * Account-deletion calls against a FAKE Flowi. These follow GoHighLevel's published API and have
+ * not been run against the real account (see the note in flowi.ts): the tests prove what OUR client
+ * sends and how it treats each response - in particular that none of these calls can create a contact.
+ */
+describe('Flowi account-deletion calls (fake fetch)', () => {
+  const fetchMock = vi.fn();
+  const saved = { key: process.env.FLOWI_API_KEY, loc: process.env.FLOWI_LOCATION_ID };
+
+  beforeEach(() => {
+    fetchMock.mockReset();
+    vi.stubGlobal('fetch', fetchMock);
+    process.env.FLOWI_API_KEY = 'test-key-not-real';
+    process.env.FLOWI_LOCATION_ID = 'loc_test';
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    if (saved.key === undefined) delete process.env.FLOWI_API_KEY;
+    else process.env.FLOWI_API_KEY = saved.key;
+    if (saved.loc === undefined) delete process.env.FLOWI_LOCATION_ID;
+    else process.env.FLOWI_LOCATION_ID = saved.loc;
+  });
+
+  const ok = (body: unknown) => ({ ok: true, status: 200, json: async () => body });
+  const status = (code: number) => ({ ok: false, status: code, json: async () => ({}) });
+
+  it('lookup: a read-only GET for the email in our location; returns the id', async () => {
+    fetchMock.mockResolvedValue(ok({ contact: { id: 'c9' } }));
+    expect(await findFlowiContactIdByEmail('a+b@example.test')).toBe('c9');
+    const [url, init] = fetchMock.mock.calls[0]!;
+    const parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/contacts/search/duplicate');
+    expect(parsed.searchParams.get('locationId')).toBe('loc_test');
+    expect(parsed.searchParams.get('email')).toBe('a+b@example.test');
+    expect(init.method).toBe('GET');
+    expect(init.body).toBeUndefined();
+    expect(init.headers.Authorization).toBe('Bearer test-key-not-real');
+  });
+
+  it('lookup: no such contact is null, not an error', async () => {
+    fetchMock.mockResolvedValue(ok({ contact: null }));
+    expect(await findFlowiContactIdByEmail('nobody@example.test')).toBeNull();
+    fetchMock.mockResolvedValue(ok({}));
+    expect(await findFlowiContactIdByEmail('nobody@example.test')).toBeNull();
+  });
+
+  it('lookup: a failure is reported with its status, so it is retried rather than read as "no contact"', async () => {
+    fetchMock.mockResolvedValue(status(503));
+    await expect(findFlowiContactIdByEmail('a@example.test')).rejects.toMatchObject({
+      status: 503,
+    });
+    fetchMock.mockResolvedValue(status(401));
+    await expect(findFlowiContactIdByEmail('a@example.test')).rejects.toBeInstanceOf(
+      FlowiRequestError,
+    );
+  });
+
+  it('suppress: PUTs dnd:true to the existing contact and nothing else', async () => {
+    fetchMock.mockResolvedValue(ok({}));
+    expect(await suppressFlowiContact('c 9')).toBe(true);
+    const [url, init] = fetchMock.mock.calls[0]!;
+    expect(url).toBe('https://services.leadconnectorhq.com/contacts/c%209');
+    expect(init.method).toBe('PUT');
+    expect(JSON.parse(init.body)).toEqual({ dnd: true });
+  });
+
+  it('delete: DELETEs the contact by id, with no body', async () => {
+    fetchMock.mockResolvedValue(ok({ succeded: true }));
+    expect(await deleteFlowiContact('c9')).toBe(true);
+    const [url, init] = fetchMock.mock.calls[0]!;
+    expect(url).toBe('https://services.leadconnectorhq.com/contacts/c9');
+    expect(init.method).toBe('DELETE');
+    expect(init.body).toBeUndefined();
+  });
+
+  it('LIVE-OBSERVED: a contact that is already gone is answered 400 "Contact not found", which is also the outcome wanted', async () => {
+    const notFound = {
+      ok: false,
+      status: 400,
+      json: async () => ({
+        message: 'Contact not found for id:RBl8jkZvT0TEpunTaivL',
+        error: 'Bad Request',
+        statusCode: 400,
+      }),
+    };
+    fetchMock.mockResolvedValue(notFound);
+    expect(await suppressFlowiContact('c9')).toBe(false);
+    expect(await deleteFlowiContact('c9')).toBe(false);
+  });
+
+  it('any OTHER 400 is still a failure (a different message, or a body that cannot be read), so it is retried or left visible', async () => {
+    fetchMock.mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: async () => ({ message: 'Invalid request', statusCode: 400 }),
+    });
+    await expect(deleteFlowiContact('c9')).rejects.toMatchObject({ status: 400 });
+    await expect(suppressFlowiContact('c9')).rejects.toMatchObject({ status: 400 });
+    fetchMock.mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: async () => {
+        throw new Error('not json');
+      },
+    });
+    await expect(deleteFlowiContact('c9')).rejects.toMatchObject({ status: 400 });
+  });
+
+  it('suppress and delete: a contact that is already gone (404) is the outcome wanted, not a failure', async () => {
+    fetchMock.mockResolvedValue(status(404));
+    expect(await suppressFlowiContact('c9')).toBe(false);
+    expect(await deleteFlowiContact('c9')).toBe(false);
+  });
+
+  it('suppress and delete: any other failure is thrown with its status so the job is retried', async () => {
+    fetchMock.mockResolvedValue(status(500));
+    await expect(suppressFlowiContact('c9')).rejects.toMatchObject({ status: 500 });
+    await expect(deleteFlowiContact('c9')).rejects.toMatchObject({ status: 500 });
+    fetchMock.mockResolvedValue(status(403));
+    await expect(deleteFlowiContact('c9')).rejects.toMatchObject({ status: 403 });
+  });
+
+  it('none of the three ever calls the upsert endpoint, so none can create a contact', async () => {
+    fetchMock.mockResolvedValue(ok({ contact: { id: 'c9' } }));
+    await findFlowiContactIdByEmail('a@example.test');
+    await suppressFlowiContact('c9');
+    await deleteFlowiContact('c9');
+    for (const [url, init] of fetchMock.mock.calls) {
+      expect(String(url)).not.toContain('/upsert');
+      expect(init.method).not.toBe('POST');
+    }
+  });
+
+  it('not configured: throws a configuration error and makes no request', async () => {
+    delete process.env.FLOWI_API_KEY;
+    await expect(findFlowiContactIdByEmail('a@example.test')).rejects.toBeInstanceOf(
+      FlowiConfigError,
+    );
+    await expect(suppressFlowiContact('c9')).rejects.toBeInstanceOf(FlowiConfigError);
+    await expect(deleteFlowiContact('c9')).rejects.toBeInstanceOf(FlowiConfigError);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses an empty contact id rather than calling the collection URL', async () => {
+    await expect(suppressFlowiContact('')).rejects.toBeInstanceOf(FlowiRequestError);
+    await expect(deleteFlowiContact('')).rejects.toBeInstanceOf(FlowiRequestError);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

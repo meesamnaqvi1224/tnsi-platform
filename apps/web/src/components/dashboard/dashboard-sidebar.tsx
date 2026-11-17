@@ -19,6 +19,7 @@ import {
   LogOut,
   type LucideIcon,
   Menu,
+  UserCog,
   Presentation,
   Sparkles,
   Users,
@@ -127,6 +128,13 @@ function FooterLinks() {
       >
         <HelpCircle aria-hidden className="size-4 shrink-0" />
         Help &amp; Support
+      </NextLink>
+      <NextLink
+        href="/dashboard/account"
+        className="interaction-colors interaction-focus text-muted-foreground hover:bg-foreground/5 hover:text-foreground flex items-center gap-3 rounded-sm px-3 py-2 text-sm"
+      >
+        <UserCog aria-hidden className="size-4 shrink-0" />
+        Account
       </NextLink>
       <SignOutButton redirectUrl="/">
         <button

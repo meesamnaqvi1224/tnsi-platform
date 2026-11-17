@@ -23,7 +23,7 @@ describe('sitemap', () => {
   it('omits lastModified for static pages', async () => {
     const entries = await sitemap();
     const statics = entries.filter((e) => !e.url.includes('/articles/'));
-    expect(statics.length).toBe(23);
+    expect(statics.length).toBe(24);
     expect(statics.every((e) => !('lastModified' in e))).toBe(true);
   });
 

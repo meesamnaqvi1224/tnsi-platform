@@ -76,6 +76,8 @@ describe('what the member is told', () => {
   it('the confirmation says what is lost and that it cannot be undone', () => {
     expect(DELETE_ACCOUNT_CONFIRMATION).toContain('permanently deleted');
     expect(DELETE_ACCOUNT_CONFIRMATION).toContain('cannot be undone');
+    // It must not read as "everything is deleted": some records are kept, and it says so.
+    expect(DELETE_ACCOUNT_CONFIRMATION).toContain('records are kept');
   });
 
   it('only `deleted` is described as complete; `pending` says it is still finishing', () => {
@@ -86,7 +88,9 @@ describe('what the member is told', () => {
     const pending = accountDeletionOutcomeMessage('pending');
     expect(pending.title).toBe('Deletion in progress');
     expect(pending.message).toContain('being closed');
-    expect(pending.message).toContain('few minutes');
+    expect(pending.message).toContain('still finishing');
+    // No time is promised: the last steps can wait for a background retry.
+    expect(pending.message).not.toMatch(/minute|hour|shortly|soon/i);
     expect(`${pending.title} ${pending.message}`).not.toMatch(
       /has been (closed|deleted)|account deleted/i,
     );

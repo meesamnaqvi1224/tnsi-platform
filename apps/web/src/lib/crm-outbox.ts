@@ -5,6 +5,9 @@ import {
   FlowiRequestError,
   addFlowiContactTags,
   classifyFlowiFailure,
+  deleteFlowiContact,
+  findFlowiContactIdByEmail,
+  suppressFlowiContact,
   upsertFlowiContact,
   type FlowiCallOptions,
   type FlowiFailureKind,
@@ -21,6 +24,27 @@ import {
 
 export type CrmEventKind =
   'contact_form' | 'newsletter' | 'assessment' | 'app_signup' | 'membership';
+
+/**
+ * Account-deletion jobs. They share the outbox (claiming, back-off, give-up, visibility of
+ * failures) but are not "events to mirror": they act on a contact that already exists and
+ * NEVER create one, so a late or repeated job cannot bring a deleted contact back.
+ *  - `account_suppress`: queued the moment a member starts deleting their account. Turns on
+ *    do-not-disturb for the contact so no marketing reaches them while deletion finishes.
+ *  - `account_delete`: queued in the same transaction that erases the member's data. Deletes
+ *    the contact. When it succeeds the row's email is scrubbed, so the outbox keeps no
+ *    address for a deleted member.
+ * See lib/account-data-erasure.ts and docs/account-deletion-and-data-retention.md.
+ */
+export const ACCOUNT_CRM_KINDS = ['account_suppress', 'account_delete'] as const;
+export type AccountCrmKind = (typeof ACCOUNT_CRM_KINDS)[number];
+
+export function isAccountCrmKind(kind: string): kind is AccountCrmKind {
+  return (ACCOUNT_CRM_KINDS as readonly string[]).includes(kind);
+}
+
+/** What a scrubbed `account_delete` row holds instead of the member's address. */
+export const SCRUBBED_OUTBOX_EMAIL = 'deleted';
 
 type Executor = Pick<DB, 'insert'>;
 
@@ -139,6 +163,22 @@ export const flowiSender: OutboxSender = {
   addTags: (contactId, tags, options) => addFlowiContactTags(contactId, tags, options),
 };
 
+/** The CRM calls account deletion needs. None of them may create a contact. */
+export interface AccountCrmSender {
+  /** The existing contact's id for this email, or null when the CRM has no such contact. */
+  findContactId(email: string, options?: FlowiCallOptions): Promise<string | null>;
+  /** Stops marketing to the contact. False when the contact no longer exists. */
+  suppress(contactId: string, options?: FlowiCallOptions): Promise<boolean>;
+  /** Deletes the contact. False when it was already gone. */
+  deleteContact(contactId: string, options?: FlowiCallOptions): Promise<boolean>;
+}
+
+export const flowiAccountSender: AccountCrmSender = {
+  findContactId: (email, options) => findFlowiContactIdByEmail(email, options),
+  suppress: (contactId, options) => suppressFlowiContact(contactId, options),
+  deleteContact: (contactId, options) => deleteFlowiContact(contactId, options),
+};
+
 /** Safe summary of a failure: its class or HTTP status only, never provider text. */
 export function describeSendFailure(error: unknown): string {
   const status = (error as { status?: unknown } | null)?.status;
@@ -173,6 +213,7 @@ async function sendClaimed(
   now: () => Date,
   /** Set for the immediate attempt: a shared time limit for both Flowi calls. */
   limit?: { deadlineMs: number; clockMs: () => number },
+  accountSender: AccountCrmSender = flowiAccountSender,
 ): Promise<SendResult> {
   /** Time left for the next call, or undefined when there is no shared limit. */
   const callOptions = (): FlowiCallOptions | undefined => {
@@ -187,6 +228,10 @@ async function sendClaimed(
     // timeout makes `AbortSignal.timeout` throw before any request is made.
     return { timeoutMs: Math.max(1, Math.floor(left)) };
   };
+
+  if (isAccountCrmKind(row.kind)) {
+    return sendAccountJob(row, row.kind, accountSender, database, now, callOptions);
+  }
 
   const savedContactId = row.contactId;
   let step: 'upsert' | 'tags' = 'upsert';
@@ -242,9 +287,80 @@ async function sendClaimed(
   }
 }
 
+/**
+ * Runs one claimed account-deletion job and records the outcome. Never throws.
+ *
+ *  1. Find the contact by email (skipped when an earlier attempt saved its id).
+ *  2. Suppress it, or delete it.
+ *
+ * "There is no such contact" - at the lookup, or a 404 from step 2 - is SUCCESS: the outcome
+ * the job exists to reach already holds. Anything else that goes wrong is retried with the
+ * same back-off and give-up rules as every other row, and a row that gives up stays `failed`
+ * and visible, never silently dropped. A completed `account_delete` row is scrubbed of the
+ * member's address at once.
+ */
+async function sendAccountJob(
+  row: CrmOutboxRow,
+  kind: AccountCrmKind,
+  sender: AccountCrmSender,
+  database: Pick<DB, 'update'>,
+  now: () => Date,
+  callOptions: () => FlowiCallOptions | undefined,
+): Promise<SendResult> {
+  try {
+    let contactId = row.contactId;
+    if (!contactId) {
+      contactId = await sender.findContactId(row.email, callOptions());
+      if (contactId) {
+        await database.update(crmOutbox).set({ contactId }).where(eq(crmOutbox.id, row.id));
+      }
+    }
+    if (contactId) {
+      if (kind === 'account_suppress') await sender.suppress(contactId, callOptions());
+      else await sender.deleteContact(contactId, callOptions());
+    }
+    await database
+      .update(crmOutbox)
+      .set({
+        status: 'sent',
+        sentAt: now(),
+        lockedUntil: null,
+        lastError: null,
+        ...(kind === 'account_delete'
+          ? { email: SCRUBBED_OUTBOX_EMAIL, contactId: null, payload: scrubbedPayload(row) }
+          : {}),
+      })
+      .where(eq(crmOutbox.id, row.id));
+    return { ok: true, isNew: false };
+  } catch (error) {
+    const failureKind = classifyFlowiFailure(error);
+    const attempts = row.attempts + 1;
+    const giveUp = attempts >= attemptLimit(failureKind);
+    await database
+      .update(crmOutbox)
+      .set({
+        status: giveUp ? 'failed' : 'pending',
+        attempts,
+        nextAttemptAt: new Date(now().getTime() + retryDelayMs(attempts)),
+        lockedUntil: null,
+        lastError: describeSendFailure(error),
+      })
+      .where(eq(crmOutbox.id, row.id));
+    return { ok: false, permanent: giveUp };
+  }
+}
+
+/** Keeps only the member's internal id (needed to answer "is this member's CRM deletion done?"). */
+function scrubbedPayload(row: CrmOutboxRow): Record<string, unknown> {
+  const userId = (row.payload as { userId?: unknown } | null)?.userId;
+  return typeof userId === 'string' ? { userId } : {};
+}
+
 export interface OutboxDeps {
   database?: DB;
   sender?: OutboxSender;
+  /** The CRM calls for account-deletion jobs (injectable in tests). */
+  accountSender?: AccountCrmSender;
   now?: () => Date;
   /** Monotonic milliseconds, for the time budget only (injectable in tests). */
   clockMs?: () => number;
@@ -312,10 +428,14 @@ export async function attemptNow(id: string, deps: OutboxDeps = {}): Promise<Sen
   if (!row) return null;
   const clockMs = deps.clockMs ?? (() => performance.now());
   const budget = deps.immediateBudgetMs ?? OUTBOX.immediateBudgetMs;
-  return sendClaimed(row, deps.sender ?? flowiSender, database, now, {
-    deadlineMs: clockMs() + budget,
-    clockMs,
-  });
+  return sendClaimed(
+    row,
+    deps.sender ?? flowiSender,
+    database,
+    now,
+    { deadlineMs: clockMs() + budget, clockMs },
+    deps.accountSender,
+  );
 }
 
 export interface ProcessSummary {
@@ -359,7 +479,7 @@ export async function processOutbox(deps: OutboxDeps = {}): Promise<ProcessSumma
     const [row] = await claimDue(database, now(), 1);
     if (!row) break;
     summary.claimed += 1;
-    const result = await sendClaimed(row, sender, database, now);
+    const result = await sendClaimed(row, sender, database, now, undefined, deps.accountSender);
     if (result.ok) summary.sent += 1;
     else if (result.permanent) summary.failed += 1;
     else summary.retrying += 1;
