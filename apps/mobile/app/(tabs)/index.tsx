@@ -9,6 +9,7 @@ import { ForThisMomentCard } from '@/components/home/ForThisMomentCard';
 import { QuoteBlock } from '@/components/home/QuoteBlock';
 import { ClosingStatementCard } from '@/components/home/ClosingStatementCard';
 import { RecommendationExtras } from '@/components/home/RecommendationExtras';
+import { HomeSuggestions } from '@/components/home/HomeSuggestions';
 import { HomeProgressWidget } from '@/components/home/HomeProgressWidget';
 import { HomeSkeleton } from '@/components/home/HomeSkeleton';
 import { CheckInCard } from '@/components/check-in/CheckInCard';
@@ -20,6 +21,7 @@ import { ResourcesOnWebsiteCard } from '@/components/home/ResourcesOnWebsiteCard
 import { useToday } from '@/hooks/useToday';
 import { useFeatures } from '@/hooks/useFeatures';
 import { practiceForToday } from '@/lib/check-in-day';
+import { suggestionsViewForToday } from '@/lib/home-suggestions';
 import { home, homeCardStyle } from '@/components/home/homeTheme';
 import { colors, spacing } from '@/theme';
 import type { CheckIn } from '@/api/types';
@@ -66,6 +68,12 @@ export default function HomeScreen() {
     state.status === 'success'
       ? practiceForToday(state.data.checkIn, state.data.todayPractice)
       : null;
+  // The wider suggestions (guided practice, PowerDrop, Somatic Card) when the server sent any; otherwise
+  // Home keeps the single recommended practice and its alternative below.
+  const suggestionsView =
+    state.status === 'success'
+      ? suggestionsViewForToday(state.data.checkIn, state.data.suggestions)
+      : null;
   return (
     <ScreenContainer scroll inTabs background={home.page}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -88,7 +96,9 @@ export default function HomeScreen() {
               />
             </Animated.View>
 
-            {state.data.checkIn ? (
+            {state.data.checkIn && suggestionsView ? (
+              <HomeSuggestions view={suggestionsView} todayPractice={todayPractice} />
+            ) : state.data.checkIn ? (
               <>
                 <ForThisMomentCard practice={todayPractice} hasCheckedInToday />
                 {todayPractice ? (

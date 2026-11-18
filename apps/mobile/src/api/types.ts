@@ -232,6 +232,23 @@ export interface JourneyResponse {
   pagination: { limit: number; offset: number; hasMore: boolean };
 }
 
+export type HomeSuggestionKind = 'practice' | 'powerDrop' | 'somaticCard';
+
+export interface HomeSuggestion {
+  kind: HomeSuggestionKind;
+  id: string;
+  /** PowerDrops and Somatic Cards open by slug; a guided practice by its id (slug is null). */
+  slug: string | null;
+  title: string;
+  description: string | null;
+}
+
+export interface HomeSuggestions {
+  /** The Developmental Condition the first item answers to, or null. */
+  condition: string | null;
+  items: HomeSuggestion[];
+}
+
 /** Response shape of GET /api/v1/today, per apps/web/src/app/api/v1/today/route.ts. */
 export interface TodayResponse {
   date: string;
@@ -248,6 +265,12 @@ export interface TodayResponse {
   todayPractice: Practice | null;
   /** One optional alternative from the same category as `todayPractice`; absent from older servers. */
   alternativePractice?: Practice | null;
+  /**
+   * A short mixed set from the whole content library for the latest check-in: at most one guided
+   * practice, PowerDrop and Somatic Card, in the order the member should see them (see
+   * apps/web/src/lib/het-suggestions.ts). Absent from older servers; empty when nothing matched.
+   */
+  suggestions?: HomeSuggestions;
   /** Observable engagement for Home's progress widget (completed sessions, latest one); absent from older servers. */
   progressSummary?: {
     completedSessions: number;
