@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { useUser } from '@clerk/clerk-expo';
 import { useFocusEffect } from 'expo-router';
@@ -37,12 +37,17 @@ export default function HomeScreen() {
   const { state, reload, setCheckIn, refresh } = useToday();
   const features = useFeatures();
 
+  // True from saving a check-in until the server's recommendation for it has arrived, so Home shows a
+  // quiet loading card instead of "Nothing matched today" in the moment between the two.
+  const [findingPractice, setFindingPractice] = useState(false);
+
   function handleCheckInSubmitted(checkIn: CheckIn) {
     // Instant feedback (CheckInCard's own "recorded" view doesn't wait on
     // this), then a quiet background refetch so todayPractice reflects the
     // category this check-in just routed to - see useToday.ts's `refresh`.
     setCheckIn(checkIn);
-    void refresh();
+    setFindingPractice(true);
+    void refresh().finally(() => setFindingPractice(false));
   }
 
   // Coming back to Home (after practising, saving or checking in elsewhere) shows what the
@@ -98,6 +103,8 @@ export default function HomeScreen() {
 
             {state.data.checkIn && suggestionsView ? (
               <HomeSuggestions view={suggestionsView} todayPractice={todayPractice} />
+            ) : state.data.checkIn && findingPractice && !todayPractice ? (
+              <HomeSkeleton />
             ) : state.data.checkIn ? (
               <>
                 <ForThisMomentCard practice={todayPractice} hasCheckedInToday />
