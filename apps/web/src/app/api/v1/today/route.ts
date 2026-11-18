@@ -12,6 +12,7 @@ import { db, checkIns, practices, practiceCompletions } from '@tnsi/db';
 import { eq, and, inArray, gte, lte, desc } from 'drizzle-orm';
 import { success } from '@/lib/api-response';
 import { getRecommendedPractices, getPracticeProgressSummary } from '@/lib/practices';
+import { getHetSuggestions } from '@/lib/het-suggestions';
 import { toPublicCheckIn } from '@/lib/check-ins';
 import { contentAccessFor, withPracticeAccess } from '@/lib/membership';
 
@@ -111,6 +112,8 @@ export async function GET() {
     condition: recommendedCondition,
   } = await getRecommendedPractices(user.id, { freeOnly });
   const progressSummary = await getPracticeProgressSummary(user.id);
+  // The wider library for this moment: a PowerDrop and a Somatic Card alongside the guided practice (additive).
+  const suggestions = await getHetSuggestions(user.id, { freeOnly, practice: recommendedPractice });
   let todayPractice = null;
   if (recommendedPractice) {
     const existingCompletion = completionsMap.get(recommendedPractice.id);
@@ -156,6 +159,8 @@ export async function GET() {
     alternativePractice: alternativeRecommendation
       ? withPracticeAccess(alternativeRecommendation, access)
       : null,
+    // Mixed suggestions across guided practices, PowerDrops and Somatic Cards, brief items first for a lower answer.
+    suggestions,
     // Observable engagement only (completed sessions, latest one), for Home's progress widget.
     progressSummary,
   });

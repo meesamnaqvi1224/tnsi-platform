@@ -138,3 +138,41 @@ export function pickHetRecommendations<T extends HetCandidate>(
   const top = ranked.slice(0, Math.max(0, count));
   return { picks: top.map((r) => r.item), condition: top[0]?.bestCondition ?? null };
 }
+
+export const HET_CONTENT_KINDS = ['practice', 'powerDrop', 'somaticCard'] as const;
+export type HetContentKind = (typeof HET_CONTENT_KINDS)[number];
+
+export type HetSuggestion<T> = { kind: HetContentKind; item: T };
+
+/**
+ * A short, mixed set of suggestions across the content library: at most one
+ * item of each kind (guided practice, PowerDrop, Somatic Card), each chosen
+ * by `pickHetRecommendations` from its own pool. Kinds are ordered by what a
+ * member can take on: someone who answered that a lot is going on (1) or that
+ * they feel unsettled (2) is offered the brief items - a PowerDrop, then a
+ * card - before a longer guided practice; everyone else sees the guided
+ * practice first. A kind with no relevant item is simply absent.
+ */
+export function pickHetSuggestions<T extends HetCandidate>(
+  pools: Partial<Record<HetContentKind, readonly T[]>>,
+  options: HetPickOptions,
+  maxItems = 3,
+): { items: HetSuggestion<T>[]; condition: HetCondition | null } {
+  const briefFirst =
+    normalizeCapacityScore(options.capacityScore) === 'LOW' ||
+    normalizeCapacityScore(options.capacityScore) === 'LOW_MODERATE';
+  const order: readonly HetContentKind[] = briefFirst
+    ? ['powerDrop', 'somaticCard', 'practice']
+    : ['practice', 'powerDrop', 'somaticCard'];
+
+  const items: HetSuggestion<T>[] = [];
+  let condition: HetCondition | null = null;
+  for (const kind of order) {
+    const best = pickHetRecommendations(pools[kind] ?? [], options, 1);
+    const item = best.picks[0];
+    if (!item) continue;
+    if (items.length === 0) condition = best.condition;
+    items.push({ kind, item });
+  }
+  return { items: items.slice(0, Math.max(0, maxItems)), condition };
+}

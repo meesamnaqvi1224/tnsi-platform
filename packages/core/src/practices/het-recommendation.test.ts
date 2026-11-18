@@ -4,6 +4,7 @@ import {
   hetConditionsOf,
   hetPreferenceForCapacityScore,
   pickHetRecommendations,
+  pickHetSuggestions,
 } from './het-recommendation';
 
 /** The ten live guided practices as tagged in Sanity after the 18 Nov 2026 tag fixes. */
@@ -153,5 +154,53 @@ describe('pickHetRecommendations on the live library', () => {
   it('respects the requested count', () => {
     expect(pickHetRecommendations(LIVE, { ...base, capacityScore: 1 }, 1).picks).toHaveLength(1);
     expect(pickHetRecommendations(LIVE, { ...base, capacityScore: 1 }, 0).picks).toHaveLength(0);
+  });
+});
+
+describe('pickHetSuggestions across the content library', () => {
+  const pools = {
+    practice: [{ id: 'mountain-state', tags: ['Capacity', 'Safety'] }],
+    powerDrop: [
+      { id: 'exhale', tags: ['Safety', 'Capacity'] },
+      { id: 'enough', tags: ['Availability', 'Participation'] },
+    ],
+    somaticCard: [
+      { id: 'heel', tags: ['Safety'] },
+      { id: 'sway', tags: ['Expansion', 'Safety'] },
+    ],
+  };
+
+  it('offers brief items first to someone whose answer is 1 or 2, and the guided practice first otherwise', () => {
+    const kinds = (capacityScore: number) =>
+      pickHetSuggestions(pools, { ...base, capacityScore }).items.map((s) => s.kind);
+    expect(kinds(1)).toEqual(['powerDrop', 'somaticCard', 'practice']);
+    expect(kinds(2)).toEqual(['powerDrop', 'somaticCard', 'practice']);
+    expect(kinds(3)).toEqual(['practice', 'powerDrop', 'somaticCard']);
+    expect(kinds(5)).toEqual(['practice', 'powerDrop', 'somaticCard']);
+  });
+
+  it('picks the most relevant item inside each kind', () => {
+    const one = pickHetSuggestions(pools, { ...base, capacityScore: 1 }).items;
+    expect(one.find((s) => s.kind === 'powerDrop')!.item.id).toBe('exhale');
+    expect(one.find((s) => s.kind === 'somaticCard')!.item.id).toBe('heel');
+    const four = pickHetSuggestions(pools, { ...base, capacityScore: 4 }).items;
+    expect(four.find((s) => s.kind === 'powerDrop')!.item.id).toBe('enough');
+  });
+
+  it("skips a kind with nothing relevant and reports the first suggestion's condition", () => {
+    const r = pickHetSuggestions(
+      { powerDrop: pools.powerDrop, somaticCard: [{ id: 'bare', tags: ['Healing'] }] },
+      { ...base, capacityScore: 1 },
+    );
+    expect(r.items.map((s) => s.kind)).toEqual(['powerDrop']);
+    expect(r.condition).toBe('Safety');
+    expect(pickHetSuggestions({}, { ...base, capacityScore: 1 })).toEqual({
+      items: [],
+      condition: null,
+    });
+  });
+
+  it('caps the result at maxItems', () => {
+    expect(pickHetSuggestions(pools, { ...base, capacityScore: 1 }, 2).items).toHaveLength(2);
   });
 });
