@@ -1,6 +1,6 @@
 import { db, practices, practiceCompletions, practiceReflections, practiceSaves } from '@tnsi/db';
 import { eq, and, desc, gt, count, countDistinct, inArray } from 'drizzle-orm';
-import { categoryForCapacityScore, pickDeterministicCandidates } from '@tnsi/core';
+import { pickHetRecommendations, type HetCondition } from '@tnsi/core';
 import { getLatestCheckIn } from './check-ins';
 import { paginateRows } from './practice-sessions';
 import type { PracticeReflection as PracticeReflectionRow } from '@tnsi/db/schema';
@@ -99,24 +99,12 @@ export async function getTodayPractice(
 }
 
 /**
- * "Today's recommended practice" — deterministic content routing from the
- * user's latest capacity check-in to a practice category (see
- * `@tnsi/core`'s `categoryForCapacityScore`), not a display-order pick like
- * `getTodayPractice` above. Mechanical only: no LLM, no clinical inference,
- * just a fixed capacity-state -> category table.
- *
- * `freeOnly` restricts candidates to the free introductory selection — set
- * by callers when the member can't open paid practices, so the daily
- * suggestion is never something they'd immediately hit a lock on.
- *
- * Returns `null` (never a silent `practices[0]`-style fallback) when:
- * - the user has no check-in yet (no capacity signal to route on), or
- * - no published practice is tagged with the mapped category yet.
- * Both are real, expected states right now since no practice in the
- * database currently carries any of the five category values this routes
- * to — that's a content-tagging gap in Sanity, not a bug here. A caller
- * wanting a guaranteed non-null result must pass an explicitly-designated
- * fallback practice id once one exists; none is hardcoded here.
+ * "Today's recommended practice": the primary pick of `getRecommendedPractices`
+ * below (Human Expansion Theory™ conditions, not a display-order pick like
+ * `getTodayPractice`). `freeOnly` restricts candidates to the free
+ * introductory selection - set by callers when the member can't open paid
+ * practices, so the daily suggestion is never something they'd immediately
+ * hit a lock on. `null` when there is no check-in yet or nothing tagged.
  */
 export async function getRecommendedPractice(
   userId: string,
@@ -126,19 +114,29 @@ export async function getRecommendedPractice(
 }
 
 /**
- * The primary recommendation plus one optional alternative, from the same
- * mapped category and in the same deterministic order (see
- * `pickDeterministicCandidates`). Same routing as `getRecommendedPractice`,
- * nothing added: the alternative is just the next practice in that category.
+ * The primary recommendation plus one optional alternative, chosen by Human
+ * Expansion Theory™ conditions rather than the legacy category: the latest
+ * primary check-in's answer gives an order of preference over the five
+ * Developmental Conditions (`@tnsi/core`'s `pickHetRecommendations`), and
+ * published practices carrying those conditions as tags are ranked against
+ * it. Mechanical routing on a self-reported answer - no LLM and no clinical
+ * inference - and the conditions are never shown as a label for the member.
+ *
+ * Returns nothing (never a `practices[0]`-style fallback) when the member has
+ * no check-in or no published practice carries a HET condition tag.
+ * `condition` is the condition the primary pick answers to, for explaining
+ * why it was offered.
  */
 export async function getRecommendedPractices(
   userId: string,
   options: { freeOnly?: boolean } = {},
-): Promise<{ primary: PracticeSummary | null; alternative: PracticeSummary | null }> {
+): Promise<{
+  primary: PracticeSummary | null;
+  alternative: PracticeSummary | null;
+  condition: HetCondition | null;
+}> {
   const latestCheckIn = await getLatestCheckIn(userId);
-  if (!latestCheckIn) return { primary: null, alternative: null };
-
-  const category = categoryForCapacityScore(latestCheckIn.capacityScore);
+  if (!latestCheckIn) return { primary: null, alternative: null, condition: null };
 
   const candidates = await db
     .select(PRACTICE_SUMMARY_COLUMNS)
@@ -146,13 +144,32 @@ export async function getRecommendedPractices(
     .where(
       and(
         eq(practices.isPublished, true),
-        eq(practices.category, category),
         ...(options.freeOnly ? [eq(practices.isFree, true)] : []),
       ),
     );
 
-  const [primary = null, alternative = null] = pickDeterministicCandidates(candidates, 2);
-  return { primary, alternative };
+  // Practices finished in the last week are offered after unseen ones of the same relevance.
+  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const recent = await db
+    .selectDistinct({ practiceId: practiceCompletions.practiceId })
+    .from(practiceCompletions)
+    .where(
+      and(
+        eq(practiceCompletions.userId, userId),
+        eq(practiceCompletions.completed, true),
+        gt(practiceCompletions.completedAt, since),
+      ),
+    );
+
+  const { picks, condition } = pickHetRecommendations(candidates, {
+    capacityScore: latestCheckIn.capacityScore,
+    userKey: userId,
+    // The check-in's own day, so the pick stays the same all day and moves on with the next day's check-in.
+    dayKey: latestCheckIn.completedDate.toISOString().slice(0, 10),
+    recentlyCompletedIds: new Set(recent.map((r) => r.practiceId)),
+  });
+  const [primary = null, alternative = null] = picks;
+  return { primary, alternative, condition };
 }
 
 /**

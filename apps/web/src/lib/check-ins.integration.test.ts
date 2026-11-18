@@ -51,14 +51,14 @@ async function newUser(label: string) {
   return row!.id;
 }
 
-async function newPractice(title: string, category: string, extra: Record<string, unknown> = {}) {
+async function newPractice(title: string, tags: string[], extra: Record<string, unknown> = {}) {
   const [row] = await m.db
     .insert(m.practices)
     .values({
       sanityId: `${RUN}-${title}`,
       title,
       contentType: 'audio',
-      category,
+      tags,
       sanityData: {},
       isPublished: true,
       ...extra,
@@ -130,18 +130,16 @@ describe.skipIf(!enabled)('daily check-ins on real PostgreSQL', { timeout: 120_0
 
   it('the recommendation follows the primary and ignores additional check-ins', async () => {
     const u = await newUser('reco');
-    // Capacity 2 maps to REGULATION; a 5 would map to EXPANSION and a 1 to GROUNDING.
-    await newPractice('reg-a', 'REGULATION');
-    await newPractice('exp-a', 'EXPANSION');
-    await newPractice('gro-a', 'GROUNDING');
+    // Capacity 2 prefers Safety; a 5 would prefer Expansion.
+    await newPractice('reco-safety', ['Safety']);
+    await newPractice('reco-expansion', ['Expansion']);
     await m.lib.recordCheckIn(u, { moodScore: 2, capacityScore: 2 });
     const before = await m.practicesLib.getRecommendedPractice(u);
     await m.lib.recordCheckIn(u, { moodScore: 5, capacityScore: 5 });
     await m.lib.recordCheckIn(u, { moodScore: 1, capacityScore: 1 });
     const after = await m.practicesLib.getRecommendedPractice(u);
-    expect(before?.category).toBe('REGULATION');
+    expect(before?.tags).toContain('Safety');
     expect(after?.id).toBe(before?.id);
-    expect(after?.category).toBe('REGULATION');
   });
 
   it('there is no recommendation without a primary check-in', async () => {
