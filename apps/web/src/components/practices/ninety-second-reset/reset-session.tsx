@@ -5,6 +5,7 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Pause, Play, ScrollText, X } from 'lucide-react';
 import { cn } from '@tnsi/ui';
+import { recordStandaloneCompletion } from '@/lib/record-standalone-completion';
 import { RESET_AUDIO_SRC, RESET_COPY, RESET_ROUTES, type ResetRoutes } from './content';
 import { ResetBrand, ResetShell } from './reset-shell';
 import styles from './reset.module.css';
@@ -226,6 +227,7 @@ export function ResetSession({
     const audio = audioRef.current;
     setPosition(audio && Number.isFinite(audio.duration) ? audio.duration : duration);
     setStatus('paused');
+    recordStandaloneCompletion('90-second-reset');
     router.push(routes.complete);
   };
 

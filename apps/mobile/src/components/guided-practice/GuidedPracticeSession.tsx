@@ -14,6 +14,7 @@ import {
   stageIndexAt,
   type GuidedPractice,
 } from '@/lib/guided-practices';
+import { useApiClient } from '@/hooks/useApiClient';
 import { colors, spacing } from '@/theme';
 import { GUIDED_PRACTICE_AUDIO } from './audio';
 
@@ -31,6 +32,7 @@ const CIRCUMFERENCE = 2 * Math.PI * RING.radius;
  */
 export function GuidedPracticeSession({ practice }: { practice: GuidedPractice }) {
   const router = useRouter();
+  const api = useApiClient();
   const routes = guidedPracticeRoutes(practice.slug);
   const source = GUIDED_PRACTICE_AUDIO[practice.slug];
   const player = useAudioPlayer(source, { updateInterval: 250 });
@@ -83,8 +85,16 @@ export function GuidedPracticeSession({ practice }: { practice: GuidedPractice }
   useEffect(() => {
     if (status.didJustFinish && started && !finishedRef.current) {
       finishedRef.current = true;
+      // Counts like any other completed practice. Silent on failure: the quiet close never waits on it.
+      api
+        .post(`/api/v1/practices/standalone/${practice.slug}/complete`, {
+          completed: true,
+          progressPct: 1,
+        })
+        .catch(() => {});
       router.replace(routes.complete);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `api` changes identity every render; it is only used inside this one-shot finish
   }, [status.didJustFinish, started, router, routes.complete]);
 
   const duration = status.duration > 0 ? status.duration : practice.durationSeconds;
