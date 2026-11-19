@@ -1,11 +1,11 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import NextLink from 'next/link';
 import { Badge, Container, Eyebrow, Heading, Section, Stack, Text } from '@tnsi/ui';
 import { LockedPracticeNotice } from '@/components/dashboard/locked-practice-notice';
 import { PracticeExperience } from '@/components/dashboard/practice-experience';
 import { ReturnPathPractice } from '@/components/return-path/return-path-practice';
 import { getReturnPathContent } from '@/content/cms/loaders';
-import { MEMBER_RETURN_PATH_LEVELS, RETURN_PATH_KEY } from '@tnsi/core';
+import { MEMBER_RETURN_PATH_LEVELS, RETURN_PATH_KEY, standaloneGuidedKey } from '@tnsi/core';
 import { SaveToggleButton } from '@/components/dashboard/save-toggle-button';
 import { requireMemberAccessOrRedirect } from '@/lib/auth-api';
 import { contentAccessFor } from '@/lib/membership';
@@ -64,6 +64,10 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
 
   const practice = await getPublishedPracticeById(idResult.data.id);
   if (!practice) notFound();
+
+  // A standalone guided practice (90-Second Reset, The Empty Chair) opens its own experience.
+  const standalone = standaloneGuidedKey(practice);
+  if (standalone) redirect(`/dashboard/practices/${standalone}`);
 
   // Free vs paid is decided here, server-side. A locked practice never has
   // its media resolved or passed to the (client) player at all.
