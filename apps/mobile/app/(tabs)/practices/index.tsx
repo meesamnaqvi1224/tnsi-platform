@@ -10,6 +10,7 @@ import { PracticeFilterBar } from '@/components/practices/PracticeFilterBar';
 import { PracticeSearchField } from '@/components/practices/PracticeSearchField';
 import { PracticesSkeleton } from '@/components/practices/PracticesSkeleton';
 import { CollectionTiles } from '@/components/practices/CollectionTiles';
+import { standaloneGuidedKey } from '@tnsi/core';
 import { GuidedPracticeCard } from '@/components/guided-practice/GuidedPracticeCard';
 import { usePractices } from '@/hooks/usePractices';
 import { capitalize } from '@/lib/format';
@@ -66,7 +67,12 @@ export default function PracticesScreen() {
     }, []),
   );
 
-  const practices = useMemo(() => (state.status === 'success' ? state.practices : []), [state]);
+  // The two standalone guided practices already have their own cards under Guided practices.
+  const practices = useMemo(
+    () =>
+      state.status === 'success' ? state.practices.filter((p) => !standaloneGuidedKey(p)) : [],
+    [state],
+  );
   const categoryOptions = useMemo(
     () => practiceCategories(practices).map((key) => ({ key, label: categoryLabel(key) })),
     [practices],
