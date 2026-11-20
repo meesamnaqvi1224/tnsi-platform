@@ -49,7 +49,9 @@ import {
   getInProgressPracticeCount,
   getInProgressPractices,
   getRecentCompletions,
+  getRecommendedPractices,
   getTodayPractice,
+  isPracticeCompleted,
 } from '@/lib/practices';
 import { createPageMetadata } from '@/lib/seo';
 import { fetchSomaticSeriesDetail, fetchSomaticSeriesList } from '@/lib/somatic-cards-client';
@@ -204,10 +206,20 @@ export default async function DashboardPage() {
   // Don't feature a paid practice as "today's" for a member who can't open it.
   const contentAccess = contentAccessFor(user.entitlements);
   const freeOnly = contentAccess.gatingActive && !contentAccess.membership.hasPaidAccess;
-  const todayPractice = await getTodayPractice(user.id, { freeOnly });
-  // Suggestions follow today's check-in, so none are fetched before the member has checked in.
+  // Once the member has checked in, today's practice is the one the Human Expansion Theory routing picks
+  // for their answer. Before that (or if nothing is tagged yet) the display-order pick stays as the fallback.
+  const recommended = todayCheckIn ? await getRecommendedPractices(user.id, { freeOnly }) : null;
+  const recommendedPractice = recommended?.primary ?? null;
+  const todayPractice = recommendedPractice
+    ? {
+        practice: recommendedPractice,
+        completed: await isPracticeCompleted(user.id, recommendedPractice.id),
+      }
+    : await getTodayPractice(user.id, { freeOnly });
+  // Suggestions follow today's check-in, so none are fetched before the member has checked in. They are built
+  // around the recommended practice, which is also what decides the reason line shown with them.
   const hetSuggestions = todayCheckIn
-    ? await getHetSuggestions(user.id, { freeOnly, practice: todayPractice?.practice ?? null })
+    ? await getHetSuggestions(user.id, { freeOnly, practice: recommendedPractice })
     : null;
   const [
     inProgressPractices,
