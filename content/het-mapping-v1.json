@@ -1,5 +1,5 @@
 {
-  "_comment": "Approved 18 Nov 2026 (Mapping V1 for Somatic cards; PowerDrop mapping approved in chat). First condition is the primary. Cards listed under excludedFromRecommendations carry open artwork/text review flags and are deliberately untagged until cleared. Series 06 cards and placeholder PowerDrops are not mapped. Owner confirmed 20 Nov 2026: Return Path stays Safety then Capacity (practice tags); The Enough List stays Availability then Participation. Both are already applied in Sanity. Update 20 Nov 2026: seven of the eight review-flagged cards were corrected (see content/somatic-cards/artwork-corrections) and tagged from Mapping V1; only the-warmth-return stays excluded until Caroline confirms its step sequence.",
+  "_comment": "Approved 18 Nov 2026 (Mapping V1 for Somatic cards; PowerDrop mapping approved in chat). First condition is the primary. Cards listed under excludedFromRecommendations carry open artwork/text review flags and are deliberately untagged until cleared. Series 06 cards and placeholder PowerDrops are not mapped. Owner confirmed 20 Nov 2026: Return Path stays Safety then Capacity (practice tags); The Enough List stays Availability then Participation. Both are already applied in Sanity. Update 20 Nov 2026: seven of the eight review-flagged cards were corrected (see content/somatic-cards/artwork-corrections) and tagged from Mapping V1; only the-warmth-return stays excluded until Caroline confirms its step sequence. Update 20 Nov 2026 (later): the-warmth-return was also corrected and tagged from Mapping V1, so no card is excluded now. Series 06 cards and placeholder PowerDrops are still not mapped.",
   "somaticCards": {
     "the-ground-press-drop": ["Safety", "Capacity"],
     "the-heel-press-reset": ["Safety"],
@@ -49,7 +49,8 @@
     "the-horizontal-eye-sweep": ["Safety", "Availability"],
     "the-visual-return": ["Safety", "Availability"],
     "the-forearm-sweep": ["Availability"],
-    "the-containment-hold": ["Safety", "Availability"]
+    "the-containment-hold": ["Safety", "Availability"],
+    "the-warmth-return": ["Availability", "Safety"]
   },
   "powerDrops": {
     "the-90-second-exhale-drop": ["Safety", "Capacity"],
@@ -62,5 +63,5 @@
     "mask-drop-mirror-ritual": ["Availability", "Expansion"],
     "the-enough-list": ["Availability", "Participation"]
   },
-  "excludedFromRecommendations": ["the-warmth-return"]
+  "excludedFromRecommendations": []
 }
