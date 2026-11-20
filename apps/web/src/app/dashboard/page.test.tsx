@@ -32,6 +32,8 @@ vi.mock('@/lib/het-suggestions', () => ({
   getHetSuggestions: (...args: unknown[]) => mockGetHetSuggestions(...args),
 }));
 const mockGetTodayPractice = vi.fn();
+const mockGetRecommendedPractices = vi.fn();
+const mockIsPracticeCompleted = vi.fn();
 vi.mock('@/lib/practices', () => ({
   formatContentTypeLabel: (v: string) => v,
   formatPracticeDuration: () => '5 min',
@@ -40,6 +42,8 @@ vi.mock('@/lib/practices', () => ({
   getInProgressPractices: () => Promise.resolve([]),
   getRecentCompletions: () => Promise.resolve([]),
   getTodayPractice: () => mockGetTodayPractice(),
+  getRecommendedPractices: (...args: unknown[]) => mockGetRecommendedPractices(...args),
+  isPracticeCompleted: (...args: unknown[]) => mockIsPracticeCompleted(...args),
 }));
 
 const mockFetchSomaticSeriesList = vi.fn();
@@ -64,6 +68,12 @@ beforeEach(() => {
   mockGetTodayCheckIn.mockResolvedValue(null);
   mockGetCheckInHistory.mockResolvedValue({ checkIns: [] });
   mockGetTodayPractice.mockResolvedValue(null);
+  mockGetRecommendedPractices.mockResolvedValue({
+    primary: null,
+    alternative: null,
+    condition: null,
+  });
+  mockIsPracticeCompleted.mockResolvedValue(false);
   mockGetHetSuggestions.mockResolvedValue({ condition: null, items: [] });
   mockFetchSomaticSeriesList.mockResolvedValue({
     status: 'ok',
@@ -266,5 +276,70 @@ describe('DashboardPage — More for today (Human Expansion Theory suggestions)'
     });
     const html = renderToStaticMarkup(await DashboardPage());
     expect(html).not.toContain('More for today');
+  });
+});
+
+describe('DashboardPage — the practice of the day follows the check-in', () => {
+  const displayOrderPick = {
+    practice: {
+      id: 'p-first',
+      title: 'Shoreline Reset',
+      description: null,
+      contentType: 'audio',
+      durationSeconds: 660,
+      category: 'REGULATION',
+      difficulty: 1,
+    },
+    completed: false,
+  };
+  const recommended = {
+    id: 'p-engine',
+    title: 'Future Self Integration',
+    description: null,
+    contentType: 'audio',
+    durationSeconds: 600,
+    category: null,
+    difficulty: 1,
+  };
+
+  it('shows the display-order practice before any check-in, and does not ask the engine', async () => {
+    mockGetTodayPractice.mockResolvedValue(displayOrderPick);
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).toContain('Shoreline Reset');
+    expect(mockGetRecommendedPractices).not.toHaveBeenCalled();
+  });
+
+  it('after a check-in, shows the practice the engine picked instead of the display-order one', async () => {
+    mockGetTodayCheckIn.mockResolvedValue({ id: 'c1' });
+    mockGetTodayPractice.mockResolvedValue(displayOrderPick);
+    mockGetRecommendedPractices.mockResolvedValue({
+      primary: recommended,
+      alternative: null,
+      condition: 'Expansion',
+    });
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).toContain('Future Self Integration');
+    expect(html).toContain('href="/dashboard/practices/p-engine"');
+    expect(html).not.toContain('Shoreline Reset');
+  });
+
+  it('builds the suggestions around the pick of the engine, not the display-order practice', async () => {
+    mockGetTodayCheckIn.mockResolvedValue({ id: 'c1' });
+    mockGetTodayPractice.mockResolvedValue(displayOrderPick);
+    mockGetRecommendedPractices.mockResolvedValue({
+      primary: recommended,
+      alternative: null,
+      condition: 'Expansion',
+    });
+    await DashboardPage();
+    const [, options] = mockGetHetSuggestions.mock.calls[0]!;
+    expect(options.practice).toEqual(recommended);
+  });
+
+  it('falls back to the display-order practice when nothing is tagged for the check-in', async () => {
+    mockGetTodayCheckIn.mockResolvedValue({ id: 'c1' });
+    mockGetTodayPractice.mockResolvedValue(displayOrderPick);
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).toContain('Shoreline Reset');
   });
 });
