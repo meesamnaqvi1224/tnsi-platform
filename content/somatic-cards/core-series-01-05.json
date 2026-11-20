@@ -427,8 +427,9 @@
       "supportingImages": [],
       "demonstrationSequence": [],
       "sourceReference": "Meesam Somatic Batch 1-5.zip",
-      "needsReview": true,
-      "reviewNote": "Artwork badge reads 'CORE SERIES | 02' (should be 01) and title renders as 'The Back-BODY' with the artwork visibly cut off before any 'Anchor' suffix - eyebrow text and Purpose/Anchor content match Series 01's xlsx-listed title 'The Back-Body Anchor' exactly, so series/title are used from the xlsx master list, not the artwork's own badge/title rendering. Flagged for human confirmation."
+      "needsReview": false,
+      "reviewNote": "Resolved 20 Nov 2026: Artwork badge corrected to Series 01 and title completed to \"The Back-Body Anchor\". Corrected artwork is in content/somatic-cards/artwork-corrections/the-back-body-anchor.jpg and is live in Sanity. Do not re-import this card from the original artwork file.",
+      "artworkCorrection": "artwork-corrections/the-back-body-anchor.jpg"
     },
     {
       "cardNumber": 7,
@@ -1298,8 +1299,9 @@
       "supportingImages": [],
       "demonstrationSequence": [],
       "sourceReference": "Meesam Somatic Batch 1-5.zip",
-      "needsReview": true,
-      "reviewNote": "Artwork badge reads 'CORE SERIES | 01' (should be 02) - eyebrow text and content ('Breath & Cardiorespiratory Rhythm', an exhale-focused practice) match Series 02, and the title matches the xlsx Series-02 master list exactly. Series assignment uses content/xlsx match, not the artwork's own badge number. Flagged for human confirmation."
+      "needsReview": false,
+      "reviewNote": "Resolved 20 Nov 2026: Artwork badge corrected to Series 02. Corrected artwork is in content/somatic-cards/artwork-corrections/the-completion-exhale.jpg and is live in Sanity. Do not re-import this card from the original artwork file.",
+      "artworkCorrection": "artwork-corrections/the-completion-exhale.jpg"
     },
     {
       "cardNumber": 20,
@@ -1571,8 +1573,9 @@
       "supportingImages": [],
       "demonstrationSequence": [],
       "sourceReference": "Meesam Somatic Batch 1-5.zip",
-      "needsReview": true,
-      "reviewNote": "Artwork's own eyebrow label reads 'SUPPORT, FOCUS, & AWARENESS' rather than the standard 'ORIENTATION & VISUAL-SPATIAL ATTENTION' used on every other Series 03 card - the subtitle line beneath the title and the badge number ('03') both confirm Series 03, so this is treated as a labeling inconsistency in the artwork, not a series-assignment ambiguity. Flagged for awareness."
+      "needsReview": false,
+      "reviewNote": "Resolved 20 Nov 2026: Artwork eyebrow corrected to \"Orientation & Visual-Spatial Attention\". Corrected artwork is in content/somatic-cards/artwork-corrections/the-peripheral-vision-reset.jpg and is live in Sanity. Do not re-import this card from the original artwork file.",
+      "artworkCorrection": "artwork-corrections/the-peripheral-vision-reset.jpg"
     },
     {
       "cardNumber": 24,
@@ -1690,16 +1693,11 @@
         },
         {
           "order": 5,
-          "label": "Left Sweep",
-          "instruction": "Repeat the sweep gently to the far left, taking in the scene without moving your head. Pause for one soft breath."
-        },
-        {
-          "order": 6,
           "label": "Full Cycle",
           "instruction": "Perform a complete smooth cycle from the center to the right, then center to the left, and back to center."
         },
         {
-          "order": 7,
+          "order": 6,
           "label": "Re-Orient",
           "instruction": "Stop. Close your eyes for a moment. Then open them, looking all around the room naturally. Notice any changes."
         }
@@ -1725,8 +1723,9 @@
       "supportingImages": [],
       "demonstrationSequence": [],
       "sourceReference": "Meesam Somatic Batch 1-5.zip",
-      "needsReview": true,
-      "reviewNote": "The card's own step numbering is inconsistent (shows 01-06 then '07.' with step 8 rendered as a separate side callout rather than in the main list) - all 8 step instructions were transcribed and re-numbered sequentially 0-7 here; a 'Left Sweep' step (labeled step 6 above) is implied by the practice's own symmetry description but its instruction text had to be inferred from the 'Full Cycle' step's own description of a left-then-center movement, since the artwork's step list skips directly from 'Right Sweep'/'Return Center' to 'Full Cycle' without its own explicit 'Left Sweep' line. Flagged for human verification against the original source."
+      "needsReview": false,
+      "reviewNote": "Resolved 20 Nov 2026: Artwork step numbers corrected to 06 and 07 and the inferred \"Left Sweep\" step removed so the data matches the card as printed (7 steps). Corrected artwork is in content/somatic-cards/artwork-corrections/the-horizontal-eye-sweep.jpg and is live in Sanity. Do not re-import this card from the original artwork file.",
+      "artworkCorrection": "artwork-corrections/the-horizontal-eye-sweep.jpg"
     },
     {
       "cardNumber": 26,
@@ -2095,8 +2094,9 @@
       "supportingImages": [],
       "demonstrationSequence": [],
       "sourceReference": "Meesam Somatic Batch 1-5.zip",
-      "needsReview": true,
-      "reviewNote": "Artwork's own eyebrow label reads 'SUPPORT, PRESSURE & PROPRIOCEPTION' (Series 01's theme) rather than Series 03's - the badge number ('03') is correct and the title matches the xlsx Series-03 master list exactly, so this is treated as a labeling inconsistency in the artwork, not a series-assignment ambiguity. Flagged for awareness."
+      "needsReview": false,
+      "reviewNote": "Resolved 20 Nov 2026: Artwork eyebrow corrected to \"Orientation & Visual-Spatial Attention\". Corrected artwork is in content/somatic-cards/artwork-corrections/the-visual-return.jpg and is live in Sanity. Do not re-import this card from the original artwork file.",
+      "artworkCorrection": "artwork-corrections/the-visual-return.jpg"
     },
     {
       "cardNumber": 31,
@@ -3099,7 +3099,7 @@
         {
           "order": 2,
           "label": "Initial Contact",
-          "instruction": "Gently place your palm or fingertips against the warm object. Start with light, light contact."
+          "instruction": "Gently place your palm or fingertips against the warm object. Start with light contact."
         },
         {
           "order": 3,
@@ -3148,8 +3148,9 @@
       "supportingImages": [],
       "demonstrationSequence": [],
       "sourceReference": "Meesam Somatic Batch 1-5.zip",
-      "needsReview": true,
-      "reviewNote": "The card's own step numbering is duplicated in the artwork ('ARRIVE' appears as both step 3's heading text and again as a separate step 4 heading, and the final two steps are both labeled '07') - all 8 distinct step entries visible on the card were transcribed and re-numbered sequentially 0-7 here, preserving each entry's own instruction text exactly as shown (including the apparent duplication of an 'Arrive'-labeled entry as a separate step). Flagged for human verification against the original source."
+      "needsReview": false,
+      "reviewNote": "Resolved 20 Nov 2026: the printed card was checked directly. The card has 8 steps; the artwork had a stray duplicate \"Arrive\" block, \"light light contact\" in step 3, and repeated step numbers 04 and 07. The image was corrected (stray block removed, numbered 01-08) and the typo removed from the card text. Corrected artwork is in content/somatic-cards/artwork-corrections/the-warmth-return.jpg and is live in Sanity. Do not re-import this card from the original artwork file.",
+      "artworkCorrection": "artwork-corrections/the-warmth-return.jpg"
     },
     {
       "cardNumber": 45,
@@ -3220,8 +3221,9 @@
       "supportingImages": [],
       "demonstrationSequence": [],
       "sourceReference": "Meesam Somatic Batch 1-5.zip",
-      "needsReview": true,
-      "reviewNote": "The final step's instruction text ('Notice the sensation in stillness. Then return your hands to rest.') is printed twice in sequence within the same step on the artwork - transcribed exactly as shown rather than silently de-duplicated. Flagged for human verification against the original source."
+      "needsReview": false,
+      "reviewNote": "Resolved 20 Nov 2026: Duplicated last sentence removed from the artwork. Corrected artwork is in content/somatic-cards/artwork-corrections/the-forearm-sweep.jpg and is live in Sanity. Do not re-import this card from the original artwork file.",
+      "artworkCorrection": "artwork-corrections/the-forearm-sweep.jpg"
     },
     {
       "cardNumber": 46,
@@ -3292,8 +3294,9 @@
       "supportingImages": [],
       "demonstrationSequence": [],
       "sourceReference": "Meesam Somatic Batch 1-5.zip",
-      "needsReview": true,
-      "reviewNote": "The card's own step numbering repeats ('SLOWLY RELEASE' appears as step 6 and its text is repeated verbatim as a separate step 7, both labeled '07' on the artwork) - all distinct step entries visible were transcribed and re-numbered sequentially 0-6 here (the verbatim-repeated entry was not duplicated in this transcription, since its text was identical to the preceding step, not new content). Flagged for human verification against the original source."
+      "needsReview": false,
+      "reviewNote": "Resolved 20 Nov 2026: Duplicate \"Slowly Release\" step removed from the artwork; steps now 01-07. Corrected artwork is in content/somatic-cards/artwork-corrections/the-containment-hold.jpg and is live in Sanity. Do not re-import this card from the original artwork file.",
+      "artworkCorrection": "artwork-corrections/the-containment-hold.jpg"
     },
     {
       "cardNumber": 47,

@@ -1,5 +1,5 @@
 {
-  "_comment": "Approved 18 Nov 2026 (Mapping V1 for Somatic cards; PowerDrop mapping approved in chat). First condition is the primary. Cards listed under excludedFromRecommendations carry open artwork/text review flags and are deliberately untagged until cleared. Series 06 cards and placeholder PowerDrops are not mapped. Owner confirmed 20 Nov 2026: Return Path stays Safety then Capacity (practice tags); The Enough List stays Availability then Participation. Both are already applied in Sanity.",
+  "_comment": "Approved 18 Nov 2026 (Mapping V1 for Somatic cards; PowerDrop mapping approved in chat). First condition is the primary. Cards listed under excludedFromRecommendations carry open artwork/text review flags and are deliberately untagged until cleared. Series 06 cards and placeholder PowerDrops are not mapped. Owner confirmed 20 Nov 2026: Return Path stays Safety then Capacity (practice tags); The Enough List stays Availability then Participation. Both are already applied in Sanity. Update 20 Nov 2026: seven of the eight review-flagged cards were corrected (see content/somatic-cards/artwork-corrections) and tagged from Mapping V1; only the-warmth-return stays excluded until Caroline confirms its step sequence. Update 20 Nov 2026 (later): the-warmth-return was also corrected and tagged from Mapping V1, so no card is excluded now. Series 06 cards and placeholder PowerDrops are still not mapped. Update 20 Nov 2026 (Series 06): the ten Series 06 cards (51-60) were mapped on the owner's approval of the proposal (voiced cards 51 and 60 carry no Safety so they are not offered at the lowest check-in answers). Placeholder PowerDrops are still not mapped.",
   "somaticCards": {
     "the-ground-press-drop": ["Safety", "Capacity"],
     "the-heel-press-reset": ["Safety"],
@@ -42,7 +42,25 @@
     "the-pressure-choice-practice": ["Capacity", "Availability"],
     "the-hand-to-arm-contact": ["Availability", "Safety"],
     "the-thermal-map": ["Availability", "Capacity"],
-    "the-texture-discrimination-map": ["Availability", "Expansion"]
+    "the-texture-discrimination-map": ["Availability", "Expansion"],
+    "the-back-body-anchor": ["Safety", "Availability"],
+    "the-completion-exhale": ["Capacity", "Safety"],
+    "the-peripheral-vision-reset": ["Availability"],
+    "the-horizontal-eye-sweep": ["Safety", "Availability"],
+    "the-visual-return": ["Safety", "Availability"],
+    "the-forearm-sweep": ["Availability"],
+    "the-containment-hold": ["Safety", "Availability"],
+    "the-warmth-return": ["Availability", "Safety"],
+    "the-humming-reset": ["Availability"],
+    "the-voiced-exhale": ["Capacity", "Availability"],
+    "extended-vowel-reset": ["Capacity", "Availability"],
+    "resonance-hold": ["Availability"],
+    "self-voice-anchor": ["Availability", "Expansion"],
+    "sound-horizon": ["Safety", "Availability"],
+    "left-right-sound-map": ["Safety", "Availability"],
+    "jaw-release": ["Safety", "Availability"],
+    "tongue-drop": ["Safety", "Availability"],
+    "voice-return": ["Capacity"]
   },
   "powerDrops": {
     "the-90-second-exhale-drop": ["Safety", "Capacity"],
@@ -55,14 +73,5 @@
     "mask-drop-mirror-ritual": ["Availability", "Expansion"],
     "the-enough-list": ["Availability", "Participation"]
   },
-  "excludedFromRecommendations": [
-    "the-back-body-anchor",
-    "the-completion-exhale",
-    "the-peripheral-vision-reset",
-    "the-horizontal-eye-sweep",
-    "the-visual-return",
-    "the-warmth-return",
-    "the-forearm-sweep",
-    "the-containment-hold"
-  ]
+  "excludedFromRecommendations": []
 }

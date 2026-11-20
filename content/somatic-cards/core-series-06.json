@@ -1,0 +1,480 @@
+{
+  "collection": "core-series",
+  "series": [
+    {
+      "seriesNumber": 6,
+      "title": "Voice, Vibration & Expression",
+      "coreQuestion": null
+    }
+  ],
+  "cards": [
+    {
+      "cardNumber": 51,
+      "seriesNumber": 6,
+      "title": "The Humming Reset",
+      "slug": "the-humming-reset",
+      "sortOrder": 51,
+      "artworkSource": "Woman_making_sound_with_hand_20260924165423.jpeg",
+      "invitation": "Let your voice create a gentle vibration you can hear and feel.",
+      "purpose": "Vocal vibration and sensory awareness.",
+      "description": "A soft hum creates sound and vibration that can be noticed through the mouth, throat and surrounding tissues. Paying attention to these sensations can help you distinguish your own vocal signal without needing to make the sound loud or intense.",
+      "orientation": null,
+      "practiceSteps": [
+        { "order": 0, "label": null, "instruction": "Sit or stand comfortably." },
+        { "order": 1, "label": null, "instruction": "Let your jaw and shoulders soften." },
+        { "order": 2, "label": null, "instruction": "Take an easy breath." },
+        {
+          "order": 3,
+          "label": null,
+          "instruction": "With your lips gently closed, make a soft hum."
+        },
+        {
+          "order": 4,
+          "label": null,
+          "instruction": "Notice where you can hear or feel the vibration."
+        },
+        {
+          "order": 5,
+          "label": null,
+          "instruction": "Pause and notice what remains when the sound stops."
+        },
+        { "order": 6, "label": null, "instruction": "Repeat only if it feels comfortable." }
+      ],
+      "whatToNotice": [
+        { "order": 0, "text": "Vibration" },
+        { "order": 1, "text": "Sound" },
+        { "order": 2, "text": "Sensory change" }
+      ],
+      "gentleNote": "Keep the sound soft and comfortable. There is no need to make the vibration strong. Stop or reduce the practice if it creates discomfort, dizziness, throat strain or sensory overwhelm.",
+      "anchor": "I can hear and feel my own signal.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Canonical Practices for Series 06.pdf",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 52,
+      "seriesNumber": 6,
+      "title": "The Voiced Exhale",
+      "slug": "the-voiced-exhale",
+      "sortOrder": 52,
+      "artworkSource": "magnific_the-woman-is-seated-comfo_3zBUu8FREY.png",
+      "invitation": "Let your exhale become an easy, audible sound.",
+      "purpose": "Vocal-respiratory coordination.",
+      "description": "Adding gentle sound to an exhale links breathing with vocal movement. This gives you an opportunity to notice how breath, voice and bodily sensation change together.",
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": null,
+          "instruction": "Find a comfortable seated or standing position."
+        },
+        { "order": 1, "label": null, "instruction": "Let your shoulders and jaw soften." },
+        { "order": 2, "label": null, "instruction": "Take an easy, ordinary breath in." },
+        {
+          "order": 3,
+          "label": null,
+          "instruction": "As you exhale, allow a soft voiced sound to emerge."
+        },
+        {
+          "order": 4,
+          "label": null,
+          "instruction": "Let the sound end naturally rather than pushing it longer."
+        },
+        { "order": 5, "label": null, "instruction": "Pause and notice your breathing." },
+        { "order": 6, "label": null, "instruction": "Repeat if comfortable." }
+      ],
+      "whatToNotice": [
+        { "order": 0, "text": "Breath" },
+        { "order": 1, "text": "Sound" },
+        { "order": 2, "text": "Effort" }
+      ],
+      "gentleNote": "Do not extend or force the exhale. Keep the sound easy and stop if you experience strain, air hunger, dizziness or discomfort.",
+      "anchor": "My breath and voice can work together without force.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Canonical Practices for Series 06.pdf",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 53,
+      "seriesNumber": 6,
+      "title": "Extended Vowel Reset",
+      "slug": "extended-vowel-reset",
+      "sortOrder": 53,
+      "artworkSource": "magnific_the-woman-is-seated-comfo_rg3Cnumxtc.png",
+      "invitation": "Let one comfortable vowel become a steady, easy sound.",
+      "purpose": "Vocal continuity and sensory tracking.",
+      "description": "Sustaining a simple vowel creates a continuous vocal signal that can be heard and felt while the sound changes over time. This gives you a simple way to notice continuity, effort and changes in resonance.",
+      "orientation": null,
+      "practiceSteps": [
+        { "order": 0, "label": null, "instruction": "Sit or stand comfortably." },
+        { "order": 1, "label": null, "instruction": "Relax your jaw and face." },
+        { "order": 2, "label": null, "instruction": "Take an easy breath." },
+        { "order": 3, "label": null, "instruction": "Choose one comfortable vowel sound." },
+        {
+          "order": 4,
+          "label": null,
+          "instruction": "Let the sound continue gently for a short, comfortable period."
+        },
+        { "order": 5, "label": null, "instruction": "Notice where you hear or feel the sound." },
+        { "order": 6, "label": null, "instruction": "Stop before you need to strain." },
+        { "order": 7, "label": null, "instruction": "Return to ordinary breathing." }
+      ],
+      "whatToNotice": [
+        { "order": 0, "text": "Continuity" },
+        { "order": 1, "text": "Resonance" },
+        { "order": 2, "text": "Effort" }
+      ],
+      "gentleNote": "The sound does not need to be long or loud. Choose a comfortable pitch and stop whenever your throat, breath or body asks you to.",
+      "anchor": "I can stay with a sound without forcing it.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Canonical Practices for Series 06.pdf",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 54,
+      "seriesNumber": 6,
+      "title": "Resonance Hold",
+      "slug": "resonance-hold",
+      "sortOrder": 54,
+      "artworkSource": "magnific_the-woman-is-seated-comfo_WDfNk8jcXe.png",
+      "invitation": "Make a gentle sound, then notice where its vibration is easiest to feel.",
+      "purpose": "Resonance awareness and sensory localisation.",
+      "description": "Vocal sound produces vibration that can be experienced through different areas of the mouth, throat and upper body. Noticing these differences builds more precise awareness of your own vocal sensations.",
+      "orientation": null,
+      "practiceSteps": [
+        { "order": 0, "label": null, "instruction": "Find a comfortable position." },
+        { "order": 1, "label": null, "instruction": "Make a soft hum or voiced sound." },
+        {
+          "order": 2,
+          "label": null,
+          "instruction": "Notice where the vibration feels most noticeable."
+        },
+        { "order": 3, "label": null, "instruction": "Keep the sound gentle." },
+        { "order": 4, "label": null, "instruction": "Stay with that sensation for a moment." },
+        { "order": 5, "label": null, "instruction": "Let the sound stop." },
+        {
+          "order": 6,
+          "label": null,
+          "instruction": "Notice the difference between sound and silence."
+        },
+        { "order": 7, "label": null, "instruction": "Repeat only if comfortable." }
+      ],
+      "whatToNotice": [
+        { "order": 0, "text": "Location" },
+        { "order": 1, "text": "Vibration" },
+        { "order": 2, "text": "Change" }
+      ],
+      "gentleNote": "There is no correct place for the vibration to be felt. Your experience may change with pitch, posture, sound and day-to-day state.",
+      "anchor": "I can notice where my voice lives in my body.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Canonical Practices for Series 06.pdf",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 55,
+      "seriesNumber": 6,
+      "title": "Self-Voice Anchor",
+      "slug": "self-voice-anchor",
+      "sortOrder": 55,
+      "artworkSource": "magnific_same-woman-as-the-supplie_u57B4VPQLD.png",
+      "invitation": "Hear your own voice and notice the experience of being the one creating it.",
+      "purpose": "Self-recognition and vocal presence.",
+      "description": "Speaking or making sound provides simultaneous auditory and bodily feedback. Noticing both the sound you hear and the sensations involved in producing it can strengthen awareness of your own vocal presence.",
+      "orientation": null,
+      "practiceSteps": [
+        { "order": 0, "label": null, "instruction": "Sit or stand comfortably." },
+        {
+          "order": 1,
+          "label": null,
+          "instruction": "Say a simple word or short phrase in your natural voice."
+        },
+        { "order": 2, "label": null, "instruction": "Notice the sound as you hear it." },
+        {
+          "order": 3,
+          "label": null,
+          "instruction": "Notice what your mouth, throat and chest are doing."
+        },
+        {
+          "order": 4,
+          "label": null,
+          "instruction": "Say it again without trying to change the sound."
+        },
+        { "order": 5, "label": null, "instruction": "Pause." },
+        {
+          "order": 6,
+          "label": null,
+          "instruction": "Notice your sense of yourself as the person making the sound."
+        }
+      ],
+      "whatToNotice": [
+        { "order": 0, "text": "Hearing" },
+        { "order": 1, "text": "Vibration" },
+        { "order": 2, "text": "Presence" }
+      ],
+      "gentleNote": "There is no need to make your voice sound a particular way. Use a volume and phrase that feel comfortable.",
+      "anchor": "My voice is part of how I experience myself.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Canonical Practices for Series 06.pdf",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 56,
+      "seriesNumber": 6,
+      "title": "Sound Horizon",
+      "slug": "sound-horizon",
+      "sortOrder": 56,
+      "artworkSource": "magnific_the-woman-is-standing-com_iGXSEQq3uK.png",
+      "invitation": "Let your attention notice sound beyond the immediate space around you.",
+      "purpose": "Auditory orientation and environmental awareness.",
+      "description": "Sound provides information about the environment around you. Broadening attention to different sounds can support awareness of location and surroundings without requiring you to identify or control every sound.",
+      "orientation": null,
+      "practiceSteps": [
+        { "order": 0, "label": null, "instruction": "Sit or stand comfortably." },
+        { "order": 1, "label": null, "instruction": "Notice the sounds closest to you." },
+        {
+          "order": 2,
+          "label": null,
+          "instruction": "Let your attention gradually include sounds farther away."
+        },
+        {
+          "order": 3,
+          "label": null,
+          "instruction": "Notice whether sounds seem to come from different directions or distances."
+        },
+        {
+          "order": 4,
+          "label": null,
+          "instruction": "Allow your attention to widen rather than searching for a particular sound."
+        },
+        { "order": 5, "label": null, "instruction": "Return awareness to your own body." },
+        {
+          "order": 6,
+          "label": null,
+          "instruction": "Notice yourself in the larger sound environment."
+        }
+      ],
+      "whatToNotice": [
+        { "order": 0, "text": "Distance" },
+        { "order": 1, "text": "Direction" },
+        { "order": 2, "text": "Surroundings" }
+      ],
+      "gentleNote": "Choose a reasonably comfortable environment. If surrounding sounds feel overwhelming, narrow your attention to one familiar or neutral sound.",
+      "anchor": "I can hear myself and the space around me.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Canonical Practices for Series 06.pdf",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 57,
+      "seriesNumber": 6,
+      "title": "Left–Right Sound Map",
+      "slug": "left-right-sound-map",
+      "sortOrder": 57,
+      "artworkSource": "magnific_the-woman-is-standing-com_nVv4KZkYQD.png",
+      "invitation": "Notice how sound arrives from different sides of your environment.",
+      "purpose": "Auditory spatial discrimination.",
+      "description": "Sounds arriving from different directions provide spatial information. Noticing left, right and central sound locations can encourage more detailed awareness of the environment.",
+      "orientation": null,
+      "practiceSteps": [
+        {
+          "order": 0,
+          "label": null,
+          "instruction": "Sit comfortably with your head in a natural position."
+        },
+        {
+          "order": 1,
+          "label": null,
+          "instruction": "Notice a sound on your left, if one is present."
+        },
+        { "order": 2, "label": null, "instruction": "Notice a sound on your right." },
+        { "order": 3, "label": null, "instruction": "Notice any sound that seems more central." },
+        {
+          "order": 4,
+          "label": null,
+          "instruction": "Compare the different locations without judging them."
+        },
+        {
+          "order": 5,
+          "label": null,
+          "instruction": "Let your attention move between left, centre and right."
+        },
+        {
+          "order": 6,
+          "label": null,
+          "instruction": "Finish by noticing the whole space around you."
+        }
+      ],
+      "whatToNotice": [
+        { "order": 0, "text": "Left / right" },
+        { "order": 1, "text": "Direction" },
+        { "order": 2, "text": "Spatial difference" }
+      ],
+      "gentleNote": "You do not need to search for sounds or turn your head repeatedly. Work with sounds that are already available in your environment.",
+      "anchor": "I can notice where sound is coming from.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Canonical Practices for Series 06.pdf",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 58,
+      "seriesNumber": 6,
+      "title": "Jaw Release",
+      "slug": "jaw-release",
+      "sortOrder": 58,
+      "artworkSource": "Card 58.png",
+      "invitation": "Notice your jaw, then allow it to soften without forcing it open.",
+      "purpose": "Jaw awareness and vocal ease.",
+      "description": "The jaw participates in speech, vocalisation and facial movement. Bringing gentle attention to jaw tension can help you notice unnecessary effort and experiment with a softer resting position.",
+      "orientation": null,
+      "practiceSteps": [
+        { "order": 0, "label": null, "instruction": "Sit or stand comfortably." },
+        { "order": 1, "label": null, "instruction": "Notice how your jaw feels right now." },
+        {
+          "order": 2,
+          "label": null,
+          "instruction": "Let your teeth separate slightly if that feels natural."
+        },
+        { "order": 3, "label": null, "instruction": "Allow the tongue and lips to soften." },
+        { "order": 4, "label": null, "instruction": "Take an easy breath." },
+        {
+          "order": 5,
+          "label": null,
+          "instruction": "Make a quiet sound or speak a few words if comfortable."
+        },
+        {
+          "order": 6,
+          "label": null,
+          "instruction": "Notice whether your jaw changes as you vocalise."
+        },
+        { "order": 7, "label": null, "instruction": "Return to a comfortable resting position." }
+      ],
+      "whatToNotice": [
+        { "order": 0, "text": "Tension" },
+        { "order": 1, "text": "Movement" },
+        { "order": 2, "text": "Ease" }
+      ],
+      "gentleNote": "Do not stretch, pull or aggressively massage the jaw. Stay within a comfortable range, especially if you have jaw pain or sensitivity.",
+      "anchor": "I can soften without forcing.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Canonical Practices for Series 06.pdf",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 59,
+      "seriesNumber": 6,
+      "title": "Tongue Drop",
+      "slug": "tongue-drop",
+      "sortOrder": 59,
+      "artworkSource": "Card 59.png",
+      "invitation": "Notice the tongue resting inside your mouth and allow unnecessary effort to soften.",
+      "purpose": "Oral sensory awareness and vocal ease.",
+      "description": "The tongue is involved in speech, swallowing and shaping vocal sounds. Noticing its resting position can increase awareness of subtle oral effort and changes that occur during vocalisation.",
+      "orientation": null,
+      "practiceSteps": [
+        { "order": 0, "label": null, "instruction": "Sit comfortably and let your face soften." },
+        { "order": 1, "label": null, "instruction": "Notice where your tongue is resting." },
+        {
+          "order": 2,
+          "label": null,
+          "instruction": "Allow it to become less effortful without deliberately pushing it down."
+        },
+        { "order": 3, "label": null, "instruction": "Keep your jaw comfortable." },
+        { "order": 4, "label": null, "instruction": "Take an easy breath." },
+        { "order": 5, "label": null, "instruction": "Say a simple word or make a gentle sound." },
+        {
+          "order": 6,
+          "label": null,
+          "instruction": "Notice how the tongue changes with the sound."
+        },
+        { "order": 7, "label": null, "instruction": "Return to a quiet resting position." }
+      ],
+      "whatToNotice": [
+        { "order": 0, "text": "Position" },
+        { "order": 1, "text": "Effort" },
+        { "order": 2, "text": "Change" }
+      ],
+      "gentleNote": "Do not force the tongue downward or stretch it. This is an awareness practice, not a physical stretching exercise.",
+      "anchor": "I can notice effort and allow more ease.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Canonical Practices for Series 06.pdf",
+      "needsReview": false,
+      "reviewNote": null
+    },
+    {
+      "cardNumber": 60,
+      "seriesNumber": 6,
+      "title": "Voice Return",
+      "slug": "voice-return",
+      "sortOrder": 60,
+      "artworkSource": "magnific_the-woman-is-seated-comfo_dt5zwueXSL.png",
+      "invitation": "Make a little sound, then return to your natural quiet.",
+      "purpose": "Transition from vocal expression back to stillness.",
+      "description": "Moving between sound and silence provides an opportunity to notice changes in breathing, muscle activity, attention and bodily sensation. The practice focuses on transition rather than producing a particular vocal effect.",
+      "orientation": null,
+      "practiceSteps": [
+        { "order": 0, "label": null, "instruction": "Sit or stand comfortably." },
+        { "order": 1, "label": null, "instruction": "Notice your natural quiet." },
+        { "order": 2, "label": null, "instruction": "Make one soft, comfortable sound." },
+        { "order": 3, "label": null, "instruction": "Let the sound finish naturally." },
+        { "order": 4, "label": null, "instruction": "Pause in silence." },
+        { "order": 5, "label": null, "instruction": "Notice your body after the sound has ended." },
+        { "order": 6, "label": null, "instruction": "Repeat once if desired." },
+        {
+          "order": 7,
+          "label": null,
+          "instruction": "Finish by returning to ordinary breathing and quiet."
+        }
+      ],
+      "whatToNotice": [
+        { "order": 0, "text": "Sound" },
+        { "order": 1, "text": "Silence" },
+        { "order": 2, "text": "Transition" }
+      ],
+      "gentleNote": "There is no need to make the sound loud, long or emotionally expressive. Keep the transition comfortable and stop if vocalisation feels strained or overwhelming.",
+      "anchor": "I can express and return to quiet.",
+      "visualTreatment": null,
+      "heroImageSource": null,
+      "supportingImages": [],
+      "demonstrationSequence": [],
+      "sourceReference": "Canonical Practices for Series 06.pdf",
+      "needsReview": false,
+      "reviewNote": null
+    }
+  ],
+  "excludedSource": []
+}
