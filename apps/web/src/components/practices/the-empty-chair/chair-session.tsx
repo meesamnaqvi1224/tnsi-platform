@@ -5,6 +5,7 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Pause, Play, X } from 'lucide-react';
 import { cn } from '@tnsi/ui';
+import { recordStandaloneCompletion } from '@/lib/record-standalone-completion';
 import type { ResetRoutes } from '../ninety-second-reset/content';
 import { ResetBrand, ResetShell } from '../ninety-second-reset/reset-shell';
 import styles from '../ninety-second-reset/reset.module.css';
@@ -166,6 +167,7 @@ export function ChairSession({
     const audio = audioRef.current;
     setPosition(audio && Number.isFinite(audio.duration) ? audio.duration : duration);
     setStatus('paused');
+    recordStandaloneCompletion('the-empty-chair');
     router.push(routes.complete);
   };
 
