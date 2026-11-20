@@ -12,6 +12,7 @@ import { db, checkIns, practices, practiceCompletions } from '@tnsi/db';
 import { eq, and, inArray, gte, lte, desc } from 'drizzle-orm';
 import { success } from '@/lib/api-response';
 import { getRecommendedPractices, getPracticeProgressSummary } from '@/lib/practices';
+import { getHetSuggestions } from '@/lib/het-suggestions';
 import { toPublicCheckIn } from '@/lib/check-ins';
 import { contentAccessFor, withPracticeAccess } from '@/lib/membership';
 
@@ -105,9 +106,14 @@ export async function GET() {
   // independent of `recentPractices`: the recommended category may not be
   // among the first 10 practices in category/difficulty order, so this is
   // its own lookup, not a re-slice of `practicesWithProgress`.
-  const { primary: recommendedPractice, alternative: alternativeRecommendation } =
-    await getRecommendedPractices(user.id, { freeOnly });
+  const {
+    primary: recommendedPractice,
+    alternative: alternativeRecommendation,
+    condition: recommendedCondition,
+  } = await getRecommendedPractices(user.id, { freeOnly });
   const progressSummary = await getPracticeProgressSummary(user.id);
+  // The wider library for this moment: a PowerDrop and a Somatic Card alongside the guided practice (additive).
+  const suggestions = await getHetSuggestions(user.id, { freeOnly, practice: recommendedPractice });
   let todayPractice = null;
   if (recommendedPractice) {
     const existingCompletion = completionsMap.get(recommendedPractice.id);
@@ -147,10 +153,14 @@ export async function GET() {
     checkIn: todayCheckIn[0] ? toPublicCheckIn(todayCheckIn[0]) : null,
     practices: practicesWithProgress,
     todayPractice,
-    // One optional alternative from the same category (see getRecommendedPractices).
+    // The Human Expansion Theory condition the primary pick answers to (additive; null when nothing is recommended).
+    recommendedCondition: recommendedCondition ?? null,
+    // One optional alternative, the next best match (see getRecommendedPractices).
     alternativePractice: alternativeRecommendation
       ? withPracticeAccess(alternativeRecommendation, access)
       : null,
+    // Mixed suggestions across guided practices, PowerDrops and Somatic Cards, brief items first for a lower answer.
+    suggestions,
     // Observable engagement only (completed sessions, latest one), for Home's progress widget.
     progressSummary,
   });

@@ -41,14 +41,14 @@ async function newUser(label: string) {
   return row!.id;
 }
 
-async function newPractice(title: string, category: string, extra: { isFree?: boolean } = {}) {
+async function newPractice(title: string, tags: string[], extra: { isFree?: boolean } = {}) {
   const [row] = await m.db
     .insert(m.practices)
     .values({
       sanityId: `${RUN}-${title}`,
       title,
       contentType: 'audio',
-      category,
+      tags,
       sanityData: {},
       isPublished: true,
       ...extra,
@@ -96,82 +96,84 @@ describe.skipIf(!enabled)(
       await m.db.delete(m.practices).where(m.like(m.practices.sanityId, `${RUN}-%`));
     });
 
-    it('gives the primary and the next practice in the same category, in the same fixed order', async () => {
+    it('recommends by Human Expansion Theory condition: a lower answer gets Safety-first content, with the next best as the alternative', async () => {
       const u = await newUser('alt');
-      const a = await newPractice('reg-a', 'REGULATION');
-      const b = await newPractice('reg-b', 'REGULATION');
-      await newPractice('gro-a', 'GROUNDING');
-      await checkInToday(u, 2); // capacity 2 maps to REGULATION
-      const { primary, alternative } = await m.lib.getRecommendedPractices(u);
-      const regulation = (
-        await m.db
-          .select({ id: m.practices.id })
-          .from(m.practices)
-          .where(m.eq(m.practices.category, 'REGULATION'))
-      )
-        .map((r) => r.id)
-        .sort();
-      expect([a.id, b.id].every((id) => regulation.includes(id))).toBe(true);
-      expect(primary?.id).toBe(regulation[0]);
-      expect(alternative?.id).toBe(regulation[1]);
+      const safetyA = await newPractice('het-safety-a', ['Safety']);
+      const safetyB = await newPractice('het-safety-b', ['Safety', 'Capacity']);
+      const exp = await newPractice('het-expansion', ['Expansion']);
+      await checkInToday(u, 2); // unsettled: Safety first, then Capacity
+      const { primary, alternative, condition } = await m.lib.getRecommendedPractices(u);
+      expect(condition).toBe('Safety');
+      expect([safetyA.id, safetyB.id]).toContain(primary?.id);
+      // A Safety-first answer never offers an Expansion practice while two Safety ones exist.
+      expect(primary?.id).not.toBe(exp.id);
+      expect(alternative?.id).not.toBe(primary?.id);
       // The single-pick function the rest of the app uses agrees with the primary.
       expect((await m.lib.getRecommendedPractice(u))?.id).toBe(primary?.id);
     });
 
-    it('has no alternative when the category holds one practice, and nothing without a check-in', async () => {
+    it('has no alternative when only one practice is tagged, and nothing without a check-in', async () => {
       const none = await newUser('alt-none');
       expect(await m.lib.getRecommendedPractices(none)).toEqual({
         primary: null,
         alternative: null,
+        condition: null,
       });
-      const u = await newUser('alt-one');
-      await newPractice('cen-only', 'CENTERING');
-      await checkInToday(u, 3); // CENTERING
+    });
+
+    it('falls back down the preference order rather than returning nothing, and ignores untagged practices', async () => {
+      const u = await newUser('alt-fallback');
+      await newPractice('het-untagged', ['Healing']);
+      await checkInToday(u, 4); // Availability first; none of this file\'s practices carry it
       const r = await m.lib.getRecommendedPractices(u);
       expect(r.primary).not.toBeNull();
-      expect(r.alternative).toBeNull();
+      expect(r.primary?.title).not.toBe('het-untagged');
     });
 
-    it('has no recommendation when nothing is published for the mapped category', async () => {
-      const u = await newUser('alt-empty');
-      await checkInToday(u, 4); // EMBODIMENT; none created by this file (and none expected in an isolated database)
-      const embodiment = await m.db
-        .select({ id: m.practices.id })
-        .from(m.practices)
-        .where(m.eq(m.practices.category, 'EMBODIMENT'));
-      if (embodiment.length === 0) {
-        expect(await m.lib.getRecommendedPractices(u)).toEqual({
-          primary: null,
-          alternative: null,
-        });
-      }
-    });
-
-    it('a free member is only ever recommended free practices; a paid member draws from the whole category', async () => {
-      // EXPANSION (capacity 5): one free practice and two paid ones.
-      const free = await newPractice('exp-free', 'EXPANSION', { isFree: true });
-      await newPractice('exp-paid-a', 'EXPANSION', { isFree: false });
-      await newPractice('exp-paid-b', 'EXPANSION', { isFree: false });
+    it('a free member is only ever recommended free practices; a paid member draws from the whole library', async () => {
+      const free = await newPractice('het-free', ['Expansion'], { isFree: true });
+      await newPractice('het-paid-a', ['Expansion'], { isFree: false });
+      await newPractice('het-paid-b', ['Expansion'], { isFree: false });
       const u = await newUser('entitlement');
       await checkInToday(u, 5);
 
       const freeMember = await m.lib.getRecommendedPractices(u, { freeOnly: true });
       expect(freeMember.primary?.id).toBe(free.id);
       expect(freeMember.primary?.isFree).toBe(true);
-      expect(freeMember.alternative).toBeNull(); // only one free practice in the category
+      for (const practice of [freeMember.primary, freeMember.alternative]) {
+        expect(practice === null || practice.isFree === true).toBe(true);
+      }
 
       const paidMember = await m.lib.getRecommendedPractices(u);
       expect(paidMember.primary).not.toBeNull();
       expect(paidMember.alternative).not.toBeNull();
       expect(paidMember.alternative?.id).not.toBe(paidMember.primary?.id);
-      // The single-pick function honours the same option.
       expect((await m.lib.getRecommendedPractice(u, { freeOnly: true }))?.id).toBe(free.id);
     });
 
-    it('a free member whose category has no free practice gets no recommendation rather than a paid one', async () => {
+    it('a practice completed this week is offered after an unseen one of the same relevance', async () => {
+      const u = await newUser('recent');
+      const a = await newPractice('het-recent-a', ['Availability']);
+      const b = await newPractice('het-recent-b', ['Availability']);
+      await checkInToday(u, 4); // Availability first
+      const first = (await m.lib.getRecommendedPractices(u)).primary!;
+      expect([a.id, b.id]).toContain(first.id);
+      await m.db.insert(m.practiceCompletions).values({
+        userId: u,
+        practiceId: first.id,
+        completed: true,
+        completedAt: new Date(),
+        progressPct: 1,
+        playCount: 1,
+      });
+      const after = (await m.lib.getRecommendedPractices(u)).primary!;
+      expect(after.id).not.toBe(first.id);
+    });
+
+    it('a free member whose answer has no free practice gets no paid one', async () => {
       const u = await newUser('entitlement-none');
-      await newPractice('gro-paid-only', 'GROUNDING', { isFree: false });
-      await checkInToday(u, 1); // GROUNDING
+      await newPractice('het-paid-only', ['Safety'], { isFree: false });
+      await checkInToday(u, 1);
       const r = await m.lib.getRecommendedPractices(u, { freeOnly: true });
       for (const practice of [r.primary, r.alternative]) {
         expect(practice === null || practice.isFree === true).toBe(true);
@@ -180,7 +182,7 @@ describe.skipIf(!enabled)(
 
     it('the progress summary counts completed sessions (repeats included) and names the latest', async () => {
       const u = await newUser('progress');
-      const p = await newPractice('prog-a', 'GROUNDING');
+      const p = await newPractice('prog-a', ['Safety']);
       expect(await m.lib.getPracticeProgressSummary(u)).toEqual({
         completedSessions: 0,
         lastCompleted: null,

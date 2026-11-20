@@ -104,6 +104,24 @@ export const powerDrop = defineType({
     }),
 
     defineField({
+      name: 'hetConditions',
+      title: 'Developmental Conditions (Human Expansion Theory)',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description:
+        'Which of the five Developmental Conditions this supports. The FIRST selected is the primary condition; add a second only where justified. This is what the daily recommendation matches on - leave empty to keep it out of recommendations. Not a diagnosis or a stage.',
+      options: {
+        list: [
+          { title: 'Safety', value: 'Safety' },
+          { title: 'Capacity', value: 'Capacity' },
+          { title: 'Availability', value: 'Availability' },
+          { title: 'Expansion', value: 'Expansion' },
+          { title: 'Participation', value: 'Participation' },
+        ],
+      },
+      validation: (r) => r.unique().max(3),
+    }),
+    defineField({
       name: 'sortOrder',
       type: 'number',
       description: 'Manual display order within the library. Lower first.',

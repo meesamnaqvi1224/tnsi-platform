@@ -22,6 +22,10 @@ vi.mock('@/lib/check-ins', () => ({
   getCheckInHistory: () => mockGetCheckInHistory(),
 }));
 
+const mockGetHetSuggestions = vi.fn();
+vi.mock('@/lib/het-suggestions', () => ({
+  getHetSuggestions: (...args: unknown[]) => mockGetHetSuggestions(...args),
+}));
 const mockGetTodayPractice = vi.fn();
 vi.mock('@/lib/practices', () => ({
   formatContentTypeLabel: (v: string) => v,
@@ -55,6 +59,7 @@ beforeEach(() => {
   mockGetTodayCheckIn.mockResolvedValue(null);
   mockGetCheckInHistory.mockResolvedValue({ checkIns: [] });
   mockGetTodayPractice.mockResolvedValue(null);
+  mockGetHetSuggestions.mockResolvedValue({ condition: null, items: [] });
   mockFetchSomaticSeriesList.mockResolvedValue({
     status: 'ok',
     data: [
@@ -187,5 +192,74 @@ describe('DashboardPage — one clear next step', () => {
   it('no longer carries the placeholder Account block', async () => {
     const html = renderToStaticMarkup(await DashboardPage());
     expect(html).not.toContain('Manage your account details');
+  });
+});
+
+describe('DashboardPage — More for today (Human Expansion Theory suggestions)', () => {
+  const practice = {
+    id: 'p1',
+    title: 'The Mountain State',
+    description: null,
+    contentType: 'audio',
+    durationSeconds: 600,
+    category: null,
+    difficulty: 1,
+  };
+  const suggestions = {
+    condition: 'Safety',
+    items: [
+      { kind: 'practice', id: 'p1', slug: null, title: 'The Mountain State', description: null },
+      {
+        kind: 'powerDrop',
+        id: 'pd1',
+        slug: 'exhale',
+        title: '90-Second Exhale Drop',
+        description: null,
+      },
+      {
+        kind: 'somaticCard',
+        id: 'c1',
+        slug: 'the-heel-press-reset',
+        title: 'The Heel Press Reset',
+        description: 'Press the heels down.',
+      },
+    ],
+  };
+
+  it('shows nothing, and asks for nothing, before the member has checked in', async () => {
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).not.toContain('More for today');
+    expect(mockGetHetSuggestions).not.toHaveBeenCalled();
+  });
+
+  it('after a check-in, lists the Somatic Card with the approved reason line', async () => {
+    mockGetTodayCheckIn.mockResolvedValue({ id: 'c1' });
+    mockGetTodayPractice.mockResolvedValue({ practice, completed: false });
+    mockGetHetSuggestions.mockResolvedValue(suggestions);
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).toContain('More for today');
+    expect(html).toContain('Chosen to help you find steadiness and support in this moment.');
+    expect(html).toContain('The Heel Press Reset');
+    expect(html).toContain('href="/dashboard/somatic-cards/card/the-heel-press-reset"');
+  });
+
+  it('does not repeat today’s practice and does not offer PowerDrops, which have no web page', async () => {
+    mockGetTodayCheckIn.mockResolvedValue({ id: 'c1' });
+    mockGetTodayPractice.mockResolvedValue({ practice, completed: false });
+    mockGetHetSuggestions.mockResolvedValue(suggestions);
+    const html = renderToStaticMarkup(await DashboardPage());
+    const block = html.slice(html.indexOf('More for today'));
+    expect(block).not.toContain('90-Second Exhale Drop');
+    expect(block.match(/The Mountain State/g) ?? []).toHaveLength(0);
+  });
+
+  it('renders no block when the only suggestions cannot be opened from the website', async () => {
+    mockGetTodayCheckIn.mockResolvedValue({ id: 'c1' });
+    mockGetHetSuggestions.mockResolvedValue({
+      condition: 'Safety',
+      items: [suggestions.items[1]],
+    });
+    const html = renderToStaticMarkup(await DashboardPage());
+    expect(html).not.toContain('More for today');
   });
 });

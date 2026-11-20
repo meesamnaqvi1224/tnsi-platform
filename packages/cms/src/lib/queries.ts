@@ -238,3 +238,30 @@ export const POWER_DROP_API_BY_SLUG_QUERY = groq`
 export const RETURN_PATH_CONTENT_QUERY = groq`*[_id == "returnPathContent"][0]{
   intro, settings, choose, practice, checkpoints, ending, email, timings
 }`;
+
+/**
+ * Recommendation candidates: published PowerDrops and Somatic Cards that
+ * carry Human Expansion Theory conditions. Untagged items are deliberately
+ * absent - an item with no `hetConditions` is never recommended.
+ */
+export const HET_POWER_DROPS_QUERY = groq`
+  *[_type == "powerDrop" && defined(slug.current) && status == "published" && count(hetConditions) > 0] {
+    "id": _id,
+    title,
+    "slug": slug.current,
+    description,
+    "tags": hetConditions,
+    "isFree": coalesce(freeAccess, false)
+  }
+`;
+
+export const HET_SOMATIC_CARDS_QUERY = groq`
+  *[_type == "somaticCard" && defined(slug.current) && status == "published" && count(hetConditions) > 0
+    && (!defined(series) || series->status == "published")] {
+    "id": _id,
+    title,
+    "slug": slug.current,
+    "description": coalesce(invitation, purpose),
+    "tags": hetConditions
+  }
+`;
