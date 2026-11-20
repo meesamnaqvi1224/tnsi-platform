@@ -56,7 +56,11 @@ export const practice = defineType({
       description:
         'Which interactive component this practice opens. Leave Media URL empty and set Duration to 240 seconds. Its on-screen copy is edited in its own content document (e.g. "The Return Path — content"), not here.',
       options: {
-        list: [{ title: 'The Return Path', value: 'the-return-path' }],
+        list: [
+          { title: 'The Return Path', value: 'the-return-path' },
+          { title: '90-Second Reset', value: '90-second-reset' },
+          { title: 'The Empty Chair', value: 'the-empty-chair' },
+        ],
       },
       hidden: ({ document }) => document?.contentType !== 'interactive',
       validation: (r) =>
