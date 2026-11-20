@@ -33,6 +33,7 @@ import {
   tintStyle,
   type Tint,
 } from '@/components/dashboard/membership/membership-visuals';
+import { HetSuggestionsBlock } from '@/components/dashboard/het-suggestions';
 import { ProgressBar } from '@/components/dashboard/progress-bar';
 import { WeekAtAGlance } from '@/components/dashboard/week-at-a-glance';
 import { ResponsiveImage } from '@/components/utility/responsive-image';
@@ -40,6 +41,7 @@ import { summariseAccess } from '@/lib/academy-access';
 import { requireMemberAccessOrRedirect } from '@/lib/auth-api';
 import { contentAccessFor } from '@/lib/membership';
 import { getCheckInHistory, getTodayCheckIn } from '@/lib/check-ins';
+import { getHetSuggestions } from '@/lib/het-suggestions';
 import {
   formatContentTypeLabel,
   formatPracticeDuration,
@@ -201,9 +203,12 @@ export default async function DashboardPage() {
   const todayCheckIn = await getTodayCheckIn(user.id);
   // Don't feature a paid practice as "today's" for a member who can't open it.
   const contentAccess = contentAccessFor(user.entitlements);
-  const todayPractice = await getTodayPractice(user.id, {
-    freeOnly: contentAccess.gatingActive && !contentAccess.membership.hasPaidAccess,
-  });
+  const freeOnly = contentAccess.gatingActive && !contentAccess.membership.hasPaidAccess;
+  const todayPractice = await getTodayPractice(user.id, { freeOnly });
+  // Suggestions follow today's check-in, so none are fetched before the member has checked in.
+  const hetSuggestions = todayCheckIn
+    ? await getHetSuggestions(user.id, { freeOnly, practice: todayPractice?.practice ?? null })
+    : null;
   const [
     inProgressPractices,
     inProgressCount,
@@ -520,6 +525,11 @@ export default async function DashboardPage() {
                           </div>
                         </div>
                       </section>
+
+                      <HetSuggestionsBlock
+                        suggestions={hetSuggestions}
+                        todayPracticeId={todayPractice?.practice.id ?? null}
+                      />
 
                       <section aria-labelledby="somatic-cards-heading">
                         <Panel tint="dusk" className="relative">

@@ -1,5 +1,5 @@
 {
-  "_comment": "Approved 18 Nov 2026 (Mapping V1 for Somatic cards; PowerDrop mapping approved in chat). First condition is the primary. Cards listed under excludedFromRecommendations carry open artwork/text review flags and are deliberately untagged until cleared. Series 06 cards and placeholder PowerDrops are not mapped.",
+  "_comment": "Approved 18 Nov 2026 (Mapping V1 for Somatic cards; PowerDrop mapping approved in chat). First condition is the primary. Cards listed under excludedFromRecommendations carry open artwork/text review flags and are deliberately untagged until cleared. Series 06 cards and placeholder PowerDrops are not mapped. Owner confirmed 20 Nov 2026: Return Path stays Safety then Capacity (practice tags); The Enough List stays Availability then Participation. Both are already applied in Sanity.",
   "somaticCards": {
     "the-ground-press-drop": ["Safety", "Capacity"],
     "the-heel-press-reset": ["Safety"],
