@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import { Alert, Button, Label, Stack, Text, Textarea } from '@tnsi/ui';
 import { browserTimeZone, buildCheckInBody } from '@/lib/check-in-request';
 
@@ -82,6 +83,7 @@ function ScaleField({
 }
 
 export function CheckInForm() {
+  const router = useRouter();
   const [mood, setMood] = React.useState<number | null>(null);
   const [capacity, setCapacity] = React.useState<number | null>(null);
   const [notes, setNotes] = React.useState('');
@@ -111,6 +113,9 @@ export function CheckInForm() {
 
       if (response.ok) {
         setStatus('success');
+        // The dashboard is rendered on the server and shows today's suggestions only once a check-in
+        // exists, so re-render it now rather than leaving the member to reload the page.
+        router.refresh();
         return;
       }
 
@@ -123,6 +128,8 @@ export function CheckInForm() {
         json?.error?.message === 'Check-in already exists for this date'
       ) {
         setStatus('already');
+        // A check-in exists for today but this page was rendered without it: bring it up to date.
+        router.refresh();
         return;
       }
 

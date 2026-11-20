@@ -10,6 +10,11 @@ import { renderToStaticMarkup } from 'react-dom/server';
  * pattern - no real Clerk session or database.
  */
 
+// The check-in form refreshes the page through the Next.js router after saving; a static render has no router.
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: () => undefined, push: () => undefined }),
+}));
+
 const mockRequireMemberAccessOrRedirect = vi.fn();
 vi.mock('@/lib/auth-api', () => ({
   requireMemberAccessOrRedirect: () => mockRequireMemberAccessOrRedirect(),
