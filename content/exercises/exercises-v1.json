@@ -21,15 +21,42 @@
           "question": "In your body, what do you usually notice first?",
           "help": "Choose as many as fit.",
           "options": [
-            { "id": "jaw", "label": "A tight jaw or clenched teeth" },
-            { "id": "shoulders", "label": "Tense shoulders or neck" },
-            { "id": "breath", "label": "Shallow or held breath" },
-            { "id": "heart", "label": "A racing heart" },
-            { "id": "chest", "label": "A tight chest" },
-            { "id": "stomach", "label": "Stomach tension" },
-            { "id": "heavy", "label": "Heaviness or tiredness" },
-            { "id": "restless", "label": "Restlessness or fidgeting" },
-            { "id": "unsure", "label": "Not sure yet" }
+            {
+              "id": "jaw",
+              "label": "A tight jaw or clenched teeth"
+            },
+            {
+              "id": "shoulders",
+              "label": "Tense shoulders or neck"
+            },
+            {
+              "id": "breath",
+              "label": "Shallow or held breath"
+            },
+            {
+              "id": "heart",
+              "label": "A racing heart"
+            },
+            {
+              "id": "chest",
+              "label": "A tight chest"
+            },
+            {
+              "id": "stomach",
+              "label": "Stomach tension"
+            },
+            {
+              "id": "heavy",
+              "label": "Heaviness or tiredness"
+            },
+            {
+              "id": "restless",
+              "label": "Restlessness or fidgeting"
+            },
+            {
+              "id": "unsure",
+              "label": "Not sure yet"
+            }
           ]
         },
         {
@@ -39,14 +66,38 @@
           "question": "Emotionally, what tends to show up early?",
           "help": "Choose as many as fit.",
           "options": [
-            { "id": "irritable", "label": "Irritability" },
-            { "id": "on-edge", "label": "Feeling on edge" },
-            { "id": "overwhelm", "label": "Overwhelm" },
-            { "id": "flat", "label": "Numbness or flatness" },
-            { "id": "sad", "label": "Sadness" },
-            { "id": "worry", "label": "Worry" },
-            { "id": "rushed", "label": "Feeling rushed" },
-            { "id": "unsure", "label": "Not sure yet" }
+            {
+              "id": "irritable",
+              "label": "Irritability"
+            },
+            {
+              "id": "on-edge",
+              "label": "Feeling on edge"
+            },
+            {
+              "id": "overwhelm",
+              "label": "Overwhelm"
+            },
+            {
+              "id": "flat",
+              "label": "Numbness or flatness"
+            },
+            {
+              "id": "sad",
+              "label": "Sadness"
+            },
+            {
+              "id": "worry",
+              "label": "Worry"
+            },
+            {
+              "id": "rushed",
+              "label": "Feeling rushed"
+            },
+            {
+              "id": "unsure",
+              "label": "Not sure yet"
+            }
           ]
         },
         {
@@ -56,13 +107,34 @@
           "question": "What tends to happen in your thinking?",
           "help": "Choose as many as fit.",
           "options": [
-            { "id": "racing", "label": "Racing thoughts" },
-            { "id": "foggy", "label": "Going blank or foggy" },
-            { "id": "replay", "label": "Replaying conversations" },
-            { "id": "planning", "label": "Planning ahead non-stop" },
-            { "id": "harsh", "label": "Harsh self-talk" },
-            { "id": "deciding", "label": "Finding it hard to decide" },
-            { "id": "unsure", "label": "Not sure yet" }
+            {
+              "id": "racing",
+              "label": "Racing thoughts"
+            },
+            {
+              "id": "foggy",
+              "label": "Going blank or foggy"
+            },
+            {
+              "id": "replay",
+              "label": "Replaying conversations"
+            },
+            {
+              "id": "planning",
+              "label": "Planning ahead non-stop"
+            },
+            {
+              "id": "harsh",
+              "label": "Harsh self-talk"
+            },
+            {
+              "id": "deciding",
+              "label": "Finding it hard to decide"
+            },
+            {
+              "id": "unsure",
+              "label": "Not sure yet"
+            }
           ]
         },
         {
@@ -72,14 +144,38 @@
           "question": "What do you tend to do?",
           "help": "Choose as many as fit.",
           "options": [
-            { "id": "withdraw", "label": "Go quiet or withdraw" },
-            { "id": "say-yes", "label": "Say yes when I mean no" },
-            { "id": "over-explain", "label": "Over-explain or apologise" },
-            { "id": "push", "label": "Push harder or work faster" },
-            { "id": "numb", "label": "Scroll or numb out" },
-            { "id": "snap", "label": "Get short with people" },
-            { "id": "control", "label": "Tidy or try to control things" },
-            { "id": "unsure", "label": "Not sure yet" }
+            {
+              "id": "withdraw",
+              "label": "Go quiet or withdraw"
+            },
+            {
+              "id": "say-yes",
+              "label": "Say yes when I mean no"
+            },
+            {
+              "id": "over-explain",
+              "label": "Over-explain or apologise"
+            },
+            {
+              "id": "push",
+              "label": "Push harder or work faster"
+            },
+            {
+              "id": "numb",
+              "label": "Scroll or numb out"
+            },
+            {
+              "id": "snap",
+              "label": "Get short with people"
+            },
+            {
+              "id": "control",
+              "label": "Tidy or try to control things"
+            },
+            {
+              "id": "unsure",
+              "label": "Not sure yet"
+            }
           ]
         },
         {
@@ -133,13 +229,34 @@
           "type": "choice",
           "question": "Which word feels closest right now?",
           "options": [
-            { "id": "tense", "label": "Tense" },
-            { "id": "wound-up", "label": "Wound up" },
-            { "id": "flat", "label": "Flat or numb" },
-            { "id": "tired", "label": "Tired" },
-            { "id": "steady", "label": "Steady" },
-            { "id": "calm", "label": "Calm" },
-            { "id": "mixed", "label": "Mixed" }
+            {
+              "id": "tense",
+              "label": "Tense"
+            },
+            {
+              "id": "wound-up",
+              "label": "Wound up"
+            },
+            {
+              "id": "flat",
+              "label": "Flat or numb"
+            },
+            {
+              "id": "tired",
+              "label": "Tired"
+            },
+            {
+              "id": "steady",
+              "label": "Steady"
+            },
+            {
+              "id": "calm",
+              "label": "Calm"
+            },
+            {
+              "id": "mixed",
+              "label": "Mixed"
+            }
           ]
         },
         {
@@ -161,13 +278,34 @@
           "type": "choice",
           "question": "Which word feels closest now?",
           "options": [
-            { "id": "tense", "label": "Tense" },
-            { "id": "wound-up", "label": "Wound up" },
-            { "id": "flat", "label": "Flat or numb" },
-            { "id": "tired", "label": "Tired" },
-            { "id": "steady", "label": "Steady" },
-            { "id": "calm", "label": "Calm" },
-            { "id": "mixed", "label": "Mixed" }
+            {
+              "id": "tense",
+              "label": "Tense"
+            },
+            {
+              "id": "wound-up",
+              "label": "Wound up"
+            },
+            {
+              "id": "flat",
+              "label": "Flat or numb"
+            },
+            {
+              "id": "tired",
+              "label": "Tired"
+            },
+            {
+              "id": "steady",
+              "label": "Steady"
+            },
+            {
+              "id": "calm",
+              "label": "Calm"
+            },
+            {
+              "id": "mixed",
+              "label": "Mixed"
+            }
           ]
         },
         {
@@ -212,10 +350,22 @@
           "type": "choice",
           "question": "Physical: your sleep, energy and body",
           "options": [
-            { "id": "growing", "label": "Growing" },
-            { "id": "steady", "label": "Steady" },
-            { "id": "low", "label": "Running low" },
-            { "id": "draining", "label": "Draining away" }
+            {
+              "id": "growing",
+              "label": "Growing"
+            },
+            {
+              "id": "steady",
+              "label": "Steady"
+            },
+            {
+              "id": "low",
+              "label": "Running low"
+            },
+            {
+              "id": "draining",
+              "label": "Draining away"
+            }
           ]
         },
         {
@@ -223,10 +373,22 @@
           "type": "choice",
           "question": "Emotional: how much you can feel and hold",
           "options": [
-            { "id": "growing", "label": "Growing" },
-            { "id": "steady", "label": "Steady" },
-            { "id": "low", "label": "Running low" },
-            { "id": "draining", "label": "Draining away" }
+            {
+              "id": "growing",
+              "label": "Growing"
+            },
+            {
+              "id": "steady",
+              "label": "Steady"
+            },
+            {
+              "id": "low",
+              "label": "Running low"
+            },
+            {
+              "id": "draining",
+              "label": "Draining away"
+            }
           ]
         },
         {
@@ -234,10 +396,22 @@
           "type": "choice",
           "question": "Mental: your focus and decision-making",
           "options": [
-            { "id": "growing", "label": "Growing" },
-            { "id": "steady", "label": "Steady" },
-            { "id": "low", "label": "Running low" },
-            { "id": "draining", "label": "Draining away" }
+            {
+              "id": "growing",
+              "label": "Growing"
+            },
+            {
+              "id": "steady",
+              "label": "Steady"
+            },
+            {
+              "id": "low",
+              "label": "Running low"
+            },
+            {
+              "id": "draining",
+              "label": "Draining away"
+            }
           ]
         },
         {
@@ -245,10 +419,22 @@
           "type": "choice",
           "question": "Relational: connection and support",
           "options": [
-            { "id": "growing", "label": "Growing" },
-            { "id": "steady", "label": "Steady" },
-            { "id": "low", "label": "Running low" },
-            { "id": "draining", "label": "Draining away" }
+            {
+              "id": "growing",
+              "label": "Growing"
+            },
+            {
+              "id": "steady",
+              "label": "Steady"
+            },
+            {
+              "id": "low",
+              "label": "Running low"
+            },
+            {
+              "id": "draining",
+              "label": "Draining away"
+            }
           ]
         },
         {
@@ -256,10 +442,22 @@
           "type": "choice",
           "question": "Practical: your time, money and day-to-day load",
           "options": [
-            { "id": "growing", "label": "Growing" },
-            { "id": "steady", "label": "Steady" },
-            { "id": "low", "label": "Running low" },
-            { "id": "draining", "label": "Draining away" }
+            {
+              "id": "growing",
+              "label": "Growing"
+            },
+            {
+              "id": "steady",
+              "label": "Steady"
+            },
+            {
+              "id": "low",
+              "label": "Running low"
+            },
+            {
+              "id": "draining",
+              "label": "Draining away"
+            }
           ]
         },
         {
@@ -267,11 +465,26 @@
           "type": "choice",
           "question": "Which area feels most worth protecting this week?",
           "options": [
-            { "id": "physical", "label": "Physical" },
-            { "id": "emotional", "label": "Emotional" },
-            { "id": "mental", "label": "Mental" },
-            { "id": "relational", "label": "Relational" },
-            { "id": "practical", "label": "Practical" }
+            {
+              "id": "physical",
+              "label": "Physical"
+            },
+            {
+              "id": "emotional",
+              "label": "Emotional"
+            },
+            {
+              "id": "mental",
+              "label": "Mental"
+            },
+            {
+              "id": "relational",
+              "label": "Relational"
+            },
+            {
+              "id": "practical",
+              "label": "Practical"
+            }
           ]
         },
         {
@@ -291,6 +504,587 @@
       "closing": {
         "heading": "A snapshot, not a verdict",
         "message": "Seeing where your resource is running low is how you decide where to protect it. You don't have to fix everything at once. One small, realistic step is plenty."
+      }
+    },
+    {
+      "slug": "future-self-capacity-map",
+      "title": "Future Self Capacity Map",
+      "subtitle": "What would help it become possible",
+      "intro": "Think of something you would like to become possible for you, without turning it into pressure. This exercise connects it to the resources that would support it, so you can see what is already there and what is not yet. There are no right answers, and you can stop at any time.",
+      "durationLabel": "About 5 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "Start small and real",
+          "body": "Choose one thing you would like to be possible in the next year. It might be a change at work, a different pace of life, a creative project or a closer relationship. Keep it modest. It only needs to matter to you."
+        },
+        {
+          "id": "goal",
+          "type": "text",
+          "question": "In a few words, what would you like to become possible?",
+          "help": "A phrase is enough.",
+          "placeholder": "For example: a calmer start to my mornings"
+        },
+        {
+          "id": "needs",
+          "type": "choice",
+          "question": "Which of these would it need most?",
+          "options": [
+            {
+              "id": "physical",
+              "label": "Physical energy and rest"
+            },
+            {
+              "id": "emotional",
+              "label": "Room to feel and recover"
+            },
+            {
+              "id": "mental",
+              "label": "Focus and headspace"
+            },
+            {
+              "id": "relational",
+              "label": "People who support me"
+            },
+            {
+              "id": "practical",
+              "label": "Time, money or practical set-up"
+            },
+            {
+              "id": "safety",
+              "label": "Feeling safe enough to try"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "have",
+          "type": "choice",
+          "question": "Which of those do you already have in place?",
+          "options": [
+            {
+              "id": "physical",
+              "label": "Physical energy and rest"
+            },
+            {
+              "id": "emotional",
+              "label": "Room to feel and recover"
+            },
+            {
+              "id": "mental",
+              "label": "Focus and headspace"
+            },
+            {
+              "id": "relational",
+              "label": "People who support me"
+            },
+            {
+              "id": "practical",
+              "label": "Time, money or practical set-up"
+            },
+            {
+              "id": "safety",
+              "label": "Feeling safe enough to try"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose any that feel at least partly true."
+        },
+        {
+          "id": "steady",
+          "type": "scale",
+          "question": "How steady does it feel to move toward this right now?",
+          "lowLabel": "Not steady",
+          "highLabel": "Very steady",
+          "help": "This is information, not a grade."
+        },
+        {
+          "id": "step",
+          "type": "text",
+          "question": "What is one small, supported step that could build what is missing?",
+          "help": "Small and realistic is best.",
+          "placeholder": "For example: asking a friend to check in weekly"
+        }
+      ],
+      "summary": {
+        "heading": "Your map",
+        "intro": "This is what you would like, what it would need, and what you already have.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "A map, not a plan",
+        "message": "You do not have to build everything at once. Seeing what is already in place, and what is not yet, shows you where one small step could help most."
+      }
+    },
+    {
+      "slug": "receiving-and-support-map",
+      "title": "Receiving and Support Map",
+      "subtitle": "Who and what holds you up",
+      "intro": "Support is easier to use when you can see it. This exercise maps what supports you now, what kind of support it is, and what makes it hard to receive. There are no right answers, and you can stop at any time.",
+      "durationLabel": "About 4 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "Looking at support",
+          "body": "Think about the past few weeks. Notice who or what helped you stay on your feet, even in small ways. Choose whatever feels true."
+        },
+        {
+          "id": "who",
+          "type": "choice",
+          "question": "Who or what supports you right now?",
+          "options": [
+            {
+              "id": "person",
+              "label": "A person close to me"
+            },
+            {
+              "id": "professional",
+              "label": "A professional or practitioner"
+            },
+            {
+              "id": "group",
+              "label": "A group or community"
+            },
+            {
+              "id": "routine",
+              "label": "A routine or practice"
+            },
+            {
+              "id": "nature",
+              "label": "Nature, movement or time outdoors"
+            },
+            {
+              "id": "faith",
+              "label": "Faith or a sense of meaning"
+            },
+            {
+              "id": "animal",
+              "label": "An animal"
+            },
+            {
+              "id": "little",
+              "label": "Not much yet"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "kind",
+          "type": "choice",
+          "question": "What kind of support is it?",
+          "options": [
+            {
+              "id": "practical",
+              "label": "Practical help"
+            },
+            {
+              "id": "listening",
+              "label": "Someone to listen"
+            },
+            {
+              "id": "advice",
+              "label": "Advice or guidance"
+            },
+            {
+              "id": "company",
+              "label": "Company"
+            },
+            {
+              "id": "reassurance",
+              "label": "Reassurance"
+            },
+            {
+              "id": "space",
+              "label": "Space and quiet"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "ease",
+          "type": "scale",
+          "question": "How easy is it for you to receive support?",
+          "lowLabel": "Very hard",
+          "highLabel": "Easy"
+        },
+        {
+          "id": "block",
+          "type": "choice",
+          "question": "What most gets in the way of receiving it?",
+          "options": [
+            {
+              "id": "burden",
+              "label": "I do not want to be a burden"
+            },
+            {
+              "id": "alone",
+              "label": "I am used to managing alone"
+            },
+            {
+              "id": "ask",
+              "label": "I do not know what to ask for"
+            },
+            {
+              "id": "trust",
+              "label": "I am not sure it will help"
+            },
+            {
+              "id": "nothing",
+              "label": "Nothing much gets in the way"
+            }
+          ]
+        },
+        {
+          "id": "week",
+          "type": "text",
+          "question": "What is one small way you could let in a little more support this week?",
+          "help": "Optional. One small thing is enough.",
+          "placeholder": "For example: telling one person how the week is going"
+        }
+      ],
+      "summary": {
+        "heading": "Your support map",
+        "intro": "Here is what holds you up, and what makes it harder to lean on.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "Support is a skill, too",
+        "message": "Receiving is something you can practise in small steps. Noticing what already holds you up is a good place to begin."
+      }
+    },
+    {
+      "slug": "nervous-system-scorecard",
+      "title": "Nervous System Scorecard",
+      "subtitle": "A snapshot across the five conditions",
+      "intro": "This is a snapshot of how available five things feel to you right now: safety, capacity, availability, expansion and participation. It is not a grade and there is no good or bad result. It simply shows where you might want more support. You can stop at any time.",
+      "durationLabel": "About 4 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "A snapshot, not a grade",
+          "body": "Answer for roughly this past week. Go with your first sense. If a question does not fit, choose the number that feels closest."
+        },
+        {
+          "id": "safety",
+          "type": "scale",
+          "question": "Safety: how easy is it to feel safe enough to settle?",
+          "lowLabel": "Hard to access",
+          "highLabel": "Easy to access"
+        },
+        {
+          "id": "capacity",
+          "type": "scale",
+          "question": "Capacity: how easy is it to hold what life is asking of you?",
+          "lowLabel": "Hard to access",
+          "highLabel": "Easy to access"
+        },
+        {
+          "id": "availability",
+          "type": "scale",
+          "question": "Availability: how easy is it to reach your own feelings, needs and other people?",
+          "lowLabel": "Hard to access",
+          "highLabel": "Easy to access"
+        },
+        {
+          "id": "expansion",
+          "type": "scale",
+          "question": "Expansion: how easy is it to move beyond what is familiar, at your own pace?",
+          "lowLabel": "Hard to access",
+          "highLabel": "Easy to access"
+        },
+        {
+          "id": "participation",
+          "type": "scale",
+          "question": "Participation: how easy is it to take part in the parts of life that matter to you?",
+          "lowLabel": "Hard to access",
+          "highLabel": "Easy to access"
+        },
+        {
+          "id": "support",
+          "type": "choice",
+          "question": "Which one would you most like more support with right now?",
+          "options": [
+            {
+              "id": "safety",
+              "label": "Safety"
+            },
+            {
+              "id": "capacity",
+              "label": "Capacity"
+            },
+            {
+              "id": "availability",
+              "label": "Availability"
+            },
+            {
+              "id": "expansion",
+              "label": "Expansion"
+            },
+            {
+              "id": "participation",
+              "label": "Participation"
+            }
+          ]
+        },
+        {
+          "id": "note",
+          "type": "text",
+          "question": "Anything you would like to remember about this snapshot?",
+          "help": "Optional."
+        }
+      ],
+      "summary": {
+        "heading": "Your snapshot",
+        "intro": "This is how things feel this week. It will change.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "Where support could go",
+        "message": "A lower number is not a failure. It points to where a little support or a small step could help. You can come back to this any time to see what has changed."
+      }
+    },
+    {
+      "slug": "smallest-meaningful-movement",
+      "title": "The Smallest Meaningful Movement",
+      "subtitle": "One manageable step toward your life",
+      "intro": "This exercise helps you choose one small, realistic step toward something that matters to you. Participation is not about doing more or being productive. It is about taking part in your own life, one ordinary moment at a time. You can stop at any time.",
+      "durationLabel": "About 3 minutes",
+      "steps": [
+        {
+          "id": "area",
+          "type": "choice",
+          "question": "Which area of life would you like to take part in a little more?",
+          "options": [
+            {
+              "id": "rest",
+              "label": "Rest"
+            },
+            {
+              "id": "relationships",
+              "label": "Relationships"
+            },
+            {
+              "id": "creativity",
+              "label": "Creativity"
+            },
+            {
+              "id": "contribution",
+              "label": "Contribution"
+            },
+            {
+              "id": "pleasure",
+              "label": "Pleasure"
+            },
+            {
+              "id": "purpose",
+              "label": "Purpose"
+            },
+            {
+              "id": "presence",
+              "label": "Being present"
+            }
+          ]
+        },
+        {
+          "id": "step",
+          "type": "text",
+          "question": "What is one small thing you could do in the next day or two?",
+          "help": "Smaller than you think. A few minutes is plenty.",
+          "placeholder": "For example: ten minutes with a friend, no phone"
+        },
+        {
+          "id": "support",
+          "type": "choice",
+          "question": "What would make it easier?",
+          "options": [
+            {
+              "id": "none",
+              "label": "Nothing, I can do it as it is"
+            },
+            {
+              "id": "tell",
+              "label": "Telling someone about it"
+            },
+            {
+              "id": "with",
+              "label": "Doing it with someone"
+            },
+            {
+              "id": "time",
+              "label": "Clearing a little time first"
+            },
+            {
+              "id": "rest",
+              "label": "Resting first"
+            }
+          ]
+        },
+        {
+          "id": "doable",
+          "type": "scale",
+          "question": "How doable does it feel?",
+          "lowLabel": "Not very",
+          "highLabel": "Very doable",
+          "help": "If it feels like a stretch, choose a smaller step."
+        },
+        {
+          "id": "when",
+          "type": "choice",
+          "question": "When could you do it?",
+          "options": [
+            {
+              "id": "today",
+              "label": "Today"
+            },
+            {
+              "id": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "id": "week",
+              "label": "Sometime this week"
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "heading": "Your step",
+        "intro": "Here is the step you chose.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "Small is enough",
+        "message": "One ordinary moment of taking part counts. If the step turns out to be too big, make it smaller. There is no wrong way to begin."
+      }
+    },
+    {
+      "slug": "pause-before-responding",
+      "title": "Pause Before Responding",
+      "subtitle": "A moment before the automatic reply",
+      "intro": "Sometimes a message, a request or a conversation pulls an automatic reaction out of us before we have chosen anything. This exercise gives you a short pause first. You do not have to respond in any particular way, and you can stop at any time.",
+      "durationLabel": "About 3 minutes",
+      "steps": [
+        {
+          "id": "situation",
+          "type": "choice",
+          "question": "What are you about to respond to?",
+          "options": [
+            {
+              "id": "message",
+              "label": "A message I need to answer"
+            },
+            {
+              "id": "request",
+              "label": "A request I feel I should agree to"
+            },
+            {
+              "id": "conversation",
+              "label": "A conversation I am dreading"
+            },
+            {
+              "id": "apology",
+              "label": "Something I feel I should apologise for"
+            },
+            {
+              "id": "other",
+              "label": "Something else"
+            }
+          ]
+        },
+        {
+          "id": "pull",
+          "type": "choice",
+          "question": "What is the pull right now?",
+          "options": [
+            {
+              "id": "fast",
+              "label": "Reply right away"
+            },
+            {
+              "id": "yes",
+              "label": "Say yes automatically"
+            },
+            {
+              "id": "explain",
+              "label": "Over-explain"
+            },
+            {
+              "id": "apologise",
+              "label": "Apologise"
+            },
+            {
+              "id": "smooth",
+              "label": "Smooth things over"
+            },
+            {
+              "id": "withdraw",
+              "label": "Go quiet or withdraw"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "pause",
+          "type": "pause",
+          "title": "Take a short pause",
+          "body": "Let your feet rest on the floor and notice what is supporting you. Breathe out a little more slowly than you breathe in, only if that feels comfortable. Notice your jaw and shoulders, and let them soften if they will. There is no hurry.",
+          "actionLabel": "I have paused"
+        },
+        {
+          "id": "room",
+          "type": "scale",
+          "question": "How much room do you feel you have now?",
+          "lowLabel": "Very little",
+          "highLabel": "A lot of room"
+        },
+        {
+          "id": "next",
+          "type": "choice",
+          "question": "What would you like to do next?",
+          "options": [
+            {
+              "id": "now",
+              "label": "Respond now"
+            },
+            {
+              "id": "later",
+              "label": "Respond later"
+            },
+            {
+              "id": "time",
+              "label": "Ask for more time"
+            },
+            {
+              "id": "kind",
+              "label": "Say no kindly"
+            },
+            {
+              "id": "wait",
+              "label": "Not respond yet"
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "heading": "Your pause",
+        "intro": "Here is what you noticed.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "The pause is yours",
+        "message": "You can take a moment before responding, whatever the situation asks. Even a few seconds can give you a little more choice."
       }
     }
   ],
@@ -315,6 +1109,41 @@
       "description": "A snapshot of your resource across five areas of life: physical, emotional, mental, relational and practical. See where it is growing, steady, running low or draining away, and choose one area to protect.",
       "tags": ["Capacity"],
       "durationSeconds": 240
+    },
+    {
+      "slug": "future-self-capacity-map",
+      "title": "Future Self Capacity Map",
+      "description": "Connect something you would like to become possible with the resources that would support it. See what is already in place and what is not yet, and choose one small step.",
+      "tags": ["Expansion"],
+      "durationSeconds": 300
+    },
+    {
+      "slug": "receiving-and-support-map",
+      "title": "Receiving and Support Map",
+      "description": "Map who and what supports you now, what kind of support it is, and what makes it hard to receive, then choose one small way to let in a little more.",
+      "tags": ["Availability"],
+      "durationSeconds": 240
+    },
+    {
+      "slug": "nervous-system-scorecard",
+      "title": "Nervous System Scorecard",
+      "description": "A snapshot of how available safety, capacity, availability, expansion and participation feel right now. Not a grade: it shows where a little support could help.",
+      "tags": ["Capacity"],
+      "durationSeconds": 240
+    },
+    {
+      "slug": "smallest-meaningful-movement",
+      "title": "The Smallest Meaningful Movement",
+      "description": "Choose one small, realistic step toward something that matters to you. Participation is about taking part in your life, not doing more.",
+      "tags": ["Participation"],
+      "durationSeconds": 180
+    },
+    {
+      "slug": "pause-before-responding",
+      "title": "Pause Before Responding",
+      "description": "A short pause before an automatic reply. Notice what is pulling at you, take a moment, then choose what to do next.",
+      "tags": ["Safety"],
+      "durationSeconds": 150
     }
   ]
 }
