@@ -204,3 +204,65 @@ describe('pickHetSuggestions across the content library', () => {
     expect(pickHetSuggestions(pools, { ...base, capacityScore: 1 }, 2).items).toHaveLength(2);
   });
 });
+
+describe('Participation shares the first rank for the highest answer only', () => {
+  const LIBRARY = [
+    ...LIVE,
+    { id: 'growing-edge', tags: ['Expansion'] },
+    { id: 'inner-compass', tags: ['Availability'] },
+    { id: 'empty-chair', tags: ['Participation'] },
+    { id: 'smallest-movement', tags: ['Participation'] },
+  ];
+  const days = Array.from(
+    { length: 60 },
+    (_, i) => `2026-12-${String((i % 28) + 1).padStart(2, '0')}-${i}`,
+  );
+  const pickedOver = (capacityScore: number) =>
+    days.map((dayKey) =>
+      pickHetRecommendations(LIBRARY, { userKey: 'm1', dayKey, capacityScore }, 1),
+    );
+
+  it('never recommends a Participation practice for answers 1, 2, 3 or 4', () => {
+    for (const capacityScore of [1, 2, 3, 4]) {
+      for (const { picks } of pickedOver(capacityScore)) {
+        expect(hetConditionsOf(picks[0]!.tags)[0]).not.toBe('Participation');
+      }
+    }
+  });
+
+  it('does recommend one for answer 5, and says the condition is Participation', () => {
+    for (const capacityScore of [5]) {
+      const results = pickedOver(capacityScore);
+      const participation = results.filter((r) => r.condition === 'Participation');
+      expect(participation.length).toBeGreaterThan(0);
+      expect(participation.length).toBeLessThan(results.length);
+      for (const r of participation) {
+        expect(hetConditionsOf(r.picks[0]!.tags)[0]).toBe('Participation');
+      }
+    }
+  });
+
+  it('reports each pick under its own condition, never a neighbour that merely shares its rank', () => {
+    for (const { picks, condition } of pickedOver(5)) {
+      const own = hetConditionsOf(picks[0]!.tags)[0];
+      expect(condition).toBe(own);
+    }
+  });
+
+  it('keeps the rest of the order: an item with a higher-ranked condition as secondary is not demoted', () => {
+    const lib = [
+      { id: 'a', tags: ['Participation'] },
+      { id: 'b', tags: ['Safety', 'Expansion'] },
+    ];
+    const r = pickHetRecommendations(lib, { userKey: 'x', dayKey: 'd', capacityScore: 5 }, 2);
+    expect(r.picks.map((p) => p.id).sort()).toEqual(['a', 'b']);
+  });
+
+  it('with no Participation content, answers 4 and 5 behave exactly as before', () => {
+    const before = pickHetRecommendations(LIVE, { ...base, capacityScore: 5 });
+    expect(before.picks[0]!.id).toBe('future-self');
+    expect(pickHetRecommendations(LIVE, { ...base, capacityScore: 4 }).picks[0]!.id).toBe(
+      'forest-walk',
+    );
+  });
+});

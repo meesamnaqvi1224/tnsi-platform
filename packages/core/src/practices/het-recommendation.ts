@@ -15,9 +15,12 @@
  *   longer drives the daily recommendation.
  * - The answer → condition table is a content decision for Caroline. Change
  *   the table, not the ranking code.
- * - Participation sits last for every answer: a single feelings question
- *   cannot responsibly indicate it, so it is only offered when nothing earlier
- *   is available.
+ * - Participation sits last for every answer except the highest: a single
+ *   feelings question cannot responsibly indicate it. Only when the member says
+ *   they feel really well (5) does it share a rank with the leading condition
+ *   (see `HET_EQUAL_RANK_BY_CAPACITY_STATE`), so Participation practices are
+ *   offered alongside Expansion ones instead of never. Changed 23 Nov 2026 at
+ *   the owner's request; still a content decision for Caroline.
  */
 import { normalizeCapacityScore, type CapacityState } from './recommendation';
 
@@ -43,6 +46,21 @@ export const HET_PREFERENCE_BY_CAPACITY_STATE: Record<CapacityState, readonly He
   MODERATE: ['Capacity', 'Safety', 'Availability', 'Expansion', 'Participation'],
   MODERATE_HIGH: ['Availability', 'Expansion', 'Safety', 'Capacity', 'Participation'],
   HIGH: ['Expansion', 'Capacity', 'Availability', 'Safety', 'Participation'],
+};
+
+/**
+ * Conditions that take the SAME rank as another condition for a given answer. Ranking is otherwise
+ * strict (an item whose condition ranks lower is only ever offered when nothing ranked higher exists),
+ * so a condition at the end of the list would never be recommended. Here Participation shares the first
+ * rank with Expansion for the highest answer only, so its practices rotate in with Expansion's. Left
+ * out for answers 1-4 on purpose: someone who is overwhelmed, unsettled, just okay or simply feeling
+ * good is not steered toward participation by one feelings question. Widening this to answer 4 is one
+ * line (`MODERATE_HIGH: { Participation: 'Availability' }`).
+ */
+export const HET_EQUAL_RANK_BY_CAPACITY_STATE: Partial<
+  Record<CapacityState, Partial<Record<HetCondition, HetCondition>>>
+> = {
+  HIGH: { Participation: 'Expansion' },
 };
 
 export function hetPreferenceForCapacityScore(capacityScore: number): readonly HetCondition[] {
@@ -101,8 +119,10 @@ export function pickHetRecommendations<T extends HetCandidate>(
   options: HetPickOptions,
   count = 2,
 ): HetPick<T> {
-  const preference = hetPreferenceForCapacityScore(options.capacityScore);
-  const position = (c: HetCondition) => preference.indexOf(c);
+  const state = normalizeCapacityScore(options.capacityScore);
+  const preference = HET_PREFERENCE_BY_CAPACITY_STATE[state];
+  const sharesRankWith = HET_EQUAL_RANK_BY_CAPACITY_STATE[state] ?? {};
+  const position = (c: HetCondition) => preference.indexOf(sharesRankWith[c] ?? c);
   const recent = options.recentlyCompletedIds ?? new Set<string>();
 
   const ranked = candidates
@@ -115,7 +135,11 @@ export function pickHetRecommendations<T extends HetCandidate>(
         .reduce((best, c) => Math.min(best, position(c)), 99);
       // A condition held as secondary counts just behind the same condition held as primary.
       const relevance = Math.min(primaryRank, secondaryRank + 0.5);
-      const bestCondition = preference[Math.floor(relevance)] ?? conditions[0]!;
+      // The condition that earned the rank: the item's own primary condition, or the secondary one that
+      // scored. Not read back from the preference list, because two conditions can share a rank.
+      const bestCondition = Number.isInteger(relevance)
+        ? conditions[0]!
+        : (conditions.slice(1).find((c) => position(c) === relevance - 0.5) ?? conditions[0]!);
       return {
         item,
         relevance,
