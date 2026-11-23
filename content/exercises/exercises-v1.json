@@ -1803,6 +1803,429 @@
         "heading": "Ready when you are",
         "message": "Having a plan means you do not have to decide everything when you are low on resource. If you ever feel unsafe or in crisis, please contact a professional or emergency service."
       }
+    },
+    {
+      "slug": "participation-goals",
+      "title": "Participation Goals",
+      "subtitle": "What taking part means to you",
+      "intro": "Participation is not about doing more or being productive. It is about taking part in the parts of your life that matter to you. This exercise helps you name what that means for you right now, in your own terms. There are no right answers, and you can stop at any time.",
+      "durationLabel": "About 4 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "In your own terms",
+          "body": "Think about the past few weeks. Notice where you felt most like a participant in your own life, and where you felt on the edge of it. Choose whatever feels true."
+        },
+        {
+          "id": "areas",
+          "type": "choice",
+          "question": "Where would you like to take part a little more?",
+          "options": [
+            {
+              "id": "rest",
+              "label": "Rest"
+            },
+            {
+              "id": "relationships",
+              "label": "Relationships"
+            },
+            {
+              "id": "creativity",
+              "label": "Creativity"
+            },
+            {
+              "id": "contribution",
+              "label": "Contribution"
+            },
+            {
+              "id": "pleasure",
+              "label": "Pleasure"
+            },
+            {
+              "id": "purpose",
+              "label": "Purpose"
+            },
+            {
+              "id": "presence",
+              "label": "Being present"
+            },
+            {
+              "id": "learning",
+              "label": "Learning"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "most",
+          "type": "choice",
+          "question": "Which matters most to you this season?",
+          "options": [
+            {
+              "id": "rest",
+              "label": "Rest"
+            },
+            {
+              "id": "relationships",
+              "label": "Relationships"
+            },
+            {
+              "id": "creativity",
+              "label": "Creativity"
+            },
+            {
+              "id": "contribution",
+              "label": "Contribution"
+            },
+            {
+              "id": "pleasure",
+              "label": "Pleasure"
+            },
+            {
+              "id": "purpose",
+              "label": "Purpose"
+            },
+            {
+              "id": "presence",
+              "label": "Being present"
+            },
+            {
+              "id": "learning",
+              "label": "Learning"
+            }
+          ]
+        },
+        {
+          "id": "look",
+          "type": "text",
+          "question": "What would taking part look like there, in your own words?",
+          "help": "A few words is enough.",
+          "placeholder": "For example: sharing a meal without checking my phone"
+        },
+        {
+          "id": "mine",
+          "type": "scale",
+          "question": "How much does this feel like yours, rather than something you should do?",
+          "lowLabel": "Feels like a should",
+          "highLabel": "Feels like mine",
+          "help": "If it feels like a should, that is worth noticing."
+        },
+        {
+          "id": "capacity",
+          "type": "choice",
+          "question": "How much capacity do you have for it right now?",
+          "options": [
+            {
+              "id": "plenty",
+              "label": "Plenty"
+            },
+            {
+              "id": "some",
+              "label": "Some"
+            },
+            {
+              "id": "little",
+              "label": "Very little"
+            },
+            {
+              "id": "unsure",
+              "label": "I am not sure"
+            }
+          ]
+        },
+        {
+          "id": "possible",
+          "type": "text",
+          "question": "What is one thing that would make it a little more possible?",
+          "help": "Small and realistic is best.",
+          "placeholder": "For example: clearing one evening a week"
+        }
+      ],
+      "summary": {
+        "heading": "Your goals",
+        "intro": "Here is what taking part means to you right now.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "Yours to define",
+        "message": "What counts as taking part is yours to decide, and it can change with the season you are in. You do not have to do it all at once."
+      }
+    },
+    {
+      "slug": "participation-bridge-tracker",
+      "title": "Participation Bridge Tracker",
+      "subtitle": "From noticing to one small action",
+      "intro": "Reflection helps most when it connects to daily life. This exercise takes something you have noticed and builds a small bridge to one real action. There are no right answers, and you can stop at any time.",
+      "durationLabel": "About 4 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "Carrying it across",
+          "body": "Bring to mind something from a recent practice, exercise or moment that stayed with you. It does not need to be big."
+        },
+        {
+          "id": "from",
+          "type": "choice",
+          "question": "What are you bringing across?",
+          "options": [
+            {
+              "id": "practice",
+              "label": "Something I noticed in a practice"
+            },
+            {
+              "id": "exercise",
+              "label": "Something from an exercise"
+            },
+            {
+              "id": "avoiding",
+              "label": "Something I have been avoiding"
+            },
+            {
+              "id": "more",
+              "label": "Something I would like more of"
+            },
+            {
+              "id": "other",
+              "label": "Something else"
+            }
+          ]
+        },
+        {
+          "id": "what",
+          "type": "text",
+          "question": "In a few words, what is it?",
+          "help": "A phrase is enough.",
+          "placeholder": "For example: I feel better after a walk"
+        },
+        {
+          "id": "where",
+          "type": "choice",
+          "question": "Where in daily life could it show up?",
+          "options": [
+            {
+              "id": "home",
+              "label": "At home"
+            },
+            {
+              "id": "work",
+              "label": "At work"
+            },
+            {
+              "id": "people",
+              "label": "With someone I care about"
+            },
+            {
+              "id": "alone",
+              "label": "On my own"
+            },
+            {
+              "id": "out",
+              "label": "Out and about"
+            }
+          ]
+        },
+        {
+          "id": "action",
+          "type": "text",
+          "question": "What is one small action that would carry it across?",
+          "help": "Small enough to do without much planning.",
+          "placeholder": "For example: a ten-minute walk after lunch"
+        },
+        {
+          "id": "doable",
+          "type": "scale",
+          "question": "How doable does it feel?",
+          "lowLabel": "Not very",
+          "highLabel": "Very doable",
+          "help": "If it feels like a stretch, make it smaller."
+        },
+        {
+          "id": "when",
+          "type": "choice",
+          "question": "When could you do it?",
+          "options": [
+            {
+              "id": "today",
+              "label": "Today"
+            },
+            {
+              "id": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "id": "week",
+              "label": "Sometime this week"
+            }
+          ]
+        },
+        {
+          "id": "snag",
+          "type": "text",
+          "question": "What might get in the way, and what could help?",
+          "help": "One line is enough."
+        }
+      ],
+      "summary": {
+        "heading": "Your bridge",
+        "intro": "Here is what you noticed and the small action that carries it across.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "A small bridge is enough",
+        "message": "Connecting what you notice to one ordinary action is how reflection becomes part of your life. If the step is too big, make it smaller."
+      }
+    },
+    {
+      "slug": "capacity-protection-plan",
+      "title": "Capacity Protection Plan",
+      "subtitle": "Protecting what taking part needs",
+      "intro": "Taking part in your life takes resource. This exercise helps you notice what drains yours, what protects it, and one limit you could try. It is a plan for protecting your capacity, not a list of things you must do. There are no right answers, and you can stop at any time.",
+      "durationLabel": "About 4 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "Protecting your resource",
+          "body": "Think about the weeks when you have had enough left for the things that matter, and the weeks when you have not. Notice what tends to make the difference."
+        },
+        {
+          "id": "drains",
+          "type": "choice",
+          "question": "What most drains the resource you need to take part?",
+          "options": [
+            {
+              "id": "commitments",
+              "label": "Too many commitments"
+            },
+            {
+              "id": "rest",
+              "label": "Not enough sleep or rest"
+            },
+            {
+              "id": "yes",
+              "label": "Saying yes automatically"
+            },
+            {
+              "id": "messages",
+              "label": "Always being reachable"
+            },
+            {
+              "id": "boundaries",
+              "label": "Unclear limits with others"
+            },
+            {
+              "id": "recovery",
+              "label": "Skipping recovery time"
+            },
+            {
+              "id": "feelings",
+              "label": "Taking on other people's feelings"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "protects",
+          "type": "choice",
+          "question": "What most helps protect it?",
+          "options": [
+            {
+              "id": "sleep",
+              "label": "Sleep and rest"
+            },
+            {
+              "id": "quiet",
+              "label": "Quiet time"
+            },
+            {
+              "id": "outdoors",
+              "label": "Time outdoors or movement"
+            },
+            {
+              "id": "stop",
+              "label": "A firm stop time"
+            },
+            {
+              "id": "no",
+              "label": "Saying no kindly"
+            },
+            {
+              "id": "help",
+              "label": "Asking for help"
+            },
+            {
+              "id": "routine",
+              "label": "A steady routine"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "limit",
+          "type": "text",
+          "question": "What is one limit or boundary you would like to try?",
+          "help": "One is enough.",
+          "placeholder": "For example: no work messages after 8pm"
+        },
+        {
+          "id": "hard",
+          "type": "scale",
+          "question": "How hard would it be to keep?",
+          "lowLabel": "Very hard",
+          "highLabel": "Easy",
+          "help": "If it feels very hard, choose a smaller limit."
+        },
+        {
+          "id": "easier",
+          "type": "text",
+          "question": "What could make it easier to keep?",
+          "help": "One line is enough."
+        },
+        {
+          "id": "tell",
+          "type": "choice",
+          "question": "Who could you tell, so it is easier to keep?",
+          "options": [
+            {
+              "id": "family",
+              "label": "A partner or family member"
+            },
+            {
+              "id": "friend",
+              "label": "A friend"
+            },
+            {
+              "id": "colleague",
+              "label": "A colleague or manager"
+            },
+            {
+              "id": "none",
+              "label": "No one yet"
+            },
+            {
+              "id": "myself",
+              "label": "Just myself. I will write it down"
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "heading": "Your plan",
+        "intro": "Here is how you could protect your capacity.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "Protection makes room",
+        "message": "Protecting your capacity is what makes taking part possible. Start with one small limit, and let it change as your life does."
+      }
     }
   ],
   "practices": [
@@ -1895,6 +2318,27 @@
       "title": "Support Plan",
       "description": "A short plan you can reach for when things are hard: when you would want support, who or what could help, and how you would ask.",
       "tags": ["Availability"],
+      "durationSeconds": 240
+    },
+    {
+      "slug": "participation-goals",
+      "title": "Participation Goals",
+      "description": "Name what taking part in your life means to you right now: the areas that matter, what it would look like, and what would make it a little more possible.",
+      "tags": ["Participation"],
+      "durationSeconds": 240
+    },
+    {
+      "slug": "participation-bridge-tracker",
+      "title": "Participation Bridge Tracker",
+      "description": "Take something you have noticed and build a small bridge to one real action in daily life: what it is, where it fits, when, and what might get in the way.",
+      "tags": ["Participation"],
+      "durationSeconds": 240
+    },
+    {
+      "slug": "capacity-protection-plan",
+      "title": "Capacity Protection Plan",
+      "description": "Notice what drains the resource you need to take part, what protects it, and one limit you could try, with what would make it easier to keep.",
+      "tags": ["Capacity", "Participation"],
       "durationSeconds": 240
     }
   ]

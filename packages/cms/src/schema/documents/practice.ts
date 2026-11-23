@@ -94,6 +94,15 @@ export const practice = defineType({
             value: 'exercise:looking-back-looking-forward',
           },
           { title: 'Exercise: Support Plan', value: 'exercise:support-plan' },
+          { title: 'Exercise: Participation Goals', value: 'exercise:participation-goals' },
+          {
+            title: 'Exercise: Participation Bridge Tracker',
+            value: 'exercise:participation-bridge-tracker',
+          },
+          {
+            title: 'Exercise: Capacity Protection Plan',
+            value: 'exercise:capacity-protection-plan',
+          },
         ],
       },
       hidden: ({ document }) => document?.contentType !== 'interactive',
