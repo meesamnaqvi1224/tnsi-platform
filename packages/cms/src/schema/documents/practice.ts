@@ -66,6 +66,23 @@ export const practice = defineType({
             title: 'Exercise: Capacity Expansion Tracker',
             value: 'exercise:capacity-expansion-tracker',
           },
+          {
+            title: 'Exercise: Future Self Capacity Map',
+            value: 'exercise:future-self-capacity-map',
+          },
+          {
+            title: 'Exercise: Receiving and Support Map',
+            value: 'exercise:receiving-and-support-map',
+          },
+          {
+            title: 'Exercise: Nervous System Scorecard',
+            value: 'exercise:nervous-system-scorecard',
+          },
+          {
+            title: 'Exercise: The Smallest Meaningful Movement',
+            value: 'exercise:smallest-meaningful-movement',
+          },
+          { title: 'Exercise: Pause Before Responding', value: 'exercise:pause-before-responding' },
         ],
       },
       hidden: ({ document }) => document?.contentType !== 'interactive',
