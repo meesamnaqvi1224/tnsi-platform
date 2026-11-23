@@ -103,6 +103,11 @@ export const practice = defineType({
             title: 'Exercise: Capacity Protection Plan',
             value: 'exercise:capacity-protection-plan',
           },
+          { title: 'Exercise: My Participation Plan', value: 'exercise:my-participation-plan' },
+          {
+            title: 'Exercise: Participation Area Check-In',
+            value: 'exercise:participation-area-check-in',
+          },
         ],
       },
       hidden: ({ document }) => document?.contentType !== 'interactive',

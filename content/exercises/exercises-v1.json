@@ -2226,6 +2226,341 @@
         "heading": "Protection makes room",
         "message": "Protecting your capacity is what makes taking part possible. Start with one small limit, and let it change as your life does."
       }
+    },
+    {
+      "slug": "my-participation-plan",
+      "title": "My Participation Plan",
+      "subtitle": "One area, one small step",
+      "intro": "Taking part in your life is easier with a plan that is small enough to start. This exercise helps you choose one area, name why it matters, and shape one small step. It is a plan to try, not a promise. There are no right answers, and you can stop at any time.",
+      "durationLabel": "About 5 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "One area at a time",
+          "body": "You do not need to change everything. Think of one part of your life where you would like to take part a little more than you do now."
+        },
+        {
+          "id": "area",
+          "type": "choice",
+          "question": "Which area would you like to take part in more?",
+          "help": "Choose the one that feels most alive right now.",
+          "multiple": false,
+          "options": [
+            {
+              "id": "work",
+              "label": "Work or purpose"
+            },
+            {
+              "id": "relationships",
+              "label": "Close relationships"
+            },
+            {
+              "id": "family",
+              "label": "Family"
+            },
+            {
+              "id": "community",
+              "label": "Friends or community"
+            },
+            {
+              "id": "creative",
+              "label": "Creativity or play"
+            },
+            {
+              "id": "body",
+              "label": "Movement or my body"
+            },
+            {
+              "id": "rest",
+              "label": "Rest and enjoyment"
+            },
+            {
+              "id": "learning",
+              "label": "Learning or growing"
+            }
+          ]
+        },
+        {
+          "id": "why",
+          "type": "text",
+          "question": "Why does this matter to you?",
+          "help": "A few words are enough.",
+          "placeholder": "For example: I want to feel more connected"
+        },
+        {
+          "id": "step",
+          "type": "text",
+          "question": "What is one small step you could take?",
+          "help": "Make it small enough that it feels doable this week.",
+          "placeholder": "For example: message one friend"
+        },
+        {
+          "id": "when",
+          "type": "choice",
+          "question": "When could you try it?",
+          "multiple": false,
+          "options": [
+            {
+              "id": "today",
+              "label": "Today"
+            },
+            {
+              "id": "week",
+              "label": "This week"
+            },
+            {
+              "id": "month",
+              "label": "This month"
+            },
+            {
+              "id": "notyet",
+              "label": "I am not ready to pick a time yet"
+            }
+          ]
+        },
+        {
+          "id": "ready",
+          "type": "scale",
+          "question": "How ready do you feel for this step?",
+          "lowLabel": "Not ready",
+          "highLabel": "Ready",
+          "help": "If it feels low, the step may be too big. You can make it smaller."
+        },
+        {
+          "id": "support",
+          "type": "choice",
+          "question": "What could support you?",
+          "help": "Choose as many as fit.",
+          "multiple": true,
+          "options": [
+            {
+              "id": "rest",
+              "label": "Enough rest beforehand"
+            },
+            {
+              "id": "person",
+              "label": "Someone to do it with"
+            },
+            {
+              "id": "reminder",
+              "label": "A reminder"
+            },
+            {
+              "id": "time",
+              "label": "Protected time"
+            },
+            {
+              "id": "small",
+              "label": "Keeping it very small"
+            },
+            {
+              "id": "kind",
+              "label": "Being kind to myself if it slips"
+            }
+          ]
+        },
+        {
+          "id": "block",
+          "type": "choice",
+          "question": "What might get in the way?",
+          "help": "Choose as many as fit.",
+          "multiple": true,
+          "options": [
+            {
+              "id": "tired",
+              "label": "Feeling tired"
+            },
+            {
+              "id": "time",
+              "label": "Not enough time"
+            },
+            {
+              "id": "others",
+              "label": "Other people's needs"
+            },
+            {
+              "id": "worry",
+              "label": "Worry about getting it wrong"
+            },
+            {
+              "id": "energy",
+              "label": "Low energy"
+            },
+            {
+              "id": "nothing",
+              "label": "Nothing in particular"
+            }
+          ]
+        },
+        {
+          "id": "pause",
+          "type": "pause",
+          "title": "One breath",
+          "body": "Take one slow breath. Notice how the step feels now that you have named it.",
+          "actionLabel": "I am ready"
+        }
+      ],
+      "summary": {
+        "heading": "Your plan",
+        "intro": "Here is your plan for taking part a little more.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "Small and steady",
+        "message": "A small step you actually take does more than a large one you do not. Come back to this plan and change it as your life does."
+      }
+    },
+    {
+      "slug": "participation-area-check-in",
+      "title": "Participation Area Check-In",
+      "subtitle": "A snapshot of how you are taking part",
+      "intro": "This is a short snapshot of how much you are taking part in six areas of your life. It is not a test and there is no target to reach. It helps you notice where you are already taking part and where you might like more. You can stop at any time.",
+      "durationLabel": "About 4 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "Where you are right now",
+          "body": "Taking part looks different in each area of life. For each area, notice how much you are taking part right now. This is a snapshot of today, not a score of how well you are doing."
+        },
+        {
+          "id": "a-work",
+          "type": "scale",
+          "question": "How much are you taking part in: Work or purpose?",
+          "lowLabel": "Barely",
+          "highLabel": "Fully",
+          "help": "Go with your first sense of it."
+        },
+        {
+          "id": "a-relationships",
+          "type": "scale",
+          "question": "How much are you taking part in: Close relationships?",
+          "lowLabel": "Barely",
+          "highLabel": "Fully",
+          "help": "Go with your first sense of it."
+        },
+        {
+          "id": "a-family",
+          "type": "scale",
+          "question": "How much are you taking part in: Family?",
+          "lowLabel": "Barely",
+          "highLabel": "Fully",
+          "help": "Go with your first sense of it."
+        },
+        {
+          "id": "a-community",
+          "type": "scale",
+          "question": "How much are you taking part in: Friends or community?",
+          "lowLabel": "Barely",
+          "highLabel": "Fully",
+          "help": "Go with your first sense of it."
+        },
+        {
+          "id": "a-creative",
+          "type": "scale",
+          "question": "How much are you taking part in: Creativity or play?",
+          "lowLabel": "Barely",
+          "highLabel": "Fully",
+          "help": "Go with your first sense of it."
+        },
+        {
+          "id": "a-body",
+          "type": "scale",
+          "question": "How much are you taking part in: Movement or my body?",
+          "lowLabel": "Barely",
+          "highLabel": "Fully",
+          "help": "Go with your first sense of it."
+        },
+        {
+          "id": "most",
+          "type": "choice",
+          "question": "Which area would you most like to take part in more?",
+          "multiple": false,
+          "help": "There is no right answer.",
+          "options": [
+            {
+              "id": "work",
+              "label": "Work or purpose"
+            },
+            {
+              "id": "relationships",
+              "label": "Close relationships"
+            },
+            {
+              "id": "family",
+              "label": "Family"
+            },
+            {
+              "id": "community",
+              "label": "Friends or community"
+            },
+            {
+              "id": "creative",
+              "label": "Creativity or play"
+            },
+            {
+              "id": "body",
+              "label": "Movement or my body"
+            }
+          ]
+        },
+        {
+          "id": "enough",
+          "type": "choice",
+          "question": "Which area already feels about right?",
+          "multiple": false,
+          "help": "It is worth noticing what is already working.",
+          "options": [
+            {
+              "id": "work",
+              "label": "Work or purpose"
+            },
+            {
+              "id": "relationships",
+              "label": "Close relationships"
+            },
+            {
+              "id": "family",
+              "label": "Family"
+            },
+            {
+              "id": "community",
+              "label": "Friends or community"
+            },
+            {
+              "id": "creative",
+              "label": "Creativity or play"
+            },
+            {
+              "id": "body",
+              "label": "Movement or my body"
+            },
+            {
+              "id": "none",
+              "label": "None of them yet"
+            }
+          ]
+        },
+        {
+          "id": "note",
+          "type": "text",
+          "question": "Is there anything you notice from this snapshot?",
+          "help": "One line is enough.",
+          "placeholder": "For example: I am doing more than I thought"
+        }
+      ],
+      "summary": {
+        "heading": "Your snapshot",
+        "intro": "Here is how you described taking part today.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "Noticing is a start",
+        "message": "A snapshot is only a snapshot. It will look different next week, and that is expected. You can return to this whenever you want to check in."
+      }
     }
   ],
   "practices": [
@@ -2339,6 +2674,20 @@
       "title": "Capacity Protection Plan",
       "description": "Notice what drains the resource you need to take part, what protects it, and one limit you could try, with what would make it easier to keep.",
       "tags": ["Capacity", "Participation"],
+      "durationSeconds": 240
+    },
+    {
+      "slug": "my-participation-plan",
+      "title": "My Participation Plan",
+      "description": "Choose one area of your life, name why it matters, and shape one small step you could try, with what could support you and what might get in the way.",
+      "tags": ["Participation"],
+      "durationSeconds": 300
+    },
+    {
+      "slug": "participation-area-check-in",
+      "title": "Participation Area Check-In",
+      "description": "A gentle snapshot of how much you are taking part in six areas of your life, and which area you might like to take part in more.",
+      "tags": ["Participation"],
       "durationSeconds": 240
     }
   ]
