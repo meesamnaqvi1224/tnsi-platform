@@ -83,6 +83,17 @@ export const practice = defineType({
             value: 'exercise:smallest-meaningful-movement',
           },
           { title: 'Exercise: Pause Before Responding', value: 'exercise:pause-before-responding' },
+          { title: 'Exercise: Delegation Tracker', value: 'exercise:delegation-tracker' },
+          { title: 'Exercise: Trigger Map', value: 'exercise:trigger-map' },
+          {
+            title: 'Exercise: Evening Regulation Reflection',
+            value: 'exercise:evening-regulation-reflection',
+          },
+          {
+            title: 'Exercise: Looking Back, Looking Forward',
+            value: 'exercise:looking-back-looking-forward',
+          },
+          { title: 'Exercise: Support Plan', value: 'exercise:support-plan' },
         ],
       },
       hidden: ({ document }) => document?.contentType !== 'interactive',
