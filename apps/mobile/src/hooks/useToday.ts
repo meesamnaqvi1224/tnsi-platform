@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useApiClient } from './useApiClient';
 import { humanizeApiError } from '@/lib/api-errors';
+import { withCheckInApplied } from '@/lib/today-after-check-in';
 import type { TodayResponse } from '@/api/types';
 
 export type TodayState =
@@ -33,10 +34,14 @@ export function useToday() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch-once-on-mount is intentional: `load` depends on `api`, whose identity can change every render (Clerk's `getToken` isn't guaranteed stable - see useApiClient.ts), so depending on `[load]` here would re-fire on every render instead of once per mount.
   }, []);
 
-  /** Lets a caller (a successful check-in submission) update the cached checkIn without a refetch. */
-  const setCheckIn = useCallback((checkIn: TodayResponse['checkIn']) => {
+  /**
+   * Lets a caller (a successful check-in submission) apply the new check-in without waiting for a
+   * refetch. The recommendation held so far came from the previous check-in, so it is cleared with it
+   * (see withCheckInApplied) rather than shown as if it were for this one.
+   */
+  const setCheckIn = useCallback((checkIn: NonNullable<TodayResponse['checkIn']>) => {
     setState((prev) =>
-      prev.status === 'success' ? { ...prev, data: { ...prev.data, checkIn } } : prev,
+      prev.status === 'success' ? { ...prev, data: withCheckInApplied(prev.data, checkIn) } : prev,
     );
   }, []);
 
