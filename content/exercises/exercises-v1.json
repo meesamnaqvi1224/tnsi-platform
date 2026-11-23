@@ -744,7 +744,7 @@
           "id": "week",
           "type": "text",
           "question": "What is one small way you could let in a little more support this week?",
-          "help": "Optional. One small thing is enough.",
+          "help": "One small thing is enough.",
           "placeholder": "For example: telling one person how the week is going"
         }
       ],
@@ -837,8 +837,7 @@
         {
           "id": "note",
           "type": "text",
-          "question": "Anything you would like to remember about this snapshot?",
-          "help": "Optional."
+          "question": "Anything you would like to remember about this snapshot?"
         }
       ],
       "summary": {
@@ -1086,6 +1085,724 @@
         "heading": "The pause is yours",
         "message": "You can take a moment before responding, whatever the situation asks. Even a few seconds can give you a little more choice."
       }
+    },
+    {
+      "slug": "delegation-tracker",
+      "title": "Delegation Tracker",
+      "subtitle": "Sharing the load",
+      "intro": "Carrying everything yourself uses up capacity. This exercise helps you notice what you hold, what you could share, and how it feels to let others help. There are no right answers, and you can stop at any time.",
+      "durationLabel": "About 4 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "What are you carrying?",
+          "body": "Think about the past week. Notice the tasks and responsibilities that landed on you, big or small, and choose whatever feels true."
+        },
+        {
+          "id": "areas",
+          "type": "choice",
+          "question": "Where are you carrying most?",
+          "options": [
+            {
+              "id": "home",
+              "label": "Home and household"
+            },
+            {
+              "id": "work",
+              "label": "Work"
+            },
+            {
+              "id": "caring",
+              "label": "Looking after other people"
+            },
+            {
+              "id": "admin",
+              "label": "Admin, money or planning"
+            },
+            {
+              "id": "social",
+              "label": "Keeping relationships going"
+            },
+            {
+              "id": "emotional",
+              "label": "Holding other people's feelings"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "one",
+          "type": "text",
+          "question": "Which one thing could someone else share or take on?",
+          "help": "One thing is enough.",
+          "placeholder": "For example: the weekly food shop"
+        },
+        {
+          "id": "who",
+          "type": "choice",
+          "question": "Who could help, or what could make it lighter?",
+          "options": [
+            {
+              "id": "partner",
+              "label": "A partner or family member"
+            },
+            {
+              "id": "friend",
+              "label": "A friend"
+            },
+            {
+              "id": "colleague",
+              "label": "A colleague or manager"
+            },
+            {
+              "id": "paid",
+              "label": "Paid help or a service"
+            },
+            {
+              "id": "system",
+              "label": "A simpler system or routine"
+            },
+            {
+              "id": "drop",
+              "label": "Letting it go for now"
+            }
+          ]
+        },
+        {
+          "id": "easy",
+          "type": "scale",
+          "question": "How easy would it be for you to ask or hand it over?",
+          "lowLabel": "Very hard",
+          "highLabel": "Easy",
+          "help": "If it feels hard, that is useful to notice."
+        },
+        {
+          "id": "block",
+          "type": "choice",
+          "question": "What makes handing things over hard?",
+          "options": [
+            {
+              "id": "faster",
+              "label": "It is quicker if I do it"
+            },
+            {
+              "id": "standards",
+              "label": "They will not do it my way"
+            },
+            {
+              "id": "burden",
+              "label": "I do not want to burden anyone"
+            },
+            {
+              "id": "worth",
+              "label": "I feel I should manage it myself"
+            },
+            {
+              "id": "nothing",
+              "label": "Nothing much"
+            }
+          ]
+        },
+        {
+          "id": "step",
+          "type": "text",
+          "question": "What is one small way to try it this week?",
+          "placeholder": "For example: asking for help with one task"
+        }
+      ],
+      "summary": {
+        "heading": "Your load",
+        "intro": "Here is what you are carrying and one way to share it.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "You do not have to carry it all",
+        "message": "Sharing a little of the load protects the resource you need for what matters. Start with one small thing, and let it be imperfect."
+      }
+    },
+    {
+      "slug": "trigger-map",
+      "title": "Trigger Map",
+      "subtitle": "What sets you off, gently",
+      "intro": "Some situations set off a strong reaction faster than we expect. This exercise helps you notice one of them from a steady distance. Choose something mild, not the hardest thing in your life. You can stop at any time, and nothing you enter is saved.",
+      "durationLabel": "About 4 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "Choose something mild",
+          "body": "Pick a situation that stirs a small to medium reaction, not the most painful thing. If thinking about it feels like too much, stop here and choose something smaller, or leave the exercise."
+        },
+        {
+          "id": "where",
+          "type": "choice",
+          "question": "Where does it tend to happen?",
+          "options": [
+            {
+              "id": "work",
+              "label": "At work"
+            },
+            {
+              "id": "home",
+              "label": "At home"
+            },
+            {
+              "id": "family",
+              "label": "With family"
+            },
+            {
+              "id": "partner",
+              "label": "With a partner"
+            },
+            {
+              "id": "friends",
+              "label": "With friends"
+            },
+            {
+              "id": "public",
+              "label": "In public"
+            },
+            {
+              "id": "online",
+              "label": "Online or on my phone"
+            },
+            {
+              "id": "other",
+              "label": "Somewhere else"
+            }
+          ]
+        },
+        {
+          "id": "what",
+          "type": "choice",
+          "question": "What tends to set it off?",
+          "options": [
+            {
+              "id": "tone",
+              "label": "A tone of voice"
+            },
+            {
+              "id": "criticism",
+              "label": "Criticism or feeling judged"
+            },
+            {
+              "id": "pressure",
+              "label": "Time pressure"
+            },
+            {
+              "id": "ignored",
+              "label": "Feeling ignored or left out"
+            },
+            {
+              "id": "conflict",
+              "label": "Conflict or tension"
+            },
+            {
+              "id": "noise",
+              "label": "Noise or crowding"
+            },
+            {
+              "id": "demands",
+              "label": "Too many demands at once"
+            },
+            {
+              "id": "unsure",
+              "label": "I am not sure"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "body",
+          "type": "choice",
+          "question": "What do you notice in your body first?",
+          "options": [
+            {
+              "id": "jaw",
+              "label": "Jaw or shoulders tightening"
+            },
+            {
+              "id": "breath",
+              "label": "Breath changing"
+            },
+            {
+              "id": "heart",
+              "label": "Heart speeding up"
+            },
+            {
+              "id": "stomach",
+              "label": "Stomach tension"
+            },
+            {
+              "id": "heat",
+              "label": "Heat or flushing"
+            },
+            {
+              "id": "shut",
+              "label": "Going numb or blank"
+            },
+            {
+              "id": "unsure",
+              "label": "Not sure"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "then",
+          "type": "choice",
+          "question": "What do you usually do next?",
+          "options": [
+            {
+              "id": "snap",
+              "label": "Snap or get short"
+            },
+            {
+              "id": "withdraw",
+              "label": "Go quiet or withdraw"
+            },
+            {
+              "id": "please",
+              "label": "Smooth things over or please"
+            },
+            {
+              "id": "push",
+              "label": "Push through"
+            },
+            {
+              "id": "avoid",
+              "label": "Avoid it afterwards"
+            },
+            {
+              "id": "unsure",
+              "label": "Not sure"
+            }
+          ]
+        },
+        {
+          "id": "intensity",
+          "type": "scale",
+          "question": "How strong is this reaction, usually?",
+          "lowLabel": "Mild",
+          "highLabel": "Very strong",
+          "help": "If it is high, choose a gentler situation next time."
+        },
+        {
+          "id": "early",
+          "type": "text",
+          "question": "What is one early sign you could watch for next time?",
+          "placeholder": "For example: my shoulders rising"
+        }
+      ],
+      "summary": {
+        "heading": "Your map",
+        "intro": "This is a picture of one pattern, from a steady distance.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "Seeing it is enough for today",
+        "message": "A reaction that makes sense is not a flaw. Noticing what sets it off, and where you feel it first, gives you a little more room next time."
+      }
+    },
+    {
+      "slug": "evening-regulation-reflection",
+      "title": "Evening Regulation Reflection",
+      "subtitle": "Closing the day gently",
+      "intro": "A short reflection to close the day: what asked the most of you, what helped, and what you would like to set down. It is not a review or a grade. You can stop at any time.",
+      "durationLabel": "About 3 minutes",
+      "steps": [
+        {
+          "id": "day",
+          "type": "scale",
+          "question": "How did today feel overall for your system?",
+          "lowLabel": "Hard going",
+          "highLabel": "Steady",
+          "help": "There is no right answer."
+        },
+        {
+          "id": "asked",
+          "type": "choice",
+          "question": "What asked the most of you today?",
+          "options": [
+            {
+              "id": "people",
+              "label": "People or conversations"
+            },
+            {
+              "id": "tasks",
+              "label": "Tasks and demands"
+            },
+            {
+              "id": "body",
+              "label": "My body or energy"
+            },
+            {
+              "id": "feelings",
+              "label": "Strong feelings"
+            },
+            {
+              "id": "uncertainty",
+              "label": "Uncertainty or change"
+            },
+            {
+              "id": "nothing",
+              "label": "Not much, a lighter day"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "helped",
+          "type": "choice",
+          "question": "What helped, even a little?",
+          "options": [
+            {
+              "id": "rest",
+              "label": "A pause or rest"
+            },
+            {
+              "id": "movement",
+              "label": "Movement or fresh air"
+            },
+            {
+              "id": "connection",
+              "label": "Time with someone"
+            },
+            {
+              "id": "quiet",
+              "label": "Quiet or space"
+            },
+            {
+              "id": "practice",
+              "label": "A practice"
+            },
+            {
+              "id": "food",
+              "label": "Eating or drinking well"
+            },
+            {
+              "id": "nothing",
+              "label": "Not sure anything did"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "down",
+          "type": "text",
+          "question": "What would you like to set down before sleep?",
+          "placeholder": "For example: the unanswered email"
+        },
+        {
+          "id": "kind",
+          "type": "text",
+          "question": "What is one kind thing you can say to yourself about today?",
+          "help": "Plain and true is enough.",
+          "placeholder": "For example: I did what I could with what I had"
+        }
+      ],
+      "summary": {
+        "heading": "Today, in brief",
+        "intro": "Here is how the day looked.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "The day is done",
+        "message": "You can set down what is left until tomorrow. Rest is part of how your system recovers, and it does not have to be earned."
+      }
+    },
+    {
+      "slug": "looking-back-looking-forward",
+      "title": "Looking Back, Looking Forward",
+      "subtitle": "What you have carried, and where you are heading",
+      "intro": "This exercise looks briefly backward to what has been true for you, and then forward to a direction that feels like yours. It is not about fixing the past or planning everything ahead. You can stop at any time.",
+      "durationLabel": "About 5 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "Two quiet glances",
+          "body": "First you will look back over a period of your life, gently. Then you will look toward a direction. Keep both modest. Choose what feels true, and leave out anything that feels too heavy."
+        },
+        {
+          "id": "period",
+          "type": "choice",
+          "question": "Which stretch of time are you looking back over?",
+          "options": [
+            {
+              "id": "week",
+              "label": "The past week"
+            },
+            {
+              "id": "month",
+              "label": "The past month"
+            },
+            {
+              "id": "season",
+              "label": "This season or year"
+            },
+            {
+              "id": "chapter",
+              "label": "A bigger chapter of my life"
+            }
+          ]
+        },
+        {
+          "id": "carried",
+          "type": "choice",
+          "question": "What have you carried or lived through in that time?",
+          "options": [
+            {
+              "id": "pressure",
+              "label": "A lot of pressure"
+            },
+            {
+              "id": "loss",
+              "label": "A loss or ending"
+            },
+            {
+              "id": "change",
+              "label": "A big change"
+            },
+            {
+              "id": "caring",
+              "label": "Looking after others"
+            },
+            {
+              "id": "uncertainty",
+              "label": "Uncertainty"
+            },
+            {
+              "id": "growth",
+              "label": "Something I grew into"
+            },
+            {
+              "id": "steady",
+              "label": "A steadier stretch"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "proud",
+          "type": "text",
+          "question": "What is something you got through, or did well, even if it was small?",
+          "placeholder": "For example: I kept going when it was hard"
+        },
+        {
+          "id": "toward",
+          "type": "choice",
+          "question": "What direction would you like to lean toward?",
+          "options": [
+            {
+              "id": "rest",
+              "label": "More rest and ease"
+            },
+            {
+              "id": "connection",
+              "label": "Closer connection"
+            },
+            {
+              "id": "creativity",
+              "label": "Creativity or play"
+            },
+            {
+              "id": "purpose",
+              "label": "Work or purpose that fits"
+            },
+            {
+              "id": "health",
+              "label": "Looking after my health"
+            },
+            {
+              "id": "boundaries",
+              "label": "Clearer boundaries"
+            },
+            {
+              "id": "unknown",
+              "label": "I am not sure yet, and that is okay"
+            }
+          ]
+        },
+        {
+          "id": "small",
+          "type": "text",
+          "question": "What is one small step that leans that way?",
+          "help": "Small and realistic is best.",
+          "placeholder": "For example: a short walk three times this week"
+        },
+        {
+          "id": "ready",
+          "type": "scale",
+          "question": "How ready does that step feel?",
+          "lowLabel": "Not ready",
+          "highLabel": "Ready",
+          "help": "Not ready is a valid answer."
+        }
+      ],
+      "summary": {
+        "heading": "Back and forward",
+        "intro": "Here is where you have been and the direction you chose.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "One step at a time",
+        "message": "Looking back shows what you have already carried. Looking forward does not have to be big. One small step in a direction that feels like yours is plenty."
+      }
+    },
+    {
+      "slug": "support-plan",
+      "title": "Support Plan",
+      "subtitle": "Who to turn to, and how to ask",
+      "intro": "A support plan is a short list you can reach for when things are hard, so you do not have to work it out in the moment. You choose who or what helps, and how you would ask. You can stop at any time, and nothing you enter is saved.",
+      "durationLabel": "About 4 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "Before you need it",
+          "body": "Think of a time recently when things felt like too much. What would you have liked to have in place? Choose whatever feels true."
+        },
+        {
+          "id": "when",
+          "type": "choice",
+          "question": "When would you most like support?",
+          "options": [
+            {
+              "id": "overwhelm",
+              "label": "When I feel overwhelmed"
+            },
+            {
+              "id": "lonely",
+              "label": "When I feel lonely or cut off"
+            },
+            {
+              "id": "decision",
+              "label": "When I have a hard decision"
+            },
+            {
+              "id": "body",
+              "label": "When my body feels worn out"
+            },
+            {
+              "id": "conflict",
+              "label": "After a hard conversation"
+            },
+            {
+              "id": "night",
+              "label": "Late at night or early morning"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "who",
+          "type": "choice",
+          "question": "Who or what could you turn to?",
+          "options": [
+            {
+              "id": "person",
+              "label": "A person I trust"
+            },
+            {
+              "id": "professional",
+              "label": "A professional"
+            },
+            {
+              "id": "group",
+              "label": "A group or community"
+            },
+            {
+              "id": "practice",
+              "label": "A practice or routine"
+            },
+            {
+              "id": "outdoors",
+              "label": "Time outdoors"
+            },
+            {
+              "id": "service",
+              "label": "A helpline or service"
+            },
+            {
+              "id": "none",
+              "label": "I am not sure yet"
+            }
+          ],
+          "multiple": true,
+          "help": "Choose as many as fit."
+        },
+        {
+          "id": "ask",
+          "type": "text",
+          "question": "What could you say to ask for support?",
+          "help": "A line you could copy and paste is fine.",
+          "placeholder": "For example: I am having a hard day. Could I talk for ten minutes?"
+        },
+        {
+          "id": "kind",
+          "type": "choice",
+          "question": "What kind of help would you want most?",
+          "options": [
+            {
+              "id": "listen",
+              "label": "Someone to listen"
+            },
+            {
+              "id": "practical",
+              "label": "Practical help"
+            },
+            {
+              "id": "company",
+              "label": "Company"
+            },
+            {
+              "id": "advice",
+              "label": "Advice"
+            },
+            {
+              "id": "space",
+              "label": "Space, with someone knowing"
+            }
+          ]
+        },
+        {
+          "id": "willing",
+          "type": "scale",
+          "question": "How willing do you feel to use this plan?",
+          "lowLabel": "Not very",
+          "highLabel": "Very willing",
+          "help": "Not very is information, not failure."
+        },
+        {
+          "id": "first",
+          "type": "text",
+          "question": "What is one thing you could do this week to put it in place?",
+          "placeholder": "For example: telling one person they are on my list"
+        }
+      ],
+      "summary": {
+        "heading": "Your support plan",
+        "intro": "Here is the plan you can reach for.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "Ready when you are",
+        "message": "Having a plan means you do not have to decide everything when you are low on resource. If you ever feel unsafe or in crisis, please contact a professional or emergency service."
+      }
     }
   ],
   "practices": [
@@ -1144,6 +1861,41 @@
       "description": "A short pause before an automatic reply. Notice what is pulling at you, take a moment, then choose what to do next.",
       "tags": ["Safety"],
       "durationSeconds": 150
+    },
+    {
+      "slug": "delegation-tracker",
+      "title": "Delegation Tracker",
+      "description": "Notice what you are carrying, choose one thing that could be shared, and see what makes handing things over hard.",
+      "tags": ["Capacity"],
+      "durationSeconds": 240
+    },
+    {
+      "slug": "trigger-map",
+      "title": "Trigger Map",
+      "description": "Look at one mild trigger from a steady distance: where it happens, what sets it off, what you notice in your body first, and one early sign to watch for.",
+      "tags": ["Safety"],
+      "durationSeconds": 240
+    },
+    {
+      "slug": "evening-regulation-reflection",
+      "title": "Evening Regulation Reflection",
+      "description": "A short end-of-day reflection: what asked the most of you, what helped, what to set down, and one kind thing to say to yourself.",
+      "tags": ["Capacity"],
+      "durationSeconds": 180
+    },
+    {
+      "slug": "looking-back-looking-forward",
+      "title": "Looking Back, Looking Forward",
+      "description": "Look gently back at what you have carried, then forward to a direction that feels like yours, and choose one small step.",
+      "tags": ["Expansion"],
+      "durationSeconds": 300
+    },
+    {
+      "slug": "support-plan",
+      "title": "Support Plan",
+      "description": "A short plan you can reach for when things are hard: when you would want support, who or what could help, and how you would ask.",
+      "tags": ["Availability"],
+      "durationSeconds": 240
     }
   ]
 }
