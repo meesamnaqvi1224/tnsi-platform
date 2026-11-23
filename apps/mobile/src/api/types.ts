@@ -1,3 +1,4 @@
+import type { GuidedExercise } from '@tnsi/core';
 /**
  * Mirrors apps/web/src/lib/api-response.ts's response envelope. Not
  * imported directly from @tnsi/web (apps can't depend on each other), so
@@ -682,6 +683,12 @@ export interface ReturnPathResponse {
   /** Levels this member may start (1 spiral, 2 seven circuits, 3 eleven circuits). */
   allowedLevels: (1 | 2 | 3)[];
   content: ReturnPathContent;
+}
+
+/** Response shape of GET /api/v1/exercises/[slug]: the practice a guided exercise is recorded against, and its content. */
+export interface ExerciseResponse {
+  practiceId: string;
+  exercise: GuidedExercise;
 }
 
 /**

@@ -26,6 +26,7 @@ export const structure: StructureResolver = (S) =>
         .title('The Return Path — content')
         .id('returnPathContent')
         .child(S.document().schemaType('returnPathContent').documentId('returnPathContent')),
+      S.documentTypeListItem('guidedExercise').title('Guided Exercises'),
       S.divider(),
       S.documentTypeListItem('somaticSeries').title('Somatic Series'),
       S.documentTypeListItem('somaticCard').title('Somatic Cards'),

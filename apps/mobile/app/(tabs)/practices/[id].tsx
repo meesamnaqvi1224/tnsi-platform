@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Redirect, useLocalSearchParams } from 'expo-router';
-import { RETURN_PATH_KEY, standaloneGuidedKey } from '@tnsi/core';
+import { guidedExerciseSlug, RETURN_PATH_KEY, standaloneGuidedKey } from '@tnsi/core';
 import { ScreenContainer, ErrorNotice, ThemedText } from '@/components';
 import { PracticeThumbnail } from '@/components/practices/PracticeThumbnail';
 import { PracticeDetailSkeleton } from '@/components/practices/PracticeDetailSkeleton';
@@ -119,6 +119,9 @@ export default function PracticeDetailScreen() {
   // A standalone guided practice (90-Second Reset, The Empty Chair) opens its own experience.
   const standalone = standaloneGuidedKey(practice);
   if (standalone) return <Redirect href={`/practices/${standalone}`} />;
+  // A guided exercise opens the reusable exercise screen, drawn from its CMS content.
+  const exerciseSlug = guidedExerciseSlug(practice);
+  if (exerciseSlug) return <Redirect href={`/practices/exercise/${exerciseSlug}`} />;
   const title = practice.title.trim();
   const meta = [capitalize(practice.contentType)];
   if (practice.durationSeconds) meta.push(formatDuration(practice.durationSeconds));

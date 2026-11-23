@@ -11,6 +11,7 @@ import { practice } from './documents/practice';
 import { assessment } from './documents/assessment';
 import { powerDrop } from './documents/powerDrop';
 import { returnPathContent } from './documents/returnPathContent';
+import { guidedExercise } from './documents/guidedExercise';
 import { somaticSeries } from './documents/somaticSeries';
 import { somaticCard } from './documents/somaticCard';
 
@@ -24,6 +25,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   assessment,
   powerDrop,
   returnPathContent,
+  guidedExercise,
   somaticSeries,
   somaticCard,
   author,

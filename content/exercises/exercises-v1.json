@@ -1,0 +1,320 @@
+{
+  "_comment": "Guided exercises, batch 1. Adapted by the assistant from the titles and one-line purposes in the Strong for Yourself workbook index (Early Warning Sign Tracker, State Before / State After Tracker, Capacity Expansion Tracker). They are NOT extracts from the book and are drafts for Caroline to review and rewrite. Nothing a member enters is stored.",
+  "exercises": [
+    {
+      "slug": "early-warning-signs",
+      "title": "Early Warning Signs",
+      "subtitle": "Noticing sooner",
+      "intro": "Before a stress response builds, your system usually gives small signals. Noticing them sooner gives you more choice about what to do next. There are no right or wrong answers, and you can skip anything that doesn't fit. You can stop at any time.",
+      "durationLabel": "About 3 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "Early signs come first",
+          "body": "Think of a recent time you felt stretched or on edge. You don't need to relive it. Just keep it loosely in mind while you answer, and choose whatever feels true. If nothing fits, choose \"Not sure yet\"."
+        },
+        {
+          "id": "body",
+          "type": "choice",
+          "multiple": true,
+          "question": "In your body, what do you usually notice first?",
+          "help": "Choose as many as fit.",
+          "options": [
+            { "id": "jaw", "label": "A tight jaw or clenched teeth" },
+            { "id": "shoulders", "label": "Tense shoulders or neck" },
+            { "id": "breath", "label": "Shallow or held breath" },
+            { "id": "heart", "label": "A racing heart" },
+            { "id": "chest", "label": "A tight chest" },
+            { "id": "stomach", "label": "Stomach tension" },
+            { "id": "heavy", "label": "Heaviness or tiredness" },
+            { "id": "restless", "label": "Restlessness or fidgeting" },
+            { "id": "unsure", "label": "Not sure yet" }
+          ]
+        },
+        {
+          "id": "feelings",
+          "type": "choice",
+          "multiple": true,
+          "question": "Emotionally, what tends to show up early?",
+          "help": "Choose as many as fit.",
+          "options": [
+            { "id": "irritable", "label": "Irritability" },
+            { "id": "on-edge", "label": "Feeling on edge" },
+            { "id": "overwhelm", "label": "Overwhelm" },
+            { "id": "flat", "label": "Numbness or flatness" },
+            { "id": "sad", "label": "Sadness" },
+            { "id": "worry", "label": "Worry" },
+            { "id": "rushed", "label": "Feeling rushed" },
+            { "id": "unsure", "label": "Not sure yet" }
+          ]
+        },
+        {
+          "id": "thoughts",
+          "type": "choice",
+          "multiple": true,
+          "question": "What tends to happen in your thinking?",
+          "help": "Choose as many as fit.",
+          "options": [
+            { "id": "racing", "label": "Racing thoughts" },
+            { "id": "foggy", "label": "Going blank or foggy" },
+            { "id": "replay", "label": "Replaying conversations" },
+            { "id": "planning", "label": "Planning ahead non-stop" },
+            { "id": "harsh", "label": "Harsh self-talk" },
+            { "id": "deciding", "label": "Finding it hard to decide" },
+            { "id": "unsure", "label": "Not sure yet" }
+          ]
+        },
+        {
+          "id": "actions",
+          "type": "choice",
+          "multiple": true,
+          "question": "What do you tend to do?",
+          "help": "Choose as many as fit.",
+          "options": [
+            { "id": "withdraw", "label": "Go quiet or withdraw" },
+            { "id": "say-yes", "label": "Say yes when I mean no" },
+            { "id": "over-explain", "label": "Over-explain or apologise" },
+            { "id": "push", "label": "Push harder or work faster" },
+            { "id": "numb", "label": "Scroll or numb out" },
+            { "id": "snap", "label": "Get short with people" },
+            { "id": "control", "label": "Tidy or try to control things" },
+            { "id": "unsure", "label": "Not sure yet" }
+          ]
+        },
+        {
+          "id": "early",
+          "type": "scale",
+          "question": "How early do you usually notice these signs?",
+          "lowLabel": "Only once it is big",
+          "highLabel": "Right at the start"
+        },
+        {
+          "id": "watch",
+          "type": "text",
+          "question": "Which one early sign would be most helpful to watch for this week?",
+          "help": "A word or a few words is enough.",
+          "placeholder": "For example: my shoulders rising"
+        }
+      ],
+      "summary": {
+        "heading": "Your early signs",
+        "intro": "This is your own list, in one place. Seeing it together can make the signs easier to spot.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "Noticing is the first step",
+        "message": "Early signs are information, not a problem. You are not expected to catch every one. Even noticing one a little sooner gives you a little more choice."
+      }
+    },
+    {
+      "slug": "state-before-after",
+      "title": "State Before / State After",
+      "subtitle": "What changes, and what doesn't",
+      "intro": "A short check-in either side of a practice, so you can see how your own system responds. You are not aiming for a particular result, and nothing here is a test. You can stop at any time.",
+      "durationLabel": "About 2 minutes, plus your practice",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "Before you start",
+          "body": "Choose a practice you are about to do, or have just decided to do. It can be anything from a breath to a full guided practice. First, a quick check of how you are right now."
+        },
+        {
+          "id": "before-settled",
+          "type": "scale",
+          "question": "Right now, how settled do you feel in your body?",
+          "lowLabel": "Not settled",
+          "highLabel": "Very settled"
+        },
+        {
+          "id": "before-words",
+          "type": "choice",
+          "question": "Which word feels closest right now?",
+          "options": [
+            { "id": "tense", "label": "Tense" },
+            { "id": "wound-up", "label": "Wound up" },
+            { "id": "flat", "label": "Flat or numb" },
+            { "id": "tired", "label": "Tired" },
+            { "id": "steady", "label": "Steady" },
+            { "id": "calm", "label": "Calm" },
+            { "id": "mixed", "label": "Mixed" }
+          ]
+        },
+        {
+          "id": "practice",
+          "type": "pause",
+          "title": "Now do your practice",
+          "body": "Do the practice you chose, at your own pace. You can keep your eyes open, adapt it, or stop if it doesn't feel right. When you have finished, come back here.",
+          "actionLabel": "I have finished"
+        },
+        {
+          "id": "after-settled",
+          "type": "scale",
+          "question": "How settled do you feel in your body now?",
+          "lowLabel": "Not settled",
+          "highLabel": "Very settled"
+        },
+        {
+          "id": "after-words",
+          "type": "choice",
+          "question": "Which word feels closest now?",
+          "options": [
+            { "id": "tense", "label": "Tense" },
+            { "id": "wound-up", "label": "Wound up" },
+            { "id": "flat", "label": "Flat or numb" },
+            { "id": "tired", "label": "Tired" },
+            { "id": "steady", "label": "Steady" },
+            { "id": "calm", "label": "Calm" },
+            { "id": "mixed", "label": "Mixed" }
+          ]
+        },
+        {
+          "id": "noticed",
+          "type": "text",
+          "question": "Anything you noticed, however small?",
+          "placeholder": "For example: my breathing slowed"
+        }
+      ],
+      "summary": {
+        "heading": "What you noticed",
+        "intro": "Here is your check-in, side by side.",
+        "showAnswers": true,
+        "compare": [
+          {
+            "label": "How settled in your body",
+            "beforeStepId": "before-settled",
+            "afterStepId": "after-settled"
+          }
+        ]
+      },
+      "closing": {
+        "heading": "Thank you for checking in",
+        "message": "Whether things shifted, stayed the same or felt different, you have learned something about how your system responds. That is useful, whichever way it went."
+      }
+    },
+    {
+      "slug": "capacity-expansion-tracker",
+      "title": "Capacity Expansion Tracker",
+      "subtitle": "Where your resource is, right now",
+      "intro": "Capacity is the resource you have available to hold what life is asking of you. This is a snapshot of where it is growing, steady, running low or draining away. It is not a score and there is no right answer. You can stop at any time.",
+      "durationLabel": "About 4 minutes",
+      "steps": [
+        {
+          "id": "intro",
+          "type": "prompt",
+          "title": "A snapshot, not a score",
+          "body": "We'll look at five areas of life. For each, choose what feels closest this week. \"Draining away\" means resource that leaks out without you choosing it, such as hours lost to worry or energy spent on things you didn't mean to take on."
+        },
+        {
+          "id": "physical",
+          "type": "choice",
+          "question": "Physical: your sleep, energy and body",
+          "options": [
+            { "id": "growing", "label": "Growing" },
+            { "id": "steady", "label": "Steady" },
+            { "id": "low", "label": "Running low" },
+            { "id": "draining", "label": "Draining away" }
+          ]
+        },
+        {
+          "id": "emotional",
+          "type": "choice",
+          "question": "Emotional: how much you can feel and hold",
+          "options": [
+            { "id": "growing", "label": "Growing" },
+            { "id": "steady", "label": "Steady" },
+            { "id": "low", "label": "Running low" },
+            { "id": "draining", "label": "Draining away" }
+          ]
+        },
+        {
+          "id": "mental",
+          "type": "choice",
+          "question": "Mental: your focus and decision-making",
+          "options": [
+            { "id": "growing", "label": "Growing" },
+            { "id": "steady", "label": "Steady" },
+            { "id": "low", "label": "Running low" },
+            { "id": "draining", "label": "Draining away" }
+          ]
+        },
+        {
+          "id": "relational",
+          "type": "choice",
+          "question": "Relational: connection and support",
+          "options": [
+            { "id": "growing", "label": "Growing" },
+            { "id": "steady", "label": "Steady" },
+            { "id": "low", "label": "Running low" },
+            { "id": "draining", "label": "Draining away" }
+          ]
+        },
+        {
+          "id": "practical",
+          "type": "choice",
+          "question": "Practical: your time, money and day-to-day load",
+          "options": [
+            { "id": "growing", "label": "Growing" },
+            { "id": "steady", "label": "Steady" },
+            { "id": "low", "label": "Running low" },
+            { "id": "draining", "label": "Draining away" }
+          ]
+        },
+        {
+          "id": "protect",
+          "type": "choice",
+          "question": "Which area feels most worth protecting this week?",
+          "options": [
+            { "id": "physical", "label": "Physical" },
+            { "id": "emotional", "label": "Emotional" },
+            { "id": "mental", "label": "Mental" },
+            { "id": "relational", "label": "Relational" },
+            { "id": "practical", "label": "Practical" }
+          ]
+        },
+        {
+          "id": "small-thing",
+          "type": "text",
+          "question": "What is one small thing that could protect it?",
+          "help": "Small and realistic is best.",
+          "placeholder": "For example: a firm stop time in the evening"
+        }
+      ],
+      "summary": {
+        "heading": "Your capacity snapshot",
+        "intro": "This is where things stand this week. It will change with sleep, load, support and season.",
+        "showAnswers": true,
+        "compare": []
+      },
+      "closing": {
+        "heading": "A snapshot, not a verdict",
+        "message": "Seeing where your resource is running low is how you decide where to protect it. You don't have to fix everything at once. One small, realistic step is plenty."
+      }
+    }
+  ],
+  "practices": [
+    {
+      "slug": "early-warning-signs",
+      "title": "Early Warning Signs",
+      "description": "A short guided exercise to notice your own early signs of stress, in your body, feelings, thinking and behaviour. You choose what fits, see it back in one place, and decide one sign to watch for.",
+      "tags": ["Safety"],
+      "durationSeconds": 180
+    },
+    {
+      "slug": "state-before-after",
+      "title": "State Before / State After",
+      "description": "A quick check-in either side of any practice, so you can see how your own system responds. Rate how settled you feel before and after, and notice what changes, or doesn't.",
+      "tags": ["Safety"],
+      "durationSeconds": 150
+    },
+    {
+      "slug": "capacity-expansion-tracker",
+      "title": "Capacity Expansion Tracker",
+      "description": "A snapshot of your resource across five areas of life: physical, emotional, mental, relational and practical. See where it is growing, steady, running low or draining away, and choose one area to protect.",
+      "tags": ["Capacity"],
+      "durationSeconds": 240
+    }
+  ]
+}
