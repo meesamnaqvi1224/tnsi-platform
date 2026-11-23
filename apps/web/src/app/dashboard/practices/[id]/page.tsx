@@ -5,7 +5,12 @@ import { LockedPracticeNotice } from '@/components/dashboard/locked-practice-not
 import { PracticeExperience } from '@/components/dashboard/practice-experience';
 import { ReturnPathPractice } from '@/components/return-path/return-path-practice';
 import { getReturnPathContent } from '@/content/cms/loaders';
-import { MEMBER_RETURN_PATH_LEVELS, RETURN_PATH_KEY, standaloneGuidedKey } from '@tnsi/core';
+import {
+  guidedExerciseSlug,
+  MEMBER_RETURN_PATH_LEVELS,
+  RETURN_PATH_KEY,
+  standaloneGuidedKey,
+} from '@tnsi/core';
 import { SaveToggleButton } from '@/components/dashboard/save-toggle-button';
 import { requireMemberAccessOrRedirect } from '@/lib/auth-api';
 import { contentAccessFor } from '@/lib/membership';
@@ -68,6 +73,10 @@ export default async function PracticeDetailPage({ params }: PracticeDetailPageP
   // A standalone guided practice (90-Second Reset, The Empty Chair) opens its own experience.
   const standalone = standaloneGuidedKey(practice);
   if (standalone) redirect(`/dashboard/practices/${standalone}`);
+
+  // A guided exercise opens the reusable exercise screen, drawn from its CMS content.
+  const exercise = guidedExerciseSlug(practice);
+  if (exercise) redirect(`/dashboard/practices/exercise/${exercise}`);
 
   // Free vs paid is decided here, server-side. A locked practice never has
   // its media resolved or passed to the (client) player at all.

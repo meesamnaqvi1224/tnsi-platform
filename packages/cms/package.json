@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "import:somatic-core-series": "tsx scripts/import-somatic-core-series.ts"
+    "import:somatic-core-series": "tsx scripts/import-somatic-core-series.ts",
+    "import:guided-exercises": "tsx scripts/import-guided-exercises.ts"
   },
   "dependencies": {
     "@sanity/client": "^7.26.2",

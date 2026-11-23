@@ -6,6 +6,7 @@ export * from './practices/recommendation';
 export * from './practices/het-recommendation';
 export * from './practices/het-copy';
 export * from './practices/standalone-guided';
+export * from './exercises/exercise';
 export * from './return-path/geometry';
 export * from './return-path/constants';
 export * from './reflections';

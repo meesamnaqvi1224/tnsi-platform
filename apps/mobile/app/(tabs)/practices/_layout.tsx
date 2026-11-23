@@ -87,6 +87,8 @@ export default function PracticesLayout() {
       <Stack.Screen name="the-empty-chair/index" options={{ headerShown: false }} />
       <Stack.Screen name="the-empty-chair/session" options={{ headerShown: false }} />
       <Stack.Screen name="the-empty-chair/complete" options={{ headerShown: false }} />
+      {/* A guided exercise draws its own chrome too (the reusable exercise screen). */}
+      <Stack.Screen name="exercise/[slug]" options={{ headerShown: false }} />
     </Stack>
   );
 }

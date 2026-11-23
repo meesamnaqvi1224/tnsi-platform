@@ -240,6 +240,25 @@ export const RETURN_PATH_CONTENT_QUERY = groq`*[_id == "returnPathContent"][0]{
 }`;
 
 /**
+ * A guided exercise by slug, shaped exactly as `parseGuidedExercise` (packages/core) expects:
+ * `slug` flattened from the slug object, and the Sanity `_key`s left out. The app validates the
+ * result, so a half-edited document is shown as "not available" rather than a broken exercise.
+ */
+export const GUIDED_EXERCISE_BY_SLUG_QUERY = groq`*[_type == "guidedExercise" && slug.current == $slug][0]{
+  "slug": slug.current,
+  title, subtitle, intro, durationLabel,
+  "steps": steps[]{
+    id, type, title, body, actionLabel, question, help, multiple, max, lowLabel, highLabel, placeholder,
+    "options": options[]{ id, label }
+  },
+  "summary": summary{
+    heading, intro, showAnswers,
+    "compare": compare[]{ label, beforeStepId, afterStepId }
+  },
+  closing{ heading, message }
+}`;
+
+/**
  * Recommendation candidates: published PowerDrops and Somatic Cards that
  * carry Human Expansion Theory conditions. Untagged items are deliberately
  * absent - an item with no `hetConditions` is never recommended.

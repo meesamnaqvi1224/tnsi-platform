@@ -1,7 +1,9 @@
 import { sanityFetch } from '@tnsi/cms/server';
+import { parseGuidedExercise, type GuidedExercise } from '@tnsi/core';
 import {
   ARTICLES_QUERY,
   ASSESSMENT_BY_SLUG_QUERY,
+  GUIDED_EXERCISE_BY_SLUG_QUERY,
   PROGRAMS_QUERY,
   RETURN_PATH_CONTENT_QUERY,
 } from '@tnsi/cms';
@@ -174,4 +176,14 @@ export async function getAssessmentBySlug(slug: string): Promise<Assessment | nu
 export async function getReturnPathContent(): Promise<ReturnPathContent> {
   const data = await sanityFetch<ReturnPathContentInput>(RETURN_PATH_CONTENT_QUERY);
   return resolveReturnPathContent(data);
+}
+
+/**
+ * A guided exercise's content from Sanity, validated. `null` when Sanity is unconfigured, the
+ * exercise does not exist, or the document is incomplete or malformed: callers show "not available"
+ * rather than a broken exercise, and there is deliberately no hardcoded fallback copy.
+ */
+export async function getGuidedExercise(slug: string): Promise<GuidedExercise | null> {
+  const data = await sanityFetch<unknown>(GUIDED_EXERCISE_BY_SLUG_QUERY, { slug });
+  return parseGuidedExercise(data);
 }

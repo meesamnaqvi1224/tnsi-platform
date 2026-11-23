@@ -1,6 +1,6 @@
 import { db, practices, practiceCompletions, practiceReflections, practiceSaves } from '@tnsi/db';
 import { eq, and, desc, gt, count, countDistinct, inArray } from 'drizzle-orm';
-import { pickHetRecommendations, type HetCondition } from '@tnsi/core';
+import { exerciseInteractiveKey, pickHetRecommendations, type HetCondition } from '@tnsi/core';
 import { getLatestCheckIn } from './check-ins';
 import { paginateRows } from './practice-sessions';
 import type { PracticeReflection as PracticeReflectionRow } from '@tnsi/db/schema';
@@ -64,6 +64,26 @@ export async function getPublishedPracticeById(id: string): Promise<PracticeSumm
     .select(PRACTICE_SUMMARY_COLUMNS)
     .from(practices)
     .where(and(eq(practices.id, id), eq(practices.isPublished, true)))
+    .limit(1);
+  return result[0] ?? null;
+}
+
+/**
+ * The published practice that opens a guided exercise (`contentType = 'interactive'`, key
+ * `exercise:<slug>`), or `null` when there is none. A draft practice is therefore not reachable
+ * by its slug, even though the exercise's own content may already exist in the CMS.
+ */
+export async function getPublishedExercisePractice(slug: string): Promise<PracticeSummary | null> {
+  const result = await db
+    .select(PRACTICE_SUMMARY_COLUMNS)
+    .from(practices)
+    .where(
+      and(
+        eq(practices.contentType, 'interactive'),
+        eq(practices.interactiveKey, exerciseInteractiveKey(slug)),
+        eq(practices.isPublished, true),
+      ),
+    )
     .limit(1);
   return result[0] ?? null;
 }

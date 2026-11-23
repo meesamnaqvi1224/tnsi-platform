@@ -17,6 +17,7 @@ export {
   POWER_DROPS_LIST_API_QUERY,
   POWER_DROP_API_BY_SLUG_QUERY,
   RETURN_PATH_CONTENT_QUERY,
+  GUIDED_EXERCISE_BY_SLUG_QUERY,
   HET_POWER_DROPS_QUERY,
   HET_SOMATIC_CARDS_QUERY,
 } from './lib/queries';
@@ -31,6 +32,7 @@ export { practice } from './schema/documents/practice';
 export { assessment } from './schema/documents/assessment';
 export { powerDrop } from './schema/documents/powerDrop';
 export { returnPathContent, RETURN_PATH_CONTENT_ID } from './schema/documents/returnPathContent';
+export { guidedExercise } from './schema/documents/guidedExercise';
 export { author } from './schema/documents/author';
 export { category } from './schema/documents/category';
 export { blockContent } from './schema/objects/blockContent';

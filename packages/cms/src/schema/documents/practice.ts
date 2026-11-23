@@ -60,6 +60,12 @@ export const practice = defineType({
           { title: 'The Return Path', value: 'the-return-path' },
           { title: '90-Second Reset', value: '90-second-reset' },
           { title: 'The Empty Chair', value: 'the-empty-chair' },
+          { title: 'Exercise: Early Warning Signs', value: 'exercise:early-warning-signs' },
+          { title: 'Exercise: State Before / State After', value: 'exercise:state-before-after' },
+          {
+            title: 'Exercise: Capacity Expansion Tracker',
+            value: 'exercise:capacity-expansion-tracker',
+          },
         ],
       },
       hidden: ({ document }) => document?.contentType !== 'interactive',
