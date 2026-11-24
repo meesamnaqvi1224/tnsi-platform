@@ -1,0 +1,244 @@
+{
+  "_comment": "Daily check-in follow-up routing, copied from the Collections tab of the TNSI Master Content Inventory (Full Backup 23 Nov 2026), decided by Caroline on 23 Nov 2026. DRAFT: the member-facing wording (memberText and the labels below) is awaiting Caroline's sign-off, and no app code reads this file yet. 'pattern' is the team's name and is never shown to members. Each pick is a Somatic Card or PowerDrop identified by its slug.",
+  "version": 1,
+  "status": "draft-wording-unconfirmed",
+  "followUp": {
+    "patternQuestion": "What does it feel like right now?",
+    "helpMostQuestion": "What would help most today?",
+    "helpMostOptions": {
+      "settle": "Help me settle",
+      "grow": "Help me grow"
+    },
+    "notSureLabel": "Not sure, just suggest something",
+    "growOptions": {
+      "expansion": {
+        "label": "Explore what's possible now",
+        "condition": "Expansion"
+      },
+      "participation": {
+        "label": "Show up more fully in my life",
+        "condition": "Participation"
+      }
+    }
+  },
+  "notSure": [
+    {
+      "kind": "somaticCard",
+      "slug": "the-physiological-sigh"
+    },
+    {
+      "kind": "somaticCard",
+      "slug": "the-horizon-lock"
+    }
+  ],
+  "patterns": [
+    {
+      "id": "protective-anger-reactivity",
+      "group": "Fight",
+      "pattern": "Protective Anger and Reactivity",
+      "memberText": "I’m irritated and on edge",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-cool-contact-reset"
+        },
+        {
+          "kind": "powerDrop",
+          "slug": "the-90-second-exhale-drop"
+        }
+      ]
+    },
+    {
+      "id": "control-over-management",
+      "group": "Fight",
+      "pattern": "Control and Over-Management",
+      "memberText": "If I don’t hold it all together, it’ll fall apart",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-exhale-and-drop"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-axial-alignment-reset"
+        }
+      ]
+    },
+    {
+      "id": "injustice-defensive-bracing",
+      "group": "Fight",
+      "pattern": "Injustice and Defensive Bracing",
+      "memberText": "Something feels unfair and I can’t let it go",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-exhale-and-drop"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-cool-contact-reset"
+        }
+      ]
+    },
+    {
+      "id": "functional-overdrive",
+      "group": "Flight",
+      "pattern": "Functional Overdrive",
+      "memberText": "I can’t switch off",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-physiological-sigh"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-horizon-lock"
+        }
+      ]
+    },
+    {
+      "id": "hypervigilance",
+      "group": "Flight",
+      "pattern": "Hypervigilance",
+      "memberText": "I’m on high alert",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-horizon-lock"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-orienting-sweep"
+        }
+      ]
+    },
+    {
+      "id": "relational-threat-social-withdrawal",
+      "group": "Flight",
+      "pattern": "Relational Threat and Social Withdrawal",
+      "memberText": "I want to hide from people",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-humming-reset"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-containment-hold"
+        }
+      ]
+    },
+    {
+      "id": "functional-freeze",
+      "group": "Freeze",
+      "pattern": "Functional Freeze",
+      "memberText": "I’m stuck and can’t get started",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-wall-support-press"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-gentle-sway"
+        }
+      ]
+    },
+    {
+      "id": "disconnection-numbing",
+      "group": "Freeze",
+      "pattern": "Disconnection and Numbing",
+      "memberText": "I’ve gone flat",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-texture-return"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-warmth-return"
+        }
+      ]
+    },
+    {
+      "id": "capacity-overload",
+      "group": "Freeze",
+      "pattern": "Capacity Overload",
+      "memberText": "It’s all too much",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-physiological-sigh"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-wall-support-press"
+        }
+      ]
+    },
+    {
+      "id": "appeasement-boundary-loss",
+      "group": "Fawn",
+      "pattern": "Appeasement and Boundary Loss",
+      "memberText": "I’m saying yes to everyone",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-wall-support-press"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-containment-hold"
+        }
+      ]
+    },
+    {
+      "id": "emotional-absorption-over-responsibility",
+      "group": "Fawn",
+      "pattern": "Emotional Absorption and Over-Responsibility",
+      "memberText": "I’m carrying everyone else’s feelings",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-containment-hold"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-midline-press"
+        }
+      ]
+    },
+    {
+      "id": "self-silencing-approval-seeking",
+      "group": "Fawn",
+      "pattern": "Self-Silencing and Approval-Seeking",
+      "memberText": "I’m hiding what I really think",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "self-voice-anchor"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-pressure-choice-practice"
+        }
+      ]
+    },
+    {
+      "id": "visceral-alarm-gut-focused-distress",
+      "group": "Mixed",
+      "pattern": "Visceral Alarm and Gut-Focused Distress",
+      "memberText": "My stomach is in knots",
+      "picks": [
+        {
+          "kind": "somaticCard",
+          "slug": "the-breath-location-scan"
+        },
+        {
+          "kind": "somaticCard",
+          "slug": "the-completion-exhale"
+        }
+      ]
+    }
+  ]
+}

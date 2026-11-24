@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity';
+import { protectionPatternsField } from '../protectionPatternOptions';
 
 /**
  * Editorial source for a practice (an audio/video/meditation/breathwork/
@@ -156,6 +157,7 @@ export const practice = defineType({
       type: 'array',
       of: [{ type: 'string' }],
     }),
+    protectionPatternsField,
     defineField({
       name: 'difficulty',
       type: 'number',
