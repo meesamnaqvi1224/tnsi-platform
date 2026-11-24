@@ -2,12 +2,13 @@
  * Check-in follow-up routing: the data side of the second daily check-in question. After the first
  * answer the app will ask "What does it feel like right now?" (one of 13 feelings, called protection
  * patterns by the team) and send the member to the two practices Caroline chose for it. This file
- * only describes and validates that routing table (`content/checkin-suggestions-v1.json`); nothing
+ * only describes and validates that routing table (`checkin-suggestions-v1.json`, next to this file); nothing
  * reads it at runtime yet, so merging it changes no behaviour. The ranking that will use it is a later
  * step (see the check-in follow-up spec).
  *
  * The pattern names are the team's language. A member only ever sees `memberText`.
  */
+import routingJson from './checkin-suggestions-v1.json';
 
 export const PROTECTION_PATTERN_IDS = [
   'protective-anger-reactivity',
@@ -160,3 +161,10 @@ export function parseFollowUpRouting(raw: unknown): FollowUpRouting | null {
     patterns,
   };
 }
+
+/**
+ * The routing table the app uses, parsed once. `null` if the file is ever invalid, in which case the
+ * follow-up is simply off (callers fall back to the answer-only behaviour); the content test guards
+ * the file so this cannot ship broken.
+ */
+export const FOLLOW_UP_ROUTING: FollowUpRouting | null = parseFollowUpRouting(routingJson);

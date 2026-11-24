@@ -97,6 +97,12 @@ export type HetPickOptions = {
   dayKey: string;
   /** Items the member completed recently; they are offered after unseen ones of the same relevance. */
   recentlyCompletedIds?: ReadonlySet<string>;
+  /**
+   * Replaces the answer's own order of conditions (the check-in follow-up uses it when the member
+   * chooses to grow). Must list all five conditions, best first, so every item has a rank. The answer's
+   * equal-rank pairs do not apply to an override: the order given is the order used.
+   */
+  preference?: readonly HetCondition[];
 };
 
 export type HetPick<T> = {
@@ -120,8 +126,8 @@ export function pickHetRecommendations<T extends HetCandidate>(
   count = 2,
 ): HetPick<T> {
   const state = normalizeCapacityScore(options.capacityScore);
-  const preference = HET_PREFERENCE_BY_CAPACITY_STATE[state];
-  const sharesRankWith = HET_EQUAL_RANK_BY_CAPACITY_STATE[state] ?? {};
+  const preference = options.preference ?? HET_PREFERENCE_BY_CAPACITY_STATE[state];
+  const sharesRankWith = options.preference ? {} : (HET_EQUAL_RANK_BY_CAPACITY_STATE[state] ?? {});
   const position = (c: HetCondition) => preference.indexOf(sharesRankWith[c] ?? c);
   const recent = options.recentlyCompletedIds ?? new Set<string>();
 

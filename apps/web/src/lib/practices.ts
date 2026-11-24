@@ -1,7 +1,13 @@
 import { db, practices, practiceCompletions, practiceReflections, practiceSaves } from '@tnsi/db';
 import { eq, and, desc, gt, count, countDistinct, inArray } from 'drizzle-orm';
-import { exerciseInteractiveKey, pickHetRecommendations, type HetCondition } from '@tnsi/core';
+import {
+  exerciseInteractiveKey,
+  hetPreferenceForFollowUp,
+  pickHetRecommendations,
+  type HetCondition,
+} from '@tnsi/core';
 import { getLatestCheckIn } from './check-ins';
+import { followUpOfCheckIn } from './check-in-follow-up';
 import { paginateRows } from './practice-sessions';
 import type { PracticeReflection as PracticeReflectionRow } from '@tnsi/db/schema';
 
@@ -181,8 +187,11 @@ export async function getRecommendedPractices(
       ),
     );
 
+  // A member who chose to grow in the check-in follow-up gets that condition first (feature-flagged).
+  const followUp = followUpOfCheckIn(latestCheckIn);
   const { picks, condition } = pickHetRecommendations(candidates, {
     capacityScore: latestCheckIn.capacityScore,
+    preference: hetPreferenceForFollowUp(latestCheckIn.capacityScore, followUp),
     userKey: userId,
     // The check-in's own day, so the pick stays the same all day and moves on with the next day's check-in.
     dayKey: latestCheckIn.completedDate.toISOString().slice(0, 10),

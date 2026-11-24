@@ -284,3 +284,22 @@ export const HET_SOMATIC_CARDS_QUERY = groq`
     "tags": hetConditions
   }
 `;
+
+/**
+ * Every published PowerDrop and Somatic Card, with its draft protection-pattern tags, for the check-in
+ * follow-up. Unlike the recommendation pools above this does NOT require `hetConditions`: the cards a
+ * pattern's two picks name must be findable whatever their condition tags say. A Somatic Card has no
+ * free/paid switch, so it counts as free (the same as the recommendation pool treats it).
+ */
+export const CHECKIN_FOLLOW_UP_ITEMS_QUERY = groq`
+  *[_type in ["powerDrop", "somaticCard"] && defined(slug.current) && status == "published"
+    && (!defined(series) || series->status == "published")] {
+    "kind": _type,
+    "id": _id,
+    title,
+    "slug": slug.current,
+    "description": select(_type == "somaticCard" => coalesce(invitation, purpose), description),
+    "patterns": coalesce(protectionPatterns, []),
+    "isFree": select(_type == "powerDrop" => coalesce(freeAccess, false), true)
+  }
+`;

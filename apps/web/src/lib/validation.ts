@@ -24,6 +24,13 @@ export const checkInSchema = z.object({
    * `lib/time-zone.ts` and simply not recorded when unusable.
    */
   timeZone: z.unknown().optional(),
+  /**
+   * The answer to the check-in follow-up question (see `@tnsi/core` `FollowUp`). Deliberately accepts
+   * anything (`unknown`) for the same reason as `timeZone`: a malformed or out-of-place follow-up must
+   * never stop a check-in being saved. The route validates it with `normalizeFollowUp` and drops it when
+   * unusable or when the feature is off.
+   */
+  followUp: z.unknown().optional(),
 });
 
 export type CheckInInput = z.infer<typeof checkInSchema>;

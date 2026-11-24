@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * POST /api/v1/check-ins with phase-1 time zone recording: what is stored, what is returned, and
@@ -212,5 +212,75 @@ describe('POST /api/v1/check-ins: time zone recording', () => {
     const res = await post({ moodScore: 9, capacityScore: 2, timeZone: 'Europe/London' });
     expect(res.status).toBe(400);
     expect(state.inserted).toHaveLength(0);
+  });
+});
+
+describe('POST /api/v1/check-ins: follow-up answer', () => {
+  const pattern = { v: 1, path: 'pattern', pattern: 'functional-overdrive' };
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('is ignored and not stored while the feature is off (the default)', async () => {
+    const res = await post({ moodScore: 2, capacityScore: 2, followUp: pattern });
+    expect(res.status).toBe(201);
+    expect(state.inserted[0]!.metadata).toEqual({});
+  });
+
+  it('is stored as ids in metadata when the feature is on, next to the time zone', async () => {
+    vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
+    const res = await post({
+      moodScore: 2,
+      capacityScore: 2,
+      completedAt: AT,
+      timeZone: 'Europe/London',
+      followUp: pattern,
+    });
+    expect(res.status).toBe(201);
+    expect(state.inserted[0]!.metadata).toMatchObject({
+      timeZone: 'Europe/London',
+      followUp: pattern,
+    });
+  });
+
+  it('never returns the answer', async () => {
+    vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
+    const res = await post({ moodScore: 2, capacityScore: 2, followUp: pattern });
+    const text = JSON.stringify(await res.json());
+    expect(text).not.toContain('functional-overdrive');
+    expect(text).toContain('"metadata":{}');
+  });
+
+  it('keeps only the allowed fields of a valid answer', async () => {
+    vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
+    await post({
+      moodScore: 4,
+      capacityScore: 4,
+      followUp: { v: 1, path: 'grow', growArea: 'participation', notes: 'free text', extra: 1 },
+    });
+    expect(state.inserted[0]!.metadata).toEqual({
+      followUp: { v: 1, path: 'grow', growArea: 'participation' },
+    });
+  });
+
+  it('drops a malformed or out-of-place answer but still saves the check-in', async () => {
+    vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
+    for (const [capacityScore, followUp] of [
+      [2, { v: 1, path: 'pattern', pattern: 'stretch' }],
+      [2, { v: 1, path: 'grow', growArea: 'expansion' }], // grow needs 3 or higher
+      [5, pattern], // a settle answer needs 3 or lower
+      [2, 'nonsense'],
+      [2, 42],
+    ] as const) {
+      state.inserted = [];
+      const res = await post({ moodScore: capacityScore, capacityScore, followUp });
+      expect(res.status).toBe(201);
+      expect(state.inserted[0]!.metadata).toEqual({});
+    }
+  });
+
+  it('a client that sends no answer (an older build) works exactly as before', async () => {
+    vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
+    const res = await post({ moodScore: 3, capacityScore: 2 });
+    expect(res.status).toBe(201);
+    expect(state.inserted[0]!.metadata).toEqual({});
   });
 });
