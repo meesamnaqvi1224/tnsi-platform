@@ -1,0 +1,295 @@
+{
+  "_comment": "Protection-pattern tags for the 69 live Somatic Cards and PowerDrops, seeded on 24 Nov 2026 from the Practice Tags tab of the TNSI Master Content Inventory (Full Backup 23 Nov 2026). First pattern is the primary one. 'confidence' is the workbook's own rating (High, Medium, Low) and every row is still a DRAFT: Caroline has not confirmed these. They are only a fallback behind the explicit picks in checkin-suggestions-v1.json and are not read by any app code yet. A card with no pattern in the workbook has an empty list.",
+  "somaticCards": {
+    "the-ground-press-drop": {
+      "patterns": ["disconnection-numbing", "hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-heel-press-reset": {
+      "patterns": ["functional-freeze"],
+      "confidence": "Medium"
+    },
+    "the-four-point-foot-map": {
+      "patterns": ["disconnection-numbing", "hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-wall-support-press": {
+      "patterns": ["appeasement-boundary-loss", "functional-freeze", "capacity-overload"],
+      "confidence": "High"
+    },
+    "the-chair-support-drop": {
+      "patterns": ["capacity-overload", "functional-overdrive"],
+      "confidence": "Medium"
+    },
+    "the-back-body-anchor": {
+      "patterns": ["hypervigilance"],
+      "confidence": "High"
+    },
+    "the-weight-shift": {
+      "patterns": ["functional-freeze", "disconnection-numbing"],
+      "confidence": "Medium"
+    },
+    "the-midline-press": {
+      "patterns": ["appeasement-boundary-loss", "emotional-absorption-over-responsibility"],
+      "confidence": "High"
+    },
+    "the-seated-grounding-press": {
+      "patterns": ["capacity-overload"],
+      "confidence": "Medium"
+    },
+    "the-axial-alignment-reset": {
+      "patterns": ["control-over-management"],
+      "confidence": "Medium"
+    },
+    "the-physiological-sigh": {
+      "patterns": ["functional-overdrive", "hypervigilance", "capacity-overload"],
+      "confidence": "High"
+    },
+    "the-extended-exhale": {
+      "patterns": ["functional-overdrive", "hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-rib-expansion-reset": {
+      "patterns": ["hypervigilance", "control-over-management"],
+      "confidence": "Medium"
+    },
+    "the-back-rib-breath": {
+      "patterns": ["hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-pursed-lip-exhale": {
+      "patterns": ["functional-overdrive", "hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-hand-on-ribs-reset": {
+      "patterns": ["disconnection-numbing"],
+      "confidence": "Medium"
+    },
+    "the-breath-pace-reset": {
+      "patterns": ["hypervigilance", "functional-overdrive"],
+      "confidence": "Medium"
+    },
+    "the-exhale-and-drop": {
+      "patterns": ["control-over-management", "capacity-overload", "injustice-defensive-bracing"],
+      "confidence": "Medium"
+    },
+    "the-completion-exhale": {
+      "patterns": [
+        "functional-overdrive",
+        "capacity-overload",
+        "visceral-alarm-gut-focused-distress"
+      ],
+      "confidence": "High"
+    },
+    "the-breath-location-scan": {
+      "patterns": ["disconnection-numbing", "visceral-alarm-gut-focused-distress"],
+      "confidence": "Medium"
+    },
+    "the-horizon-lock": {
+      "patterns": ["hypervigilance", "functional-overdrive", "disconnection-numbing"],
+      "confidence": "High"
+    },
+    "the-orienting-sweep": {
+      "patterns": ["hypervigilance", "functional-overdrive"],
+      "confidence": "High"
+    },
+    "the-peripheral-vision-reset": {
+      "patterns": ["hypervigilance", "functional-overdrive"],
+      "confidence": "High"
+    },
+    "the-near-far-focus-shift": {
+      "patterns": ["hypervigilance"],
+      "confidence": "High"
+    },
+    "the-horizontal-eye-sweep": {
+      "patterns": ["hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-colour-orientation-reset": {
+      "patterns": ["disconnection-numbing"],
+      "confidence": "High"
+    },
+    "the-shape-mapping-reset": {
+      "patterns": ["disconnection-numbing", "hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-light-anchor": {
+      "patterns": ["hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-distance-map": {
+      "patterns": ["hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-visual-return": {
+      "patterns": ["functional-overdrive", "hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-gentle-sway": {
+      "patterns": ["functional-freeze", "disconnection-numbing"],
+      "confidence": "Medium"
+    },
+    "the-seated-rock": {
+      "patterns": ["functional-freeze"],
+      "confidence": "Medium"
+    },
+    "the-centre-line-return": {
+      "patterns": ["functional-freeze"],
+      "confidence": "Medium"
+    },
+    "the-slow-turn": {
+      "patterns": ["hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-weight-transfer-reset": {
+      "patterns": ["functional-freeze"],
+      "confidence": "Medium"
+    },
+    "the-head-level-reset": {
+      "patterns": ["hypervigilance"],
+      "confidence": "Medium"
+    },
+    "the-step-and-settle": {
+      "patterns": ["functional-freeze"],
+      "confidence": "Medium"
+    },
+    "the-upright-return": {
+      "patterns": ["functional-freeze"],
+      "confidence": "Medium"
+    },
+    "the-supported-balance-pause": {
+      "patterns": [],
+      "confidence": "Medium"
+    },
+    "the-movement-to-stillness-reset": {
+      "patterns": ["functional-overdrive"],
+      "confidence": "Medium"
+    },
+    "the-texture-return": {
+      "patterns": ["disconnection-numbing"],
+      "confidence": "High"
+    },
+    "the-temperature-shift": {
+      "patterns": ["disconnection-numbing"],
+      "confidence": "Medium"
+    },
+    "the-cool-contact-reset": {
+      "patterns": [
+        "protective-anger-reactivity",
+        "functional-overdrive",
+        "injustice-defensive-bracing"
+      ],
+      "confidence": "Medium"
+    },
+    "the-warmth-return": {
+      "patterns": ["functional-freeze", "disconnection-numbing"],
+      "confidence": "High"
+    },
+    "the-forearm-sweep": {
+      "patterns": ["disconnection-numbing"],
+      "confidence": "Medium"
+    },
+    "the-containment-hold": {
+      "patterns": [
+        "emotional-absorption-over-responsibility",
+        "appeasement-boundary-loss",
+        "relational-threat-social-withdrawal"
+      ],
+      "confidence": "Medium"
+    },
+    "the-pressure-choice-practice": {
+      "patterns": ["appeasement-boundary-loss", "self-silencing-approval-seeking"],
+      "confidence": "Medium"
+    },
+    "the-hand-to-arm-contact": {
+      "patterns": ["disconnection-numbing"],
+      "confidence": "High"
+    },
+    "the-thermal-map": {
+      "patterns": ["disconnection-numbing"],
+      "confidence": "Medium"
+    },
+    "the-texture-discrimination-map": {
+      "patterns": ["disconnection-numbing"],
+      "confidence": "Medium"
+    },
+    "the-humming-reset": {
+      "patterns": ["hypervigilance", "relational-threat-social-withdrawal"],
+      "confidence": "High"
+    },
+    "the-voiced-exhale": {
+      "patterns": [],
+      "confidence": "Medium"
+    },
+    "extended-vowel-reset": {
+      "patterns": [],
+      "confidence": "Medium"
+    },
+    "resonance-hold": {
+      "patterns": ["disconnection-numbing"],
+      "confidence": "Medium"
+    },
+    "self-voice-anchor": {
+      "patterns": ["self-silencing-approval-seeking"],
+      "confidence": "High"
+    },
+    "sound-horizon": {
+      "patterns": ["hypervigilance"],
+      "confidence": "High"
+    },
+    "left-right-sound-map": {
+      "patterns": ["hypervigilance"],
+      "confidence": "Medium"
+    },
+    "jaw-release": {
+      "patterns": ["hypervigilance"],
+      "confidence": "High"
+    },
+    "tongue-drop": {
+      "patterns": ["hypervigilance"],
+      "confidence": "Medium"
+    },
+    "voice-return": {
+      "patterns": [],
+      "confidence": "High"
+    }
+  },
+  "powerDrops": {
+    "the-90-second-exhale-drop": {
+      "patterns": ["functional-overdrive", "capacity-overload", "protective-anger-reactivity"],
+      "confidence": "Medium"
+    },
+    "the-powerdown-ritual": {
+      "patterns": ["functional-overdrive", "capacity-overload"],
+      "confidence": "Medium"
+    },
+    "micro-visualization-the-return": {
+      "patterns": ["disconnection-numbing", "hypervigilance"],
+      "confidence": "Medium"
+    },
+    "softness-reclaim-reset": {
+      "patterns": ["functional-overdrive", "control-over-management"],
+      "confidence": "Medium"
+    },
+    "mask-drop-mirror-ritual": {
+      "patterns": ["self-silencing-approval-seeking", "functional-overdrive"],
+      "confidence": "Medium"
+    },
+    "invisible-labor-dump": {
+      "patterns": ["capacity-overload", "emotional-absorption-over-responsibility"],
+      "confidence": "Medium"
+    },
+    "body-permission-practice": {
+      "patterns": ["functional-overdrive", "capacity-overload"],
+      "confidence": "Medium"
+    },
+    "the-enough-list": {
+      "patterns": ["functional-overdrive"],
+      "confidence": "Medium"
+    },
+    "microrebel-the-unsent-email": {
+      "patterns": ["self-silencing-approval-seeking"],
+      "confidence": "Medium"
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { protectionPatternsField } from '../protectionPatternOptions';
 
 /**
  * A Somatic Card - the bottom tier of the Collection → Series → Card
@@ -84,6 +85,7 @@ export const somaticCard = defineType({
       },
       validation: (r) => r.unique().max(3),
     }),
+    protectionPatternsField,
     defineField({
       name: 'sortOrder',
       title: 'Display order',

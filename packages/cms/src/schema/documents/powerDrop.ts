@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity';
+import { protectionPatternsField } from '../protectionPatternOptions';
 
 /**
  * PowerDrops™ — short, practical interventions for a specific moment,
@@ -121,6 +122,7 @@ export const powerDrop = defineType({
       },
       validation: (r) => r.unique().max(3),
     }),
+    protectionPatternsField,
     defineField({
       name: 'sortOrder',
       type: 'number',
