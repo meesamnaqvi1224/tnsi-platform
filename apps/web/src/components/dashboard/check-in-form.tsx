@@ -3,7 +3,9 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Alert, Button, Label, Stack, Text, Textarea } from '@tnsi/ui';
+import { FOLLOW_UP_ROUTING, type FollowUp } from '@tnsi/core';
 import { browserTimeZone, buildCheckInBody } from '@/lib/check-in-request';
+import { CheckInFollowUp } from './check-in-follow-up';
 
 const SCALE = [1, 2, 3, 4, 5] as const;
 
@@ -82,7 +84,15 @@ function ScaleField({
   );
 }
 
-export function CheckInForm() {
+interface CheckInFormProps {
+  /**
+   * Ask the follow-up question after the member has chosen how they feel. Set from the server switch
+   * (`CHECKIN_FOLLOW_UP_ENABLED`); off by default, in which case the form behaves exactly as before.
+   */
+  followUpEnabled?: boolean;
+}
+
+export function CheckInForm({ followUpEnabled = false }: CheckInFormProps) {
   const router = useRouter();
   const [mood, setMood] = React.useState<number | null>(null);
   const [capacity, setCapacity] = React.useState<number | null>(null);
@@ -90,10 +100,23 @@ export function CheckInForm() {
   // The note is optional, so it starts folded away; it opens on request (or stays open once it has text).
   const [noteOpen, setNoteOpen] = React.useState(false);
   const [status, setStatus] = React.useState<Status>('idle');
+  // The member answers how they feel first; the follow-up question (when switched on) comes next.
+  const [stage, setStage] = React.useState<'answers' | 'followUp'>('answers');
+  const followUpAvailable = followUpEnabled && FOLLOW_UP_ROUTING !== null;
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (mood === null || capacity === null) return;
+    if (followUpAvailable) {
+      setErrorMessage(null);
+      setStage('followUp');
+      return;
+    }
+    void save(null);
+  }
+
+  async function save(followUp: FollowUp | null) {
     if (mood === null || capacity === null) return;
 
     setStatus('submitting');
@@ -107,6 +130,7 @@ export function CheckInForm() {
           buildCheckInBody(
             { moodScore: mood, capacityScore: capacity, notes: notes.trim() || undefined },
             browserTimeZone(),
+            followUp,
           ),
         ),
       });
@@ -165,6 +189,22 @@ export function CheckInForm() {
 
   const submitting = status === 'submitting';
 
+  if (stage === 'followUp' && capacity !== null) {
+    return (
+      <CheckInFollowUp
+        capacity={capacity}
+        disabled={submitting}
+        error={status === 'error' ? errorMessage : null}
+        onDone={(followUp) => void save(followUp)}
+        onSkip={() => void save(null)}
+        onExit={() => {
+          setStatus('idle');
+          setStage('answers');
+        }}
+      />
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} noValidate={false}>
       <Stack gap="lg">
@@ -220,7 +260,8 @@ export function CheckInForm() {
         <Stack gap="xs">
           {mood === null || capacity === null ? (
             <Text tone="muted" size="sm">
-              Select a mood and capacity above to save your check-in.
+              Select a mood and capacity above to{' '}
+              {followUpAvailable ? 'continue' : 'save your check-in'}.
             </Text>
           ) : null}
           <Button
@@ -228,7 +269,7 @@ export function CheckInForm() {
             disabled={submitting || mood === null || capacity === null}
             className="w-full shadow-sm sm:w-fit"
           >
-            {submitting ? 'Saving…' : 'Save Check-In'}
+            {submitting ? 'Saving…' : followUpAvailable ? 'Continue' : 'Save Check-In'}
           </Button>
         </Stack>
       </Stack>

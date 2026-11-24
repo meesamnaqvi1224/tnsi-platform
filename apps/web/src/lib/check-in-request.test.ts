@@ -22,6 +22,17 @@ describe('buildCheckInBody (web form payload)', () => {
     expect(keys).not.toContain('utcOffsetMinutes');
   });
 
+  it('adds the follow-up answer only when the member gave one', () => {
+    const answer = { v: 1, path: 'unsure' } as const;
+    expect(buildCheckInBody({ moodScore: 3, capacityScore: 2 }, undefined, answer)).toMatchObject({
+      followUp: answer,
+    });
+    for (const none of [undefined, null]) {
+      const body = buildCheckInBody({ moodScore: 3, capacityScore: 2 }, 'Europe/London', none);
+      expect(Object.keys(body)).not.toContain('followUp');
+    }
+  });
+
   it('browserTimeZone never throws', () => {
     vi.spyOn(Intl, 'DateTimeFormat').mockImplementation(() => {
       throw new Error('no Intl');

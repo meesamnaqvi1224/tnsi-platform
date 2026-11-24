@@ -23,6 +23,7 @@ import {
   Text,
 } from '@tnsi/ui';
 import { CheckInForm } from '@/components/dashboard/check-in-form';
+import { isCheckInFollowUpEnabled } from '@/lib/check-in-follow-up-flag';
 import { ReflectionsInvitation } from '@/components/dashboard/reflections/reflections-invitation';
 import { isReflectionsEnabled } from '@/lib/reflections-flag';
 import {
@@ -442,7 +443,9 @@ export default async function DashboardPage() {
                               : 'Notice where you are today, without needing to change anything.'}
                           </Text>
 
-                          {todayCheckIn ? null : <CheckInForm />}
+                          {todayCheckIn ? null : (
+                            <CheckInForm followUpEnabled={isCheckInFollowUpEnabled()} />
+                          )}
                         </Stack>
                       </Panel>
                     </section>

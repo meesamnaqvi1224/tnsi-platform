@@ -12,3 +12,4 @@ export * from './return-path/constants';
 export * from './reflections';
 export * from './check-in/follow-up-routing';
 export * from './check-in/follow-up';
+export * from './check-in/follow-up-flow';
