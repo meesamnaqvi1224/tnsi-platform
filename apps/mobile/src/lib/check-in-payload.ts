@@ -1,3 +1,4 @@
+import type { FollowUp } from '@tnsi/core';
 import type { CheckInInput } from '@/api/types';
 
 /**
@@ -16,13 +17,18 @@ export function deviceTimeZone(): string | undefined {
 
 /**
  * The body of POST /api/v1/check-ins for the home check-in, where mood and capacity are the same
- * answer. `timeZone` is included only when known, so the request is otherwise identical to what older
- * builds send.
+ * answer. `timeZone` is included only when known, and `followUp` only when the member answered the
+ * follow-up question, so the request is otherwise identical to what older builds send.
  */
-export function buildCheckInPayload(capacity: number, timeZone: string | undefined): CheckInInput {
+export function buildCheckInPayload(
+  capacity: number,
+  timeZone: string | undefined,
+  followUp?: FollowUp | null,
+): CheckInInput {
   return {
     moodScore: capacity,
     capacityScore: capacity,
     ...(timeZone ? { timeZone } : {}),
+    ...(followUp ? { followUp } : {}),
   };
 }

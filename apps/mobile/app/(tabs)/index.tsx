@@ -98,6 +98,7 @@ export default function HomeScreen() {
                 key={state.data.checkIn?.id ?? 'no-check-in-today'}
                 initialCheckIn={state.data.checkIn}
                 onSubmitted={handleCheckInSubmitted}
+                followUpEnabled={features.checkInFollowUp}
               />
             </Animated.View>
 

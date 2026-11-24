@@ -1,4 +1,4 @@
-import type { GuidedExercise } from '@tnsi/core';
+import type { FollowUp, GuidedExercise } from '@tnsi/core';
 /**
  * Mirrors apps/web/src/lib/api-response.ts's response envelope. Not
  * imported directly from @tnsi/web (apps can't depend on each other), so
@@ -76,6 +76,8 @@ export interface CheckInInput {
   notes?: string;
   /** The device's IANA time zone identifier only; the server validates it and derives everything else. */
   timeZone?: string;
+  /** The answer to the check-in follow-up question, only when the member gave one (see `@tnsi/core`). */
+  followUp?: FollowUp;
 }
 
 /**

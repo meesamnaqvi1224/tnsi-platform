@@ -6,19 +6,24 @@ import { useApiClient } from './useApiClient';
  * -off feature's own routes), so this only decides what to SHOW. Fails closed: until the answer arrives,
  * and if it cannot be read, every optional feature is treated as off and its entry points stay hidden.
  */
-export function useFeatures(): { reflections: boolean; ready: boolean } {
+export function useFeatures(): { reflections: boolean; checkInFollowUp: boolean; ready: boolean } {
   const api = useApiClient();
-  const [state, setState] = useState({ reflections: false, ready: false });
+  const [state, setState] = useState({ reflections: false, checkInFollowUp: false, ready: false });
 
   useEffect(() => {
     let cancelled = false;
     api
-      .get<{ reflections: boolean }>('/api/v1/features')
+      .get<{ reflections: boolean; checkInFollowUp?: boolean }>('/api/v1/features')
       .then((f) => {
-        if (!cancelled) setState({ reflections: f.reflections === true, ready: true });
+        if (!cancelled)
+          setState({
+            reflections: f.reflections === true,
+            checkInFollowUp: f.checkInFollowUp === true,
+            ready: true,
+          });
       })
       .catch(() => {
-        if (!cancelled) setState({ reflections: false, ready: true });
+        if (!cancelled) setState({ reflections: false, checkInFollowUp: false, ready: true });
       });
     return () => {
       cancelled = true;

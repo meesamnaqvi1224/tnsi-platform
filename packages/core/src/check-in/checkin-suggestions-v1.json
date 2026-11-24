@@ -12,7 +12,7 @@
     "notSureLabel": "Not sure, just suggest something",
     "growOptions": {
       "expansion": {
-        "label": "Explore what's possible now",
+        "label": "Explore what’s possible now",
         "condition": "Expansion"
       },
       "participation": {

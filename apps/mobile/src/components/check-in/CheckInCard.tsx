@@ -1,10 +1,12 @@
 import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { FOLLOW_UP_ROUTING, type FollowUp } from '@tnsi/core';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { CapacityOptionList, capacityOptionLabel } from './CapacityOptionList';
+import { FollowUpQuestion } from './FollowUpQuestion';
 import { useApiClient } from '@/hooks/useApiClient';
 import { humanizeApiError } from '@/lib/api-errors';
 import { buildCheckInPayload, deviceTimeZone } from '@/lib/check-in-payload';
@@ -33,6 +35,8 @@ type Phase =
       capacity: number | null;
       submitting: boolean;
       error: string | null;
+      /** True while the follow-up question is on screen (after the member chose how they feel). */
+      followUpStep?: boolean;
     };
 
 interface CheckInCardProps {
@@ -40,6 +44,11 @@ interface CheckInCardProps {
   initialCheckIn: CheckIn | null;
   /** Lets Home keep its own cached "today" state in sync, avoiding a refetch. */
   onSubmitted: (checkIn: CheckIn) => void;
+  /**
+   * Ask the follow-up question after the member has chosen how they feel. Comes from the server's
+   * features switch; off (the default) leaves the card exactly as it was.
+   */
+  followUpEnabled?: boolean;
 }
 
 /**
@@ -61,7 +70,11 @@ function Surface({ children }: { children: ReactNode }) {
   return <View style={styles.surface}>{children}</View>;
 }
 
-export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
+export function CheckInCard({
+  initialCheckIn,
+  onSubmitted,
+  followUpEnabled = false,
+}: CheckInCardProps) {
   const api = useApiClient();
   const router = useRouter();
   // The question and the "Check in now" button come first; the answer list opens on tap, so Home
@@ -73,16 +86,28 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
       : { kind: 'form', capacity: null, submitting: false, error: null },
   );
 
-  async function handleSubmit() {
+  const followUpAvailable = followUpEnabled && FOLLOW_UP_ROUTING !== null;
+
+  /** The button under the answers: ask the follow-up first when it is on, otherwise save straight away. */
+  function handleContinue() {
+    if (phase.kind !== 'form' || phase.capacity === null) return;
+    if (followUpAvailable) {
+      setPhase({ ...phase, followUpStep: true, error: null });
+      return;
+    }
+    void handleSubmit(null);
+  }
+
+  async function handleSubmit(followUp: FollowUp | null) {
     if (phase.kind !== 'form' || phase.capacity === null) return;
 
-    const { capacity } = phase;
+    const { capacity, followUpStep } = phase;
     setPhase({ ...phase, submitting: true, error: null });
 
     try {
       const checkIn = await api.post<CheckIn>(
         '/api/v1/check-ins',
-        buildCheckInPayload(capacity, deviceTimeZone()),
+        buildCheckInPayload(capacity, deviceTimeZone(), followUp),
       );
       setPhase({ kind: 'recorded', checkIn });
       onSubmitted(checkIn);
@@ -103,6 +128,7 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
           capacity,
           submitting: false,
           error: humanizeApiError(err),
+          followUpStep,
         });
       }
     }
@@ -290,7 +316,16 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
         A quick check-in helps us offer practices that meet you where you are.
       </ThemedText>
 
-      {open ? (
+      {open && phase.followUpStep && phase.capacity !== null ? (
+        <FollowUpQuestion
+          capacity={phase.capacity}
+          disabled={phase.submitting}
+          error={phase.error}
+          onDone={(followUp) => void handleSubmit(followUp)}
+          onSkip={() => void handleSubmit(null)}
+          onExit={() => setPhase({ ...phase, followUpStep: false, error: null })}
+        />
+      ) : open ? (
         <>
           <CapacityOptionList
             value={phase.capacity}
@@ -306,8 +341,8 @@ export function CheckInCard({ initialCheckIn, onSubmitted }: CheckInCardProps) {
 
           <View style={styles.actionsRow}>
             <PrimaryButton
-              label="Save Check-In"
-              onPress={handleSubmit}
+              label={followUpAvailable ? 'Continue' : 'Save Check-In'}
+              onPress={handleContinue}
               loading={phase.submitting}
               disabled={!canSubmit}
               style={styles.saveButton}
