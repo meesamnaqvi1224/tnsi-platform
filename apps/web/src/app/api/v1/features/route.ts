@@ -8,6 +8,7 @@ import { success } from '@/lib/api-response';
 import { privateRoute } from '@/lib/private-response';
 import { requireMemberAccess, memberAccessErrorResponse } from '@/lib/auth-api';
 import { isReflectionsEnabled } from '@/lib/reflections-flag';
+import { isCheckInFollowUpEnabled } from '@/lib/check-in-follow-up-flag';
 
 export const runtime = 'nodejs';
 
@@ -17,5 +18,8 @@ export const GET = privateRoute('features get', async () => {
   } catch (err) {
     return memberAccessErrorResponse(err);
   }
-  return success({ reflections: isReflectionsEnabled() });
+  return success({
+    reflections: isReflectionsEnabled(),
+    checkInFollowUp: isCheckInFollowUpEnabled(),
+  });
 });

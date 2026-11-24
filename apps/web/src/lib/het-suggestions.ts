@@ -1,12 +1,22 @@
 import { sanityFetch } from '@tnsi/cms/server';
-import { HET_POWER_DROPS_QUERY, HET_SOMATIC_CARDS_QUERY } from '@tnsi/cms';
 import {
+  CHECKIN_FOLLOW_UP_ITEMS_QUERY,
+  HET_POWER_DROPS_QUERY,
+  HET_SOMATIC_CARDS_QUERY,
+} from '@tnsi/cms';
+import {
+  FOLLOW_UP_ROUTING,
+  hetPreferenceForFollowUp,
+  isSettleFollowUp,
   pickHetSuggestions,
+  pickSettleItems,
+  type FollowUpCandidate,
   type HetCondition,
   type HetContentKind,
   type HetPickOptions,
 } from '@tnsi/core';
 import { getLatestCheckIn } from './check-ins';
+import { followUpOfCheckIn } from './check-in-follow-up';
 import type { PracticeSummary } from './practices';
 
 type RawItem = {
@@ -34,6 +44,12 @@ export type HetSuggestions = {
 };
 
 type Candidate = { id: string; tags: string[]; out: HetSuggestionItem; isFree: boolean };
+
+type FollowUpRaw = RawItem & {
+  kind: 'somaticCard' | 'powerDrop';
+  patterns: string[] | null;
+};
+type SettleCandidate = FollowUpCandidate & { out: HetSuggestionItem };
 
 const NONE: HetSuggestions = { condition: null, items: [] };
 
@@ -96,12 +112,54 @@ export async function getHetSuggestions(
       somaticCard: (cards ?? []).map((c) => toItem('somaticCard', c)),
     };
 
+    // The check-in follow-up (when the feature is on and the member answered it). A grow choice reorders
+    // the conditions for every kind; a settle choice replaces the list below with Caroline's two.
+    const followUp = followUpOfCheckIn(latest);
     const pick: HetPickOptions = {
       capacityScore: latest.capacityScore,
       userKey: userId,
       dayKey: latest.completedDate.toISOString().slice(0, 10),
+      preference: hetPreferenceForFollowUp(latest.capacityScore, followUp),
     };
     const { items, condition } = pickHetSuggestions(pools, pick);
+
+    if (isSettleFollowUp(followUp) && FOLLOW_UP_ROUTING) {
+      const rows = (await sanityFetch<FollowUpRaw[]>(CHECKIN_FOLLOW_UP_ITEMS_QUERY)) ?? [];
+      const candidates: SettleCandidate[] = rows.map((r) => ({
+        kind: r.kind,
+        slug: r.slug,
+        patterns: r.patterns ?? [],
+        isFree: r.isFree ?? true,
+        out: {
+          kind: r.kind,
+          id: r.id,
+          slug: r.slug,
+          title: r.title,
+          description: r.description ?? null,
+        },
+      }));
+      // The answer-only brief items, used only to fill a gap behind the named practices.
+      const fallback: SettleCandidate[] = items
+        .filter((s) => s.kind !== 'practice')
+        .map((s) => ({
+          kind: s.kind as 'somaticCard' | 'powerDrop',
+          slug: s.item.out.slug ?? s.item.id,
+          patterns: [],
+          isFree: true,
+          out: s.item.out,
+        }));
+      const settle = pickSettleItems({
+        routing: FOLLOW_UP_ROUTING,
+        followUp,
+        candidates,
+        fallback,
+        freeOnly: options.freeOnly,
+        userKey: pick.userKey,
+        dayKey: pick.dayKey,
+      });
+      // No named practice is shown as "answering to" a condition: a feeling is not one.
+      if (settle.length > 0) return { condition: null, items: settle.map((c) => c.out) };
+    }
     return { condition, items: items.map((s) => s.item.out) };
   } catch (error) {
     console.error('[het-suggestions] failed:', error);

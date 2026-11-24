@@ -11,7 +11,7 @@ import {
 const REPO = path.resolve(__dirname, '../../../..');
 const readJson = (rel: string) => JSON.parse(readFileSync(path.join(REPO, rel), 'utf8'));
 
-const routingFile = readJson('content/checkin-suggestions-v1.json');
+const routingFile = readJson('packages/core/src/check-in/checkin-suggestions-v1.json');
 const seedFile = readJson('content/protection-patterns-v1.json') as {
   somaticCards: Record<string, { patterns: string[]; confidence: string }>;
   powerDrops: Record<string, { patterns: string[]; confidence: string }>;
@@ -48,7 +48,7 @@ describe('protection patterns', () => {
   });
 });
 
-describe('check-in routing file (content/checkin-suggestions-v1.json)', () => {
+describe('check-in routing file (checkin-suggestions-v1.json)', () => {
   const routing = parseFollowUpRouting(routingFile);
 
   it('parses: all 13 patterns, two different picks each', () => {

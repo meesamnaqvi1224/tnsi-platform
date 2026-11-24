@@ -3,6 +3,8 @@ import { getCheckInHistory, recordCheckIn, toPublicCheckIn } from '@/lib/check-i
 import { checkInSchema, checkInsListQuerySchema } from '@/lib/validation';
 import { success, unauthorized, badRequest, internalError } from '@/lib/api-response';
 import { buildTimeZoneMetadata, describeRejectedTimeZone } from '@/lib/time-zone';
+import { normalizeFollowUp } from '@tnsi/core';
+import { isCheckInFollowUpEnabled } from '@/lib/check-in-follow-up-flag';
 import type { CheckIn } from '@tnsi/db/schema';
 
 export const runtime = 'nodejs';
@@ -86,7 +88,14 @@ export async function POST(request: Request) {
     return badRequest('Validation failed', { errors: result.error.flatten().fieldErrors });
   }
 
-  const { moodScore, capacityScore, notes, completedAt, timeZone } = result.data;
+  const {
+    moodScore,
+    capacityScore,
+    notes,
+    completedAt,
+    timeZone,
+    followUp: rawFollowUp,
+  } = result.data;
 
   const completedAtDate = completedAt ? new Date(completedAt) : new Date();
 
@@ -98,6 +107,13 @@ export async function POST(request: Request) {
     console.warn(`check-in time zone not recorded: ${describeRejectedTimeZone(timeZone)}`);
   }
 
+  // The check-in follow-up answer, kept only when the feature is on and it fits the first answer. It is
+  // stored as ids in metadata (never returned: `toPublicCheckIn` hides metadata) and never fails a save.
+  const followUp = isCheckInFollowUpEnabled()
+    ? normalizeFollowUp(rawFollowUp, capacityScore)
+    : null;
+  const storedMetadata = followUp ? { ...metadata, followUp } : metadata;
+
   // The first check-in of the day is the primary; any further one is saved as an additional record
   // (see recordCheckIn), carrying the same metadata. A repeat never fails and never replaces the primary.
   const checkIn = await recordCheckIn(user.id, {
@@ -105,7 +121,7 @@ export async function POST(request: Request) {
     capacityScore,
     notes: notes ?? null,
     completedAt: completedAtDate,
-    metadata,
+    metadata: storedMetadata,
   });
 
   return success(toPublicCheckIn(checkIn), 201);

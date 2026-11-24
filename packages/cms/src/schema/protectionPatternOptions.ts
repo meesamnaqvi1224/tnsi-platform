@@ -3,7 +3,7 @@ import { defineField } from 'sanity';
 /**
  * The 13 protection patterns offered on content documents, in the order agreed in the TNSI content
  * workbook (Collections tab). These are the team's names and are never shown to members; the plain
- * words a member sees live in `content/checkin-suggestions-v1.json`. The ids must match
+ * words a member sees live in `checkin-suggestions-v1.json` in `@tnsi/core`. The ids must match
  * `PROTECTION_PATTERN_IDS` in `@tnsi/core` (a test in core checks this).
  */
 export const PROTECTION_PATTERN_OPTIONS = [
