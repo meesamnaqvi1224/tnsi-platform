@@ -1,37 +1,59 @@
 /**
- * Focused, idempotent bulk importer for the TNSI Somatic Core Series
- * (Series 01-05, Cards 1-50) - NOT a generic CMS migration platform.
- * Reads the repository-controlled manifest at
- * `content/somatic-cards/core-series-01-05.json` and writes Series/Card
- * documents (+ uploads their artwork) directly to Sanity via the
- * project's Content Lake HTTP API - the same "Sanity is the editorial
- * source of truth" pipeline every other Somatic Card milestone has used.
+ * Focused importer for the TNSI Somatic Core Series (Series 01-05, Cards 1-50) - NOT a generic CMS
+ * migration platform. Reads the repository-controlled manifest at
+ * `content/somatic-cards/core-series-01-05.json` and brings the Series/Card documents in Sanity in line
+ * with it, via the project's Content Lake HTTP API.
  *
- * Never writes to Postgres directly - Postgres is only ever updated by
- * the real webhook/sync pipeline (`/api/webhooks/sanity-somatic`),
- * unchanged by this script.
+ * Never writes to Postgres directly - Postgres is only ever updated by the real webhook/sync pipeline
+ * (`/api/webhooks/sanity-somatic`), unchanged by this script.
+ *
+ * SAFETY (changed 25 Nov 2026). Sanity has a single dataset, `production`, so any real run changes the
+ * live site. This script therefore:
+ *  - defaults to a DRY RUN that prints the exact plan and writes nothing;
+ *  - refuses a real run unless `--allow-production` is passed AND the dataset name is typed back (at the
+ *    prompt, or `--confirm-dataset production`);
+ *  - never replaces a document: missing ones are created as drafts, existing ones are patched field by
+ *    field, and only where the manifest differs;
+ *  - never changes `status`, `hetConditions` or `protectionPatterns` on a document that exists, and
+ *    leaves existing series completely alone (see somatic-import-plan.ts);
+ *  - aborts if one run would change more than `--max-changes` documents (default 10);
+ *  - before any write, saves a full export of the dataset and a copy of every document it will change
+ *    to `.local/backups/`, and aborts if either cannot be written or checked.
  *
  * Usage:
- *   pnpm --filter @tnsi/cms exec tsx scripts/import-somatic-core-series.ts --dry-run
- *   pnpm --filter @tnsi/cms exec tsx scripts/import-somatic-core-series.ts --execute
+ *   pnpm --filter @tnsi/cms exec tsx scripts/import-somatic-core-series.ts                 # dry run
+ *   pnpm --filter @tnsi/cms exec tsx scripts/import-somatic-core-series.ts --execute \
+ *       --allow-production --confirm-dataset production [--max-changes N]
+ *
+ * Artwork: a card whose manifest `artworkSource` is `null` has no image by design (its image is
+ * removed); a named file that exists in the artwork directory is uploaded and set; a named file that is
+ * missing leaves the card's image as it is.
  *
  * Requires (read from apps/web/.env.local, never printed):
  *   NEXT_PUBLIC_SANITY_PROJECT_ID, NEXT_PUBLIC_SANITY_DATASET, SANITY_API_WRITE_TOKEN
  *
  * Optional:
- *   --artwork-dir <path>   Directory containing the source artwork files
- *                          named in the manifest's `artworkSource` field.
- *                          Defaults to $SOMATIC_ARTWORK_DIR, then a
- *                          repo-relative `.local/somatic-artwork` (never
- *                          committed - see .gitignore).
+ *   --artwork-dir <path>   Directory containing the source artwork files named in the manifest's
+ *                          `artworkSource` field. Defaults to $SOMATIC_ARTWORK_DIR, then a
+ *                          repo-relative `.local/somatic-artwork` (never committed - see .gitignore).
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import readline from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
-import { validateManifest, seriesDocId, cardDocId, type Manifest } from './somatic-import-lib';
+import { cardDocId, validateManifest, type Manifest } from './somatic-import-lib';
+import {
+  backupFileName,
+  checkChangeLimit,
+  checkWriteGuard,
+  parseMaxChanges,
+  verifyExport,
+} from './import-guard';
+import { buildPlan, formatPlan, type ExistingDoc, type PlanItem } from './somatic-import-plan';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../../..');
+const BACKUP_DIR = path.join(REPO_ROOT, '.local', 'backups');
 
 // ---------------------------------------------------------------------
 // CLI args
@@ -39,10 +61,13 @@ const REPO_ROOT = path.resolve(__dirname, '../../..');
 const args = process.argv.slice(2);
 const EXECUTE = args.includes('--execute');
 const DRY_RUN = !EXECUTE;
-const artworkDirArgIdx = args.indexOf('--artwork-dir');
-const artworkDirArg = artworkDirArgIdx >= 0 ? args[artworkDirArgIdx + 1] : undefined;
+const ALLOW_PRODUCTION = args.includes('--allow-production');
+const argValue = (flag: string): string | undefined => {
+  const i = args.indexOf(flag);
+  return i >= 0 ? args[i + 1] : undefined;
+};
 const ARTWORK_DIR: string =
-  artworkDirArg ??
+  argValue('--artwork-dir') ??
   process.env.SOMATIC_ARTWORK_DIR ??
   path.join(REPO_ROOT, '.local', 'somatic-artwork');
 
@@ -111,18 +136,56 @@ async function uploadImageAsset(filePath: string): Promise<string> {
   return body.document._id;
 }
 
-// ---------------------------------------------------------------------
-// Manifest validation (structural - matches the approved Sanity schema's
-// required fields; does not invent or repair content)
-// ---------------------------------------------------------------------
+/** Saves every document in the dataset (one JSON document per line) and returns the lines. Throws on any failure. */
+async function exportDataset(file: string): Promise<string[]> {
+  const res = await fetch(`${BASE}/data/export/${DATASET}`, {
+    headers: { Authorization: `Bearer ${WRITE_TOKEN}` },
+  });
+  if (!res.ok) throw new Error(`Dataset export failed: HTTP ${res.status}`);
+  const text = await res.text();
+  writeFileSync(file, text);
+  return text.split('\n').filter((l) => l.trim().length > 0);
+}
+
+/** The typed confirmation: the dataset name, from `--confirm-dataset` or typed at the prompt. */
+async function confirmedDataset(): Promise<string | null> {
+  const fromFlag = argValue('--confirm-dataset');
+  if (fromFlag !== undefined) return fromFlag;
+  if (!EXECUTE || !ALLOW_PRODUCTION || !process.stdin.isTTY) return null;
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    return (
+      await rl.question(
+        `This changes the LIVE "${DATASET}" dataset. Type the dataset name to continue: `,
+      )
+    ).trim();
+  } finally {
+    rl.close();
+  }
+}
+
 async function main() {
   console.log(`\n=== TNSI Somatic Core Series Importer (${DRY_RUN ? 'DRY RUN' : 'EXECUTE'}) ===\n`);
   console.log(`Sanity project: ${PROJECT_ID}  dataset: ${DATASET}`);
   console.log(`Artwork directory: ${ARTWORK_DIR}\n`);
 
+  // 1. The guard comes first: nothing below runs (or even reads the manifest) for an unconfirmed write.
+  const guardErrors = checkWriteGuard({
+    execute: EXECUTE,
+    allowProduction: ALLOW_PRODUCTION,
+    confirmedDataset: await confirmedDataset(),
+    dataset: DATASET,
+  });
+  if (guardErrors.length > 0) {
+    for (const e of guardErrors) console.error(`REFUSED: ${e}`);
+    process.exitCode = 1;
+    return;
+  }
+  const maxChanges = parseMaxChanges(argValue('--max-changes'));
+
+  // 2. Manifest.
   const manifestPath = path.join(REPO_ROOT, 'content/somatic-cards/core-series-01-05.json');
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8')) as Manifest;
-
   const validationErrors = validateManifest(manifest);
   if (validationErrors.length > 0) {
     console.error('Manifest validation FAILED:');
@@ -134,163 +197,108 @@ async function main() {
     `Manifest valid: ${manifest.series.length} series, ${manifest.cards.length} cards.\n`,
   );
 
-  // Existing documents (duplicate/idempotency check)
-  const existing = await sanityQuery<{ _id: string; _type: string }[]>(
-    '*[_type in ["somaticSeries","somaticCard"]]{_id,_type}',
-  );
-  const existingIds = new Set(existing.map((d) => d._id));
-  console.log(`Found ${existingIds.size} existing Somatic document(s) in Sanity.\n`);
+  // 3. The plan: what exists, and exactly what would change. Printed before anything else happens.
+  const docs = await sanityQuery<ExistingDoc[]>('*[_type in ["somaticSeries","somaticCard"]]');
+  const existing = new Map(docs.map((d) => [d._id, d]));
+  console.log(`Found ${existing.size} existing Somatic document(s) in Sanity.\n`);
+  const plan = buildPlan(manifest, existing, {
+    artworkFileExists: (c) =>
+      c.artworkSource !== null && existsSync(path.join(ARTWORK_DIR, c.artworkSource)),
+  });
+  console.log('=== Plan ===');
+  for (const line of formatPlan(plan)) console.log(line);
 
-  let artworkMatched = 0;
-  let artworkMissing = 0;
-  let structuredOk = 0;
-  let needsReview = 0;
-  const missingArtworkCards: number[] = [];
-  const readyCards: number[] = [];
-  const failedCards: { cardNumber: number; error: string }[] = [];
-
-  const mutations: unknown[] = [];
-
-  // --- Series (before Cards) ---
-  for (const s of manifest.series) {
-    const id = seriesDocId(s.seriesNumber);
-    const isNew = !existingIds.has(id);
-    console.log(
-      `Series ${s.seriesNumber} (${s.title}): ${isNew ? 'CREATE' : 'RECONCILE (exists)'} [${id}]`,
-    );
-    mutations.push({
-      createOrReplace: {
-        _id: id,
-        _type: 'somaticSeries',
-        seriesNumber: s.seriesNumber,
-        title: s.title,
-        slug: {
-          _type: 'slug',
-          current: s.title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, ''),
-        },
-        collection: manifest.collection,
-        coreQuestion: s.coreQuestion,
-        status: 'draft',
-        sortOrder: s.seriesNumber,
-      },
-    });
+  if (plan.violations.length > 0) {
+    console.error('\nThe plan breaks a safety rule and will not run.');
+    process.exitCode = 1;
+    return;
   }
-
-  // --- Cards ---
-  for (const c of manifest.cards) {
-    try {
-      // `artworkSource: null` means the card deliberately has no image: it imports with its text only.
-      const noImageByDesign = c.artworkSource === null;
-      const artworkPath = noImageByDesign ? null : path.join(ARTWORK_DIR, c.artworkSource!);
-      const hasArtwork = artworkPath !== null && existsSync(artworkPath);
-      if (hasArtwork) artworkMatched++;
-      else if (!noImageByDesign) {
-        artworkMissing++;
-        missingArtworkCards.push(c.cardNumber);
-      }
-
-      const hasStructuredContent =
-        c.practiceSteps.length > 0 && c.whatToNotice.length > 0 && !!c.anchor && !!c.gentleNote;
-      if (hasStructuredContent) structuredOk++;
-      if (c.needsReview) needsReview++;
-
-      const id = cardDocId(c.seriesNumber, c.cardNumber);
-      const isNew = !existingIds.has(id);
-      const status = hasArtwork
-        ? 'CREATE/UPDATE'
-        : noImageByDesign
-          ? 'CREATE/UPDATE (no image by design)'
-          : 'SKIP (no artwork found)';
-      console.log(
-        `Card ${c.cardNumber} - ${c.title}: ${isNew ? 'new' : 'existing'} ${status}${c.needsReview ? '  [needsReview]' : ''}`,
-      );
-
-      if (!hasArtwork && !noImageByDesign) continue; // Part 4: continue-on-item-error, don't block the batch
-
-      let assetId: string | undefined;
-      if (EXECUTE && hasArtwork && artworkPath) {
-        assetId = await uploadImageAsset(artworkPath);
-      }
-
-      const doc: Record<string, unknown> = {
-        _id: id,
-        _type: 'somaticCard',
-        cardNumber: c.cardNumber,
-        title: c.title,
-        slug: { _type: 'slug', current: c.slug },
-        series: { _type: 'reference', _ref: seriesDocId(c.seriesNumber) },
-        status: 'draft',
-        sortOrder: c.sortOrder,
-        practiceSteps: c.practiceSteps.map((s) => ({
-          _type: 'practiceStep',
-          _key: `step${s.order}`,
-          order: s.order,
-          ...(s.label ? { label: s.label } : {}),
-          instruction: s.instruction,
-        })),
-        whatToNotice: c.whatToNotice.map((n) => ({
-          _type: 'noticePrompt',
-          _key: `notice${n.order}`,
-          order: n.order,
-          text: n.text,
-        })),
-      };
-      if (c.invitation) doc.invitation = c.invitation;
-      if (c.purpose) doc.purpose = c.purpose;
-      if (c.description) doc.description = c.description;
-      if (c.orientation) doc.orientation = c.orientation;
-      if (c.gentleNote) doc.gentleNote = c.gentleNote;
-      if (c.anchor) doc.anchor = c.anchor;
-      if (assetId) {
-        doc.cardArtwork = { _type: 'image', asset: { _type: 'reference', _ref: assetId } };
-      }
-
-      mutations.push({ createOrReplace: doc });
-      readyCards.push(c.cardNumber);
-    } catch (err) {
-      failedCards.push({
-        cardNumber: c.cardNumber,
-        error: err instanceof Error ? err.message : String(err),
-      });
-      console.error(`  Card ${c.cardNumber} FAILED: ${err instanceof Error ? err.message : err}`);
-      // continue-on-item-error: do not rethrow, move to next card
-    }
-  }
-
-  console.log('\n=== Summary ===');
-  console.log(`Series discovered: ${manifest.series.length}`);
-  console.log(`Cards discovered: ${manifest.cards.length}`);
-  console.log(`Artwork matched: ${artworkMatched}`);
-  console.log(
-    `Artwork missing: ${artworkMissing}${missingArtworkCards.length ? ` (cards ${missingArtworkCards.join(', ')})` : ''}`,
-  );
-  console.log(`Structured content complete: ${structuredOk}`);
-  console.log(`Flagged needsReview: ${needsReview}`);
-  console.log(`Ready to import: ${readyCards.length}`);
-  console.log(`Failed (skipped, batch continued): ${failedCards.length}`);
-  if (failedCards.length) {
-    for (const f of failedCards) console.log(`  - Card ${f.cardNumber}: ${f.error}`);
-  }
-  console.log(
-    `Excluded from manifest (no authoritative card number): ${manifest.excludedSource.length}`,
-  );
-  for (const ex of manifest.excludedSource) console.log(`  - "${ex.title}" (${ex.artworkSource})`);
-
   if (DRY_RUN) {
     console.log(
-      '\nDry run complete - no writes were made. Re-run with --execute to write to Sanity.',
+      '\nDry run complete - no writes were made. To write, re-run with --execute --allow-production --confirm-dataset production.',
     );
     return;
   }
+  if (plan.changedDocs === 0) {
+    console.log('\nNothing to change. No backup was made and nothing was written.');
+    return;
+  }
+  const limitError = checkChangeLimit(plan.changedDocs, maxChanges);
+  if (limitError) {
+    console.error(`\nREFUSED: ${limitError}`);
+    process.exitCode = 1;
+    return;
+  }
 
-  console.log(
-    `\nWriting ${mutations.length} mutations (${manifest.series.length} series + ${readyCards.length} cards)...`,
+  // 4. A way back, BEFORE any write (an uploaded image is a write too). Abort if it cannot be made.
+  mkdirSync(BACKUP_DIR, { recursive: true });
+  const now = new Date();
+  const exportFile = path.join(BACKUP_DIR, backupFileName('sanity-export', DATASET, 'ndjson', now));
+  const docsFile = path.join(
+    BACKUP_DIR,
+    backupFileName('somatic-docs-before', DATASET, 'json', now),
   );
+  console.log(`\nSaving a full export of the "${DATASET}" dataset...`);
+  const liveCount = await sanityQuery<number>('count(*)');
+  const touched = plan.items.filter(
+    (i): i is Extract<PlanItem, { kind: 'patch' }> => i.kind === 'patch',
+  );
+  const exported = await exportDataset(exportFile);
+  const exportErrors = verifyExport(exported, { requiredIds: touched.map((t) => t.id), liveCount });
+  if (exportErrors.length > 0) {
+    console.error('REFUSED: the export is not usable, so nothing was written:');
+    for (const e of exportErrors) console.error(`  - ${e}`);
+    process.exitCode = 1;
+    return;
+  }
+  writeFileSync(
+    docsFile,
+    JSON.stringify(
+      touched.map((t) => existing.get(t.id)),
+      null,
+      2,
+    ),
+  );
+  console.log(`  export: ${exportFile} (${exported.length} documents)`);
+  console.log(`  documents about to change: ${docsFile}`);
+
+  // 5. Artwork uploads (only for cards that are changing), then ONE all-or-nothing transaction.
+  const assetFor = new Map<string, string>();
+  for (const item of plan.items) {
+    if (item.kind === 'skip' || item.artwork !== 'upload') continue;
+    const card = manifest.cards.find((c) => cardDocId(c.seriesNumber, c.cardNumber) === item.id);
+    if (!card || card.artworkSource === null) continue;
+    assetFor.set(item.id, await uploadImageAsset(path.join(ARTWORK_DIR, card.artworkSource)));
+  }
+  const imageRef = (id: string) => ({
+    _type: 'image',
+    asset: { _type: 'reference', _ref: assetFor.get(id) },
+  });
+
+  const mutations: unknown[] = [];
+  for (const item of plan.items) {
+    if (item.kind === 'create') {
+      const doc = assetFor.has(item.id)
+        ? { ...item.doc, cardArtwork: imageRef(item.id) }
+        : item.doc;
+      mutations.push({ createIfNotExists: doc });
+    } else if (item.kind === 'patch') {
+      const set = assetFor.has(item.id)
+        ? { ...item.set, cardArtwork: imageRef(item.id) }
+        : item.set;
+      mutations.push({
+        patch: {
+          id: item.id,
+          ifRevisionID: item.rev,
+          ...(Object.keys(set).length > 0 ? { set } : {}),
+          ...(item.unset.length > 0 ? { unset: item.unset } : {}),
+        },
+      });
+    }
+  }
+  console.log(`\nWriting ${mutations.length} mutation(s) in one transaction...`);
   await sanityMutate(mutations);
-  console.log('Done.');
+  console.log('Done. To undo, restore from the backup files above.');
 }
 
 main().catch((err) => {
