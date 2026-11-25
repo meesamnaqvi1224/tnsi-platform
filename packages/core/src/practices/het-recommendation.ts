@@ -169,6 +169,54 @@ export function pickHetRecommendations<T extends HetCandidate>(
   return { picks: top.map((r) => r.item), condition: top[0]?.bestCondition ?? null };
 }
 
+/**
+ * The primary recommendation plus one alternative.
+ *
+ * Without `alternativeFromCondition` this is exactly `pickHetRecommendations(candidates, options, 2)`.
+ *
+ * With it (the check-in follow-up's "Show up more fully in my life" passes `Participation`), the
+ * PRIMARY is still chosen by the strict ranking, so it can only be an item that has the condition
+ * FIRST. The ALTERNATIVE, though, may be any other item that carries the condition at all, first or
+ * second, so items that only hold it as a secondary tag can still appear. Among those candidates the
+ * alternative is chosen the usual way: not recently completed first, then the stable per-member,
+ * per-day rotation. If no other item carries the condition, the alternative falls back to the strict
+ * ranking, so a thin library never leaves it empty.
+ */
+export function pickHetPrimaryAndAlternative<T extends HetCandidate>(
+  candidates: readonly T[],
+  options: HetPickOptions,
+  settings: { alternativeFromCondition?: HetCondition } = {},
+): HetPick<T> {
+  const { alternativeFromCondition } = settings;
+  if (!alternativeFromCondition) return pickHetRecommendations(candidates, options, 2);
+
+  const first = pickHetRecommendations(candidates, options, 1);
+  const primary = first.picks[0];
+  if (!primary) return first;
+
+  const others = candidates.filter((c) => c.id !== primary.id);
+  const recent = options.recentlyCompletedIds ?? new Set<string>();
+  const carrying = others
+    .filter((c) => hetConditionsOf(c.tags).includes(alternativeFromCondition))
+    .map((item) => ({
+      item,
+      seen: recent.has(item.id) ? 1 : 0,
+      // Its own rotation (a different salt from the primary's), so the alternative is not tied to which
+      // item the primary rotation happened to put first.
+      tie: hash(`${options.userKey}|${options.dayKey}|alternative|${item.id}`),
+    }))
+    .sort(
+      (a, b) =>
+        a.seen - b.seen ||
+        a.tie - b.tie ||
+        (a.item.id < b.item.id ? -1 : a.item.id > b.item.id ? 1 : 0),
+    );
+  const alternative =
+    carrying[0]?.item ?? pickHetRecommendations(others, options, 1).picks[0] ?? null;
+
+  return { picks: alternative ? [primary, alternative] : [primary], condition: first.condition };
+}
+
 export const HET_CONTENT_KINDS = ['practice', 'powerDrop', 'somaticCard'] as const;
 export type HetContentKind = (typeof HET_CONTENT_KINDS)[number];
 

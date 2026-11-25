@@ -3,7 +3,7 @@ import { eq, and, desc, gt, count, countDistinct, inArray } from 'drizzle-orm';
 import {
   exerciseInteractiveKey,
   hetPreferenceForFollowUp,
-  pickHetRecommendations,
+  pickHetPrimaryAndAlternative,
   type HetCondition,
 } from '@tnsi/core';
 import { getLatestCheckIn } from './check-ins';
@@ -189,14 +189,25 @@ export async function getRecommendedPractices(
 
   // A member who chose to grow in the check-in follow-up gets that condition first (feature-flagged).
   const followUp = followUpOfCheckIn(latestCheckIn);
-  const { picks, condition } = pickHetRecommendations(candidates, {
-    capacityScore: latestCheckIn.capacityScore,
-    preference: hetPreferenceForFollowUp(latestCheckIn.capacityScore, followUp),
-    userKey: userId,
-    // The check-in's own day, so the pick stays the same all day and moves on with the next day's check-in.
-    dayKey: latestCheckIn.completedDate.toISOString().slice(0, 10),
-    recentlyCompletedIds: new Set(recent.map((r) => r.practiceId)),
-  });
+  const { picks, condition } = pickHetPrimaryAndAlternative(
+    candidates,
+    {
+      capacityScore: latestCheckIn.capacityScore,
+      preference: hetPreferenceForFollowUp(latestCheckIn.capacityScore, followUp),
+      userKey: userId,
+      // The check-in's own day, so the pick stays the same all day and moves on with the next day's check-in.
+      dayKey: latestCheckIn.completedDate.toISOString().slice(0, 10),
+      recentlyCompletedIds: new Set(recent.map((r) => r.practiceId)),
+    },
+    // "Show up more fully in my life": Today's Practice only ever has Participation first, but the
+    // alternative may also be one that holds Participation second, so all seven can appear.
+    {
+      alternativeFromCondition:
+        followUp?.path === 'grow' && followUp.growArea === 'participation'
+          ? 'Participation'
+          : undefined,
+    },
+  );
   const [primary = null, alternative = null] = picks;
   return { primary, alternative, condition };
 }
