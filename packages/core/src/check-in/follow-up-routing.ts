@@ -36,7 +36,18 @@ export function isProtectionPatternId(value: unknown): value is ProtectionPatter
 export const FOLLOW_UP_PICK_KINDS = ['somaticCard', 'powerDrop'] as const;
 export type FollowUpPickKind = (typeof FOLLOW_UP_PICK_KINDS)[number];
 
-export type FollowUpPick = { kind: FollowUpPickKind; slug: string };
+/**
+ * What the WEBSITE shows in place of a PowerDrop pick. PowerDrops are served in the app only, so a
+ * PowerDrop pick on the website would be a dead end; the app keeps the pick exactly as listed.
+ */
+export type FollowUpWebFallback = { kind: 'somaticCard'; slug: string };
+
+export type FollowUpPick = {
+  kind: FollowUpPickKind;
+  slug: string;
+  /** Only on a PowerDrop pick: the Somatic Card the website shows instead. */
+  webFallback?: FollowUpWebFallback;
+};
 
 export type FollowUpPatternRoute = {
   id: ProtectionPatternId;
@@ -84,7 +95,13 @@ function parsePick(raw: unknown): FollowUpPick | null {
     ? (r.kind as FollowUpPickKind)
     : null;
   const slug = typeof r.slug === 'string' && SLUG.test(r.slug) ? r.slug : null;
-  return kind && slug ? { kind, slug } : null;
+  if (!kind || !slug) return null;
+  if (r.webFallback === undefined) return { kind, slug };
+  // A website stand-in is only meaningful for a PowerDrop, and must itself be a Somatic Card.
+  const fb = asRecord(r.webFallback);
+  const fbSlug = fb && typeof fb.slug === 'string' && SLUG.test(fb.slug) ? fb.slug : null;
+  if (kind !== 'powerDrop' || !fb || fb.kind !== 'somaticCard' || !fbSlug) return null;
+  return { kind, slug, webFallback: { kind: 'somaticCard', slug: fbSlug } };
 }
 
 function parsePair(raw: unknown): [FollowUpPick, FollowUpPick] | null {
