@@ -92,12 +92,25 @@ export function hetPreferenceForFollowUp(
   return [chosen, ...usual.filter((c) => c !== chosen)];
 }
 
+export type PatternConfidence = 'High' | 'Medium' | 'Low';
+
+/** Confidence levels whose pattern tags may fill a gap: High always, Medium only to replace a locked pick. */
+function allowedConfidence(replacingLockedPick: boolean): readonly PatternConfidence[] {
+  return replacingLockedPick ? ['High', 'Medium'] : ['High'];
+}
+
 /** What the settle path needs to know about a card or PowerDrop. */
 export type FollowUpCandidate = {
   kind: FollowUpPickKind;
   slug: string;
   /** Draft pattern tags, used only to fill a gap behind the explicit picks. */
   patterns: readonly string[];
+  /**
+   * How sure the team is of those tags (the Practice Tags tab's "Pattern confidence"). Tags only fill a
+   * gap when this is High, or High or Medium to replace a practice locked for a free member. Medium
+   * and Low are never used otherwise until Caroline has reviewed them; missing counts as unknown.
+   */
+  patternConfidence?: PatternConfidence | null;
   /** A free-tier member can open it. */
   isFree: boolean;
 };
@@ -159,8 +172,22 @@ export function pickSettleItems<T extends FollowUpCandidate>(
   for (const pick of listed) add(resolve(pick));
 
   if (chosen.length < count && followUp.path === 'pattern') {
+    // A listed practice that exists but is locked for this free member is being replaced: Medium tags
+    // are good enough for that. In every other gap only High tags are.
+    const replacingLocked =
+      freeOnly &&
+      listed.some((pick) => {
+        const item = resolve(pick);
+        return item !== undefined && !item.isFree;
+      });
+    const allowed = allowedConfidence(replacingLocked);
     const rotated = candidates
-      .filter((c) => c.patterns.includes(followUp.pattern))
+      .filter(
+        (c) =>
+          c.patterns.includes(followUp.pattern) &&
+          c.patternConfidence != null &&
+          allowed.includes(c.patternConfidence),
+      )
       .sort(
         (a, b) =>
           hash(`${input.userKey}|${input.dayKey}|${a.slug}`) -
