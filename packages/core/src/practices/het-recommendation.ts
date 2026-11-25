@@ -230,11 +230,16 @@ export type HetSuggestion<T> = { kind: HetContentKind; item: T };
  * they feel unsettled (2) is offered the brief items - a PowerDrop, then a
  * card - before a longer guided practice; everyone else sees the guided
  * practice first. A kind with no relevant item is simply absent.
+ *
+ * `slots` changes how many of a kind are picked (default one each; zero leaves a kind out). The
+ * website cannot open PowerDrops, so it asks for `{ powerDrop: 0, somaticCard: 2 }`: the PowerDrop's
+ * place goes to the next-best Somatic Card by the same ranking, never the same card twice.
  */
 export function pickHetSuggestions<T extends HetCandidate>(
   pools: Partial<Record<HetContentKind, readonly T[]>>,
   options: HetPickOptions,
   maxItems = 3,
+  slots: Partial<Record<HetContentKind, number>> = {},
 ): { items: HetSuggestion<T>[]; condition: HetCondition | null } {
   const briefFirst =
     normalizeCapacityScore(options.capacityScore) === 'LOW' ||
@@ -246,11 +251,12 @@ export function pickHetSuggestions<T extends HetCandidate>(
   const items: HetSuggestion<T>[] = [];
   let condition: HetCondition | null = null;
   for (const kind of order) {
-    const best = pickHetRecommendations(pools[kind] ?? [], options, 1);
-    const item = best.picks[0];
-    if (!item) continue;
+    const wanted = slots[kind] ?? 1;
+    if (wanted <= 0) continue;
+    const best = pickHetRecommendations(pools[kind] ?? [], options, wanted);
+    if (best.picks.length === 0) continue;
     if (items.length === 0) condition = best.condition;
-    items.push({ kind, item });
+    for (const item of best.picks) items.push({ kind, item });
   }
   return { items: items.slice(0, Math.max(0, maxItems)), condition };
 }

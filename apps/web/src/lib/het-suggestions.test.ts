@@ -251,3 +251,52 @@ describe('getHetSuggestions: website versus app for "I\'m irritated and on edge"
     expect(r.items.every((i) => i.kind === 'somaticCard')).toBe(true);
   });
 });
+
+describe('getHetSuggestions: the website shows a second card instead of a PowerDrop', () => {
+  const manyCards = [
+    { id: 'c1', title: 'Heel Press', slug: 'heel-press', description: 'a', tags: ['Safety'] },
+    {
+      id: 'c2',
+      title: 'Wall Press',
+      slug: 'wall-press',
+      description: 'b',
+      tags: ['Safety', 'Capacity'],
+    },
+    { id: 'c3', title: 'Sway', slug: 'sway', description: 'c', tags: ['Capacity'] },
+  ];
+
+  beforeEach(() => {
+    sanityFetch.mockImplementation(async (q: string) =>
+      q.includes('powerDrop') ? drops : manyCards,
+    );
+  });
+
+  it('the app is unchanged: the guided practice, a PowerDrop and one card', async () => {
+    getLatestCheckIn.mockResolvedValue({ capacityScore: 3, completedDate: new Date('2026-11-25') });
+    const r = await getHetSuggestions('u1', { practice, surface: 'app' });
+    expect(r.items.map((i) => i.kind)).toEqual(['practice', 'powerDrop', 'somaticCard']);
+  });
+
+  it('the app is the default when no surface is given', async () => {
+    getLatestCheckIn.mockResolvedValue({ capacityScore: 3, completedDate: new Date('2026-11-25') });
+    const r = await getHetSuggestions('u1', { practice });
+    expect(r.items.map((i) => i.kind)).toEqual(['practice', 'powerDrop', 'somaticCard']);
+  });
+
+  it('the website gets no PowerDrop and two different cards', async () => {
+    for (const capacityScore of [1, 2, 3, 4, 5]) {
+      getLatestCheckIn.mockResolvedValue({ capacityScore, completedDate: new Date('2026-11-25') });
+      const r = await getHetSuggestions('u1', { practice, surface: 'web' });
+      const cardRows = r.items.filter((i) => i.kind === 'somaticCard');
+      expect(r.items.some((i) => i.kind === 'powerDrop')).toBe(false);
+      expect(cardRows).toHaveLength(2);
+      expect(cardRows[1]!.id).not.toBe(cardRows[0]!.id);
+    }
+  });
+
+  it('for a low answer the website leads with the cards, as the app leads with the brief items', async () => {
+    getLatestCheckIn.mockResolvedValue({ capacityScore: 1, completedDate: new Date('2026-11-25') });
+    const r = await getHetSuggestions('u1', { practice, surface: 'web' });
+    expect(r.items.map((i) => i.kind)).toEqual(['somaticCard', 'somaticCard', 'practice']);
+  });
+});

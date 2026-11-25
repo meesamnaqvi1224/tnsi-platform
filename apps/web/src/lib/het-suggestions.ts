@@ -126,7 +126,14 @@ export async function getHetSuggestions(
       dayKey: latest.completedDate.toISOString().slice(0, 10),
       preference: hetPreferenceForFollowUp(latest.capacityScore, followUp),
     };
-    const { items, condition } = pickHetSuggestions(pools, pick);
+    // The website cannot open PowerDrops, so there the PowerDrop's place goes to a second Somatic Card
+    // (same ranking, never the same card twice). The app keeps the usual one of each kind.
+    const { items, condition } = pickHetSuggestions(
+      pools,
+      pick,
+      3,
+      options.surface === 'web' ? { powerDrop: 0, somaticCard: 2 } : {},
+    );
 
     if (isSettleFollowUp(followUp) && FOLLOW_UP_ROUTING) {
       const rows = (await sanityFetch<FollowUpRaw[]>(CHECKIN_FOLLOW_UP_ITEMS_QUERY)) ?? [];
