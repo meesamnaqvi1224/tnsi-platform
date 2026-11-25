@@ -2645,14 +2645,14 @@
       "slug": "looking-back-looking-forward",
       "title": "Looking Back, Looking Forward",
       "description": "Look gently back at what you have carried, then forward to a direction that feels like yours, and choose one small step.",
-      "tags": ["Expansion"],
+      "tags": ["Participation"],
       "durationSeconds": 300
     },
     {
       "slug": "support-plan",
       "title": "Support Plan",
       "description": "A short plan you can reach for when things are hard: when you would want support, who or what could help, and how you would ask.",
-      "tags": ["Availability"],
+      "tags": ["Participation", "Availability"],
       "durationSeconds": 240
     },
     {
@@ -2673,14 +2673,14 @@
       "slug": "capacity-protection-plan",
       "title": "Capacity Protection Plan",
       "description": "Notice what drains the resource you need to take part, what protects it, and one limit you could try, with what would make it easier to keep.",
-      "tags": ["Capacity", "Participation"],
+      "tags": ["Participation", "Capacity"],
       "durationSeconds": 240
     },
     {
       "slug": "my-participation-plan",
       "title": "My Participation Plan",
       "description": "Choose one area of your life, name why it matters, and shape one small step you could try, with what could support you and what might get in the way.",
-      "tags": ["Capacity", "Participation"],
+      "tags": ["Participation", "Capacity"],
       "durationSeconds": 300
     },
     {
