@@ -123,3 +123,28 @@ describe('pickHetSuggestions for the website: never a PowerDrop, a second card i
     expect(items.map((i) => i.kind)).toEqual(['practice']);
   });
 });
+
+describe('pickHetSuggestions reports the condition of each kind', () => {
+  it('conditionByKind holds each kind own condition, and condition stays the first item one', () => {
+    for (const answer of [1, 2, 3, 4, 5]) {
+      const r = pickHetSuggestions(pools, o(answer));
+      expect(r.conditionByKind.somaticCard).toBe(
+        pickHetRecommendations(cards, o(answer), 1).condition,
+      );
+      expect(r.conditionByKind.powerDrop).toBe(
+        pickHetRecommendations(drops, o(answer), 1).condition,
+      );
+      expect(r.conditionByKind.practice).toBe(
+        pickHetRecommendations(practice, o(answer), 1).condition,
+      );
+      const first = r.items[0]!.kind;
+      expect(r.condition).toBe(r.conditionByKind[first]);
+    }
+  });
+
+  it('for the website the card condition is available and a left-out kind is absent', () => {
+    const r = pickHetSuggestions(pools, o(3), 3, WEB);
+    expect(r.conditionByKind.somaticCard).toBe(pickHetRecommendations(cards, o(3), 2).condition);
+    expect('powerDrop' in r.conditionByKind).toBe(false);
+  });
+});

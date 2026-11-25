@@ -5,6 +5,7 @@ const getLatestCheckIn = vi.fn();
 vi.mock('@tnsi/cms/server', () => ({ sanityFetch: (q: string) => sanityFetch(q) }));
 vi.mock('./check-ins', () => ({ getLatestCheckIn: (u: string) => getLatestCheckIn(u) }));
 
+import { HET_WHY_FALLBACK, hetWhyLine } from '@tnsi/core';
 import { getHetSuggestions } from './het-suggestions';
 import type { PracticeSummary } from './practices';
 
@@ -175,7 +176,9 @@ describe('getHetSuggestions with the check-in follow-up', () => {
     expect(r.items.length).toBeGreaterThan(0);
   });
 
-  it('a grow answer reorders the ranking for every kind', async () => {
+  it('a grow answer for Participation reports no condition, so the neutral reason line shows', async () => {
+    // How a grow choice reorders the ranking for every kind is tested in @tnsi/core; what matters here
+    // is that a Participation choice never names another condition (see the reason-line tests below).
     vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
     arrange({ v: 1, path: 'grow', growArea: 'participation' }, 4);
     const participationPractice = {
@@ -184,7 +187,7 @@ describe('getHetSuggestions with the check-in follow-up', () => {
       tags: ['Participation'],
     } as unknown as PracticeSummary;
     const r = await getHetSuggestions('u1', { practice: participationPractice });
-    expect(r.condition).toBe('Participation');
+    expect(r.condition).toBeNull();
   });
 });
 
@@ -298,5 +301,96 @@ describe('getHetSuggestions: the website shows a second card instead of a PowerD
     getLatestCheckIn.mockResolvedValue({ capacityScore: 1, completedDate: new Date('2026-11-25') });
     const r = await getHetSuggestions('u1', { practice, surface: 'web' });
     expect(r.items.map((i) => i.kind)).toEqual(['somaticCard', 'somaticCard', 'practice']);
+  });
+});
+
+describe('getHetSuggestions: the reason line follows the card the website shows', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  const expansionCards = [
+    {
+      id: 'c1',
+      title: 'Rib Expansion',
+      slug: 'rib-expansion',
+      description: 'a',
+      tags: ['Expansion'],
+    },
+    {
+      id: 'c2',
+      title: 'Weight Shift',
+      slug: 'weight-shift',
+      description: 'b',
+      tags: ['Expansion', 'Capacity'],
+    },
+    { id: 'c3', title: 'Heel Press', slug: 'heel-press', description: 'c', tags: ['Safety'] },
+  ];
+  const participationPractice = {
+    id: 'p-part',
+    title: 'The Empty Chair',
+    description: 'x',
+    tags: ['Participation'],
+    isFree: false,
+  } as unknown as PracticeSummary;
+
+  const arrange = (capacityScore: number, followUp?: unknown) => {
+    getLatestCheckIn.mockResolvedValue({
+      capacityScore,
+      completedDate: new Date('2026-11-25'),
+      metadata: followUp ? { followUp } : {},
+    });
+    sanityFetch.mockImplementation(async (q: string) =>
+      q.includes('powerDrop') ? drops : expansionCards,
+    );
+  };
+
+  it('at answer 5 the website line describes the first card, not the hidden practice', async () => {
+    arrange(5);
+    const web = await getHetSuggestions('u1', { practice: participationPractice, surface: 'web' });
+    expect(web.condition).toBe('Expansion');
+    expect(hetWhyLine(web.condition)).not.toBe(HET_WHY_FALLBACK);
+  });
+
+  it('the app is unchanged: its line still follows the first suggestion (the practice)', async () => {
+    arrange(5);
+    const app = await getHetSuggestions('u1', { practice: participationPractice, surface: 'app' });
+    expect(app.condition).toBe('Participation');
+    expect(hetWhyLine(app.condition)).toBe(HET_WHY_FALLBACK);
+    const dflt = await getHetSuggestions('u1', { practice: participationPractice });
+    expect(dflt.condition).toBe('Participation');
+  });
+
+  it('for the low answers the app line follows its PowerDrop and the website line follows its card', async () => {
+    arrange(1);
+    const app = await getHetSuggestions('u1', { practice, surface: 'app' });
+    const web = await getHetSuggestions('u1', { practice, surface: 'web' });
+    expect(app.items[0]!.kind).toBe('powerDrop');
+    expect(web.items[0]!.kind).toBe('somaticCard');
+    expect(web.condition).toBe('Safety');
+  });
+
+  it('when the member chose "Show up more fully in my life" the line is always the neutral one', async () => {
+    vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
+    const participation = { v: 1, path: 'grow', growArea: 'participation' };
+    for (const capacityScore of [3, 4, 5]) {
+      arrange(capacityScore, participation);
+      for (const surface of ['web', 'app'] as const) {
+        const r = await getHetSuggestions('u1', { practice: participationPractice, surface });
+        expect(r.condition).toBeNull();
+        expect(hetWhyLine(r.condition)).toBe(HET_WHY_FALLBACK);
+      }
+    }
+  });
+
+  it('the exception is only for that choice: Explore what is possible now follows the card', async () => {
+    vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
+    arrange(4, { v: 1, path: 'grow', growArea: 'expansion' });
+    const web = await getHetSuggestions('u1', { practice: participationPractice, surface: 'web' });
+    expect(web.condition).toBe('Expansion');
+  });
+
+  it('with the follow-up off, a stored Participation choice changes nothing', async () => {
+    arrange(5, { v: 1, path: 'grow', growArea: 'participation' });
+    const web = await getHetSuggestions('u1', { practice: participationPractice, surface: 'web' });
+    expect(web.condition).toBe('Expansion');
   });
 });

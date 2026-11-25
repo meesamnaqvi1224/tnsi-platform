@@ -197,6 +197,7 @@ describe('pickHetSuggestions across the content library', () => {
     expect(pickHetSuggestions({}, { ...base, capacityScore: 1 })).toEqual({
       items: [],
       condition: null,
+      conditionByKind: {},
     });
   });
 
