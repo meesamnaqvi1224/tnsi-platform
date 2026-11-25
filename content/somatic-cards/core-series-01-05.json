@@ -1661,14 +1661,14 @@
       "slug": "the-horizontal-eye-sweep",
       "sortOrder": 25,
       "artworkSource": null,
-      "invitation": "Regulate the nervous system with controlled visual scanning.",
+      "invitation": "Let your gaze move gently from side to side.",
       "purpose": "Orientation & spatial awareness. Feel where you are visually. Connect to your environment.",
       "description": null,
       "orientation": null,
       "practiceSteps": [
         {
           "order": 0,
-          "label": "Seat & Stabilize",
+          "label": "Sit & Stabilise",
           "instruction": "Sit comfortably on a chair. Place both feet flat on the floor. Feel your sit bones and let your posture be relaxed yet upright."
         },
         {
@@ -1684,12 +1684,12 @@
         {
           "order": 3,
           "label": "Right Sweep",
-          "instruction": "Gently and slowly sweep your eyes to the far right, taking in the scene without moving your head. Pause for one soft breath."
+          "instruction": "Gently and slowly sweep your eyes a small, comfortable distance to the right, taking in the scene without moving your head. Pause for one soft breath."
         },
         {
           "order": 4,
-          "label": "Return Center",
-          "instruction": "Slowly return your gaze to the center line. Pause."
+          "label": "Return to Centre",
+          "instruction": "Slowly return your gaze to the centre line. Pause."
         },
         {
           "order": 5,
@@ -1699,12 +1699,12 @@
         {
           "order": 6,
           "label": "Full Cycle",
-          "instruction": "Perform a complete smooth cycle from the center to the right, then center to the left, and back to center."
+          "instruction": "If comfortable, repeat the sequence: centre, right, centre, left, centre."
         },
         {
           "order": 7,
           "label": "Re-Orient",
-          "instruction": "Stop. Close your eyes for a moment. Then open them, looking all around the room naturally. Notice any changes."
+          "instruction": "Pause. Keep your eyes open, or close them briefly if comfortable. Then let your gaze move naturally around the room. Notice any changes."
         }
       ],
       "whatToNotice": [
@@ -1721,7 +1721,7 @@
           "text": "Sensation — Notice any changes in tension in your neck, face, or chest."
         }
       ],
-      "gentleNote": "Practice in a room with varied objects for visual richness. If you feel dizzy, slow down or take a break.",
+      "gentleNote": "Practise in a room with varied objects for visual richness. If you feel dizzy, slow down or take a break.",
       "anchor": "I can look from side to side and stay connected to the space around me.",
       "visualTreatment": null,
       "heroImageSource": null,
@@ -3108,7 +3108,7 @@
         {
           "order": 3,
           "label": "Registering Warmth",
-          "instruction": "Focus only on the warmth. Notice how it feels — comfortable, soothing, deep, or stable."
+          "instruction": "Notice the warmth and how it feels to you, without needing a particular sensation."
         },
         {
           "order": 4,
