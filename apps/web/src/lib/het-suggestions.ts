@@ -17,6 +17,7 @@ import {
 } from '@tnsi/core';
 import { getLatestCheckIn } from './check-ins';
 import { followUpOfCheckIn } from './check-in-follow-up';
+import { patternConfidenceOf } from './pattern-confidence';
 import type { PracticeSummary } from './practices';
 
 type RawItem = {
@@ -145,6 +146,7 @@ export async function getHetSuggestions(
         kind: r.kind,
         slug: r.slug,
         patterns: r.patterns ?? [],
+        patternConfidence: patternConfidenceOf(r.kind, r.slug),
         isFree: r.isFree ?? true,
         out: {
           kind: r.kind,

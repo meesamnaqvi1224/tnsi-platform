@@ -222,6 +222,7 @@ describe('pickSettleItems', () => {
   it('replaces an unavailable listed item from the same pattern, then from the fallback', () => {
     const tagged = cand('tagged-for-overdrive', 'somaticCard', {
       patterns: ['functional-overdrive'],
+      patternConfidence: 'High',
     });
     const out = pickSettleItems({
       ...base,
@@ -238,6 +239,61 @@ describe('pickSettleItems', () => {
       fallback: [cand('fallback')],
     });
     expect(out2.map((c) => c.slug)).toEqual(['the-physiological-sigh', 'fallback']);
+  });
+
+  describe('pattern-tag confidence', () => {
+    const tag = (slug: string, patternConfidence: FollowUpCandidate['patternConfidence']) =>
+      cand(slug, 'somaticCard', { patterns: ['functional-overdrive'], patternConfidence });
+
+    it('fills a gap from High tags only, never Medium, Low or unrated', () => {
+      for (const level of ['Medium', 'Low', null, undefined] as const) {
+        const out = pickSettleItems({
+          ...base,
+          followUp: follow,
+          candidates: [sigh, tag('tagged', level)], // the Horizon Lock is not available
+          fallback: [cand('fallback')],
+        });
+        expect(out.map((c) => c.slug)).toEqual(['the-physiological-sigh', 'fallback']);
+      }
+      const high = pickSettleItems({
+        ...base,
+        followUp: follow,
+        candidates: [sigh, tag('tagged', 'High')],
+        fallback: [cand('fallback')],
+      });
+      expect(high.map((c) => c.slug)).toEqual(['the-physiological-sigh', 'tagged']);
+    });
+
+    it('lets Medium tags replace a practice locked for a free member, but not Low', () => {
+      const locked = cand('the-horizon-lock', 'somaticCard', { isFree: false });
+      const withMedium = pickSettleItems({
+        ...base,
+        followUp: follow,
+        freeOnly: true,
+        candidates: [sigh, locked, tag('tagged', 'Medium')],
+        fallback: [cand('fallback')],
+      });
+      expect(withMedium.map((c) => c.slug)).toEqual(['the-physiological-sigh', 'tagged']);
+      const withLow = pickSettleItems({
+        ...base,
+        followUp: follow,
+        freeOnly: true,
+        candidates: [sigh, locked, tag('tagged', 'Low')],
+        fallback: [cand('fallback')],
+      });
+      expect(withLow.map((c) => c.slug)).toEqual(['the-physiological-sigh', 'fallback']);
+    });
+
+    it('a member who is not locked out does not get Medium tags even if a pick is locked for others', () => {
+      const out = pickSettleItems({
+        ...base,
+        followUp: follow,
+        freeOnly: false,
+        candidates: [sigh, tag('tagged', 'Medium')],
+        fallback: [cand('fallback')],
+      });
+      expect(out.map((c) => c.slug)).toEqual(['the-physiological-sigh', 'fallback']);
+    });
   });
 
   it('never offers a locked item to a free member', () => {
