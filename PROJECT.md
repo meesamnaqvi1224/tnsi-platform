@@ -175,6 +175,47 @@ Build Brief for Claude Code" (Claude Docs). Decisions approved 2026-10-12:
   `page_view`.
 - **Expo app is out of scope for v1** (phase 2).
 
+### 2026-10-23 — W-02 public claims and customer-journey audit
+
+Read-only audit of the public website against the code, the live site and the
+Notion decisions register; findings, evidence, owners and a remediation order
+are in [`docs/10-website-claims-and-journeys-audit.md`](./docs/10-website-claims-and-journeys-audit.md).
+No P0. Headline P1s: Google Analytics loads before consent on production
+(fixed by W-01 / PR #9, unmerged); 12 of 22 sitemap article URLs are
+placeholders or show another article's body; the assessment promises an email
+that nothing sends; billing buttons (incl. Lifetime) exist on production
+`main`; Practitioner Certification registry/reapproval/"available today" and
+the research page's "active study" lines are presented as current without
+confirmation. No code, CMS, environment, billing or deployment change was made.
+
+### 2026-10-23 — Owner decisions after the W-02 audit
+
+Recorded from the owner's instructions of 23 October 2026. They do **not**
+authorise deployment, merging, production configuration changes, opening
+membership, or publishing to the live CMS.
+
+1. **Membership stays closed** until the checkout and entitlement flow is tested and launch requirements are met.
+2. **New Lifetime purchases are discontinued.** Existing legitimate Lifetime entitlements are preserved.
+3. **Duplicate active subscriptions are prevented server-side.**
+4. **Stripe Billing Portal:** existing-customer self-service only (payment methods, cancellation, invoices, history). No plan switching, no Lifetime.
+5. **Production analytics stays disabled** until the privacy approval and GA4 configuration checks are complete.
+6. **Global Privacy Control takes precedence over saved consent** while active; analytics stays off.
+7. **Cookie/privacy wording remains pending** privacy/legal review.
+8. **Practitioner Registry and annual reapproval claims removed** until their availability and authorisation are confirmed.
+9. **No "16-module" claim** unless the actual curriculum supports it.
+10. **Unsupported research statistics and longitudinal-study claims removed or qualified.**
+11. **Caroline Reed's approved experience wording: "25+ years of experience."** Biography copy standardised.
+12. **Regulation Suite terms approved as displayed:** GBP 5.99/month, GBP 59/year, 30-day card-free trial, no refunds (per `docs/membership-commercial-decisions.md`). This does not authorise opening checkout.
+13. **Assessment results stay on screen; the Return Path stays unlaunched** until its promised functionality exists.
+14. **Form security** is a separate approved task: spam protection, server-side validation, email verification where genuinely required.
+
+Implementation: PR #9 (consent + GPC), #11 (website copy), #12 (billing guard,
+duplicate-subscription protection, Lifetime handling), #13 (form security,
+stacked on #11). Still open: legal approval of the wording, GA4 property
+checks, Flowi checks, Stripe Dashboard checks (portal configuration, Prices,
+retry schedule), the trial (implemented only on the unreleased membership
+branch), email verification, the Sanity author bio ("over fifteen years").
+
 ## Open decisions
 
 None recorded yet beyond the log above.
