@@ -1,7 +1,7 @@
 {
-  "_comment": "Daily check-in follow-up routing, copied from the Collections tab of the TNSI Master Content Inventory (Full Backup 23 Nov 2026), decided by Caroline on 23 Nov 2026. DRAFT: the member-facing wording (memberText and the labels below) is awaiting Caroline's sign-off, and no app code reads this file yet. 'pattern' is the team's name and is never shown to members. Each pick is a Somatic Card or PowerDrop identified by its slug.",
+  "_comment": "Daily check-in follow-up routing, copied from the Collections tab of the TNSI Master Content Inventory (Full Backup 23 Nov 2026), decided by Caroline on 23 Nov 2026. Member-facing wording (memberText and the labels below) APPROVED by Caroline on 25 Nov 2026, as in the \"Check-In Follow-Up Questions\" spec. The follow-up stays off until the CHECKIN_FOLLOW_UP_ENABLED switch is turned on. 'pattern' is the team's name and is never shown to members. Each pick is a Somatic Card or PowerDrop identified by its slug.",
   "version": 1,
-  "status": "draft-wording-unconfirmed",
+  "status": "wording-approved-2026-11-25",
   "followUp": {
     "patternQuestion": "What does it feel like right now?",
     "helpMostQuestion": "What would help most today?",

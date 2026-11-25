@@ -1693,11 +1693,16 @@
         },
         {
           "order": 5,
+          "label": "Left Sweep",
+          "instruction": "Gently move your gaze a small, comfortable distance to the left. Pause."
+        },
+        {
+          "order": 6,
           "label": "Full Cycle",
           "instruction": "Perform a complete smooth cycle from the center to the right, then center to the left, and back to center."
         },
         {
-          "order": 6,
+          "order": 7,
           "label": "Re-Orient",
           "instruction": "Stop. Close your eyes for a moment. Then open them, looking all around the room naturally. Notice any changes."
         }
@@ -3109,7 +3114,7 @@
         {
           "order": 4,
           "label": "Sustained Contact",
-          "instruction": "Keep the contact stable for 1-2 minutes. Feel the warmth deepening into the tissues."
+          "instruction": "Keep contact for a short, comfortable pause. Notice whether the sensation changes or stays the same."
         },
         {
           "order": 5,
@@ -3119,7 +3124,7 @@
         {
           "order": 6,
           "label": "Compare Sensations",
-          "instruction": "Compare what you noticed with the object held still versus when your hand was moving across it."
+          "instruction": "Compare what you noticed before contact, during contact and after release."
         },
         {
           "order": 7,
@@ -3142,7 +3147,7 @@
         }
       ],
       "gentleNote": "Select an object with a safe, comfortable level of warmth. Do not use items that are hot enough to burn or cause distress. A slightly pre-warmed cloth is ideal. If you have temperature sensitivities, practice with caution.",
-      "anchor": "I can notice and hold the feeling of comfort and warmth, even after the source is gone.",
+      "anchor": "I can notice warmth and what remains after contact ends.",
       "visualTreatment": null,
       "heroImageSource": null,
       "supportingImages": [],
