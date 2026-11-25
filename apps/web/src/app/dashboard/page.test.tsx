@@ -204,6 +204,17 @@ describe('DashboardPage — one clear next step', () => {
     expect(html).toContain('href="/dashboard/practices/p1"');
   });
 
+  it('offers "Check in again" after a check-in only when every check-in drives (the switch is on)', async () => {
+    mockGetTodayCheckIn.mockResolvedValue({ id: 'c1' });
+    expect(renderToStaticMarkup(await DashboardPage())).not.toContain('Check in again');
+    vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
+    try {
+      expect(renderToStaticMarkup(await DashboardPage())).toContain('Check in again');
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it('no longer carries the placeholder Account block', async () => {
     const html = renderToStaticMarkup(await DashboardPage());
     expect(html).not.toContain('Manage your account details');

@@ -15,7 +15,8 @@ import {
   type HetContentKind,
   type HetPickOptions,
 } from '@tnsi/core';
-import { getLatestCheckIn } from './check-ins';
+import { everyCheckInDrives, getLatestCheckIn, getShownEarlierToday } from './check-ins';
+import { drivingDayKey, preferFresh } from './check-in-driving';
 import { followUpOfCheckIn } from './check-in-follow-up';
 import type { PracticeSummary } from './practices';
 
@@ -123,21 +124,30 @@ export async function getHetSuggestions(
     const pick: HetPickOptions = {
       capacityScore: latest.capacityScore,
       userKey: userId,
-      dayKey: latest.completedDate.toISOString().slice(0, 10),
+      dayKey: drivingDayKey(latest, everyCheckInDrives()),
       preference: hetPreferenceForFollowUp(latest.capacityScore, followUp),
     };
     // The website cannot open PowerDrops, so there the PowerDrop's place goes to a second Somatic Card
     // (same ranking, never the same card twice). The app keeps the usual one of each kind.
-    const {
-      items,
-      condition: firstItemCondition,
-      conditionByKind,
-    } = pickHetSuggestions(
-      pools,
-      pick,
-      3,
-      options.surface === 'web' ? { powerDrop: 0, somaticCard: 2 } : {},
-    );
+    const slots = options.surface === 'web' ? { powerDrop: 0, somaticCard: 2 } : {};
+    const whole = pickHetSuggestions(pools, pick, 3, slots);
+    let { items, condition: firstItemCondition, conditionByKind } = whole;
+    // A later check-in the same day (when every check-in drives) prefers what has not been shown yet today;
+    // where nothing new is left for a slot, the earlier item is allowed to repeat.
+    const shown = await getShownEarlierToday(latest);
+    if (shown.size > 0) {
+      const freshPools = {
+        practice: pools.practice,
+        powerDrop: pools.powerDrop.filter((c) => !shown.has(c.id)),
+        somaticCard: pools.somaticCard.filter((c) => !shown.has(c.id)),
+      };
+      const fresh = pickHetSuggestions(freshPools, pick, 3, slots);
+      if (fresh.items.length > 0) {
+        items = preferFresh(whole.items, fresh.items);
+        firstItemCondition = fresh.condition ?? firstItemCondition;
+        conditionByKind = { ...conditionByKind, ...fresh.conditionByKind };
+      }
+    }
 
     if (isSettleFollowUp(followUp) && FOLLOW_UP_ROUTING) {
       const rows = (await sanityFetch<FollowUpRaw[]>(CHECKIN_FOLLOW_UP_ITEMS_QUERY)) ?? [];

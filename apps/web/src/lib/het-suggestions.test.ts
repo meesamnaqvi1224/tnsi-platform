@@ -3,7 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const sanityFetch = vi.fn();
 const getLatestCheckIn = vi.fn();
 vi.mock('@tnsi/cms/server', () => ({ sanityFetch: (q: string) => sanityFetch(q) }));
-vi.mock('./check-ins', () => ({ getLatestCheckIn: (u: string) => getLatestCheckIn(u) }));
+const shownEarlier = vi.fn();
+vi.mock('./check-ins', () => ({
+  getLatestCheckIn: (u: string) => getLatestCheckIn(u),
+  everyCheckInDrives: () => true,
+  getShownEarlierToday: () => shownEarlier(),
+}));
 
 import { HET_WHY_FALLBACK, hetWhyLine } from '@tnsi/core';
 import { getHetSuggestions } from './het-suggestions';
@@ -42,6 +47,8 @@ const cards = [
 beforeEach(() => {
   sanityFetch.mockReset();
   getLatestCheckIn.mockReset();
+  shownEarlier.mockReset();
+  shownEarlier.mockResolvedValue(new Set<string>());
   sanityFetch.mockImplementation(async (q: string) => (q.includes('powerDrop') ? drops : cards));
   getLatestCheckIn.mockResolvedValue({ capacityScore: 1, completedDate: new Date('2026-11-18') });
 });
@@ -392,5 +399,39 @@ describe('getHetSuggestions: the reason line follows the card the website shows'
     arrange(5, { v: 1, path: 'grow', growArea: 'participation' });
     const web = await getHetSuggestions('u1', { practice: participationPractice, surface: 'web' });
     expect(web.condition).toBe('Expansion');
+  });
+});
+
+describe('getHetSuggestions: a later check-in the same day', () => {
+  const twoCards = [
+    { id: 'c1', title: 'Heel Press', slug: 'heel-press', description: 'z', tags: ['Safety'] },
+    { id: 'c2', title: 'Wall Press', slug: 'wall-press', description: 'z', tags: ['Safety'] },
+  ];
+  const later = {
+    capacityScore: 1,
+    completedDate: new Date('2026-11-18'),
+    isPrimary: false,
+    id: 'later',
+  };
+
+  it('prefers a card not shown earlier today', async () => {
+    sanityFetch.mockImplementation(async (q: string) =>
+      q.includes('powerDrop') ? drops : twoCards,
+    );
+    getLatestCheckIn.mockResolvedValue(later);
+    const first = await getHetSuggestions('u1', { practice });
+    const shownCard = first.items.find((i) => i.kind === 'somaticCard')!.id;
+    shownEarlier.mockResolvedValue(new Set([shownCard]));
+    const again = await getHetSuggestions('u1', { practice });
+    const nextCard = again.items.find((i) => i.kind === 'somaticCard')!.id;
+    expect(nextCard).not.toBe(shownCard);
+  });
+
+  it('lets an earlier card repeat when nothing new is left', async () => {
+    getLatestCheckIn.mockResolvedValue(later);
+    shownEarlier.mockResolvedValue(new Set(['c1', 'd-free', 'd-paid']));
+    const r = await getHetSuggestions('u1', { practice });
+    expect(r.items.map((i) => i.kind)).toEqual(['powerDrop', 'somaticCard', 'practice']);
+    expect(r.items.find((i) => i.kind === 'somaticCard')!.id).toBe('c1');
   });
 });

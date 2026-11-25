@@ -9,15 +9,45 @@ const state = vi.hoisted(() => ({
   /** Whether a primary check-in already exists for the day (the guarded insert then does nothing). */
   primaryExists: false,
   inserted: [] as Record<string, unknown>[],
+  /** How many times the suggested ids were merged into a saved row's metadata. */
+  updates: 0,
 }));
 
 vi.mock('@/lib/auth-api', () => ({
   requireAuth: async () => ({ id: 'user-1' }),
 }));
 
+// The suggestions are only recorded when every check-in drives them (the follow-up switch); these tests
+// run with it off, and the recording has its own tests.
+vi.mock('@/lib/practices', () => ({
+  getRecommendedPractices: async () => ({
+    primary: { id: 'practice-a' },
+    alternative: { id: 'practice-b' },
+    condition: null,
+  }),
+}));
+vi.mock('@/lib/het-suggestions', () => ({
+  getHetSuggestions: async (_u: string, o: { surface?: string }) => ({
+    condition: null,
+    items: [{ id: o.surface === 'web' ? 'card-web' : 'card-app' }],
+  }),
+}));
+vi.mock('@/lib/membership', () => ({
+  contentAccessFor: () => ({ gatingActive: false, membership: { hasPaidAccess: true } }),
+}));
+
 vi.mock('@tnsi/db', () => ({
   checkIns: { userId: 'userId', completedDate: 'completedDate', isPrimary: 'isPrimary' },
   db: {
+    update: () => {
+      const chain = {
+        set: () => chain,
+        where: async () => {
+          state.updates += 1;
+        },
+      };
+      return chain;
+    },
     insert: () => {
       let values: Record<string, unknown> = {};
       let guarded = false;
@@ -58,6 +88,7 @@ function post(body: Record<string, unknown>) {
 beforeEach(() => {
   state.primaryExists = false;
   state.inserted = [];
+  state.updates = 0;
   vi.restoreAllMocks();
 });
 
@@ -282,5 +313,31 @@ describe('POST /api/v1/check-ins: follow-up answer', () => {
     const res = await post({ moodScore: 3, capacityScore: 2 });
     expect(res.status).toBe(201);
     expect(state.inserted[0]!.metadata).toEqual({});
+  });
+});
+
+describe('POST /api/v1/check-ins: remembering what was suggested', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('stores nothing extra while the switch is off', async () => {
+    const res = await post({ moodScore: 3, capacityScore: 3 });
+    expect(res.status).toBe(201);
+    expect(state.updates).toBe(0);
+  });
+
+  it('records the suggested ids once when every check-in drives, and still answers 201', async () => {
+    vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
+    const res = await post({ moodScore: 3, capacityScore: 3 });
+    expect(res.status).toBe(201);
+    expect(state.updates).toBe(1);
+  });
+
+  it('records it for an additional check-in too', async () => {
+    vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
+    state.primaryExists = true;
+    const res = await post({ moodScore: 3, capacityScore: 4 });
+    expect(res.status).toBe(201);
+    expect(state.inserted[0]!.isPrimary).toBe(false);
+    expect(state.updates).toBe(1);
   });
 });
