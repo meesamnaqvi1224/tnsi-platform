@@ -6,8 +6,9 @@ import {
   pickHetPrimaryAndAlternative,
   type HetCondition,
 } from '@tnsi/core';
-import { getLatestCheckIn } from './check-ins';
+import { everyCheckInDrives, getLatestCheckIn, getShownEarlierToday } from './check-ins';
 import { followUpOfCheckIn } from './check-in-follow-up';
+import { drivingDayKey } from './check-in-driving';
 import { paginateRows } from './practice-sessions';
 import type { PracticeReflection as PracticeReflectionRow } from '@tnsi/db/schema';
 
@@ -189,25 +190,41 @@ export async function getRecommendedPractices(
 
   // A member who chose to grow in the check-in follow-up gets that condition first (feature-flagged).
   const followUp = followUpOfCheckIn(latestCheckIn);
-  const { picks, condition } = pickHetPrimaryAndAlternative(
-    candidates,
-    {
-      capacityScore: latestCheckIn.capacityScore,
-      preference: hetPreferenceForFollowUp(latestCheckIn.capacityScore, followUp),
-      userKey: userId,
-      // The check-in's own day, so the pick stays the same all day and moves on with the next day's check-in.
-      dayKey: latestCheckIn.completedDate.toISOString().slice(0, 10),
-      recentlyCompletedIds: new Set(recent.map((r) => r.practiceId)),
-    },
-    // "Show up more fully in my life": Today's Practice only ever has Participation first, but the
-    // alternative may also be one that holds Participation second, so all seven can appear.
-    {
-      alternativeFromCondition:
-        followUp?.path === 'grow' && followUp.growArea === 'participation'
-          ? 'Participation'
-          : undefined,
-    },
-  );
+  // A later check-in the same day (when every check-in drives) prefers what the member has not been
+  // shown yet today. Where nothing new is left, an earlier pick is allowed to repeat.
+  const shown = await getShownEarlierToday(latestCheckIn);
+  const pickFrom = (pool: typeof candidates) =>
+    pickHetPrimaryAndAlternative(
+      pool,
+      {
+        capacityScore: latestCheckIn.capacityScore,
+        preference: hetPreferenceForFollowUp(latestCheckIn.capacityScore, followUp),
+        userKey: userId,
+        // The check-in's own day, so the pick stays the same all day and moves on with the next day's
+        // check-in. A later check-in the same day (every check-in drives) adds its own id, so it rotates.
+        dayKey: drivingDayKey(latestCheckIn, everyCheckInDrives()),
+        recentlyCompletedIds: new Set(recent.map((r) => r.practiceId)),
+      },
+      // "Show up more fully in my life": Today's Practice only ever has Participation first, but the
+      // alternative may also be one that holds Participation second, so all seven can appear.
+      {
+        alternativeFromCondition:
+          followUp?.path === 'grow' && followUp.growArea === 'participation'
+            ? 'Participation'
+            : undefined,
+      },
+    );
+  const full = pickFrom(candidates);
+  let { picks, condition } = full;
+  if (shown.size > 0) {
+    const fresh = pickFrom(candidates.filter((c) => !shown.has(c.id)));
+    if (fresh.picks.length > 0) {
+      // Fresh picks first; fill any slot they cannot (nothing new left) from the unrestricted result.
+      const rest = full.picks.filter((p) => !fresh.picks.some((f) => f.id === p.id));
+      picks = [...fresh.picks, ...rest].slice(0, full.picks.length);
+      condition = fresh.condition;
+    }
+  }
   const [primary = null, alternative = null] = picks;
   return { primary, alternative, condition };
 }

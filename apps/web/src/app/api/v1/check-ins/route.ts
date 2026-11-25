@@ -1,5 +1,14 @@
 import { requireAuth } from '@/lib/auth-api';
-import { getCheckInHistory, recordCheckIn, toPublicCheckIn } from '@/lib/check-ins';
+import {
+  everyCheckInDrives,
+  getCheckInHistory,
+  recordCheckIn,
+  recordSuggestedIds,
+  toPublicCheckIn,
+} from '@/lib/check-ins';
+import { getRecommendedPractices } from '@/lib/practices';
+import { getHetSuggestions } from '@/lib/het-suggestions';
+import { contentAccessFor } from '@/lib/membership';
 import { checkInSchema, checkInsListQuerySchema } from '@/lib/validation';
 import { success, unauthorized, badRequest, internalError } from '@/lib/api-response';
 import { buildTimeZoneMetadata, describeRejectedTimeZone } from '@/lib/time-zone';
@@ -123,6 +132,31 @@ export async function POST(request: Request) {
     completedAt: completedAtDate,
     metadata: storedMetadata,
   });
+
+  // When every check-in drives the suggestions, remember what this one suggested (ids only, in its
+  // metadata) so the next check-in the same day can prefer something not yet shown. It is a record of
+  // what was offered, never a reason to fail the save.
+  if (everyCheckInDrives()) {
+    try {
+      const access = contentAccessFor(user.entitlements);
+      const freeOnly = access.gatingActive && !access.membership.hasPaidAccess;
+      const { primary, alternative } = await getRecommendedPractices(user.id, { freeOnly });
+      const ids = new Set<string>(
+        [primary?.id, alternative?.id].filter((id): id is string => !!id),
+      );
+      for (const surface of ['app', 'web'] as const) {
+        const { items } = await getHetSuggestions(user.id, {
+          freeOnly,
+          practice: primary,
+          surface,
+        });
+        for (const item of items) ids.add(item.id);
+      }
+      await recordSuggestedIds(checkIn.id, ids);
+    } catch (error) {
+      console.error('[check-ins] could not store the suggested ids:', error);
+    }
+  }
 
   return success(toPublicCheckIn(checkIn), 201);
 }

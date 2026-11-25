@@ -13,7 +13,7 @@ import { eq, and, inArray, gte, lte, desc } from 'drizzle-orm';
 import { success } from '@/lib/api-response';
 import { getRecommendedPractices, getPracticeProgressSummary } from '@/lib/practices';
 import { getHetSuggestions } from '@/lib/het-suggestions';
-import { toPublicCheckIn } from '@/lib/check-ins';
+import { everyCheckInDrives, toPublicCheckIn } from '@/lib/check-ins';
 import { contentAccessFor, withPracticeAccess } from '@/lib/membership';
 
 export const runtime = 'nodejs';
@@ -43,10 +43,12 @@ export async function GET() {
         eq(checkIns.userId, user.id),
         gte(checkIns.completedAt, startOfDay),
         lte(checkIns.completedAt, endOfDay),
-        // Today's primary check-in only; additional check-ins never stand in for it.
-        eq(checkIns.isPrimary, true),
+        // Today's primary check-in only; additional check-ins never stand in for it. When every check-in
+        // drives the suggestions, today's check-in is the latest one, primary or not.
+        ...(everyCheckInDrives() ? [] : [eq(checkIns.isPrimary, true)]),
       ),
     )
+    .orderBy(desc(checkIns.completedAt), desc(checkIns.id))
     .limit(1);
 
   // Get recent practices (published, ordered by category and difficulty)

@@ -1,6 +1,17 @@
 import { db, checkIns } from '@tnsi/db';
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, desc, lt, sql } from 'drizzle-orm';
 import type { CheckIn } from '@tnsi/db/schema';
+import { isCheckInFollowUpEnabled } from './check-in-follow-up-flag';
+import { suggestedIdsOf, suggestedMetadata } from './check-in-driving';
+
+/**
+ * Whether EVERY check-in (not only the first of the day) drives the suggestions: the latest one wins.
+ * Switched with the check-in follow-up switch, so while it is off the first check-in of the day is the
+ * only one that counts, exactly as before.
+ */
+export function everyCheckInDrives(): boolean {
+  return isCheckInFollowUpEnabled();
+}
 
 /** The server-local calendar day of an instant, as a date-only `Date` (what `check_ins.completed_date` stores). */
 export function localDayOf(instant: Date): Date {
@@ -16,9 +27,10 @@ export function toPublicCheckIn<T extends { metadata: unknown }>(checkIn: T): T 
 }
 
 /**
- * Today's PRIMARY check-in for a user, if one exists: the first check-in of the (server-local)
- * calendar day. Additional check-ins the same day are separate rows (`isPrimary = false`) and never
- * count here - this is what Home's "checked in today" state and the daily recommendation key off.
+ * Today's check-in for a user, if one exists. By default this is the PRIMARY one: the first check-in of
+ * the (server-local) calendar day; additional check-ins the same day are separate rows
+ * (`isPrimary = false`) and do not count. With `everyCheckInDrives()` it is the LATEST check-in of the
+ * day instead, primary or not. This is what Home's "checked in today" state and the recommendation key off.
  */
 export async function getTodayCheckIn(userId: string): Promise<CheckIn | null> {
   const now = new Date();
@@ -31,9 +43,10 @@ export async function getTodayCheckIn(userId: string): Promise<CheckIn | null> {
       and(
         eq(checkIns.userId, userId),
         eq(checkIns.completedDate, today),
-        eq(checkIns.isPrimary, true),
+        ...(everyCheckInDrives() ? [] : [eq(checkIns.isPrimary, true)]),
       ),
     )
+    .orderBy(desc(checkIns.completedAt), desc(checkIns.id))
     .limit(1);
 
   return result[0] ?? null;
@@ -117,17 +130,53 @@ export async function getCheckInHistory(
 }
 
 /**
- * This user's most recent PRIMARY check-in (by day), regardless of whether it's today's - unlike
- * `getTodayCheckIn`, which only matches the current calendar day. Powers the "today's recommended
- * practice" content routing. Only primary check-ins count: an additional check-in the same day never
- * changes the recommendation.
+ * This user's most recent check-in that drives the recommendation, regardless of whether it's today's -
+ * unlike `getTodayCheckIn`, which only matches the current calendar day. Powers the "today's recommended
+ * practice" content routing. By default only primary check-ins count: an additional check-in the same
+ * day never changes the recommendation. With `everyCheckInDrives()` the latest check-in of any kind does.
  */
 export async function getLatestCheckIn(userId: string): Promise<CheckIn | null> {
   const rows = await db
     .select()
     .from(checkIns)
-    .where(and(eq(checkIns.userId, userId), eq(checkIns.isPrimary, true)))
-    .orderBy(desc(checkIns.completedDate), desc(checkIns.completedAt))
+    .where(
+      and(
+        eq(checkIns.userId, userId),
+        ...(everyCheckInDrives() ? [] : [eq(checkIns.isPrimary, true)]),
+      ),
+    )
+    .orderBy(desc(checkIns.completedDate), desc(checkIns.completedAt), desc(checkIns.id))
     .limit(1);
   return rows[0] ?? null;
+}
+
+/**
+ * The ids of everything the member was already suggested on the same day, before this check-in: read
+ * from the picks stored with each earlier check-in (never re-derived, so it is what they actually saw).
+ * Empty unless every check-in drives, and for the first check-in of the day.
+ */
+export async function getShownEarlierToday(
+  checkIn: Pick<CheckIn, 'userId' | 'completedDate' | 'completedAt' | 'isPrimary'>,
+): Promise<Set<string>> {
+  if (!everyCheckInDrives() || checkIn.isPrimary) return new Set();
+  const earlier = await db
+    .select({ metadata: checkIns.metadata })
+    .from(checkIns)
+    .where(
+      and(
+        eq(checkIns.userId, checkIn.userId),
+        eq(checkIns.completedDate, checkIn.completedDate),
+        lt(checkIns.completedAt, checkIn.completedAt),
+      ),
+    );
+  return new Set(earlier.flatMap((row) => suggestedIdsOf(row.metadata)));
+}
+
+/** Stores what a check-in's suggestions showed, merged into its metadata (no schema change). */
+export async function recordSuggestedIds(checkInId: string, ids: Iterable<string>): Promise<void> {
+  const fragment = JSON.stringify(suggestedMetadata(ids));
+  await db
+    .update(checkIns)
+    .set({ metadata: sql`${checkIns.metadata} || ${fragment}::jsonb` })
+    .where(eq(checkIns.id, checkInId));
 }

@@ -171,10 +171,19 @@ describe('JourneyPage — filter, counts and entries', () => {
 
   it('shows the real counts and nothing like a streak or score', async () => {
     const t = text(await render());
-    expect(t).toContain('Check-ins this month 1');
+    expect(t).toContain('Days checked in this month 1');
     expect(t).toContain('Practices completed 3');
     expect(t).toContain('In progress 1');
     expect(t.toLowerCase()).not.toContain('streak');
+  });
+
+  it('counts days, not check-ins: several on one day are one day', async () => {
+    const today = new Date();
+    mockGetCheckInHistory.mockResolvedValue({
+      checkIns: [{ completedDate: today }, { completedDate: today }, { completedDate: today }],
+    });
+    const t = text(await render());
+    expect(t).toContain('Days checked in this month 1');
   });
 
   it('groups entries under a month and year, with a plain label for each check-in', async () => {

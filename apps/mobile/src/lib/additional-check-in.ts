@@ -6,10 +6,19 @@ import type { CheckIn } from '@/api/types';
  * Additional check-ins exist only on a server that knows the primary/additional split, and such a
  * server marks every check-in it returns with `isPrimary`. An older server leaves the field out,
  * and its API would reject a second same-day check-in, so there the entry point is not offered at
- * all. Only today's PRIMARY check-in can be the one shown on Home.
+ * all. Only today's PRIMARY check-in can be the one shown on Home, unless every check-in drives the
+ * suggestions (`everyCheckInDrives`), when the latest one is shown whichever kind it is.
  */
-export function canCheckInAgain(todaysCheckIn: Pick<CheckIn, 'isPrimary'>): boolean {
-  return todaysCheckIn.isPrimary === true;
+export function canCheckInAgain(
+  todaysCheckIn: Pick<CheckIn, 'isPrimary'>,
+  everyCheckInDrives = false,
+): boolean {
+  // When every check-in drives the suggestions (the server's follow-up switch), the check-in on Home is
+  // the latest one and may itself be an additional record, so any check-in from a server that reports
+  // the flag can be followed by another.
+  return everyCheckInDrives
+    ? typeof todaysCheckIn.isPrimary === 'boolean'
+    : todaysCheckIn.isPrimary === true;
 }
 
 /**

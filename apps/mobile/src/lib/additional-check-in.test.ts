@@ -11,6 +11,16 @@ describe('canCheckInAgain', () => {
   });
 });
 
+describe('canCheckInAgain when every check-in drives the suggestions', () => {
+  it('is offered after any check-in a new server marks, including an additional one', () => {
+    expect(canCheckInAgain({ isPrimary: true }, true)).toBe(true);
+    expect(canCheckInAgain({ isPrimary: false }, true)).toBe(true);
+  });
+  it('is still not offered by an older server that sends no flag', () => {
+    expect(canCheckInAgain({}, true)).toBe(false);
+  });
+});
+
 describe('savedCheckInKind', () => {
   it('is additional only when the server says so', () => {
     expect(savedCheckInKind({ isPrimary: false })).toBe('additional');

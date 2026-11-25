@@ -256,9 +256,12 @@ export default async function JourneyPage({ searchParams }: JourneyPageProps) {
   const nextPractice = next && !next.completed ? next.practice : null;
 
   const thisMonth = now.toISOString().slice(0, 7);
-  const checkInsThisMonth = monthCheckIns.checkIns.filter(
-    (checkIn) => checkIn.completedDate.toISOString().slice(0, 7) === thisMonth,
-  ).length;
+  // Days, not records: several check-ins on one day still count as one day checked in.
+  const daysCheckedInThisMonth = new Set(
+    monthCheckIns.checkIns
+      .filter((checkIn) => checkIn.completedDate.toISOString().slice(0, 7) === thisMonth)
+      .map((checkIn) => checkIn.completedDate.toISOString().slice(0, 10)),
+  ).size;
 
   // Milestones belong to the whole journey, so they appear only on the unfiltered view.
   const items = activeType
@@ -338,7 +341,11 @@ export default async function JourneyPage({ searchParams }: JourneyPageProps) {
 
               {hasAnyActivity ? (
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  <StatTile tint="sand" label="Check-ins this month" value={checkInsThisMonth} />
+                  <StatTile
+                    tint="sand"
+                    label="Days checked in this month"
+                    value={daysCheckedInThisMonth}
+                  />
                   <StatTile tint="sage" label="Practices completed" value={completedCount} />
                   <StatTile tint="dusk" label="In progress" value={inProgressCount} />
                 </div>

@@ -29,6 +29,8 @@ type Phase =
       capacity: number | null;
       submitting: boolean;
       error: string | null;
+      /** True while the follow-up question is on screen (when every check-in asks it). */
+      followUpStep?: boolean;
     }
   | {
       kind: 'form';
@@ -134,7 +136,17 @@ export function CheckInCard({
     }
   }
 
-  async function handleAdditionalSubmit() {
+  /** The button under the answers of a further check-in: ask the follow-up first when it is on. */
+  function handleAdditionalContinue() {
+    if (phase.kind !== 'additional' || phase.capacity === null) return;
+    if (followUpAvailable) {
+      setPhase({ ...phase, followUpStep: true, error: null });
+      return;
+    }
+    void handleAdditionalSubmit(null);
+  }
+
+  async function handleAdditionalSubmit(followUp: FollowUp | null) {
     if (phase.kind !== 'additional' || phase.capacity === null) return;
     const { primary, capacity } = phase;
     setPhase({ ...phase, submitting: true, error: null });
@@ -142,11 +154,17 @@ export function CheckInCard({
     try {
       const saved = await api.post<CheckIn>(
         '/api/v1/check-ins',
-        buildCheckInPayload(capacity, deviceTimeZone()),
+        buildCheckInPayload(capacity, deviceTimeZone(), followUp),
       );
       if (savedCheckInKind(saved) === 'primary') {
         // The server made it the day's primary (there was none): from here it is today's check-in.
         setPhase({ kind: 'recorded', checkIn: saved });
+        onSubmitted(saved);
+        return;
+      }
+      if (followUpEnabled) {
+        // Every check-in drives the suggestions: this one is now today's check-in, and Home follows it.
+        setPhase({ kind: 'recorded', checkIn: saved, notice: 'Check-in saved.' });
         onSubmitted(saved);
         return;
       }
@@ -164,6 +182,7 @@ export function CheckInCard({
         capacity,
         submitting: false,
         error: humanizeApiError(err),
+        followUpStep: false,
       });
     }
   }
@@ -176,40 +195,54 @@ export function CheckInCard({
           Check in again
         </ThemedText>
         <ThemedText variant="body" color={home.ink} style={styles.support}>
-          This is saved as a separate check-in. Your first check-in today keeps guiding your
-          practice.
+          {followUpEnabled
+            ? 'This is saved as a new check-in, and what we suggest follows it.'
+            : 'This is saved as a separate check-in. Your first check-in today keeps guiding your practice.'}
         </ThemedText>
-        <CapacityOptionList
-          value={phase.capacity}
-          onChange={(capacity) => setPhase({ ...phase, capacity })}
-          disabled={phase.submitting}
-        />
-        {phase.error ? (
-          <ThemedText variant="body" color={colors.error} style={styles.errorText}>
-            {phase.error}
-          </ThemedText>
-        ) : null}
-        <View style={styles.actionsRow}>
-          <PrimaryButton
-            label="Save check-in"
-            onPress={handleAdditionalSubmit}
-            loading={phase.submitting}
-            disabled={phase.capacity === null || phase.submitting}
-            style={styles.saveButton}
-          />
-          <Pressable
-            onPress={() => setPhase({ kind: 'recorded', checkIn: phase.primary })}
+        {phase.followUpStep && phase.capacity !== null ? (
+          <FollowUpQuestion
+            capacity={phase.capacity}
             disabled={phase.submitting}
-            accessibilityRole="button"
-            accessibilityLabel="Cancel"
-            hitSlop={linkHitSlop}
-            style={linkTouchTarget}
-          >
-            <ThemedText variant="label" color={home.bronze}>
-              Cancel
-            </ThemedText>
-          </Pressable>
-        </View>
+            error={phase.error}
+            onDone={(followUp) => void handleAdditionalSubmit(followUp)}
+            onSkip={() => void handleAdditionalSubmit(null)}
+            onExit={() => setPhase({ ...phase, followUpStep: false, error: null })}
+          />
+        ) : (
+          <>
+            <CapacityOptionList
+              value={phase.capacity}
+              onChange={(capacity) => setPhase({ ...phase, capacity })}
+              disabled={phase.submitting}
+            />
+            {phase.error ? (
+              <ThemedText variant="body" color={colors.error} style={styles.errorText}>
+                {phase.error}
+              </ThemedText>
+            ) : null}
+            <View style={styles.actionsRow}>
+              <PrimaryButton
+                label={followUpAvailable ? 'Continue' : 'Save check-in'}
+                onPress={handleAdditionalContinue}
+                loading={phase.submitting}
+                disabled={phase.capacity === null || phase.submitting}
+                style={styles.saveButton}
+              />
+              <Pressable
+                onPress={() => setPhase({ kind: 'recorded', checkIn: phase.primary })}
+                disabled={phase.submitting}
+                accessibilityRole="button"
+                accessibilityLabel="Cancel"
+                hitSlop={linkHitSlop}
+                style={linkTouchTarget}
+              >
+                <ThemedText variant="label" color={home.bronze}>
+                  Cancel
+                </ThemedText>
+              </Pressable>
+            </View>
+          </>
+        )}
       </Surface>
     );
   }
@@ -270,7 +303,7 @@ export function CheckInCard({
               View History →
             </ThemedText>
           </Pressable>
-          {canCheckInAgain(recorded.checkIn) ? (
+          {canCheckInAgain(recorded.checkIn, followUpEnabled) ? (
             <Pressable
               onPress={() =>
                 setPhase({
