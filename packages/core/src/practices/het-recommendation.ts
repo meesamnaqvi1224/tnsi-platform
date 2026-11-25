@@ -240,7 +240,13 @@ export function pickHetSuggestions<T extends HetCandidate>(
   options: HetPickOptions,
   maxItems = 3,
   slots: Partial<Record<HetContentKind, number>> = {},
-): { items: HetSuggestion<T>[]; condition: HetCondition | null } {
+): {
+  items: HetSuggestion<T>[];
+  /** The condition the FIRST suggestion answers to (what the app's reason line describes). */
+  condition: HetCondition | null;
+  /** The condition each kind's best pick answers to, so a surface can describe the item it shows. */
+  conditionByKind: Partial<Record<HetContentKind, HetCondition | null>>;
+} {
   const briefFirst =
     normalizeCapacityScore(options.capacityScore) === 'LOW' ||
     normalizeCapacityScore(options.capacityScore) === 'LOW_MODERATE';
@@ -249,6 +255,7 @@ export function pickHetSuggestions<T extends HetCandidate>(
     : ['practice', 'powerDrop', 'somaticCard'];
 
   const items: HetSuggestion<T>[] = [];
+  const conditionByKind: Partial<Record<HetContentKind, HetCondition | null>> = {};
   let condition: HetCondition | null = null;
   for (const kind of order) {
     const wanted = slots[kind] ?? 1;
@@ -256,7 +263,8 @@ export function pickHetSuggestions<T extends HetCandidate>(
     const best = pickHetRecommendations(pools[kind] ?? [], options, wanted);
     if (best.picks.length === 0) continue;
     if (items.length === 0) condition = best.condition;
+    conditionByKind[kind] = best.condition;
     for (const item of best.picks) items.push({ kind, item });
   }
-  return { items: items.slice(0, Math.max(0, maxItems)), condition };
+  return { items: items.slice(0, Math.max(0, maxItems)), condition, conditionByKind };
 }

@@ -128,7 +128,11 @@ export async function getHetSuggestions(
     };
     // The website cannot open PowerDrops, so there the PowerDrop's place goes to a second Somatic Card
     // (same ranking, never the same card twice). The app keeps the usual one of each kind.
-    const { items, condition } = pickHetSuggestions(
+    const {
+      items,
+      condition: firstItemCondition,
+      conditionByKind,
+    } = pickHetSuggestions(
       pools,
       pick,
       3,
@@ -173,6 +177,18 @@ export async function getHetSuggestions(
       // No named practice is shown as "answering to" a condition: a feeling is not one.
       if (settle.length > 0) return { condition: null, items: settle.map((c) => c.out) };
     }
+    // The reason line describes the condition this list answers to. By default that is the first
+    // suggestion's (the app's hero). On the website the guided practice is shown elsewhere as Today's
+    // Practice and is not in this list, so the line takes its condition from the first CARD shown, which
+    // is what sits under it. Exception, on both surfaces: a member who chose "Show up more fully in my
+    // life" always gets the neutral line, because no Somatic Card or PowerDrop is tagged Participation
+    // and naming another condition over cards they asked to be about participation would mislead.
+    const choseParticipation = followUp?.path === 'grow' && followUp.growArea === 'participation';
+    const condition = choseParticipation
+      ? null
+      : options.surface === 'web'
+        ? (conditionByKind.somaticCard ?? firstItemCondition)
+        : firstItemCondition;
     return { condition, items: items.map((s) => s.item.out) };
   } catch (error) {
     console.error('[het-suggestions] failed:', error);
