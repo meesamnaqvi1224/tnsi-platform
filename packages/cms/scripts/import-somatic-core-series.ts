@@ -182,10 +182,12 @@ async function main() {
   // --- Cards ---
   for (const c of manifest.cards) {
     try {
-      const artworkPath = path.join(ARTWORK_DIR, c.artworkSource);
-      const hasArtwork = existsSync(artworkPath);
+      // `artworkSource: null` means the card deliberately has no image: it imports with its text only.
+      const noImageByDesign = c.artworkSource === null;
+      const artworkPath = noImageByDesign ? null : path.join(ARTWORK_DIR, c.artworkSource!);
+      const hasArtwork = artworkPath !== null && existsSync(artworkPath);
       if (hasArtwork) artworkMatched++;
-      else {
+      else if (!noImageByDesign) {
         artworkMissing++;
         missingArtworkCards.push(c.cardNumber);
       }
@@ -197,15 +199,19 @@ async function main() {
 
       const id = cardDocId(c.seriesNumber, c.cardNumber);
       const isNew = !existingIds.has(id);
-      const status = hasArtwork ? 'CREATE/UPDATE' : 'SKIP (no artwork found)';
+      const status = hasArtwork
+        ? 'CREATE/UPDATE'
+        : noImageByDesign
+          ? 'CREATE/UPDATE (no image by design)'
+          : 'SKIP (no artwork found)';
       console.log(
         `Card ${c.cardNumber} - ${c.title}: ${isNew ? 'new' : 'existing'} ${status}${c.needsReview ? '  [needsReview]' : ''}`,
       );
 
-      if (!hasArtwork) continue; // Part 4: continue-on-item-error, don't block the batch
+      if (!hasArtwork && !noImageByDesign) continue; // Part 4: continue-on-item-error, don't block the batch
 
       let assetId: string | undefined;
-      if (EXECUTE) {
+      if (EXECUTE && hasArtwork && artworkPath) {
         assetId = await uploadImageAsset(artworkPath);
       }
 

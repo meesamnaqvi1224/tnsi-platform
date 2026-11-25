@@ -21,7 +21,11 @@ export interface ManifestCard {
   title: string;
   slug: string;
   sortOrder: number;
-  artworkSource: string;
+  /**
+   * The artwork file for this card, or `null` when the card deliberately has no image (it then imports
+   * with its text only, and a re-import can never put an old image back).
+   */
+  artworkSource: string | null;
   invitation: string | null;
   purpose: string | null;
   description: string | null;

@@ -1660,7 +1660,7 @@
       "title": "The Horizontal Eye Sweep",
       "slug": "the-horizontal-eye-sweep",
       "sortOrder": 25,
-      "artworkSource": "Person_doing_horizontal_eye_sweep_20260921185047.jpeg",
+      "artworkSource": null,
       "invitation": "Regulate the nervous system with controlled visual scanning.",
       "purpose": "Orientation & spatial awareness. Feel where you are visually. Connect to your environment.",
       "description": null,
@@ -1729,8 +1729,7 @@
       "demonstrationSequence": [],
       "sourceReference": "Meesam Somatic Batch 1-5.zip",
       "needsReview": false,
-      "reviewNote": "Resolved 20 Nov 2026: Artwork step numbers corrected to 06 and 07 and the inferred \"Left Sweep\" step removed so the data matches the card as printed (7 steps). Corrected artwork is in content/somatic-cards/artwork-corrections/the-horizontal-eye-sweep.jpg and is live in Sanity. Do not re-import this card from the original artwork file.",
-      "artworkCorrection": "artwork-corrections/the-horizontal-eye-sweep.jpg"
+      "reviewNote": "Resolved 20 Nov 2026: Artwork step numbers corrected to 06 and 07 and the inferred \"Left Sweep\" step removed so the data matches the card as printed (7 steps). Corrected artwork is in content/somatic-cards/artwork-corrections/the-horizontal-eye-sweep.jpg and is live in Sanity. Do not re-import this card from the original artwork file. 25 Nov 2026: the card image was removed on purpose (it printed text that no longer matches the approved wording) and is awaiting new artwork from the card redesign; artworkSource is null so a re-import creates no image. The old corrected image file is kept in the artwork-corrections folder."
     },
     {
       "cardNumber": 26,
@@ -3085,7 +3084,7 @@
       "title": "The Warmth Return",
       "slug": "the-warmth-return",
       "sortOrder": 44,
-      "artworkSource": "Warmth_awareness_sensory_return_…_20260921185047.jpeg",
+      "artworkSource": null,
       "invitation": "Notice warmth, then notice what changes when contact ends.",
       "purpose": "Warmth awareness & sensory return. Use a safe, pre-warmed object (like a folded, warm cloth) to explore how your skin registers temperature and how that comforting sensation is perceived and how it lingers after the object is removed.",
       "description": null,
@@ -3154,8 +3153,7 @@
       "demonstrationSequence": [],
       "sourceReference": "Meesam Somatic Batch 1-5.zip",
       "needsReview": false,
-      "reviewNote": "Resolved 20 Nov 2026: the printed card was checked directly. The card has 8 steps; the artwork had a stray duplicate \"Arrive\" block, \"light light contact\" in step 3, and repeated step numbers 04 and 07. The image was corrected (stray block removed, numbered 01-08) and the typo removed from the card text. Corrected artwork is in content/somatic-cards/artwork-corrections/the-warmth-return.jpg and is live in Sanity. Do not re-import this card from the original artwork file.",
-      "artworkCorrection": "artwork-corrections/the-warmth-return.jpg"
+      "reviewNote": "Resolved 20 Nov 2026: the printed card was checked directly. The card has 8 steps; the artwork had a stray duplicate \"Arrive\" block, \"light light contact\" in step 3, and repeated step numbers 04 and 07. The image was corrected (stray block removed, numbered 01-08) and the typo removed from the card text. Corrected artwork is in content/somatic-cards/artwork-corrections/the-warmth-return.jpg and is live in Sanity. Do not re-import this card from the original artwork file. 25 Nov 2026: the card image was removed on purpose (it printed text that no longer matches the approved wording) and is awaiting new artwork from the card redesign; artworkSource is null so a re-import creates no image. The old corrected image file is kept in the artwork-corrections folder."
     },
     {
       "cardNumber": 45,
