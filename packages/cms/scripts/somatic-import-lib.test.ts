@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { validateManifest, seriesDocId, cardDocId, type Manifest } from './somatic-import-lib';
 
@@ -104,5 +106,37 @@ describe('seriesDocId / cardDocId', () => {
   it('is a pure function - same input always produces the same ID (re-running the importer reconciles, never duplicates)', () => {
     expect(seriesDocId(3)).toBe(seriesDocId(3));
     expect(cardDocId(2, 15)).toBe(cardDocId(2, 15));
+  });
+});
+
+describe('core series manifest: cards with no image by design', () => {
+  type CardWithNote = Manifest['cards'][number] & { artworkCorrection?: string };
+  const raw = JSON.parse(
+    readFileSync(
+      path.resolve(__dirname, '../../../content/somatic-cards/core-series-01-05.json'),
+      'utf8',
+    ),
+  ) as { cards: CardWithNote[] };
+  const manifest = raw as unknown as Manifest;
+  const NO_IMAGE = ['the-horizontal-eye-sweep', 'the-warmth-return'];
+
+  it('the Eye Sweep and the Warmth Return have no image, so a re-import cannot restore the old ones', () => {
+    for (const slug of NO_IMAGE) {
+      const card = raw.cards.find((c) => c.slug === slug)!;
+      expect(card).toBeDefined();
+      expect(card.artworkSource).toBeNull();
+      expect(card.artworkCorrection).toBeUndefined();
+    }
+  });
+
+  it('every other card still names its image file', () => {
+    for (const card of raw.cards.filter((c) => !NO_IMAGE.includes(c.slug))) {
+      expect(typeof card.artworkSource).toBe('string');
+      expect((card.artworkSource as string).trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it('the manifest is still valid', () => {
+    expect(validateManifest(manifest)).toEqual([]);
   });
 });
