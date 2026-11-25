@@ -187,3 +187,67 @@ describe('getHetSuggestions with the check-in follow-up', () => {
     expect(r.condition).toBe('Participation');
   });
 });
+
+describe('getHetSuggestions: website versus app for "I\'m irritated and on edge"', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  const rows = [
+    {
+      kind: 'somaticCard',
+      id: 'c-cool',
+      title: 'The Cool Contact Reset',
+      slug: 'the-cool-contact-reset',
+      description: 'c',
+      patterns: [],
+      isFree: true,
+    },
+    {
+      kind: 'powerDrop',
+      id: 'd-exhale',
+      title: 'The Exhale Drop',
+      slug: 'the-90-second-exhale-drop',
+      description: 'e',
+      patterns: [],
+      isFree: true,
+    },
+    {
+      kind: 'somaticCard',
+      id: 'c-exhale-drop',
+      title: 'The Exhale-and-Drop',
+      slug: 'the-exhale-and-drop',
+      description: 'x',
+      patterns: [],
+      isFree: true,
+    },
+  ];
+  const angry = { v: 1, path: 'pattern', pattern: 'protective-anger-reactivity' };
+
+  beforeEach(() => {
+    vi.stubEnv('CHECKIN_FOLLOW_UP_ENABLED', 'true');
+    getLatestCheckIn.mockResolvedValue({
+      capacityScore: 2,
+      completedDate: new Date('2026-11-25'),
+      metadata: { followUp: angry },
+    });
+    sanityFetch.mockImplementation(async (q: string) => {
+      if (q.includes('"kind": _type')) return rows;
+      return q.includes('powerDrop') ? drops : cards;
+    });
+  });
+
+  it("the app gets Caroline's exact pair, including the PowerDrop", async () => {
+    const r = await getHetSuggestions('u1', { practice, surface: 'app' });
+    expect(r.items.map((i) => i.title)).toEqual(['The Cool Contact Reset', 'The Exhale Drop']);
+  });
+
+  it('the app is the default when no surface is given', async () => {
+    const r = await getHetSuggestions('u1', { practice });
+    expect(r.items.map((i) => i.title)).toEqual(['The Cool Contact Reset', 'The Exhale Drop']);
+  });
+
+  it('the website gets two cards: The Exhale-and-Drop fills the PowerDrop slot', async () => {
+    const r = await getHetSuggestions('u1', { practice, surface: 'web' });
+    expect(r.items.map((i) => i.title)).toEqual(['The Cool Contact Reset', 'The Exhale-and-Drop']);
+    expect(r.items.every((i) => i.kind === 'somaticCard')).toBe(true);
+  });
+});

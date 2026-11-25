@@ -124,15 +124,26 @@ export function pickSettleItems<T extends FollowUpCandidate>(
     candidates: readonly T[];
     fallback: readonly T[];
     freeOnly?: boolean;
+    /**
+     * Where the list is shown. The app shows Caroline's pair exactly as listed. The website cannot
+     * open PowerDrops, so there a PowerDrop pick is replaced by its `webFallback` Somatic Card and no
+     * PowerDrop is chosen at all. Defaults to the app.
+     */
+    surface?: 'web' | 'app';
     userKey: string;
     dayKey: string;
   },
   count = 2,
 ): T[] {
   const { routing, followUp, candidates, fallback, freeOnly = false } = input;
-  const usable = (c: T) => !freeOnly || c.isFree;
-  const find = (pick: FollowUpPick) =>
+  const onWeb = input.surface === 'web';
+  const usable = (c: T) => (!freeOnly || c.isFree) && !(onWeb && c.kind === 'powerDrop');
+  const find = (pick: { kind: FollowUpPickKind; slug: string }) =>
     candidates.find((c) => c.kind === pick.kind && c.slug === pick.slug);
+  const resolve = (pick: FollowUpPick) => {
+    const target = onWeb && pick.kind === 'powerDrop' ? pick.webFallback : pick;
+    return target ? find(target) : undefined;
+  };
 
   const listed =
     followUp.path === 'unsure'
@@ -145,7 +156,7 @@ export function pickSettleItems<T extends FollowUpCandidate>(
     if (item && usable(item) && !has(item) && chosen.length < count) chosen.push(item);
   };
 
-  for (const pick of listed) add(find(pick));
+  for (const pick of listed) add(resolve(pick));
 
   if (chosen.length < count && followUp.path === 'pattern') {
     const rotated = candidates

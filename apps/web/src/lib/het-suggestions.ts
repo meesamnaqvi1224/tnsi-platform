@@ -65,7 +65,12 @@ const NONE: HetSuggestions = { condition: null, items: [] };
  */
 export async function getHetSuggestions(
   userId: string,
-  options: { freeOnly?: boolean; practice: PracticeSummary | null },
+  options: {
+    freeOnly?: boolean;
+    practice: PracticeSummary | null;
+    /** The website cannot open PowerDrops, so it asks for a card in their place. Defaults to the app. */
+    surface?: 'web' | 'app';
+  },
 ): Promise<HetSuggestions> {
   try {
     const latest = await getLatestCheckIn(userId);
@@ -154,6 +159,7 @@ export async function getHetSuggestions(
         candidates,
         fallback,
         freeOnly: options.freeOnly,
+        surface: options.surface,
         userKey: pick.userKey,
         dayKey: pick.dayKey,
       });

@@ -1,5 +1,5 @@
 {
-  "_comment": "Daily check-in follow-up routing, copied from the Collections tab of the TNSI Master Content Inventory (Full Backup 23 Nov 2026), decided by Caroline on 23 Nov 2026. Member-facing wording (memberText and the labels below) APPROVED by Caroline on 25 Nov 2026, as in the \"Check-In Follow-Up Questions\" spec. The follow-up stays off until the CHECKIN_FOLLOW_UP_ENABLED switch is turned on. 'pattern' is the team's name and is never shown to members. Each pick is a Somatic Card or PowerDrop identified by its slug.",
+  "_comment": "Daily check-in follow-up routing, copied from the Collections tab of the TNSI Master Content Inventory (Full Backup 23 Nov 2026), decided by Caroline on 23 Nov 2026. Member-facing wording (memberText and the labels below) APPROVED by Caroline on 25 Nov 2026, as in the \"Check-In Follow-Up Questions\" spec. The follow-up stays off until the CHECKIN_FOLLOW_UP_ENABLED switch is turned on. 'pattern' is the team's name and is never shown to members. Each pick is a Somatic Card or PowerDrop identified by its slug. A PowerDrop pick may carry a webFallback (a Somatic Card): the website cannot open PowerDrops, so it shows that card instead; the app keeps the pick as listed.",
   "version": 1,
   "status": "wording-approved-2026-11-25",
   "followUp": {
@@ -44,7 +44,11 @@
         },
         {
           "kind": "powerDrop",
-          "slug": "the-90-second-exhale-drop"
+          "slug": "the-90-second-exhale-drop",
+          "webFallback": {
+            "kind": "somaticCard",
+            "slug": "the-exhale-and-drop"
+          }
         }
       ]
     },

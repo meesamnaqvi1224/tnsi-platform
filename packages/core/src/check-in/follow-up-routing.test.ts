@@ -92,6 +92,52 @@ describe('check-in routing file (checkin-suggestions-v1.json)', () => {
     expect(parseFollowUpRouting({ ...routingFile, patterns: kinds })).toBeNull();
   });
 
+  it('every PowerDrop pick has a website stand-in that is a real Somatic Card', () => {
+    const dropPicks = routing!.patterns
+      .flatMap((p) => p.picks)
+      .filter((p) => p.kind === 'powerDrop');
+    expect(dropPicks.length).toBeGreaterThan(0);
+    for (const pick of dropPicks) {
+      expect(pick.webFallback).toBeDefined();
+      expect(pick.webFallback!.kind).toBe('somaticCard');
+      expect(cardSlugs.has(pick.webFallback!.slug)).toBe(true);
+    }
+  });
+
+  it('a stand-in is rejected unless it is a Somatic Card on a PowerDrop pick', () => {
+    const withFallback = (index: number, mutate: (pick: Record<string, unknown>) => void) => {
+      const patterns = structuredClone(routingFile.patterns) as {
+        picks: Record<string, unknown>[];
+      }[];
+      mutate(patterns[index]!.picks[1]!);
+      return { ...routingFile, patterns };
+    };
+    const dropIndex = routingFile.patterns.findIndex((p: { picks: { kind: string }[] }) =>
+      p.picks.some((x) => x.kind === 'powerDrop'),
+    );
+    const cardIndex = routingFile.patterns.findIndex((p: { picks: { kind: string }[] }) =>
+      p.picks.every((x) => x.kind === 'somaticCard'),
+    );
+    // On a card pick: not allowed.
+    expect(
+      parseFollowUpRouting(
+        withFallback(cardIndex, (pick) => {
+          pick.webFallback = { kind: 'somaticCard', slug: 'the-exhale-and-drop' };
+        }),
+      ),
+    ).toBeNull();
+    // A stand-in that is itself a PowerDrop, or has a bad slug: not allowed.
+    for (const bad of [
+      { kind: 'powerDrop', slug: 'the-90-second-exhale-drop' },
+      { kind: 'somaticCard', slug: 'Not A Slug' },
+      'nonsense',
+    ]) {
+      expect(
+        parseFollowUpRouting(withFallback(dropIndex, (pick) => (pick.webFallback = bad))),
+      ).toBeNull();
+    }
+  });
+
   it('rejects non-objects', () => {
     expect(parseFollowUpRouting(null)).toBeNull();
     expect(parseFollowUpRouting('x')).toBeNull();

@@ -276,3 +276,68 @@ describe('pickSettleItems', () => {
     expect(out).toEqual([]);
   });
 });
+
+describe('pickSettleItems: website versus app', () => {
+  const cand = (
+    slug: string,
+    kind: 'somaticCard' | 'powerDrop' = 'somaticCard',
+    extra: Partial<FollowUpCandidate> = {},
+  ): FollowUpCandidate => ({ kind, slug, patterns: [], isFree: true, ...extra });
+  const coolContact = cand('the-cool-contact-reset');
+  const exhaleDrop = cand('the-90-second-exhale-drop', 'powerDrop');
+  const exhaleAndDrop = cand('the-exhale-and-drop');
+  const angry = { v: 1, path: 'pattern', pattern: 'protective-anger-reactivity' } as const;
+  const base = {
+    routing,
+    followUp: angry,
+    candidates: [coolContact, exhaleDrop, exhaleAndDrop, cand('other')],
+    fallback: [cand('fallback')],
+    userKey: 'u',
+    dayKey: '2026-11-25',
+  };
+
+  it("the app keeps Caroline's exact pair: The Cool Contact Reset and The Exhale Drop", () => {
+    for (const surface of [undefined, 'app' as const]) {
+      const out = pickSettleItems({ ...base, surface });
+      expect(out.map((c) => `${c.kind}:${c.slug}`)).toEqual([
+        'somaticCard:the-cool-contact-reset',
+        'powerDrop:the-90-second-exhale-drop',
+      ]);
+    }
+  });
+
+  it('the website fills the PowerDrop slot with the Somatic Card The Exhale-and-Drop', () => {
+    const out = pickSettleItems({ ...base, surface: 'web' });
+    expect(out.map((c) => `${c.kind}:${c.slug}`)).toEqual([
+      'somaticCard:the-cool-contact-reset',
+      'somaticCard:the-exhale-and-drop',
+    ]);
+  });
+
+  it('the website never chooses a PowerDrop, even as a backfill or fallback', () => {
+    const out = pickSettleItems({
+      ...base,
+      surface: 'web',
+      candidates: [coolContact, exhaleDrop],
+      fallback: [exhaleDrop, cand('fallback-card')],
+    });
+    expect(out.every((c) => c.kind === 'somaticCard')).toBe(true);
+    expect(out.map((c) => c.slug)).toEqual(['the-cool-contact-reset', 'fallback-card']);
+  });
+
+  it('every other feeling is identical on the website and in the app', () => {
+    for (const pattern of routing.patterns) {
+      if (pattern.picks.some((p) => p.kind === 'powerDrop')) continue;
+      const all = pattern.picks.map((p) => cand(p.slug, p.kind));
+      const input = {
+        ...base,
+        followUp: { v: 1, path: 'pattern', pattern: pattern.id } as const,
+        candidates: all,
+        fallback: [],
+      };
+      expect(pickSettleItems({ ...input, surface: 'web' })).toEqual(
+        pickSettleItems({ ...input, surface: 'app' }),
+      );
+    }
+  });
+});

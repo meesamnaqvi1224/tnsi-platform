@@ -220,7 +220,11 @@ export default async function DashboardPage() {
   // Suggestions follow today's check-in, so none are fetched before the member has checked in. They are built
   // around the recommended practice, which is also what decides the reason line shown with them.
   const hetSuggestions = todayCheckIn
-    ? await getHetSuggestions(user.id, { freeOnly, practice: recommendedPractice })
+    ? await getHetSuggestions(user.id, {
+        freeOnly,
+        practice: recommendedPractice,
+        surface: 'web',
+      })
     : null;
   const [
     inProgressPractices,
