@@ -47,12 +47,12 @@ describe('the nine real PowerDrops™ manifest', () => {
 
   it('holds exactly the nine approved PowerDrops, in card order, and not the bonus Journal Page', () => {
     expect(manifest.powerDrops.map((d) => d.title)).toEqual([
-      'The 90-Second Exhale Drop',
-      'The Powerdown Ritual',
+      'The Exhale Drop',
+      'The PowerDown Ritual',
       'Softness Reclaim Reset',
       'Mask Drop Mirror Ritual',
-      'Invisible Labor Dump',
-      'Micro Visualization: The Return',
+      'Invisible Labour Dump',
+      'The Return',
       'Body Permission Practice',
       'The Enough List',
       'MicroRebel: The Unsent Email',
@@ -70,9 +70,9 @@ describe('the nine real PowerDrops™ manifest', () => {
     expect(new Set(powerDrops.map((d) => powerDropDocId(d.slug))).size).toBe(9);
   });
 
-  it('The Powerdown Ritual carries no ™ in its title', () => {
+  it('The PowerDown Ritual carries no ™ in its title', () => {
     const drop = manifest.powerDrops.find((d) => d.slug === 'the-powerdown-ritual')!;
-    expect(drop.title).toBe('The Powerdown Ritual');
+    expect(drop.title).toBe('The PowerDown Ritual');
     expect(drop.title).not.toContain('™');
   });
 
@@ -91,16 +91,29 @@ describe('the nine real PowerDrops™ manifest', () => {
     expect(new Set(manifest.powerDrops.map((d) => d.category)).size).toBe(9);
   });
 
-  it('exactly three are free — The 90-Second Exhale Drop, Micro Visualization: The Return, The Powerdown Ritual', () => {
+  it('the renamed PowerDrops keep their live slugs, and only a locked slug may differ from its title', () => {
+    const renamed = manifest.powerDrops.filter((d) => d.slugLocked);
+    expect(renamed.map((d) => d.slug).sort()).toEqual([
+      'invisible-labor-dump',
+      'micro-visualization-the-return',
+      'the-90-second-exhale-drop',
+      'the-powerdown-ritual',
+    ]);
+    const unlocked = {
+      ...manifest,
+      powerDrops: manifest.powerDrops.map((d) => ({ ...d, slugLocked: undefined })),
+    };
+    expect(validatePowerDropManifest(unlocked).some((e) => e.includes('does not match'))).toBe(
+      true,
+    );
+  });
+
+  it('exactly three are free — The Exhale Drop, The Return, The PowerDown Ritual', () => {
     const free = manifest.powerDrops.filter((d) => d.freeAccess);
     expect(free).toHaveLength(APPROVED_FREE_POWERDROPS);
     expect(free.map((d) => d.slug).sort()).toEqual([...FREE_SLUGS].sort());
     expect(free.map((d) => d.title).sort()).toEqual(
-      [
-        'Micro Visualization: The Return',
-        'The 90-Second Exhale Drop',
-        'The Powerdown Ritual',
-      ].sort(),
+      ['The Return', 'The Exhale Drop', 'The PowerDown Ritual'].sort(),
     );
   });
 
@@ -278,6 +291,8 @@ describe('validatePowerDropManifest', () => {
     const m = clone();
     m.powerDrops[1]!.slug = m.powerDrops[0]!.slug;
     m.powerDrops[2]!.sortOrder = 1;
+    // A renamed PowerDrop keeps its live slug on purpose (slugLocked); an ordinary one may not drift from its title.
+    m.powerDrops[3]!.slug = 'not-the-title';
     const errors = validatePowerDropManifest(m).join('\n');
     expect(errors).toContain('duplicate slug');
     expect(errors).toContain('duplicate sortOrder');

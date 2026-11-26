@@ -27,6 +27,11 @@ export type PowerDropStatus = 'published' | 'draft';
 
 export interface PowerDropManifestEntry {
   slug: string;
+  /**
+   * Set when the title was renamed after the PowerDrop went live: the slug (and the Sanity document id built
+   * from it) is kept, because links, suggestions and the apps refer to it. Only then may it differ from the title's slug.
+   */
+  slugLocked?: boolean;
   title: string;
   category: string;
   /** The card's one-line summary (schema field `description`). */
@@ -102,7 +107,7 @@ export function validatePowerDropManifest(
     const label = d.title?.trim() || d.slug || '(untitled)';
     if (!d.title?.trim()) errors.push(`${label}: missing title`);
     if (!d.slug?.trim()) errors.push(`${label}: missing slug`);
-    else if (d.title?.trim() && d.slug !== slugifyTitle(d.title)) {
+    else if (d.title?.trim() && !d.slugLocked && d.slug !== slugifyTitle(d.title)) {
       errors.push(`${label}: slug "${d.slug}" does not match the title's slug`);
     }
     if (!d.description?.trim()) errors.push(`${label}: missing description`);

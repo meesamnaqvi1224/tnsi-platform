@@ -51,7 +51,7 @@
     "the-forearm-sweep": ["Availability"],
     "the-containment-hold": ["Safety", "Availability"],
     "the-warmth-return": ["Availability", "Safety"],
-    "the-humming-reset": ["Availability"],
+    "the-humming-reset": ["Safety", "Availability"],
     "the-voiced-exhale": ["Capacity", "Availability"],
     "extended-vowel-reset": ["Capacity", "Availability"],
     "resonance-hold": ["Availability"],

@@ -31,7 +31,7 @@
     {
       "cardNumber": 1,
       "seriesNumber": 1,
-      "title": "The Ground + Press Drop",
+      "title": "The Ground & Press Drop",
       "slug": "the-ground-press-drop",
       "sortOrder": 1,
       "artworkSource": "Woman_leaning_against_wall_20260921185046.jpeg",
@@ -63,7 +63,7 @@
         {
           "order": 4,
           "label": "Pause",
-          "instruction": "Stay for a few slow breaths. Notice your feet, hands, posture, and the space your body occupies."
+          "instruction": "Pause for a few natural breaths. Notice your feet, hands, posture and the space your body occupies."
         },
         {
           "order": 5,
@@ -182,7 +182,7 @@
         {
           "order": 1,
           "label": "Heel Point",
-          "instruction": "Find the point under the center of your heel. Feel its dense contact with the ground."
+          "instruction": "Notice the contact beneath the centre of each heel."
         },
         {
           "order": 2,
@@ -208,11 +208,11 @@
       "whatToNotice": [
         {
           "order": 0,
-          "text": "Distribution — Are all four points equally weighted?"
+          "text": "Distribution — How does the pressure differ across these areas?"
         },
         {
           "order": 1,
-          "text": "Position — How does clearer foot contact affect your overall alignment?"
+          "text": "Position — What do you notice about your position as you attend to your feet?"
         },
         {
           "order": 2,
@@ -244,17 +244,17 @@
         {
           "order": 0,
           "label": "Arrive",
-          "instruction": "Stand with both feet on floor. Relax knees."
+          "instruction": "Stand comfortably with both feet on the floor and your knees soft."
         },
         {
           "order": 1,
           "label": "Press",
-          "instruction": "Place palms flat on wall at shoulder height. Press firmly."
+          "instruction": "Place your palms against a stable wall at shoulder height. Apply a comfortable amount of pressure."
         },
         {
           "order": 2,
           "label": "Feel",
-          "instruction": "Notice wall pressure beneath palms & ground support under feet."
+          "instruction": "Notice the contact beneath your palms and the support beneath your feet."
         },
         {
           "order": 3,
@@ -264,7 +264,7 @@
         {
           "order": 4,
           "label": "Pause",
-          "instruction": "Take slow breaths. Sense your body's shape & position."
+          "instruction": "Let your breathing remain natural. Notice your body's position."
         },
         {
           "order": 5,
@@ -287,7 +287,7 @@
         }
       ],
       "gentleNote": "Move at your own pace. Use a stable wall. Adapt to sitting if needed. Lessen pressure if discomfort occurs.",
-      "anchor": "I can meet support with my own strength.",
+      "anchor": "I can meet pressure and remain connected to myself.",
       "visualTreatment": null,
       "heroImageSource": null,
       "supportingImages": [],
@@ -326,7 +326,7 @@
         {
           "order": 3,
           "label": "Receive",
-          "instruction": "Allow the chair to fully support your weight. You don't need to hold yourself up."
+          "instruction": "Notice how the chair supports your weight. Allow any unnecessary effort to soften, if comfortable."
         },
         {
           "order": 4,
@@ -350,7 +350,7 @@
         },
         {
           "order": 2,
-          "text": "Support — What changes when you fully trust the chair to hold your weight?"
+          "text": "Support — What do you notice when you allow the chair to take some of your weight?"
         }
       ],
       "gentleNote": "This practice can be done in any stable chair. If you experience discomfort, adjust your position or take a break.",
@@ -446,12 +446,12 @@
         {
           "order": 0,
           "label": "Arrive",
-          "instruction": "Stand with natural posture, feet hip-width. Notice the ground beneath you."
+          "instruction": "Stand comfortably with your feet hip-width apart. Notice the ground beneath you."
         },
         {
           "order": 1,
           "label": "Shift (A)",
-          "instruction": "Slowly move your body's weight towards your right foot. Observe the sensation on the inner arch."
+          "instruction": "Slowly move your body's weight towards your right foot. Observe the sensation on the inner arch. Keep both feet in contact with the floor and the movement small."
         },
         {
           "order": 2,
@@ -461,17 +461,17 @@
         {
           "order": 3,
           "label": "Shift (B)",
-          "instruction": "Move weight back through center and then smoothly to the left foot."
+          "instruction": "Move your weight back through centre, then gently towards your left foot."
         },
         {
           "order": 4,
           "label": "Pause & Breathe",
-          "instruction": "Hold the position, taking a calm breath. How does balance feel in this spot?"
+          "instruction": "Pause briefly, allowing your breathing to remain natural. What do you notice about your balance here?"
         },
         {
           "order": 5,
           "label": "Settle",
-          "instruction": "Gradually move weight back to center, allowing your whole body to find a soft, centered state."
+          "instruction": "Gradually bring your weight back towards the middle. Notice what feels different or unchanged."
         }
       ],
       "whatToNotice": [
@@ -505,7 +505,7 @@
       "slug": "the-midline-press",
       "sortOrder": 8,
       "artworkSource": "Person_standing_with_hands_together_20260921185046.jpeg",
-      "invitation": null,
+      "invitation": "Meet your centre with steady pressure.",
       "purpose": "Midline awareness & bodily organisation.",
       "description": null,
       "orientation": "Meet your centre with steady pressure.",
@@ -518,7 +518,7 @@
         {
           "order": 1,
           "label": "Press",
-          "instruction": "Bring your palms together, fingers up, at the chest center. Apply steady pressure."
+          "instruction": "Bring your palms together, fingers up, at the centre of your chest. Apply comfortable pressure."
         },
         {
           "order": 2,
@@ -528,12 +528,12 @@
         {
           "order": 3,
           "label": "Organise",
-          "instruction": "Notice how this central connection organises your core and breath."
+          "instruction": "Notice what, if anything, changes in your body or breathing while your palms meet."
         },
         {
           "order": 4,
           "label": "Maintain",
-          "instruction": "Hold the steady pressure and breathe deeply for several counts."
+          "instruction": "Maintain comfortable pressure for a brief pause, allowing your breathing to remain natural."
         },
         {
           "order": 5,
@@ -555,7 +555,7 @@
           "text": "Support — How does this practice provide internal structure and support?"
         }
       ],
-      "gentleNote": "Adapt pressure for comfort. Practice at your own pace. If pain occurs, reduce intensity or stop.",
+      "gentleNote": "Adapt pressure for comfort. Practise at your own pace. If pain occurs, reduce intensity or stop.",
       "anchor": "I can meet myself at the centre.",
       "visualTreatment": null,
       "heroImageSource": null,
@@ -580,17 +580,17 @@
         {
           "order": 0,
           "label": "Arrive",
-          "instruction": "Sit tall with both feet flat on the floor."
+          "instruction": "Sit comfortably with both feet resting on the floor."
         },
         {
           "order": 1,
           "label": "Press",
-          "instruction": "Rest your hands comfortably in your lap. Focus your attention on your feet."
+          "instruction": "Rest your hands in your lap. If comfortable, gently press your feet into the floor without lifting yourself from the chair."
         },
         {
           "order": 2,
           "label": "Feel",
-          "instruction": "Notice the exact sensation of the floor beneath your bare feet."
+          "instruction": "Notice whatever sensations are available where your feet meet the floor. Shoes may remain on."
         },
         {
           "order": 3,
@@ -605,7 +605,7 @@
         {
           "order": 5,
           "label": "Release",
-          "instruction": "Gradually soften any holding in your body, keeping your feet gently connected."
+          "instruction": "Ease off the extra pressure, keeping your feet in contact with the floor."
         }
       ],
       "whatToNotice": [
@@ -619,7 +619,7 @@
         },
         {
           "order": 2,
-          "text": "Support — What changes when you allow the chair to hold your upper body and the floor to hold your lower body?"
+          "text": "Support — What do you notice at the points where your body meets the chair and your feet meet the floor?"
         }
       ],
       "gentleNote": "Move at your own pace. This practice can be done at a desk or table. Use a stable, secure surface. If you experience pain or dizziness, take a break.",
@@ -639,7 +639,7 @@
       "slug": "the-axial-alignment-reset",
       "sortOrder": 10,
       "artworkSource": "Person_standing_for_postural_reset_20260921185046.jpeg",
-      "invitation": "Find your length without forcing your posture. Regulate from the axial spine out.",
+      "invitation": "Find your length without forcing your posture.",
       "purpose": "Postural awareness & whole-body organisation. Find your centered length and integrated structure.",
       "description": null,
       "orientation": null,
@@ -662,23 +662,23 @@
         {
           "order": 3,
           "label": "Release",
-          "instruction": "Scan your body for any rigidity and consciously let it go, especially in the neck and shoulders."
+          "instruction": "Notice any effort in your neck and shoulders. See whether a little less effort feels comfortable."
         },
         {
           "order": 4,
           "label": "Balance",
-          "instruction": "Notice how your center of gravity self-adjusts without forceful holding."
+          "instruction": "Notice how your weight is distributed, without holding yourself rigid."
         },
         {
           "order": 5,
           "label": "Breathe",
-          "instruction": "Integration. Savor several natural breaths in this new feeling of space."
+          "instruction": "Pause for a few natural breaths. Notice whether anything feels different or unchanged."
         }
       ],
       "whatToNotice": [
         {
           "order": 0,
-          "text": "Pressure — What do you feel where your hands and feet make contact?"
+          "text": "Pressure — What do you notice where your feet meet the floor?"
         },
         {
           "order": 1,
@@ -689,7 +689,7 @@
           "text": "Support — What changes when you allow the surface to hold some of your weight?"
         }
       ],
-      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the pressure or take a break.",
+      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience discomfort or dizziness, pause the practice.",
       "anchor": "I can be upright without holding myself rigid.",
       "visualTreatment": null,
       "heroImageSource": null,
@@ -780,7 +780,7 @@
       "practiceSteps": [
         {
           "order": 0,
-          "label": "Find Your Seat",
+          "label": "Find Your Position",
           "instruction": "Stand with both feet on the floor. Or sit with feet on floor and spine supported."
         },
         {
@@ -801,12 +801,12 @@
         {
           "order": 4,
           "label": "Slow It Down",
-          "instruction": "Count as you exhale, making it last 2-3 seconds longer than the inhale."
+          "instruction": "If comfortable, allow the exhale a little more time, without forcing it or needing to meet a count."
         },
         {
           "order": 5,
           "label": "Pause & Notice",
-          "instruction": "Feel the end of the exhale. Notice any sense of relaxation or grounding."
+          "instruction": "Feel the end of the exhale. Notice what, if anything, has changed."
         }
       ],
       "whatToNotice": [
@@ -820,7 +820,7 @@
         },
         {
           "order": 2,
-          "text": "State — Notice any feelings of calmness or settling."
+          "text": "State — Notice how you feel, whether changed or unchanged."
         }
       ],
       "gentleNote": "Move at your own pace. If you feel lightheaded, return to a natural rhythm. This practice can be modified for any position. Discontinue if you feel strain.",
@@ -868,12 +868,12 @@
         {
           "order": 4,
           "label": "Breathing Out",
-          "instruction": "As you exhale, notice the gentle softening and return to center. Feel the ribcage move back."
+          "instruction": "As you exhale, notice the gentle softening and return to centre. Feel the ribcage move back."
         },
         {
           "order": 5,
           "label": "Gentle Release",
-          "instruction": "Gradually reduce the hands-on focus but keep the awareness. Continue to breathe with this expanded sensation."
+          "instruction": "Let your hands rest when you are ready. Notice whether the sensations change or stay the same."
         }
       ],
       "whatToNotice": [
@@ -887,7 +887,7 @@
         },
         {
           "order": 2,
-          "text": "Internal Space — How much space does your breath create? What changes when you breathe fully into your ribs?"
+          "text": "Internal Space — What movement or change, if any, do you notice around your ribs?"
         }
       ],
       "gentleNote": "Move at your own pace. There is no 'right' amount of expansion. This practice can also be done while standing or lying down. If you feel dizzy, reduce the depth of your breath or take a break.",
@@ -914,7 +914,7 @@
       "practiceSteps": [
         {
           "order": 0,
-          "label": "Seat",
+          "label": "Sit",
           "instruction": "Sit comfortably and tall on a stool. Keep feet flat on the floor."
         },
         {
@@ -929,13 +929,13 @@
         },
         {
           "order": 3,
-          "label": "Breath (Gentle)",
+          "label": "Breathe Gently",
           "instruction": "Inhale gently, noticing where your breath naturally flows, without forcing anything."
         },
         {
           "order": 4,
           "label": "Invite",
-          "instruction": "With patience, observe if breath can be gently invited to expand into the area under your hands."
+          "instruction": "Notice whether you can feel any movement under your hands as you breathe naturally."
         },
         {
           "order": 5,
@@ -987,7 +987,7 @@
         {
           "order": 1,
           "label": "Inhale",
-          "instruction": "Take a normal, deep breath through your nose."
+          "instruction": "Take a comfortable breath in through your nose, without deliberately making it deep."
         },
         {
           "order": 2,
@@ -1007,7 +1007,7 @@
         {
           "order": 5,
           "label": "Regulate",
-          "instruction": "Extend the duration of your exhale relative to your inhale."
+          "instruction": "If comfortable, let the exhale be a little longer than the inhale."
         }
       ],
       "whatToNotice": [
@@ -1021,7 +1021,7 @@
         },
         {
           "order": 2,
-          "text": "Diaphragm Engagement — Notice the core support."
+          "text": "Effort — How much effort does the breath feel like it requires?"
         }
       ],
       "gentleNote": "Move at your own pace. This practice can be done lying down. If you experience dizziness, pause and breathe normally.",
@@ -1069,11 +1069,11 @@
         {
           "order": 4,
           "label": "Rhythm",
-          "instruction": "Track the natural pause. Is it after the inhale, or after the exhale?"
+          "instruction": "Notice any pauses that occur naturally, without adding or extending them."
         },
         {
           "order": 5,
-          "label": "Regulate",
+          "label": "Notice the Pace",
           "instruction": "Notice the pace. Is it faster or slower than you expected?"
         }
       ],
@@ -1121,7 +1121,7 @@
         {
           "order": 1,
           "label": "Observe Inhale",
-          "instruction": "Breathe in naturally. Follow the path of the air into your lungs."
+          "instruction": "Breathe in naturally. Notice the sensations of breathing in."
         },
         {
           "order": 2,
@@ -1136,12 +1136,12 @@
         {
           "order": 4,
           "label": "Gentle Counting",
-          "instruction": "Try a simple, comfortable rhythm, e.g., count 4 for inhale, count 4 for exhale."
+          "instruction": "If comfortable, try counting with a rhythm that feels easy for you. There is no need to use a particular count."
         },
         {
           "order": 5,
-          "label": "Stabilize",
-          "instruction": "Maintain this predictable count for 5 minutes. Find predictability."
+          "label": "Stabilise",
+          "instruction": "Continue briefly while comfortable, then return to your natural breathing."
         }
       ],
       "whatToNotice": [
@@ -1183,17 +1183,17 @@
         {
           "order": 0,
           "label": "Arrive",
-          "instruction": "Stand naturally, shoulders back, arms loose, near a softly lit window. Notice the ground beneath your feet."
+          "instruction": "Stand comfortably with your arms resting naturally. Notice the ground beneath your feet."
         },
         {
           "order": 1,
           "label": "Exhale",
-          "instruction": "Take a long, natural, unforced exhale. Feel your body sink slightly into the support of your skeletal structure."
+          "instruction": "Let your breath leave naturally, without pushing it longer. Notice the support beneath your feet."
         },
         {
           "order": 2,
           "label": "Drop",
-          "instruction": "As you exhale, let your shoulders subtly lower and your ribcage compress without forcing."
+          "instruction": "As you breathe out, let your shoulders soften downwards if they want to, without forcing."
         },
         {
           "order": 3,
@@ -1203,7 +1203,7 @@
         {
           "order": 4,
           "label": "Repeat",
-          "instruction": "Do this for several breath cycles, emphasizing the complete exhale."
+          "instruction": "Repeat only while comfortable, allowing each breath to remain unforced."
         },
         {
           "order": 5,
@@ -1214,7 +1214,7 @@
       "whatToNotice": [
         {
           "order": 0,
-          "text": "Pressure — What do you feel where your hands and feet make contact?"
+          "text": "Pressure — What do you notice where your feet meet the floor?"
         },
         {
           "order": 1,
@@ -1225,7 +1225,7 @@
           "text": "Support — What changes when you allow the surface to hold some of your weight?"
         }
       ],
-      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the pressure or take a break.",
+      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience discomfort or dizziness, pause the practice.",
       "anchor": "I can soften without forcing myself to relax.",
       "visualTreatment": null,
       "heroImageSource": null,
@@ -1270,7 +1270,7 @@
         {
           "order": 4,
           "label": "Pause",
-          "instruction": "Wait for a moment in the space after the exhale. Notice stillness."
+          "instruction": "Notice any pause that occurs naturally after the exhale, without holding your breath or delaying the next inhale."
         },
         {
           "order": 5,
@@ -1318,17 +1318,17 @@
         {
           "order": 0,
           "label": "Arrive",
-          "instruction": "Seated comfortably with your back supported. Close your eyes or soften your gaze."
+          "instruction": "Sit comfortably with your back supported. Close your eyes or soften your gaze."
         },
         {
           "order": 1,
           "label": "Inhale",
-          "instruction": "Begin a slow, deep inhale. Where do you feel it first?"
+          "instruction": "Let your breathing continue naturally. Where do you first notice movement?"
         },
         {
           "order": 2,
           "label": "Trace",
-          "instruction": "Mentally track the air as it moves down the trachea and into the lungs."
+          "instruction": "Notice where you can feel the movement of breathing, without needing to imagine the path of the air."
         },
         {
           "order": 3,
@@ -1338,7 +1338,7 @@
         {
           "order": 4,
           "label": "Exhale",
-          "instruction": "Note the feeling of release and contraction as you slowly exhale."
+          "instruction": "As you breathe out naturally, notice any movement or change."
         },
         {
           "order": 5,
@@ -1467,7 +1467,7 @@
         {
           "order": 3,
           "label": "Notice",
-          "instruction": "Without analyzing, just notice objects, colors, and shapes."
+          "instruction": "Without analysing, just notice objects, colours and shapes."
         },
         {
           "order": 4,
@@ -1539,17 +1539,17 @@
         {
           "order": 3,
           "label": "Notice Details",
-          "instruction": "Without moving your eyes, can you perceive the shape or color of an object to your far left?"
+          "instruction": "With your gaze resting comfortably ahead, notice what is available toward either side."
         },
         {
           "order": 4,
           "label": "Feel the Field",
-          "instruction": "Sense the entire visual field as a whole, rather than picking out specific objects."
+          "instruction": "Notice as much of the surrounding space as is comfortably available, without needing to take in everything."
         },
         {
           "order": 5,
           "label": "Allow the Space",
-          "instruction": "Remain in this state for a few breaths. Notice the felt sense of expanded space."
+          "instruction": "Pause for a few easy breaths. Notice whether your sense of the surrounding space changes or stays the same."
         }
       ],
       "whatToNotice": [
@@ -1559,7 +1559,7 @@
         },
         {
           "order": 1,
-          "text": "Tension — Is there less tension in your eyes or facial muscles?"
+          "text": "Tension — What do you notice in your eyes or facial muscles?"
         },
         {
           "order": 2,
@@ -1584,7 +1584,7 @@
       "slug": "the-near-far-focus-shift",
       "sortOrder": 24,
       "artworkSource": "Person_near_window_focusing_20260921185047.jpeg",
-      "invitation": "Recenter your perception. Adapt your vision from the inside out.",
+      "invitation": "Re-centre your perception. Adapt your vision from the inside out.",
       "purpose": "Orientation & attention flexibility. Feel your eyes and vision adapt. Experience environmental connection.",
       "description": null,
       "orientation": null,
@@ -1602,7 +1602,7 @@
         {
           "order": 2,
           "label": "Study Details",
-          "instruction": "Notice the texture, color, and sharp lines. See it clearly without tension."
+          "instruction": "Notice whatever texture, colour and detail are comfortably available."
         },
         {
           "order": 3,
@@ -1622,12 +1622,12 @@
         {
           "order": 6,
           "label": "Return Near",
-          "instruction": "Bring your attention back to the near object. Allow it to come into sharp focus again."
+          "instruction": "Bring your attention back to the near object. Notice whatever detail is comfortably available as your gaze returns."
         },
         {
           "order": 7,
-          "label": "Repeating",
-          "instruction": "Gently cycle your focus 3-5 times, noticing the transitions."
+          "label": "Repeat",
+          "instruction": "Repeat a few times if comfortable, noticing the transitions."
         }
       ],
       "whatToNotice": [
@@ -1641,7 +1641,7 @@
         },
         {
           "order": 2,
-          "text": "Detail Notice — How do textures and colors seem different between points of focus?"
+          "text": "Detail Notice — How do textures and colours seem different between points of focus?"
         }
       ],
       "gentleNote": "Move at your own pace. If your eyes feel strained, soften your gaze or close them for a moment. This practice is about ease, not forced effort. Adapt as needed.",
@@ -1661,14 +1661,14 @@
       "slug": "the-horizontal-eye-sweep",
       "sortOrder": 25,
       "artworkSource": null,
-      "invitation": "Regulate the nervous system with controlled visual scanning.",
+      "invitation": "Let your gaze move gently from side to side.",
       "purpose": "Orientation & spatial awareness. Feel where you are visually. Connect to your environment.",
       "description": null,
       "orientation": null,
       "practiceSteps": [
         {
           "order": 0,
-          "label": "Seat & Stabilize",
+          "label": "Sit & Stabilise",
           "instruction": "Sit comfortably on a chair. Place both feet flat on the floor. Feel your sit bones and let your posture be relaxed yet upright."
         },
         {
@@ -1684,12 +1684,12 @@
         {
           "order": 3,
           "label": "Right Sweep",
-          "instruction": "Gently and slowly sweep your eyes to the far right, taking in the scene without moving your head. Pause for one soft breath."
+          "instruction": "Gently and slowly sweep your eyes a small, comfortable distance to the right, taking in the scene without moving your head. Pause for one soft breath."
         },
         {
           "order": 4,
-          "label": "Return Center",
-          "instruction": "Slowly return your gaze to the center line. Pause."
+          "label": "Return to Centre",
+          "instruction": "Slowly return your gaze to the centre line. Pause."
         },
         {
           "order": 5,
@@ -1699,18 +1699,18 @@
         {
           "order": 6,
           "label": "Full Cycle",
-          "instruction": "Perform a complete smooth cycle from the center to the right, then center to the left, and back to center."
+          "instruction": "If comfortable, repeat the sequence: centre, right, centre, left, centre."
         },
         {
           "order": 7,
           "label": "Re-Orient",
-          "instruction": "Stop. Close your eyes for a moment. Then open them, looking all around the room naturally. Notice any changes."
+          "instruction": "Pause. Keep your eyes open, or close them briefly if comfortable. Then let your gaze move naturally around the room. Notice any changes."
         }
       ],
       "whatToNotice": [
         {
           "order": 0,
-          "text": "Visual Field — What do you see at the far edges? How wide is your range?"
+          "text": "Visual Field — What do you notice at the edges of your view, without straining?"
         },
         {
           "order": 1,
@@ -1721,7 +1721,7 @@
           "text": "Sensation — Notice any changes in tension in your neck, face, or chest."
         }
       ],
-      "gentleNote": "Practice in a room with varied objects for visual richness. If you feel dizzy, slow down or take a break.",
+      "gentleNote": "Practise in a room with varied objects for visual richness. If you feel dizzy, slow down or take a break.",
       "anchor": "I can look from side to side and stay connected to the space around me.",
       "visualTreatment": null,
       "heroImageSource": null,
@@ -1761,21 +1761,21 @@
         {
           "order": 3,
           "label": "Choose A Colour",
-          "instruction": "Allow your eyes to find and settle on one primary color in your environment (e.g., a blue vase or red book)."
+          "instruction": "Allow your eyes to find and settle on one primary colour in your environment (e.g., a blue vase or red book)."
         },
         {
           "order": 4,
           "label": "Observe The Shade",
-          "instruction": "Notice the specific hue, shade, texture, and how light interacts with that color."
+          "instruction": "Notice its colour, shade and texture, and whether it looks lighter or darker in different places."
         },
         {
           "order": 5,
           "label": "Repeat",
-          "instruction": "Gently shift your gaze to a different color and notice its unique features in the same way."
+          "instruction": "Gently shift your gaze to a different colour and notice its unique features in the same way."
         },
         {
           "order": 6,
-          "label": "Re-Orient / Allow Experience",
+          "label": "Re-Orient",
           "instruction": "Remain still for a moment. Notice how your visual perspective feels now."
         }
       ],
@@ -1838,7 +1838,7 @@
         {
           "order": 4,
           "label": "Observe Depth",
-          "instruction": "Look between objects. Notice the negative space. Is there a defined path or container?"
+          "instruction": "Look between objects. Notice the gaps and distances between objects."
         },
         {
           "order": 5,
@@ -1848,7 +1848,7 @@
         {
           "order": 6,
           "label": "Pause",
-          "instruction": "Stay for a few slow breaths. Let your eyes move smoothly. Notice the stability."
+          "instruction": "Stay for a few slow breaths. Let your eyes move smoothly. Notice what is present or what has changed."
         },
         {
           "order": 7,
@@ -1870,7 +1870,7 @@
           "text": "Spatial Relationships — Can you sense the distance and depth of objects?"
         }
       ],
-      "gentleNote": "Practice on surfaces you trust. This can be adapted to any environment. If you feel visually overwhelmed or motion-sick, pause and refocus on a single stationary object.",
+      "gentleNote": "Choose a position and environment that feel comfortable. This can be adapted to any environment. If you feel visually overwhelmed or motion-sick, pause and refocus on a single stationary object.",
       "anchor": "I can see the shape of the space I am in.",
       "visualTreatment": null,
       "heroImageSource": null,
@@ -1895,7 +1895,7 @@
         {
           "order": 0,
           "label": "Locate",
-          "instruction": "Look around and select one steady, soft light source, like daylight from a window."
+          "instruction": "Look around and choose one softly lit area or surface, such as a wall lit by daylight."
         },
         {
           "order": 1,
@@ -1905,12 +1905,12 @@
         {
           "order": 2,
           "label": "Soften Gaze",
-          "instruction": "Direct your eyes to the light and soften your eyes."
+          "instruction": "Let your gaze rest comfortably on the chosen area."
         },
         {
           "order": 3,
           "label": "Focus",
-          "instruction": "Gently maintain visual contact with the light."
+          "instruction": "Keep the chosen area available to your vision without staring."
         },
         {
           "order": 4,
@@ -1939,7 +1939,7 @@
         },
         {
           "order": 2,
-          "text": "Spatial Calm — The sense of visual stability in your environment."
+          "text": "Spatial Awareness — What do you notice about your position in the surrounding space?"
         }
       ],
       "gentleNote": "Focus gently, without intense staring. Keep your vision expansive. If you experience visual strain, look away and take a break.",
@@ -1972,7 +1972,7 @@
         {
           "order": 1,
           "label": "Mid Focus",
-          "instruction": "Notice something within your reach. Its texture, its color. Feel your physical connection to it."
+          "instruction": "Notice something within your reach. Its texture, its colour. Notice where it is in relation to you."
         },
         {
           "order": 2,
@@ -1981,8 +1981,8 @@
         },
         {
           "order": 3,
-          "label": "Re-Center",
-          "instruction": "Bring attention back to your feet. They are your stable center point."
+          "label": "Re-Centre",
+          "instruction": "Bring attention back to your feet. They are your stable centre point."
         },
         {
           "order": 4,
@@ -2011,7 +2011,7 @@
         },
         {
           "order": 2,
-          "text": "Support — Do you feel more spacious yet connected as you notice your surroundings?"
+          "text": "Support — What do you notice about the space around you?"
         }
       ],
       "gentleNote": "Move at your own pace. Visual tracking can be adapted. If spatial perception feels challenging, start with fewer points. If you experience dizziness or eye strain, reduce the focus points or take a break.",
@@ -2054,7 +2054,7 @@
         {
           "order": 3,
           "label": "Sense Your Body",
-          "instruction": "While gazing, briefly check-in with your physical grounding."
+          "instruction": "While gazing, briefly check in with your physical grounding."
         },
         {
           "order": 4,
@@ -2084,11 +2084,11 @@
         },
         {
           "order": 1,
-          "text": "Attention — Can you sense the shift in how your attention is moving?"
+          "text": "Attention — What do you notice as your attention moves?"
         },
         {
           "order": 2,
-          "text": "Clarity — Does the environment seem sharper upon your return?"
+          "text": "Clarity — What, if anything, seems different when your attention returns?"
         }
       ],
       "gentleNote": "If you experience eye strain or dizziness, soften your gaze or take a break. Move at your own pace.",
@@ -2286,7 +2286,7 @@
         {
           "order": 5,
           "label": "Sense the Return",
-          "instruction": "Feel the midline re-engaging."
+          "instruction": "Notice what changes as your weight returns towards the middle."
         },
         {
           "order": 6,
@@ -2310,88 +2310,11 @@
         },
         {
           "order": 2,
-          "text": "Return — Describe the sensation of finding your exact midline."
+          "text": "Return — What do you notice as your weight returns towards the middle?"
         }
       ],
       "gentleNote": "Keep the initial movement very small. Focus on the sensory return. This practice is not about the sway, but about the return to alignment. If balance is a concern, hold a surface. If discomfort arises, please stop and rest.",
       "anchor": "I can move and still find my centre.",
-      "visualTreatment": null,
-      "heroImageSource": null,
-      "supportingImages": [],
-      "demonstrationSequence": [],
-      "sourceReference": "Meesam Somatic Batch 1-5.zip",
-      "needsReview": false,
-      "reviewNote": null
-    },
-    {
-      "cardNumber": 34,
-      "seriesNumber": 4,
-      "title": "The Slow Turn",
-      "slug": "the-slow-turn",
-      "sortOrder": 34,
-      "artworkSource": "Person_practicing_slow_turn_20260921185047.jpeg",
-      "invitation": "Turn slowly and let your body update with the movement.",
-      "purpose": "Explore a controlled, full-body rotation. Notice how your sense of space and orientation updates with each degree of movement. The goal is a seamless update of your inner map, not a fast spin.",
-      "description": null,
-      "orientation": null,
-      "practiceSteps": [
-        {
-          "order": 0,
-          "label": "Arrive & Ground",
-          "instruction": "Stand with your feet comfortably apart. Sense the floor beneath you. Soften your knees."
-        },
-        {
-          "order": 1,
-          "label": "Choose a Reference Point",
-          "instruction": "Select a clear visual object or point in front of you as your starting orientation."
-        },
-        {
-          "order": 2,
-          "label": "Begin the Rotation",
-          "instruction": "Start a very slow, controlled turn towards one side (e.g., right), keeping your body integrated."
-        },
-        {
-          "order": 3,
-          "label": "Lead With Your Intention",
-          "instruction": "Direct your attention to the destination. Let the turn originate from your core."
-        },
-        {
-          "order": 4,
-          "label": "Let Your Head Follow",
-          "instruction": "Your head should naturally rotate with your spine, keeping your eyes updated."
-        },
-        {
-          "order": 5,
-          "label": "Continue Gently",
-          "instruction": "Turn as far as is comfortable and controlled. The key is to avoid jerky movements."
-        },
-        {
-          "order": 6,
-          "label": "Update Your Map",
-          "instruction": "As you turn, mentally update the positions of objects around you in your spatial awareness."
-        },
-        {
-          "order": 7,
-          "label": "Return to Stillness",
-          "instruction": "Slow the turn to a stop. Face your original reference point or a new one. Recalibrate your sense of 'front'."
-        }
-      ],
-      "whatToNotice": [
-        {
-          "order": 0,
-          "text": "Weight — Where is the pressure in your feet shifting as you rotate?"
-        },
-        {
-          "order": 1,
-          "text": "Support — How does your central balance line feel during rotation?"
-        },
-        {
-          "order": 2,
-          "text": "Return — How does it feel to return your gaze to your starting point?"
-        }
-      ],
-      "gentleNote": "Practice on a stable surface. Use small, partial turns initially to build control. If turning triggers vertigo or significant imbalance, reduce the degree of turn or practice seated, turning your head and torso.",
-      "anchor": "I can rotate my view and still return to my center.",
       "visualTreatment": null,
       "heroImageSource": null,
       "supportingImages": [],
@@ -2468,7 +2391,7 @@
         }
       ],
       "gentleNote": "Keep the movement smaller than you think you need. Hold a stable surface if balance is uncertain, or practise seated if standing does not feel appropriate. If you experience dizziness, nausea, pain, or significant discomfort, stop and return to a stable position.",
-      "anchor": "I can transfer weight and remain perfectly grounded.",
+      "anchor": "I can transfer weight and notice the support beneath me.",
       "visualTreatment": null,
       "heroImageSource": null,
       "supportingImages": [],
@@ -2512,7 +2435,7 @@
         {
           "order": 4,
           "label": "Maintain Orientation",
-          "instruction": "Challenge yourself to keep your head from tilting or turning as you shift."
+          "instruction": "Keep your head comfortably oriented as you shift, without holding it rigid."
         },
         {
           "order": 5,
@@ -2522,7 +2445,7 @@
         {
           "order": 6,
           "label": "Return to Stillness",
-          "instruction": "Gradually stop the shift. Return to standing with head level and centered. Notice how it feels."
+          "instruction": "Gradually stop the shift. Return to standing with head level and centred. Notice how it feels."
         }
       ],
       "whatToNotice": [
@@ -2536,7 +2459,7 @@
         },
         {
           "order": 2,
-          "text": "Return — How easily can you find center and head orientation?"
+          "text": "Return — How easily can you find centre and head orientation?"
         }
       ],
       "gentleNote": "Keep the movement smaller than you think you need. Hold a stable surface if balance is uncertain, or practise seated if standing does not feel appropriate. If you experience dizziness, nausea, pain, or significant discomfort, stop and return to a stable position.",
@@ -2579,7 +2502,7 @@
         {
           "order": 3,
           "label": "Extend",
-          "instruction": "Reach the lifted leg forward or to the side, maintaining balance."
+          "instruction": "Reach the lifted leg forward, maintaining balance."
         },
         {
           "order": 4,
@@ -2589,7 +2512,7 @@
         {
           "order": 5,
           "label": "Settle",
-          "instruction": "Full weight transfer. Allow your body weight to fully drop into the new base."
+          "instruction": "Transfer weight gradually onto the placed foot, noticing the support beneath it."
         },
         {
           "order": 6,
@@ -2641,7 +2564,7 @@
         {
           "order": 0,
           "label": "Arrive",
-          "instruction": "Stand near a low stool or seated on a low cushion. Settle into your base and notice your breath."
+          "instruction": "Sit on a low stool with both feet on the floor. Rest one hand on a stable surface, such as a chair back or table. Settle into your base and notice your breath."
         },
         {
           "order": 1,
@@ -2656,7 +2579,7 @@
         {
           "order": 3,
           "label": "Rise",
-          "instruction": "Continue the movement, rising from the low position."
+          "instruction": "Continue the movement, rising from the stool to standing."
         },
         {
           "order": 4,
@@ -2665,7 +2588,7 @@
         },
         {
           "order": 5,
-          "label": "Center",
+          "label": "Centre",
           "instruction": "Pause in this upright position. Focus gently on a stable horizon."
         },
         {
@@ -2728,7 +2651,7 @@
         {
           "order": 3,
           "label": "Find Balance",
-          "instruction": "Lift a foot. Discover new points of connection."
+          "instruction": "Keep both feet on the floor. Discover new points of connection."
         },
         {
           "order": 4,
@@ -2737,18 +2660,13 @@
         },
         {
           "order": 5,
-          "label": "Engage Core",
-          "instruction": "Connect core muscles. Increase inner support."
+          "label": "Keep Support",
+          "instruction": "Keep your chosen hand support in place. Notice how it contributes to your balance."
         },
         {
           "order": 6,
-          "label": "Release Hand",
-          "instruction": "Temporarily lift your hand. Test your own balance."
-        },
-        {
-          "order": 7,
           "label": "Return to Stance",
-          "instruction": "Step down. Standard standing pose."
+          "instruction": "Take your hand away when you are ready. Return to a standard standing pose."
         }
       ],
       "whatToNotice": [
@@ -2758,7 +2676,7 @@
         },
         {
           "order": 1,
-          "text": "Position — Can you sense your center of gravity shifting?"
+          "text": "Position — Can you sense your centre of gravity shifting?"
         },
         {
           "order": 2,
@@ -2766,7 +2684,7 @@
         }
       ],
       "gentleNote": "Move with intention. Ensure the countertop is sturdy and will not move. If you feel unbalanced or dizzy, stop and rest immediately. Adapt to a seated balance pose if needed.",
-      "anchor": "I can sense support. My body finds balance. I am steady and organized.",
+      "anchor": "I can sense support.",
       "visualTreatment": null,
       "heroImageSource": null,
       "supportingImages": [],
@@ -2790,7 +2708,7 @@
         {
           "order": 0,
           "label": "Arrive",
-          "instruction": "Stand with feet hip-width. Soft knees. Take 3 deep breaths."
+          "instruction": "Stand with feet hip-width. Soft knees. Let your breathing remain easy."
         },
         {
           "order": 1,
@@ -2800,7 +2718,7 @@
         {
           "order": 2,
           "label": "Expand",
-          "instruction": "Slowly let the sway grow larger, engaging the hips."
+          "instruction": "If comfortable, slowly let the sway grow larger, engaging the hips."
         },
         {
           "order": 3,
@@ -2810,7 +2728,7 @@
         {
           "order": 4,
           "label": "Flow",
-          "instruction": "Move freely and comfortably for one minute. Find a rhythm."
+          "instruction": "If you like, move freely and comfortably for up to one minute. Find a rhythm."
         },
         {
           "order": 5,
@@ -2819,8 +2737,8 @@
         },
         {
           "order": 6,
-          "label": "Almost Still",
-          "instruction": "Movements become almost imperceptible, internal only."
+          "label": "Smaller Movement",
+          "instruction": "Let the movement become smaller, if comfortable. Notice what remains as you come towards stillness."
         },
         {
           "order": 7,
@@ -2835,15 +2753,15 @@
         },
         {
           "order": 1,
-          "text": "Balance — Can you sense your center of gravity? Are you shifting or centered?"
+          "text": "Balance — Can you sense your centre of gravity? Are you shifting or centred?"
         },
         {
           "order": 2,
-          "text": "Internal Shifts — What is moving internally now that the outside is still? Find micro-pulsations."
+          "text": "Internal Shifts — What, if anything, do you notice after the outward movement stops?"
         }
       ],
-      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the pressure or take a break.",
-      "anchor": "I have movement. I have stillness. I can integrate them. I can find calm.",
+      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the movement or take a break.",
+      "anchor": "I have movement. I have stillness. I can integrate them.",
       "visualTreatment": null,
       "heroImageSource": null,
       "supportingImages": [],
@@ -2979,7 +2897,7 @@
         {
           "order": 6,
           "label": "Compare & Repeat",
-          "instruction": "Pause and compare the sensations before and after contact. Let the objects return to their neutral states before repeating."
+          "instruction": "Pause and compare the sensations before and after contact. If repeating, allow the objects to return towards their starting temperatures."
         }
       ],
       "whatToNotice": [
@@ -3068,7 +2986,7 @@
           "text": "Change — What do you notice when your hand moves compared with when it stays still?"
         }
       ],
-      "gentleNote": "Choose an object that feels safe and comfortable to touch. There is no need to use extreme temperatures. Keep exploration within a comfortable range. You can practise with a damp cloth, a smooth stone, or a metal object if preferred. If direct cold contact feels uncomfortable, use a thin barrier cloth.",
+      "gentleNote": "Choose an object that feels safe and comfortable to touch. There is no need to use extreme temperatures. Keep exploration within a comfortable range. You can use a damp cloth, a smooth stone or a metal object. If direct cool contact feels uncomfortable, use a thin barrier cloth.",
       "anchor": "I can notice sensation and choose how I make contact.",
       "visualTreatment": null,
       "heroImageSource": null,
@@ -3108,7 +3026,7 @@
         {
           "order": 3,
           "label": "Registering Warmth",
-          "instruction": "Focus only on the warmth. Notice how it feels — comfortable, soothing, deep, or stable."
+          "instruction": "Notice the warmth and how it feels to you, without needing a particular sensation."
         },
         {
           "order": 4,
@@ -3217,7 +3135,7 @@
           "text": "Change — What specific changes in sensation do you feel with motion versus static contact?"
         }
       ],
-      "gentleNote": "Choose a time when you are calm and free from distraction. You can practice with clothing or another surface if direct skin contact is uncomfortable.",
+      "gentleNote": "Choose a reasonably comfortable moment. You can practise with clothing or another surface if direct skin contact is uncomfortable.",
       "anchor": "I can notice sensation and choose how I make contact.",
       "visualTreatment": null,
       "heroImageSource": null,
@@ -3262,7 +3180,7 @@
         },
         {
           "order": 4,
-          "label": "Notice the Containee",
+          "label": "Notice the Contact",
           "instruction": "Become aware of the sensation of being held. How does the area under your hand feel contained or defined?"
         },
         {
@@ -3290,7 +3208,7 @@
           "text": "Change — How does the sense of containment change when contact stays still?"
         }
       ],
-      "gentleNote": "Choose areas that feel safe and comfortable to hold. Avoid any areas of tension or pain. If self-contact is not comfortable, you can practice with a blanket or pillow for the sensation of containment. Keep the exploration within a pleasant and defining range.",
+      "gentleNote": "Choose areas that feel safe and comfortable to hold. Avoid any areas of tension or pain. If self-contact is not comfortable, you can practise with a blanket or pillow for the sensation of containment. Keep the exploration within a pleasant and defining range.",
       "anchor": "I can create my own sense of safety and defined boundary through my touch.",
       "visualTreatment": null,
       "heroImageSource": null,
@@ -3336,7 +3254,7 @@
         {
           "order": 4,
           "label": "Reduce",
-          "instruction": "Slowly begin to ease off the pressure. Feel the moment the tension recedes."
+          "instruction": "Slowly begin to ease off the pressure. Notice what changes as you reduce the pressure."
         },
         {
           "order": 5,
@@ -3352,18 +3270,18 @@
       "whatToNotice": [
         {
           "order": 0,
-          "text": "Touch Clarity — What do you feel where your hands and feet make contact?"
+          "text": "Touch Clarity — What do you notice where your palm meets the cushion?"
         },
         {
           "order": 1,
-          "text": "Tactile Range — What can sense where your body is in space with this difference?"
+          "text": "Tactile Range — What changes as you vary the pressure?"
         },
         {
           "order": 2,
-          "text": "Choice and Comfort — What changes when choice and comfort?"
+          "text": "Choice and Comfort — What changes when you choose a comfortable level of pressure?"
         }
       ],
-      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the pressure or take a break.",
+      "gentleNote": "Move at your own pace. Use a stable, secure surface. If you experience pain or dizziness, reduce the pressure or take a break.",
       "anchor": "I can notice subtle differences. I have a choice in how I engage with pressure.",
       "visualTreatment": null,
       "heroImageSource": null,
@@ -3413,7 +3331,7 @@
         {
           "order": 5,
           "label": "Pause",
-          "instruction": "Hold the position. Breathe slowly. Let the sensations deepen."
+          "instruction": "Hold the position. Breathe slowly. Pause and notice whether the sensations change."
         },
         {
           "order": 6,
@@ -3475,12 +3393,12 @@
         {
           "order": 3,
           "label": "Track",
-          "instruction": "Trace the flow of temperature shifts over your skin as they move."
+          "instruction": "Notice whether temperature sensations change or stay the same."
         },
         {
           "order": 4,
           "label": "Map",
-          "instruction": "Become aware of multiple temperature zones simultaneously, building a complete picture."
+          "instruction": "If comfortable, include more than one area in your attention. You do not need to build a complete picture."
         },
         {
           "order": 5,
@@ -3502,7 +3420,7 @@
           "text": "Full Body Map — Perceive multiple zones at once and see the full bodily thermal landscape."
         }
       ],
-      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If you experience pain or dizziness, reduce the pressure or take a break.",
+      "gentleNote": "Move at your own pace. Use a stable, secure surface. This practice can be adapted to sitting if needed. If the practice feels uncomfortable, pause or return your attention to one comfortable area.",
       "anchor": "My body is a landscape of feeling. I can track the change.",
       "visualTreatment": null,
       "heroImageSource": null,
@@ -3552,7 +3470,7 @@
         {
           "order": 5,
           "label": "Focus",
-          "instruction": "Close your eyes to sharpen texture sensations."
+          "instruction": "Keep your eyes open, or close them if comfortable. Notice whether the sensation changes."
         },
         {
           "order": 6,
@@ -3595,6 +3513,11 @@
       "artworkSource": "Hand_holding_smooth_stone_20260921185047.jpeg",
       "title": "The Object-To-Palm Reset",
       "reason": "Card title does not appear anywhere in the Somatic_Anatomy_System_Master.xlsx 'Primary Card List' for Series 05 (or any other series) - the master list names exactly 10 Series-05 cards and this is an 11th, unlisted title. Not assigned a card number and not imported, since no authoritative position exists for it. Flagged for human review - it may be a genuine additional card requiring a manifest/architecture decision outside this importer's scope, a duplicate/renamed version of an existing card, or draft material not yet finalized."
+    },
+    {
+      "artworkSource": "Person_practicing_slow_turn_20260921185047.jpeg",
+      "title": "The Slow Turn",
+      "reason": "Taken out of the active cards by Caroline (VA guide, 10 Nov 2026). Archived in Sanity on 26 Nov 2026; kept here as history only. Do not re-import."
     }
   ]
 }
