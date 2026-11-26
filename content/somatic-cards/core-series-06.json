@@ -117,7 +117,11 @@
         { "order": 0, "label": null, "instruction": "Sit or stand comfortably." },
         { "order": 1, "label": null, "instruction": "Relax your jaw and face." },
         { "order": 2, "label": null, "instruction": "Take an easy breath." },
-        { "order": 3, "label": null, "instruction": "Choose one comfortable vowel sound." },
+        {
+          "order": 3,
+          "label": null,
+          "instruction": "Choose a comfortable vowel sound, such as 'ah', 'ee' or 'oo'."
+        },
         {
           "order": 4,
           "label": null,
@@ -159,7 +163,7 @@
         {
           "order": 2,
           "label": null,
-          "instruction": "Notice where the vibration feels most noticeable."
+          "instruction": "Notice where you feel the vibration most clearly."
         },
         { "order": 3, "label": null, "instruction": "Keep the sound gentle." },
         { "order": 4, "label": null, "instruction": "Stay with that sensation for a moment." },
@@ -279,7 +283,7 @@
         { "order": 2, "text": "Surroundings" }
       ],
       "gentleNote": "Choose a reasonably comfortable environment. If surrounding sounds feel overwhelming, narrow your attention to one familiar or neutral sound.",
-      "anchor": "I can hear myself and the space around me.",
+      "anchor": "I can notice myself and the space around me.",
       "visualTreatment": null,
       "heroImageSource": null,
       "supportingImages": [],
@@ -310,8 +314,16 @@
           "label": null,
           "instruction": "Notice a sound on your left, if one is present."
         },
-        { "order": 2, "label": null, "instruction": "Notice a sound on your right." },
-        { "order": 3, "label": null, "instruction": "Notice any sound that seems more central." },
+        {
+          "order": 2,
+          "label": null,
+          "instruction": "Notice a sound on your right, if one is present."
+        },
+        {
+          "order": 3,
+          "label": null,
+          "instruction": "Notice any sound that seems more central, if one is present."
+        },
         {
           "order": 4,
           "label": null,
@@ -408,7 +420,7 @@
         {
           "order": 2,
           "label": null,
-          "instruction": "Allow it to become less effortful without deliberately pushing it down."
+          "instruction": "Allow any unnecessary effort to soften, without pushing your tongue down."
         },
         { "order": 3, "label": null, "instruction": "Keep your jaw comfortable." },
         { "order": 4, "label": null, "instruction": "Take an easy breath." },

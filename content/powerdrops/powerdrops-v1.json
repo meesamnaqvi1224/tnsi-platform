@@ -23,7 +23,8 @@
   "powerDrops": [
     {
       "slug": "the-90-second-exhale-drop",
-      "title": "The 90-Second Exhale Drop",
+      "slugLocked": true,
+      "title": "The Exhale Drop",
       "category": "Regulation",
       "focus": "Regulation",
       "description": "Shift your nervous system from overwhelm into calm—fast.",
@@ -45,7 +46,8 @@
     },
     {
       "slug": "the-powerdown-ritual",
-      "title": "The Powerdown Ritual",
+      "slugLocked": true,
+      "title": "The PowerDown Ritual",
       "category": "Transition",
       "focus": "Transition",
       "description": "Signal the end of effort. Re-enter rest.",
@@ -55,7 +57,7 @@
         "Take 3 slow exhales",
         "Light a candle or pause in stillness"
       ],
-      "anchorStatement": "I've done enough. I am enough.",
+      "anchorStatement": "I've done enough for today. I am enough.",
       "sourceTags": ["Boundary", "Closure", "Rest readiness"],
       "sortOrder": 2,
       "featured": false,
@@ -97,7 +99,7 @@
         "Speak truth gently",
         "Acknowledge your worth"
       ],
-      "anchorStatement": "I release the need to perform. I honor who I am beneath the mask.",
+      "anchorStatement": "I release the need to perform. I honour who I am beneath the mask.",
       "sourceTags": ["Authenticity", "Self-acceptance", "Freedom"],
       "sortOrder": 4,
       "featured": false,
@@ -108,7 +110,8 @@
     },
     {
       "slug": "invisible-labor-dump",
-      "title": "Invisible Labor Dump",
+      "slugLocked": true,
+      "title": "Invisible Labour Dump",
       "category": "Mental Unload",
       "focus": "Mental Unload",
       "description": "Clear the unseen weight you've been carrying.",
@@ -129,7 +132,8 @@
     },
     {
       "slug": "micro-visualization-the-return",
-      "title": "Micro Visualization: The Return",
+      "slugLocked": true,
+      "title": "The Return",
       "category": "Grounding",
       "focus": "Grounding",
       "description": "Come back to yourself.",
@@ -160,7 +164,7 @@
         "Offer one small response",
         "Thank your body"
       ],
-      "anchorStatement": "I honor my body's wisdom.",
+      "anchorStatement": "I honour my body's wisdom.",
       "sourceTags": ["Awareness", "Trust", "Self-kindness"],
       "sortOrder": 7,
       "featured": false,
