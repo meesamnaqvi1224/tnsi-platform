@@ -198,7 +198,7 @@ describe('checkInJourneyLabel', () => {
       capacityScore: 4,
       notes: null,
     };
-    expect(checkInJourneyLabel(entry)).toBe("I'm feeling good");
+    expect(checkInJourneyLabel(entry)).toBe('I’m feeling good');
   });
 
   it('returns null for a legacy check-in with differing mood/capacity, rather than inventing a label', () => {
