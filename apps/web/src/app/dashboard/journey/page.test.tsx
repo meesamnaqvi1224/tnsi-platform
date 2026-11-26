@@ -182,7 +182,7 @@ describe('JourneyPage — filter, counts and entries', () => {
     expect(t).toMatch(
       /(January|February|March|April|May|June|July|August|September|October|November|December) \d{4}/,
     );
-    expect(t).toContain("I'm feeling good");
+    expect(t).toContain('I’m feeling good');
     expect(t).toContain('I feel different');
     expect(t).toContain('View practice');
   });

@@ -151,10 +151,10 @@ export function groupJourneyEntriesByDate<T extends { occurredAt: Date }>(
  */
 const CAPACITY_LABELS: Record<number, string> = {
   1: 'A lot is going on',
-  2: "I'm feeling unsettled",
-  3: "I'm okay",
-  4: "I'm feeling good",
-  5: "I'm feeling really well",
+  2: 'I’m feeling unsettled',
+  3: 'I’m okay',
+  4: 'I’m feeling good',
+  5: 'I’m feeling really well',
 };
 
 export function checkInJourneyLabel(entry: CheckInJourneyEntry): string | null {

@@ -17,8 +17,8 @@ import { radius, spacing } from '@/theme';
  */
 export const CAPACITY_OPTIONS = [
   { label: 'A lot is going on', value: 1, icon: 'rainy-outline' },
-  { label: "I'm feeling unsettled", value: 2, icon: 'cloud-outline' },
-  { label: "I'm okay", value: 3, icon: 'partly-sunny-outline' },
+  { label: 'I’m feeling unsettled', value: 2, icon: 'cloud-outline' },
+  { label: 'I’m okay', value: 3, icon: 'partly-sunny-outline' },
   { label: 'I’m feeling good', value: 4, icon: 'sunny-outline' },
   { label: 'I’m feeling really well', value: 5, icon: 'sunny' },
 ] as const satisfies readonly {
