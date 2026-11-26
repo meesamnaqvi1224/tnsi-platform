@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -61,7 +61,12 @@ export default function BreathingSetupScreen() {
         </Pressable>
       </View>
 
-      <View style={styles.content}>
+      {/* Scrolls on a short screen, so the last option is never covered by the Start Breathing button, which stays pinned below. */}
+      <ScrollView
+        style={styles.contentScroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <ThemedText variant="display" style={styles.title}>
           Breathing Exercise
         </ThemedText>
@@ -111,7 +116,7 @@ export default function BreathingSetupScreen() {
             );
           })}
         </View>
-      </View>
+      </ScrollView>
 
       <View style={styles.footer}>
         <PrimaryButton label="Start Breathing" onPress={start} />
@@ -136,10 +141,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: -spacing.sm,
   },
-  content: {
+  contentScroll: {
     flex: 1,
+  },
+  content: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
+    paddingBottom: spacing.md,
   },
   title: {
     marginBottom: spacing.sm,
